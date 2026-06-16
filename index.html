@@ -461,16 +461,6 @@ header {
   border-top: 1px solid var(--c-line);
 }
 .acc:last-child { border-bottom: 1px solid var(--c-line); }
-
-/* Accordion row that is actually just a single link (no toggle). */
-.acc--link {
-  padding: 18px 0;
-}
-.acc--link__a {
-  font-size: 14px;
-  letter-spacing: -0.02em;
-  text-transform: none;
-}
 .acc__btn {
   width: 100%;
   background: none; border: 0; padding: 18px 0;
@@ -1031,6 +1021,7 @@ html.is-unlocked .gate { display: none; }
       <span id="changeSizeText">Größe wählen</span>
     </button>
     <button class="cta" id="addBtn"><span id="ctaText">Zum Warenkorb hinzufügen</span></button>
+    <button class="cta cta--white secondary-cta" id="storeAvailBtn">Verfügbarkeit in der Filiale</button>
     <div class="member-note">
       <a href="#">Jetzt MyTriumph Member</a> werden und Ihre Lieferung kostenlos erhalten
     </div>
@@ -1082,10 +1073,6 @@ html.is-unlocked .gate { display: none; }
           <div class="sku">Artikelnummer: 10208018 (7613137673660)</div>
         </div>
       </details>
-
-      <div class="acc acc--link">
-        <a href="#" class="link-underline acc--link__a">Verfügbarkeit in der Filiale</a>
-      </div>
 
       <details class="acc">
         <summary class="acc__btn">
