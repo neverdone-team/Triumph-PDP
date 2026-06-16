@@ -549,21 +549,32 @@ header {
 
 /* ============================================================
    RECOMMENDATION CAROUSELS
+   ----
+   Figma node 71-6266: title + nav arrows live in a left column,
+   the cards form a horizontal rail to the right that overflows.
    ============================================================ */
 .recs {
   max-width: 1400px; margin: 0 auto;
   padding: 0 24px 64px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  column-gap: 24px;
+  align-items: start;
 }
 .recs__head {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-right: 8px;
 }
 .recs__head h2 {
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: 18px;
-  letter-spacing: .14em;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
+  margin: 0;
 }
 .recs__nav { display: flex; gap: 8px; }
 .recs__nav button {
@@ -576,17 +587,18 @@ header {
 .recs__nav svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.6; }
 
 .recs__rail {
-  display: flex; gap: 14px;
+  display: flex; gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-bottom: 4px;
+  min-width: 0;            /* allow grid child to shrink */
 }
 .recs__rail::-webkit-scrollbar { display: none; }
 
 .card {
-  flex: 0 0 calc((100% - 14px * 3) / 4);
+  flex: 0 0 280px;
   min-width: 0;
   scroll-snap-align: start;
   position: relative;
@@ -594,7 +606,7 @@ header {
 .card__img {
   position: relative;
   background: var(--c-offwhite);
-  aspect-ratio: 4/5;
+  aspect-ratio: 311/409;
   overflow: hidden;
 }
 .card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s ease; }
@@ -1148,7 +1160,7 @@ html.is-unlocked .gate { display: none; }
   <div class="recs__rail" id="rail1">
     <a class="card" href="#">
       <div class="card__img">
-        <div class="card__tags"><span class="card__tag">Bestseller</span></div>
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10215855-0004_1.webp" alt="Aura Spotlight Bralette" />
       </div>
       <div class="card__swatches">
@@ -1164,6 +1176,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Bügel-BH Black" />
       </div>
       <div class="card__swatches">
@@ -1178,6 +1191,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10214770-0003_1.webp" alt="Amourette Charm" />
       </div>
       <div class="card__swatches">
@@ -1192,7 +1206,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
-        <div class="card__tags"><span class="card__tag">Neu</span></div>
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10210668-0003_1.webp" alt="Body Make-Up Soft Touch" />
       </div>
       <div class="card__swatches">
@@ -1207,6 +1221,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10208024-0004_1.webp" alt="Aura Spotlight Tanga" />
       </div>
       <div class="card__swatches">
@@ -1234,6 +1249,7 @@ html.is-unlocked .gate { display: none; }
   <div class="recs__rail" id="rail2">
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Black" />
       </div>
       <div class="card__swatches">
@@ -1248,6 +1264,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10215855-0004_1.webp" alt="Aura Spotlight Bralette" />
       </div>
       <div class="card__swatches">
@@ -1261,6 +1278,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10214770-0003_1.webp" alt="Amourette Charm" />
       </div>
       <div class="card__swatches">
@@ -1274,6 +1292,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10210668-0003_1.webp" alt="Body Make-Up" />
       </div>
       <div class="card__swatches">
@@ -1287,6 +1306,7 @@ html.is-unlocked .gate { display: none; }
     </a>
     <a class="card" href="#">
       <div class="card__img">
+        <div class="card__tags"><span class="card__tag">BLACK FRIDAY</span><span class="card__tag">LAST PIECE</span></div>
         <img src="./Assets/10207997-0004_1.webp" alt="Aura Spotlight Maxi-Slip" />
       </div>
       <div class="card__swatches">
