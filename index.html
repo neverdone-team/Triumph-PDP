@@ -135,11 +135,11 @@ header {
 .nav__links a.special { color: var(--c-burgundy); }
 .nav__links a:hover { color: var(--c-burgundy); }
 
-/* Right cluster (search + icons) */
+/* Right cluster (search + icons), evenly spaced */
 .nav__right {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 24px;
   flex: none;
 }
 
@@ -148,7 +148,6 @@ header {
   flex-direction: column;
   gap: 4px;
   width: 124px;
-  margin-right: 12px;
 }
 .search__row {
   display: flex;
@@ -175,10 +174,10 @@ header {
   width: 108px;
 }
 
-.nav__icons { display: flex; align-items: center; }
+.nav__icons { display: flex; align-items: center; gap: 24px; }
 .nav__icons button {
   background: none; border: 0;
-  padding: 8px 16px;
+  padding: 0;
   color: var(--c-ink);
   display: inline-flex; align-items: center; gap: 4px;
 }
