@@ -512,6 +512,41 @@ header {
 
 .bottom-cta { margin-top: 24px; }
 
+/* ---- "Mehr aus der Kategorie" link list ---- */
+.cat-links { margin-top: 28px; }
+.cat-links__title {
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-bottom: 18px;
+}
+.cat-links__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cat-links__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--c-ink);
+  width: max-content;
+  letter-spacing: -0.02em;
+}
+.cat-links__item > span {
+  border-bottom: 1px solid var(--c-ink);
+  padding-bottom: 1px;
+}
+.cat-links__item:hover { color: var(--c-burgundy); }
+.cat-links__item:hover > span { border-bottom-color: var(--c-burgundy); }
+.cat-links__item svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none;
+  flex: none;
+}
+
 /* ============================================================
    RECOMMENDATION CAROUSELS
    ============================================================ */
@@ -1068,7 +1103,35 @@ html.is-unlocked .gate { display: none; }
 
     </div>
 
-    <button class="cta cta--white bottom-cta">Alles aus der Kategorie entdecken</button>
+    <div class="cat-links">
+      <div class="cat-links__title">Mehr aus der Kategorie</div>
+      <ul class="cat-links__list">
+        <li>
+          <a class="cat-links__item" href="#">
+            <span>Gefütterte BHs</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11L11 5M11 5H6.5M11 5V9.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+        <li>
+          <a class="cat-links__item" href="#">
+            <span>Bügel-BHs</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11L11 5M11 5H6.5M11 5V9.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+        <li>
+          <a class="cat-links__item" href="#">
+            <span>Schalen BHs</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11L11 5M11 5H6.5M11 5V9.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+        <li>
+          <a class="cat-links__item" href="#">
+            <span>Push-up BHs</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11L11 5M11 5H6.5M11 5V9.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+      </ul>
+    </div>
 
   </aside>
 </section>
