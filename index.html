@@ -50,7 +50,7 @@
   /* layout: 1440 viewport, 920 gallery + 24 gap + 416 info */
   --maxw: 1400px;
   --gutter: 20px;
-  --col-gap: 24px;
+  --col-gap: 60px;
 
   --header-h: 64px;
   --sticky-offset: calc(var(--header-h) + 16px);
@@ -172,7 +172,7 @@ header {
 .product {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 24px 96px;
+  padding: 40px 2px 96px;             /* tight horizontal padding so 920+60+416=1396 fits */
   display: grid;
   grid-template-columns: 920px 416px;
   column-gap: var(--col-gap);
