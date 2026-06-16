@@ -394,6 +394,8 @@ header {
   color: var(--c-ink);
 }
 .cta.cta--white:hover { background: var(--c-ink); color: #fff; }
+.change-size-btn { margin-bottom: 8px; }
+.change-size-btn + .cta { margin-top: 0; }
 
 .member-note {
   font-size: 12px;
@@ -473,8 +475,8 @@ header {
   width: 100%;
   background: none; border: 0; padding: 18px 0;
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 12px;
-  letter-spacing: .14em;
+  font-size: 16px;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--c-ink);
   cursor: pointer;
@@ -572,7 +574,7 @@ header {
   font-weight: 400;
   font-size: 32px;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: .08em;
   text-transform: uppercase;
   margin: 0;
 }
@@ -1024,7 +1026,10 @@ html.is-unlocked .gate { display: none; }
       </div>
     </div>
 
-    <!-- CTA -->
+    <!-- CTAs -->
+    <button class="cta cta--white change-size-btn" id="changeSizeBtn" hidden>
+      <span id="changeSizeText">Größe wählen</span>
+    </button>
     <button class="cta" id="addBtn"><span id="ctaText">Zum Warenkorb hinzufügen</span></button>
     <div class="member-note">
       <a href="#">Jetzt MyTriumph Member</a> werden und Ihre Lieferung kostenlos erhalten
@@ -1508,12 +1513,27 @@ html.is-unlocked .gate { display: none; }
     sheetGrid.appendChild(btn);
   }));
 
+  const changeSizeBtn  = document.getElementById('changeSizeBtn');
+  const changeSizeText = document.getElementById('changeSizeText');
+
+  function updateCtas() {
+    const mode = body.dataset.mode;
+    if (mode === 'v1') {
+      changeSizeBtn.hidden = true;
+      ctaText.textContent = 'Zum Warenkorb hinzufügen';
+    } else if (pickedSize) {
+      changeSizeBtn.hidden = false;
+      changeSizeText.textContent = 'Größe ' + pickedSize + ' – Ändern';
+      ctaText.textContent = 'In den Warenkorb';
+    } else {
+      changeSizeBtn.hidden = true;
+      ctaText.textContent = 'Größe wählen';
+    }
+  }
   function setMode(mode) {
     body.dataset.mode = mode;
     versionNum.textContent = mode === 'v1' ? '1' : '2';
-    ctaText.textContent = mode === 'v2'
-      ? 'Größe wählen'
-      : 'Zum Warenkorb hinzufügen';
+    updateCtas();
   }
   setMode('v1');
   versionBtn.addEventListener('click', () => {
@@ -1534,6 +1554,7 @@ html.is-unlocked .gate { display: none; }
   }
   backdrop.addEventListener('click', closeSheet);
   sheetClose.addEventListener('click', closeSheet);
+  changeSizeBtn.addEventListener('click', openSheet);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sheet.dataset.show === 'true') closeSheet();
   });
@@ -1554,12 +1575,16 @@ html.is-unlocked .gate { display: none; }
       document.querySelectorAll('#cupSizes .size').forEach(x => {
         x.dataset.sel = (x.dataset.cup === pickedCup) ? 'true' : 'false';
       });
+      updateCtas();
     });
   });
 
-  /* Main CTA — opens sheet in v2 (always); adds to cart in v1 */
+  /* Main CTA:
+       v1 — adds to cart with selected size
+       v2 + no size — opens sheet
+       v2 + size  — adds to cart */
   addBtn.addEventListener('click', () => {
-    if (body.dataset.mode === 'v2') { openSheet(); return; }
+    if (body.dataset.mode === 'v2' && !pickedSize) { openSheet(); return; }
     if (!pickedBand || !pickedCup) { showToast('Bitte Größe wählen'); return; }
     showToast('In den Warenkorb hinzugefügt · Größe ' + pickedBand + pickedCup);
   });
