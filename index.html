@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1440" />
+<title>Gefütterter Bügel-BH – Aura Spotlight | Triumph</title>
+<style>
+/* ============================================================
+   FONTS (local — Alliance No.1 Light + Regular)
+   ============================================================ */
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/Alliance%20No.1%20Regular/Alliance%20No.1%20Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS  (from Figma)
+   ============================================================ */
+:root {
+  --c-bg:        #FFFFFF;
+  --c-surface:   #FFFFFF;
+  --c-ink:       #000000;
+  --c-ink-soft:  #747474;       /* Dark Grey */
+  --c-line:      #DADADA;       /* Mid Grey  */
+  --c-line-2:    #DADADA;
+  --c-offwhite:  #F8F3F3;       /* Off-White */
+  --c-sand:      #E7D8C3;
+  --c-creamy:    #E2C8B3;
+  --c-burgundy:  #5E2039;
+  --c-special:   #B0282A;       /* "Special Deals" red */
+
+  --font-sans:   "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  /* layout: 1440 viewport, 920 gallery + 24 gap + 416 info */
+  --maxw: 1400px;
+  --gutter: 20px;
+  --col-gap: 24px;
+
+  --header-h: 64px;
+  --sticky-offset: calc(var(--header-h) + 16px);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1440px;
+}
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+h1, h2, h3, h4 { margin: 0; font-weight: 400; }
+
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--c-line);
+}
+.nav {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 24px;
+  height: var(--header-h);
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 32px;
+}
+.logo {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: .22em;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.logo .crown {
+  font-size: 14px;
+  letter-spacing: 0;
+  font-weight: 300;
+}
+.nav__center {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 28px;
+}
+.nav__links {
+  display: flex; gap: 28px;
+  flex: 0 1 auto;
+}
+.nav__links a {
+  font-size: 13px;
+  letter-spacing: 0;
+  padding: 6px 0;
+  font-weight: 400;
+  color: var(--c-ink);
+  white-space: nowrap;
+}
+.nav__links a.special { color: var(--c-special); }
+.nav__links a:hover { color: var(--c-burgundy); }
+
+.search {
+  margin-left: auto;
+  display: flex; align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--c-line);
+  padding: 6px 0;
+  width: 200px;
+}
+.search input {
+  border: 0; outline: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+  color: var(--c-ink);
+}
+.search input::placeholder { color: var(--c-ink-soft); }
+.search svg { width: 16px; height: 16px; stroke: var(--c-ink); fill: none; stroke-width: 1.5; flex: none; }
+
+.nav__icons { display: flex; gap: 22px; justify-content: flex-end; align-items: center; }
+.nav__icons button {
+  background: none; border: 0; padding: 0; color: var(--c-ink);
+  display: flex; align-items: center; gap: 4px;
+  position: relative;
+}
+.nav__icons .cart-count {
+  font-size: 13px;
+  font-weight: 400;
+}
+.icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+/* ============================================================
+   PRODUCT LAYOUT  (sticky pair lives here)
+   ============================================================ */
+.product {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 24px 96px;
+  display: grid;
+  grid-template-columns: 920px 416px;
+  column-gap: var(--col-gap);
+  align-items: start;
+}
+
+/* ---------- Gallery ---------- */
+.gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.gallery figure {
+  margin: 0;
+  background: #F1EDE6;
+  overflow: hidden;
+  position: relative;
+}
+.gallery img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  aspect-ratio: 460/646;
+  display: block;
+}
+.gallery .span-2 { grid-column: 1 / -1; }
+.gallery .span-2 img { aspect-ratio: 920/1292; }
+
+.fav-pill {
+  position: absolute; top: 12px; right: 12px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.94);
+  display: flex; align-items: center; justify-content: center;
+  border: 0; padding: 0; cursor: pointer;
+}
+.fav-pill svg { width: 18px; height: 18px; stroke: var(--c-ink); fill: none; stroke-width: 1.4; }
+.fav-pill[data-active="true"] svg { fill: var(--c-ink); }
+
+/* ============================================================
+   INFO  (sticky buybox — Calvin Klein-style)
+   ----
+   The info column is `position: sticky` at the top of the
+   viewport. Its parent `.product` stretches as tall as the gallery
+   (the taller sibling), so the column stays pinned while the
+   gallery scrolls past it and only "lifts off" when the parent's
+   bottom edge meets the column's bottom edge — i.e. when the
+   gallery has been scrolled through. No max-height, no internal
+   scroll, no wheel-jacking: the browser's native sticky behavior
+   does the work.
+   ============================================================ */
+.info {
+  position: sticky;
+  top: var(--sticky-offset);
+  align-self: start;
+  width: 416px;
+  padding-top: 24px;
+}
+
+/* ---- title block ---- */
+.info__cat {
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+.title-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 16px;
+}
+.info__title {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.18;
+  letter-spacing: -.01em;
+  flex: 1;
+}
+.title-fav {
+  flex: none;
+  width: 24px; height: 24px;
+  border: 0; background: none; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-ink);
+}
+.title-fav svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+.title-fav[data-active="true"] svg { fill: var(--c-ink); }
+
+.rating {
+  display: flex; align-items: center; gap: 8px;
+  margin: 14px 0 18px;
+}
+.stars { display: flex; gap: 1px; }
+.stars svg { width: 14px; height: 14px; }
+.rating__num {
+  font-size: 12px;
+  color: var(--c-ink);
+  border-bottom: 1px solid var(--c-ink);
+  padding-bottom: 1px;
+}
+
+/* ---- price ---- */
+.price-row {
+  display: flex; align-items: baseline; gap: 10px;
+  margin: 0 0 22px;
+}
+.price { font-size: 18px; letter-spacing: -.01em; font-weight: 400; }
+.tax {
+  font-size: 11px;
+  color: var(--c-ink-soft);
+  letter-spacing: 0;
+}
+
+/* ---- field heads ---- */
+.field { margin-bottom: 22px; }
+.field__head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.field__label {
+  font-size: 13px;
+  letter-spacing: 0;
+}
+.field__label strong { font-weight: 400; }
+.field__label .v { color: var(--c-ink); }
+.link-underline {
+  font-size: 13px;
+  border-bottom: 1px solid var(--c-ink);
+  padding-bottom: 1px;
+  color: var(--c-ink);
+}
+.link-underline:hover { color: var(--c-burgundy); border-color: var(--c-burgundy); }
+
+/* ---- colour swatches (real product photos) ---- */
+.swatches { display: flex; gap: 6px; }
+.swatch {
+  width: 54px; height: 66px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 4px 4px 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-bottom-color .15s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.swatch:hover { border-bottom-color: var(--c-line); }
+.swatch[data-sel="true"] { border-bottom-color: var(--c-ink); }
+.swatch__inner {
+  width: 100%; height: 100%;
+  display: block;
+  background: var(--c-offwhite);
+  overflow: hidden;
+}
+.swatch__inner img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- size group titles ---- */
+.size-group { margin-bottom: 14px; }
+.size-group__title {
+  font-size: 11px;
+  color: var(--c-ink);
+  letter-spacing: 0;
+  margin-bottom: 8px;
+}
+
+/* ---- size chips ---- */
+.sizes {
+  display: grid;
+  gap: 8px;
+}
+.sizes--6 { grid-template-columns: repeat(6, 1fr); }
+.size {
+  border: 1px solid var(--c-line);
+  background: #fff;
+  color: var(--c-ink);
+  padding: 0;
+  height: 30px;
+  font-size: 11px;
+  letter-spacing: 0;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.size:hover { border-color: var(--c-ink); }
+.size[data-sel="true"] {
+  background: var(--c-ink);
+  color: #fff;
+  border-color: var(--c-ink);
+}
+.size.oos {
+  color: var(--c-line);
+  cursor: not-allowed;
+  position: relative;
+}
+.size.oos::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top left,
+    transparent calc(50% - 1px), var(--c-line) 50%, transparent calc(50% + 1px));
+}
+
+/* ---- CTA ---- */
+.cta {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--c-ink);
+  color: #fff;
+  border: 1px solid var(--c-ink);
+  height: 50px;
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 400;
+  transition: background .2s ease, color .2s ease;
+}
+.cta:hover { background: transparent; color: var(--c-ink); }
+.cta.cta--white {
+  background: transparent;
+  color: var(--c-ink);
+}
+.cta.cta--white:hover { background: var(--c-ink); color: #fff; }
+
+.member-note {
+  font-size: 12px;
+  color: var(--c-ink-soft);
+  margin: 16px 0 28px;
+  line-height: 1.5;
+}
+.member-note a {
+  color: var(--c-ink);
+  border-bottom: 1px solid var(--c-ink);
+  padding-bottom: 1px;
+}
+
+/* ---- "Set vervollständigen" (titled section, not an accordion) ---- */
+.set-section {
+  border-top: 1px solid var(--c-line);
+  padding: 22px 0;
+}
+.set-section__title {
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  font-weight: 400;
+}
+.set-tiles {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.set-tile {
+  display: grid;
+  grid-template-columns: 96px 1fr 40px;
+  gap: 12px;
+  align-items: center;
+}
+.set-tile .thumb {
+  width: 96px; height: 104px;
+  background: var(--c-offwhite); overflow: hidden;
+}
+.set-tile .thumb img { width: 100%; height: 100%; object-fit: cover; }
+.set-tile .meta { display: flex; flex-direction: column; gap: 4px; }
+.set-tile .meta .eb {
+  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+}
+.set-tile .meta .nm { font-size: 13px; }
+.set-tile .meta .pr-row { display: flex; gap: 6px; align-items: baseline; margin-top: 6px; }
+.set-tile .meta .pr { font-size: 13px; }
+.set-tile .meta .uvp {
+  font-size: 10px;
+  color: var(--c-ink-soft);
+  letter-spacing: 0;
+}
+.add-bag-btn {
+  width: 40px; height: 40px;
+  border: 1px solid var(--c-ink);
+  background: #fff; color: var(--c-ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.add-bag-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+
+/* ---- accordion ---- */
+.accordion { margin-top: 0; }
+.acc {
+  border-top: 1px solid var(--c-line);
+}
+.acc:last-of-type { border-bottom: 1px solid var(--c-line); }
+.acc__btn {
+  width: 100%;
+  background: none; border: 0; padding: 18px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  cursor: pointer;
+  font-weight: 400;
+}
+.chev {
+  width: 12px; height: 8px;
+  stroke: currentColor; fill: none; stroke-width: 1.5;
+  transition: transform .25s ease;
+}
+.acc[open] .chev { transform: rotate(180deg); }
+.acc__body {
+  padding: 0 0 22px;
+  color: var(--c-ink);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.acc__body p { margin: 0 0 14px; }
+.acc__body p.muted { color: var(--c-ink); }
+.acc__body .materials { font-weight: 400; margin-bottom: 10px; }
+.acc__body ul.bullets { margin: 14px 0; }
+.acc__body ul.bullets li {
+  position: relative; padding-left: 14px; margin-bottom: 4px;
+  color: var(--c-ink);
+  font-size: 13px;
+}
+.acc__body ul.bullets li::before {
+  content: ""; position: absolute; left: 0; top: 9px;
+  width: 3px; height: 3px; border-radius: 50%; background: var(--c-ink);
+}
+.acc__body .sku {
+  font-size: 12px; color: var(--c-ink); margin-top: 14px;
+  letter-spacing: 0;
+}
+
+.bottom-cta { margin-top: 24px; }
+
+/* ============================================================
+   RECOMMENDATION CAROUSELS
+   ============================================================ */
+.recs {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 24px 64px;
+}
+.recs__head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px;
+}
+.recs__head h2 {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.recs__nav { display: flex; gap: 8px; }
+.recs__nav button {
+  width: 30px; height: 30px;
+  border: 1px solid var(--c-line);
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.recs__nav button:hover { border-color: var(--c-ink); }
+.recs__nav svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+
+.recs__rail {
+  display: flex; gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.recs__rail::-webkit-scrollbar { display: none; }
+
+.card {
+  flex: 0 0 calc((100% - 14px * 3) / 4);
+  min-width: 0;
+  scroll-snap-align: start;
+  position: relative;
+}
+.card__img {
+  position: relative;
+  background: var(--c-offwhite);
+  aspect-ratio: 4/5;
+  overflow: hidden;
+}
+.card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s ease; }
+.card:hover .card__img img { transform: scale(1.04); }
+.card__tags {
+  position: absolute; top: 12px; left: 12px;
+  display: flex; gap: 6px;
+}
+.card__tag {
+  background: #fff; color: var(--c-ink);
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  padding: 4px 8px;
+}
+.card__swatches { display: flex; gap: 6px; margin: 12px 0 6px; }
+.card__sw {
+  width: 28px; height: 34px;
+  background: var(--c-offwhite);
+  overflow: hidden;
+  display: block;
+  padding-bottom: 2px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  transition: border-bottom-color .15s ease;
+}
+.card__sw img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.card__sw:hover { border-bottom-color: var(--c-line); }
+.card__sw[data-sel="true"] { border-bottom-color: var(--c-ink); }
+.card__cat { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; margin: 4px 0 2px; }
+.card__nm { font-size: 13px; }
+.card__pr-row { margin-top: 4px; }
+.card__pr { font-size: 13px; }
+.card__pr .uvp { font-size: 10px; color: var(--c-ink-soft); margin-left: 6px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  background: var(--c-ink);
+  color: #C9C5BC;
+  margin-top: 32px;
+}
+.foot {
+  max-width: 1400px; margin: 0 auto;
+  padding: 48px 24px 24px;
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: 40px;
+}
+.foot .logo { color: #F4F1EA; padding-left: 0; margin-bottom: 16px; }
+.foot__brand p { font-size: 13px; max-width: 30ch; }
+.foot h4 {
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: #F4F1EA; margin: 0 0 18px; font-weight: 400;
+}
+.foot li { margin-bottom: 10px; }
+.foot a { font-size: 13px; color: #C9C5BC; }
+.foot a:hover { color: #fff; }
+.foot__bottom { border-top: 1px solid rgba(255,255,255,.12); }
+.foot__bottom-inner {
+  max-width: 1400px; margin: 0 auto;
+  padding: 16px 24px;
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: #8E8A82;
+}
+
+/* ============================================================
+   V2 MODE — size sheet
+   ============================================================ */
+/* hide inline size grids in v2 */
+body[data-mode="v2"] .field--sizes { display: none; }
+
+/* backdrop */
+.size-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, .4);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.size-backdrop[data-show="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* right-side sheet */
+.size-sheet {
+  position: fixed; right: 0; top: 0; bottom: 0;
+  width: 480px;
+  background: #fff;
+  z-index: 210;
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.32, .72, 0, 1);
+  display: flex; flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, .08);
+}
+.size-sheet[data-show="true"] { transform: translateX(0); }
+
+.size-sheet__head {
+  padding: 28px 32px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.size-sheet__title {
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--c-ink);
+}
+.size-sheet__close {
+  width: 24px; height: 24px;
+  border: 0; background: none; padding: 0;
+  color: var(--c-ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.size-sheet__close svg { width: 18px; height: 18px; }
+
+.size-sheet__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 32px 24px;
+}
+.size-sheet__guide {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.size-sheet__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.size-sheet__grid .size {
+  height: 40px;
+  font-size: 12px;
+}
+
+.size-sheet__foot {
+  padding: 20px 32px 28px;
+  border-top: 1px solid var(--c-line);
+  background: #fff;
+}
+.size-sheet__foot .cta { margin-top: 0; }
+
+/* ============================================================
+   Version toggle (prototype-only)
+   ============================================================ */
+.version-toggle {
+  position: fixed;
+  left: 24px; bottom: 24px;
+  z-index: 300;
+  background: var(--c-ink);
+  color: #fff;
+  padding: 10px 14px 10px 18px;
+  border: 0;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+}
+.version-toggle:hover { background: #1a1a1a; }
+.version-toggle__num {
+  background: #fff;
+  color: var(--c-ink);
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+/* ============================================================
+   Toast
+   ============================================================ */
+.toast {
+  position: fixed; right: 24px; bottom: 24px;
+  background: var(--c-ink); color: #fff;
+  padding: 14px 18px;
+  font-size: 13px; letter-spacing: .04em;
+  z-index: 100;
+  transform: translateY(160%);
+  transition: transform .25s ease;
+}
+.toast.show { transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav class="nav">
+    <div class="logo">TRIUMPH<span class="crown">♛</span></div>
+
+    <div class="nav__center">
+      <ul class="nav__links">
+        <li><a href="#" class="special">Special Deals</a></li>
+        <li><a href="#">Bras</a></li>
+        <li><a href="#">Knickers</a></li>
+        <li><a href="#">Shapewear</a></li>
+        <li><a href="#">Activewear</a></li>
+        <li><a href="#">Sleep &amp; Lounge</a></li>
+        <li><a href="#">Swimwear</a></li>
+      </ul>
+      <label class="search" aria-label="Suche">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Search" />
+      </label>
+    </div>
+
+    <div class="nav__icons">
+      <button aria-label="Konto">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+      </button>
+      <button aria-label="Wunschliste">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+      </button>
+      <button aria-label="Warenkorb">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+        <span class="cart-count">(2)</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- PRODUCT -->
+<section class="product">
+
+  <!-- ============ GALLERY (left, scrolls naturally) ============ -->
+  <div class="gallery" id="gallery">
+    <figure class="span-2">
+      <img src="./Assets/10208018-6720_2.webp" alt="Gefütterter Bügel-BH Aura Spotlight, Hauptansicht" />
+    </figure>
+    <figure><img src="./Assets/10208018-6720_5.webp" alt="Spitzendetail" /></figure>
+    <figure><img src="./Assets/10208018-6720_1.webp" alt="Produktansicht" /></figure>
+    <figure><img src="./Assets/10208018-6720_3.webp" alt="Aussenansicht" /></figure>
+    <figure><img src="./Assets/10208018-6720_4.webp" alt="Sitzende Ansicht" /></figure>
+  </div>
+
+  <!-- ============ INFO / BUYBOX (right, sticky) ============ -->
+  <aside class="info" id="info">
+
+    <div class="info__cat">AURA SPOTLIGHT</div>
+    <div class="title-row">
+      <h1 class="info__title">Gefütterter Bügel-BH</h1>
+      <button class="title-fav" data-active="false" aria-label="Auf die Wunschliste">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="rating">
+      <span class="stars" id="stars"></span>
+      <a href="#" class="rating__num">67 Bewertungen</a>
+    </div>
+
+    <div class="price-row">
+      <span class="price">59,95&nbsp;€</span>
+      <span class="tax">inkl. MwSt.</span>
+    </div>
+
+    <!-- COLOR -->
+    <div class="field">
+      <div class="field__head">
+        <span class="field__label"><strong>Farbe:</strong> <span class="v" id="colorName">Creamy Dream</span></span>
+      </div>
+      <div class="swatches" id="swatches">
+        <button class="swatch" data-name="Creamy Dream" data-sel="true"  aria-label="Creamy Dream">
+          <span class="swatch__inner"><img src="./Assets/10208018-6720_1.webp" alt="" /></span>
+        </button>
+        <button class="swatch" data-name="Black" data-sel="false" aria-label="Black">
+          <span class="swatch__inner"><img src="./Assets/10208018-0004_1.webp" alt="" /></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SIZE -->
+    <div class="field field--sizes">
+      <div class="field__head">
+        <span class="field__label"><strong>Größe:</strong> <span class="v" id="sizeLabel">75D</span></span>
+        <a href="#" class="link-underline">Größe bestimmen</a>
+      </div>
+
+      <!-- Unterbrustweite -->
+      <div class="size-group">
+        <div class="size-group__title">Unterbrustweite</div>
+        <div class="sizes sizes--6" id="bandSizes">
+          <button class="size" data-band="65">65</button>
+          <button class="size" data-band="70">70</button>
+          <button class="size" data-band="75" data-sel="true">75</button>
+          <button class="size" data-band="80">80</button>
+          <button class="size" data-band="85">85</button>
+          <button class="size" data-band="90">90</button>
+          <button class="size" data-band="95">95</button>
+          <button class="size" data-band="100">100</button>
+          <button class="size" data-band="105">105</button>
+          <button class="size oos" data-band="110" disabled>110</button>
+          <button class="size oos" data-band="115" disabled>115</button>
+        </div>
+      </div>
+
+      <!-- Körbchen -->
+      <div class="size-group">
+        <div class="size-group__title">Körbchen</div>
+        <div class="sizes sizes--6" id="cupSizes">
+          <button class="size" data-cup="A">A</button>
+          <button class="size" data-cup="B">B</button>
+          <button class="size" data-cup="C">C</button>
+          <button class="size" data-cup="D" data-sel="true">D</button>
+          <button class="size" data-cup="E">E</button>
+          <button class="size" data-cup="F">F</button>
+          <button class="size oos" data-cup="G" disabled>G</button>
+          <button class="size oos" data-cup="H" disabled>H</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button class="cta" id="addBtn"><span id="ctaText">Zum Warenkorb hinzufügen</span></button>
+    <div class="member-note">
+      <a href="#">Jetzt MyTriumph Member</a> werden und Ihre Lieferung kostenlos erhalten
+    </div>
+
+    <!-- SET VERVOLLSTÄNDIGEN (not an accordion) -->
+    <div class="set-section">
+      <div class="set-section__title">Set vervollständigen</div>
+      <div class="set-tiles">
+        <a class="set-tile" href="#">
+          <div class="thumb"><img src="./Assets/10208024-0004_1.webp" alt="Tanga" /></div>
+          <div class="meta">
+            <div class="eb">AURA SPOTLIGHT</div>
+            <div class="nm">Gefütterter Bügel-BH</div>
+            <div class="pr-row"><span class="pr">59,95&nbsp;€</span><span class="uvp">UVP</span></div>
+          </div>
+          <button class="add-bag-btn" aria-label="Hinzufügen"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>
+        </a>
+        <a class="set-tile" href="#">
+          <div class="thumb"><img src="./Assets/10207997-0004_1.webp" alt="Maxi-Slip" /></div>
+          <div class="meta">
+            <div class="eb">AURA SPOTLIGHT</div>
+            <div class="nm">Gefütterter Bügel-BH</div>
+            <div class="pr-row"><span class="pr">59,95&nbsp;€</span><span class="uvp">UVP</span></div>
+          </div>
+          <button class="add-bag-btn" aria-label="Hinzufügen"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>
+        </a>
+      </div>
+    </div>
+
+    <!-- ACCORDIONS -->
+    <div class="accordion">
+
+      <details class="acc" open>
+        <summary class="acc__btn">
+          Eigenschaften
+          <svg class="chev" viewBox="0 0 14 8"><path d="m1 1 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="acc__body">
+          <p class="materials">54% Polyamid, 35% Polyester, 11% Elastan</p>
+          <p>Dieser gefütterte Bügel-BH mit tiefem Dekolleté vereint luxuriöse Spitze mit außergewöhnlichem Komfort für einen dramatischeren Look. Die durchdachte Konstruktion bietet nicht nur optimalen Halt, sondern auch die Eleganz, die Sie für besondere Anlässe suchen. Modisch und funktional – genau richtig für Oberteile mit tiefem Ausschnitt.</p>
+          <ul class="bullets">
+            <li>Bügel-BH mit Einlage für perfekte Formgebung</li>
+            <li>Tiefes Dekolleté ideal für Oberteile mit tiefem Ausschnitt</li>
+            <li>Mit gemusterter Spitze bezogen für luxuriöse Optik</li>
+            <li>Hochwertige Materialien und perfekte Passform</li>
+            <li>Stützend und elegant zugleich</li>
+            <li>Komfortable und verstellbare Träger</li>
+          </ul>
+          <div class="sku">Artikelnummer: 10208018 (7613137673660)</div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary class="acc__btn">
+          Verfügbarkeit in der Filiale
+          <svg class="chev" viewBox="0 0 14 8"><path d="m1 1 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="acc__body">
+          <p>Prüfen Sie die Verfügbarkeit dieses Artikels in einer Filiale in Ihrer Nähe.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary class="acc__btn">
+          Versand &amp; Rücksendung
+          <svg class="chev" viewBox="0 0 14 8"><path d="m1 1 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="acc__body">
+          <p>Kostenloser Standardversand (2–4 Werktage) für alle Bestellungen. Express-Versand an der Kasse verfügbar.</p>
+          <p>Kostenlose Rücksendung innerhalb von 30 Tagen. Artikel müssen ungetragen mit Originaletiketten zurückgeschickt werden.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary class="acc__btn">
+          Pflege
+          <svg class="chev" viewBox="0 0 14 8"><path d="m1 1 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="acc__body">
+          <p>Handwäsche bei max. 30 °C. Nicht bleichen, nicht im Trockner trocknen, nicht bügeln, nicht chemisch reinigen.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary class="acc__btn">
+          Standards &amp; Rückverfolgbarkeit
+          <svg class="chev" viewBox="0 0 14 8"><path d="m1 1 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="acc__body">
+          <p>Hergestellt unter Einhaltung unserer Lieferanten-Sozialstandards. STANDARD&nbsp;100 by OEKO-TEX® zertifiziert.</p>
+        </div>
+      </details>
+
+    </div>
+
+    <button class="cta cta--white bottom-cta">Alles aus der Kategorie entdecken</button>
+
+  </aside>
+</section>
+
+<!-- ============ CAROUSEL 1 — DAS KÖNNTE DIR GEFALLEN ============ -->
+<section class="recs">
+  <div class="recs__head">
+    <h2>Das könnte dir gefallen</h2>
+    <div class="recs__nav" data-target="rail1">
+      <button data-dir="prev" aria-label="Zurück"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button data-dir="next" aria-label="Weiter"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="recs__rail" id="rail1">
+    <a class="card" href="#">
+      <div class="card__img">
+        <div class="card__tags"><span class="card__tag">Bestseller</span></div>
+        <img src="./Assets/10215855-0004_1.webp" alt="Aura Spotlight Bralette" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10215855-0004_1.webp" alt="" /></span>
+        <span class="card__sw"><img src="./Assets/10215855-0004_2.webp" alt="" /></span>
+        <span class="card__sw"><img src="./Assets/10215857-00NZ_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AURA SPOTLIGHT</div>
+      <div class="card__nm">Bralette ohne Bügel</div>
+      <div class="card__pr-row">
+        <span class="card__pr">54,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Bügel-BH Black" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw"><img src="./Assets/10208018-6720_1.webp" alt="" /></span>
+        <span class="card__sw" data-sel="true"><img src="./Assets/10208018-0004_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AURA SPOTLIGHT</div>
+      <div class="card__nm">Gefütterter Bügel-BH</div>
+      <div class="card__pr-row">
+        <span class="card__pr">59,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10214770-0003_1.webp" alt="Amourette Charm" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10214770-0003_1.webp" alt="" /></span>
+        <span class="card__sw"><img src="./Assets/10215857-00NZ_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AMOURETTE CHARM</div>
+      <div class="card__nm">Balconette-BH</div>
+      <div class="card__pr-row">
+        <span class="card__pr">59,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <div class="card__tags"><span class="card__tag">Neu</span></div>
+        <img src="./Assets/10210668-0003_1.webp" alt="Body Make-Up Soft Touch" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10210668-0003_1.webp" alt="" /></span>
+        <span class="card__sw"><img src="./Assets/10181552-0003_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">BODY MAKE-UP</div>
+      <div class="card__nm">Soft Touch BH</div>
+      <div class="card__pr-row">
+        <span class="card__pr">45,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10208024-0004_1.webp" alt="Aura Spotlight Tanga" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10208024-0004_1.webp" alt="" /></span>
+        <span class="card__sw"><img src="./Assets/10207997-0004_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AURA SPOTLIGHT</div>
+      <div class="card__nm">Tanga</div>
+      <div class="card__pr-row">
+        <span class="card__pr">25,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ============ CAROUSEL 2 — ZULETZT ANGESEHEN ============ -->
+<section class="recs">
+  <div class="recs__head">
+    <h2>Zuletzt angesehen</h2>
+    <div class="recs__nav" data-target="rail2">
+      <button data-dir="prev" aria-label="Zurück"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button data-dir="next" aria-label="Weiter"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="recs__rail" id="rail2">
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Black" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw"><img src="./Assets/10208018-6720_1.webp" alt="" /></span>
+        <span class="card__sw" data-sel="true"><img src="./Assets/10208018-0004_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AURA SPOTLIGHT</div>
+      <div class="card__nm">Gefütterter Bügel-BH</div>
+      <div class="card__pr-row">
+        <span class="card__pr">59,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10215855-0004_1.webp" alt="Aura Spotlight Bralette" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10215855-0004_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AURA SPOTLIGHT</div>
+      <div class="card__nm">Bralette ohne Bügel</div>
+      <div class="card__pr-row">
+        <span class="card__pr">54,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10214770-0003_1.webp" alt="Amourette Charm" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10214770-0003_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AMOURETTE CHARM</div>
+      <div class="card__nm">Balconette-BH</div>
+      <div class="card__pr-row">
+        <span class="card__pr">59,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10210668-0003_1.webp" alt="Body Make-Up" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10210668-0003_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">BODY MAKE-UP</div>
+      <div class="card__nm">Soft Touch BH</div>
+      <div class="card__pr-row">
+        <span class="card__pr">45,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img">
+        <img src="./Assets/10207997-0004_1.webp" alt="Aura Spotlight Maxi-Slip" />
+      </div>
+      <div class="card__swatches">
+        <span class="card__sw" data-sel="true"><img src="./Assets/10207997-0004_1.webp" alt="" /></span>
+      </div>
+      <div class="card__cat">AURA SPOTLIGHT</div>
+      <div class="card__nm">Maxi-Slip</div>
+      <div class="card__pr-row">
+        <span class="card__pr">27,95&nbsp;€<span class="uvp">UVP</span></span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot">
+    <div class="foot__brand">
+      <div class="logo">TRIUMPH</div>
+      <p>Wäsche, die seit 1886 mit Anspruch an Passform, Komfort und stiller Selbstsicherheit gefertigt wird.</p>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">Bras</a></li>
+        <li><a href="#">Knickers</a></li>
+        <li><a href="#">Shapewear</a></li>
+        <li><a href="#">Swimwear</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Hilfe</h4>
+      <ul>
+        <li><a href="#">Größenberater</a></li>
+        <li><a href="#">Versand</a></li>
+        <li><a href="#">Rücksendung</a></li>
+        <li><a href="#">Kontakt</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Über uns</h4>
+      <ul>
+        <li><a href="#">Unsere Geschichte</a></li>
+        <li><a href="#">Nachhaltigkeit</a></li>
+        <li><a href="#">Filialen</a></li>
+        <li><a href="#">Karriere</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__bottom">
+    <div class="foot__bottom-inner">
+      <span>© 2026 Triumph. Alle Rechte vorbehalten.</span>
+      <span>Datenschutz · AGB · Cookies</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ SIZE SHEET (V2) ============ -->
+<div class="size-backdrop" id="sizeBackdrop"></div>
+<aside class="size-sheet" id="sizeSheet" aria-hidden="true" role="dialog" aria-label="Größe wählen">
+  <div class="size-sheet__head">
+    <h2 class="size-sheet__title">Größe wählen</h2>
+    <button class="size-sheet__close" id="sizeSheetClose" aria-label="Schließen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l14 14M19 5L5 19" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="size-sheet__body">
+    <div class="size-sheet__guide"><a href="#" class="link-underline">BH-Größe bestimmen</a></div>
+    <div class="size-sheet__grid" id="sizeSheetGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+  <div class="size-sheet__foot">
+    <button class="cta" id="sheetAddBtn">Zum Warenkorb hinzufügen</button>
+  </div>
+</aside>
+
+<!-- ============ VERSION TOGGLE ============ -->
+<button class="version-toggle" id="versionToggle" aria-label="Variante wechseln">
+  <span>Variante</span>
+  <span class="version-toggle__num" id="versionToggleNum">1</span>
+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast">In den Warenkorb hinzugefügt</div>
+
+<script>
+  /* Star rating */
+  const starsEl = document.getElementById('stars');
+  const filledStar = '<svg viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  starsEl.innerHTML = filledStar.repeat(5);
+
+  /* Colour swatches */
+  const swatches = document.querySelectorAll('#swatches .swatch');
+  const colorName = document.getElementById('colorName');
+  swatches.forEach(s => s.addEventListener('click', () => {
+    swatches.forEach(x => x.dataset.sel = 'false');
+    s.dataset.sel = 'true';
+    colorName.textContent = s.dataset.name;
+  }));
+
+  /* Size selection */
+  const sizeLabel = document.getElementById('sizeLabel');
+  let pickedBand = '75';
+  let pickedCup = 'D';
+  function updateLabel() {
+    sizeLabel.textContent = (pickedBand && pickedCup) ? (pickedBand + pickedCup) : '–';
+  }
+  document.querySelectorAll('#bandSizes .size:not(.oos)').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#bandSizes .size').forEach(x => x.dataset.sel = 'false');
+    b.dataset.sel = 'true';
+    pickedBand = b.dataset.band;
+    updateLabel();
+  }));
+  document.querySelectorAll('#cupSizes .size:not(.oos)').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#cupSizes .size').forEach(x => x.dataset.sel = 'false');
+    b.dataset.sel = 'true';
+    pickedCup = b.dataset.cup;
+    updateLabel();
+  }));
+
+  /* Add to bag toast */
+  const toast = document.getElementById('toast');
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+  document.querySelectorAll('.add-bag-btn').forEach(b => {
+    b.addEventListener('click', (e) => { e.preventDefault(); showToast('In den Warenkorb hinzugefügt'); });
+  });
+  document.querySelectorAll('.fav-pill, .title-fav').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      const active = b.dataset.active === 'true';
+      b.dataset.active = String(!active);
+    });
+  });
+
+  /* -----------------------------------------------------------
+     V1 / V2 TOGGLE + SIZE SHEET
+     ----------------------------------------------------------- */
+  const body          = document.body;
+  const versionBtn    = document.getElementById('versionToggle');
+  const versionNum    = document.getElementById('versionToggleNum');
+  const sheet         = document.getElementById('sizeSheet');
+  const backdrop      = document.getElementById('sizeBackdrop');
+  const sheetClose    = document.getElementById('sizeSheetClose');
+  const sheetGrid     = document.getElementById('sizeSheetGrid');
+  const sheetAddBtn   = document.getElementById('sheetAddBtn');
+  const ctaText       = document.getElementById('ctaText');
+  const addBtn        = document.getElementById('addBtn');
+
+  /* Build the size grid in the sheet (4 bands × 8 cups = 32 sizes).
+     A small set of out-of-stock combos is hard-coded for visual variety. */
+  const BANDS = ['75', '80', '85', '90'];
+  const CUPS  = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const OOS   = new Set(['75C', '75E', '80F', '90C']);
+
+  let pickedSize = pickedBand + pickedCup;        // start at "75D" from v1
+  BANDS.forEach(b => CUPS.forEach(c => {
+    const code = b + c;
+    const btn  = document.createElement('button');
+    btn.className = 'size';
+    btn.dataset.size = code;
+    btn.textContent = code;
+    if (OOS.has(code)) { btn.classList.add('oos'); btn.disabled = true; }
+    if (code === pickedSize) btn.dataset.sel = 'true';
+    sheetGrid.appendChild(btn);
+  }));
+
+  function setMode(mode) {
+    body.dataset.mode = mode;
+    versionNum.textContent = mode === 'v1' ? '1' : '2';
+    ctaText.textContent = mode === 'v2'
+      ? 'Größe wählen'
+      : 'Zum Warenkorb hinzufügen';
+  }
+  setMode('v1');
+  versionBtn.addEventListener('click', () => {
+    setMode(body.dataset.mode === 'v1' ? 'v2' : 'v1');
+  });
+
+  function openSheet() {
+    sheet.dataset.show    = 'true';
+    backdrop.dataset.show = 'true';
+    sheet.setAttribute('aria-hidden', 'false');
+    document.documentElement.style.overflow = 'hidden';
+  }
+  function closeSheet() {
+    sheet.dataset.show    = 'false';
+    backdrop.dataset.show = 'false';
+    sheet.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+  }
+  backdrop.addEventListener('click', closeSheet);
+  sheetClose.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sheet.dataset.show === 'true') closeSheet();
+  });
+
+  /* Pick a size inside the sheet */
+  sheetGrid.querySelectorAll('.size:not(.oos)').forEach(b => {
+    b.addEventListener('click', () => {
+      sheetGrid.querySelectorAll('.size').forEach(x => x.dataset.sel = 'false');
+      b.dataset.sel = 'true';
+      pickedSize = b.dataset.size;
+      pickedBand = pickedSize.slice(0, -1);
+      pickedCup  = pickedSize.slice(-1);
+      sizeLabel.textContent = pickedSize;
+      /* keep v1 chips in sync */
+      document.querySelectorAll('#bandSizes .size').forEach(x => {
+        x.dataset.sel = (x.dataset.band === pickedBand) ? 'true' : 'false';
+      });
+      document.querySelectorAll('#cupSizes .size').forEach(x => {
+        x.dataset.sel = (x.dataset.cup === pickedCup) ? 'true' : 'false';
+      });
+    });
+  });
+
+  /* Main CTA — opens sheet in v2 (always); adds to cart in v1 */
+  addBtn.addEventListener('click', () => {
+    if (body.dataset.mode === 'v2') { openSheet(); return; }
+    if (!pickedBand || !pickedCup) { showToast('Bitte Größe wählen'); return; }
+    showToast('In den Warenkorb hinzugefügt · Größe ' + pickedBand + pickedCup);
+  });
+
+  /* Sheet CTA — adds to cart and closes the sheet */
+  sheetAddBtn.addEventListener('click', () => {
+    if (!pickedSize) { showToast('Bitte Größe wählen'); return; }
+    showToast('In den Warenkorb hinzugefügt · Größe ' + pickedSize);
+    closeSheet();
+  });
+
+  /* Carousel arrows */
+  document.querySelectorAll('.recs__nav').forEach(nav => {
+    const rail = document.getElementById(nav.dataset.target);
+    if (!rail) return;
+    nav.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = btn.dataset.dir === 'next' ? 1 : -1;
+        const cardW = rail.querySelector('.card').getBoundingClientRect().width + 14;
+        rail.scrollBy({ left: dir * cardW, behavior: 'smooth' });
+      });
+    });
+  });
+</script>
+</body>
+</html>

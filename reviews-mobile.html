@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Amourette 300 · Reviews</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #faf8f6;
+    --bg-track: #ece8e3;
+    --text: #1c1a18;
+    --text-2: #6b655e;
+    --text-3: #9a958d;
+    --line: rgba(28, 26, 24, 0.12);
+    --gold: #c8a35b;
+    --success: #4a7a4f;
+    --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: var(--sans);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .reviews { max-width: 480px; margin: 0 auto; padding: 28px 20px 40px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0);
+  }
+  .eyebrow {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3);
+  }
+
+  .head { text-align: center; margin-bottom: 28px; }
+  .head .eyebrow { display: block; margin-bottom: 6px; }
+  .head h2 {
+    margin: 0; font-family: var(--serif); font-size: 30px;
+    font-weight: 500; line-height: 1.12; letter-spacing: -0.01em;
+  }
+
+  /* Hero — stacked for mobile */
+  .hero {
+    display: flex; align-items: center; justify-content: center; gap: 28px;
+    padding-bottom: 22px; border-bottom: 0.5px solid var(--line);
+  }
+  .hero-num {
+    font-family: var(--serif); font-size: 52px; font-weight: 500;
+    line-height: 0.95; letter-spacing: -0.02em;
+  }
+  .hero-num .pct { font-size: 24px; vertical-align: 13px; }
+  .hero-center { text-align: center; }
+  .stars { color: var(--gold); }
+  .hero-center .stars { font-size: 15px; letter-spacing: 4px; margin: 8px 0 4px; }
+  .hero-center .label { font-size: 11px; color: var(--text-3); }
+  .recommend-label { font-size: 11px; color: var(--text-2); margin-top: 10px; max-width: 110px; }
+  .vrule { width: 0.5px; height: 78px; background: var(--line); }
+
+  /* Distribution as its own band on mobile */
+  .dist {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 20px 4px; border-bottom: 0.5px solid var(--line);
+  }
+  .dist-row { display: flex; align-items: center; gap: 10px; }
+  .dist-row .n { width: 10px; font-size: 12px; color: var(--text-3); }
+  .dist-track { flex: 1; height: 3px; background: var(--bg-track); }
+  .dist-fill { height: 100%; background: var(--gold); }
+  .dist-row .c { width: 30px; text-align: right; font-size: 12px; color: var(--text-3); }
+
+  /* Fit — single column rows on mobile */
+  .fit { padding: 22px 0; border-bottom: 0.5px solid var(--line); }
+  .fit-cell {
+    display: grid; grid-template-columns: 70px 1fr auto; align-items: center;
+    gap: 14px; padding: 12px 0;
+  }
+  .fit-cell + .fit-cell { border-top: 0.5px solid var(--line); }
+  .fit-cell .label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
+  }
+  .gauge { height: 2px; background: var(--bg-track); position: relative; }
+  .gauge .dot {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 9px; height: 9px; border-radius: 50%; background: var(--text);
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+  .fit-verdict {
+    font-family: var(--serif); font-size: 16px; font-weight: 500;
+    white-space: nowrap; text-align: right;
+  }
+
+  /* Featured */
+  .featured { padding: 24px 0; border-bottom: 0.5px solid var(--line); text-align: center; }
+  .featured .eyebrow { display: block; margin-bottom: 12px; }
+  .featured blockquote {
+    font-family: var(--serif); font-size: 21px; line-height: 1.45; margin: 0; font-weight: 500;
+  }
+  .featured .by { margin-top: 14px; font-size: 11px; letter-spacing: 0.04em; color: var(--text-2); }
+  .featured .by .stars { font-size: 11px; letter-spacing: 1px; }
+
+  /* Toolbar — horizontal scroll tabs */
+  .toolbar { padding: 20px 0 4px; }
+  .tabs {
+    display: flex; gap: 18px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3);
+    cursor: pointer; padding-bottom: 4px; white-space: nowrap;
+    background: none; border: none; font-family: inherit; flex-shrink: 0;
+  }
+  .tab.on { color: var(--text); border-bottom: 0.5px solid var(--text); }
+  .sort {
+    width: 100%; margin-top: 14px; border: 0.5px solid var(--line);
+    border-radius: 8px; background: var(--bg); font-family: inherit;
+    font-size: 13px; color: var(--text-2); padding: 9px 12px;
+  }
+
+  /* Review cards */
+  .rev { padding: 22px 0; border-bottom: 0.5px solid var(--line); }
+  .rev-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .rev-id { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; color: #fff;
+  }
+  .rev-name { font-size: 14px; font-weight: 500; }
+  .verified { font-size: 10px; color: var(--success); margin-left: 3px; }
+  .rev-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .rev-title { font-family: var(--serif); font-size: 18px; font-weight: 500; margin: 6px 0; }
+  .rev-body { margin: 0; font-size: 14px; line-height: 1.65; color: var(--text-2); }
+  .rev-foot { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .rev-foot .count { font-size: 12px; color: var(--text-3); }
+  .helpful {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2);
+    cursor: pointer; background: none; border: 0.5px solid var(--line);
+    border-radius: 99px; padding: 7px 14px; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+
+  /* Sticky write-a-review bar */
+  .cta-bar {
+    position: sticky; bottom: 0; margin: 24px -20px -40px; padding: 14px 20px;
+    background: var(--bg); border-top: 0.5px solid var(--line);
+  }
+  .cta-btn {
+    display: block; width: 100%; text-align: center; text-decoration: none;
+    background: var(--text); color: var(--bg); padding: 15px;
+    border-radius: 99px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<section class="reviews" aria-label="Customer reviews">
+  <p class="sr-only">Premium customer review section for the Triumph Amourette 300 bra.</p>
+
+  <div class="head">
+    <span class="eyebrow">Amourette 300 &middot; Reviews</span>
+    <h2>Loved by 328 women</h2>
+  </div>
+
+  <div class="hero">
+    <div class="hero-center">
+      <div class="hero-num">4.6</div>
+      <div class="stars" aria-label="4.6 of 5 stars">★★★★<span style="opacity:.45">★</span></div>
+      <div class="label">out of 5</div>
+    </div>
+    <div class="vrule"></div>
+    <div class="hero-center">
+      <div class="hero-num">94<span class="pct">%</span></div>
+      <div class="recommend-label">would recommend</div>
+    </div>
+  </div>
+
+  <div class="dist" aria-label="Rating distribution">
+    <div class="dist-row"><span class="n">5</span><div class="dist-track"><div class="dist-fill" style="width:71%"></div></div><span class="c">232</span></div>
+    <div class="dist-row"><span class="n">4</span><div class="dist-track"><div class="dist-fill" style="width:18%"></div></div><span class="c">59</span></div>
+    <div class="dist-row"><span class="n">3</span><div class="dist-track"><div class="dist-fill" style="width:6%"></div></div><span class="c">21</span></div>
+    <div class="dist-row"><span class="n">2</span><div class="dist-track"><div class="dist-fill" style="width:3%"></div></div><span class="c">10</span></div>
+    <div class="dist-row"><span class="n">1</span><div class="dist-track"><div class="dist-fill" style="width:2%"></div></div><span class="c">6</span></div>
+  </div>
+
+  <div class="fit">
+    <div class="fit-cell">
+      <div class="label">Size</div>
+      <div class="gauge"><span class="dot" style="left:55%"></span></div>
+      <div class="fit-verdict">True to size</div>
+    </div>
+    <div class="fit-cell">
+      <div class="label">Cup fit</div>
+      <div class="gauge"><span class="dot" style="left:48%"></span></div>
+      <div class="fit-verdict">Spot on</div>
+    </div>
+    <div class="fit-cell">
+      <div class="label">Comfort</div>
+      <div class="gauge"><span class="dot" style="left:84%"></span></div>
+      <div class="fit-verdict">All-day soft</div>
+    </div>
+  </div>
+
+  <div class="featured">
+    <span class="eyebrow">Most loved review</span>
+    <blockquote>&ldquo;The first minimizer that smooths without that flattened feeling &mdash; I wore it all day with zero adjusting.&rdquo;</blockquote>
+    <div class="by">Sandra K. &middot; bought 75D &middot; <span class="stars">★★★★★</span></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab on">All</button>
+      <button class="tab">With photos</button>
+      <button class="tab">My size</button>
+      <button class="tab">Highest rated</button>
+    </div>
+    <select class="sort" aria-label="Sort reviews">
+      <option>Most helpful</option>
+      <option>Most recent</option>
+      <option>Highest rated</option>
+    </select>
+  </div>
+
+  <div id="reviews"></div>
+
+  <div class="cta-bar">
+    <a class="cta-btn" href="#review-form">Share your experience</a>
+  </div>
+</section>
+
+<script>
+  const reviews = [
+    { ini: "ML", name: "Marie L.", date: "1 week ago", r: 5, title: "My everyday favourite", body: "Soft against the skin, no wire digging, and the black stays a true deep black wash after wash. I've already bought a second in skin tone.", bought: "80C", help: 28, color: "#993556" },
+    { ini: "AT", name: "Anja T.", date: "2 weeks ago", r: 4, title: "Lovely fit, straps could be sturdier", body: "Cup fit is perfect and true to size. The straps loosen slightly through the day so I re-tighten once — otherwise gorgeous and worth it.", bought: "75D", help: 15, color: "#534ab7" },
+    { ini: "CB", name: "Claudia B.", date: "3 weeks ago", r: 5, title: "Elegant and supportive", body: "Rare to find a minimizer this pretty. The lace detail feels luxurious and it holds shape beautifully under tailoring.", bought: "85C", help: 11, color: "#993c1d" },
+  ];
+
+  function stars(n) {
+    let out = "";
+    for (let i = 1; i <= 5; i++) {
+      out += '<span style="color:#c8a35b;opacity:' + (i <= n ? 1 : 0.3) + '">★</span>';
+    }
+    return '<span style="letter-spacing:1px;font-size:13px">' + out + '</span>';
+  }
+
+  function card(rv) {
+    return '<div class="rev">' +
+      '<div class="rev-head">' +
+        '<div class="rev-id">' +
+          '<div class="avatar" style="background:' + rv.color + '">' + rv.ini + '</div>' +
+          '<div>' +
+            '<div class="rev-name">' + rv.name +
+              '<span class="verified" title="Verified buyer">✓ Verified</span></div>' +
+            '<div class="rev-meta">' + rv.date + ' &middot; bought ' + rv.bought + '</div>' +
+          '</div>' +
+        '</div>' +
+        stars(rv.r) +
+      '</div>' +
+      '<div class="rev-title">' + rv.title + '</div>' +
+      '<p class="rev-body">' + rv.body + '</p>' +
+      '<div class="rev-foot">' +
+        '<span class="count">' + rv.help + ' found this helpful</span>' +
+        '<button class="helpful">▲ Helpful</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  document.getElementById("reviews").innerHTML = reviews.map(card).join("");
+
+  document.querySelectorAll(".tab").forEach(function (t) {
+    t.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("on"); });
+      t.classList.add("on");
+    });
+  });
+</script>
+
+</body>
+</html>
