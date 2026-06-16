@@ -345,7 +345,7 @@ header {
 /* ---- colour swatches (real product photos) ---- */
 .swatches { display: flex; gap: 6px; }
 .swatch {
-  width: 54px; height: 66px;
+  width: 72px; height: 88px;
   border: 0;
   border-bottom: 2px solid transparent;
   padding: 0;
@@ -365,7 +365,9 @@ header {
 .swatch__inner img {
   width: 100%; height: 100%;
   object-fit: cover;
+  object-position: center 25%;
   display: block;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* ---- size group titles ---- */
