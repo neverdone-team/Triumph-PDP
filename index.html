@@ -52,7 +52,7 @@
   --gutter: 20px;
   --col-gap: 60px;
 
-  --header-h: 64px;
+  --header-h: 100px;
   --sticky-offset: calc(var(--header-h) + 16px);
 }
 
@@ -85,86 +85,118 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
 }
 
 /* ============================================================
-   HEADER
+   HEADER — Figma node 66-3180
    ============================================================ */
 header {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(255,255,255,.96);
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--c-line);
+  background: rgba(255,255,255,.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .nav {
-  max-width: 1400px; margin: 0 auto;
-  padding: 0 24px;
-  height: var(--header-h);
-  display: grid;
-  grid-template-columns: 110px 1fr auto;
-  align-items: center;
-  gap: 32px;
-}
-.logo {
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: 22px;
-  letter-spacing: .22em;
-  display: flex; align-items: baseline; gap: 4px;
-}
-.logo .crown {
-  font-size: 14px;
-  letter-spacing: 0;
-  font-weight: 300;
-}
-.nav__center {
+  max-width: 1440px; margin: 0 auto;
+  padding: 34px 24px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 28px;
+  justify-content: space-between;
+  gap: 24px;
 }
+
+/* Logo */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-ink);
+  flex: none;
+}
+.logo__word {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: .22em;
+  line-height: 1;
+}
+.logo__crown {
+  width: 24px; height: 14px;
+  fill: currentColor;
+  flex: none;
+}
+
+/* Nav links (center) */
 .nav__links {
-  display: flex; gap: 28px;
-  flex: 0 1 auto;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
 }
 .nav__links a {
-  font-size: 14px;
-  letter-spacing: 0;
-  padding: 6px 0;
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: -0.02em;
   font-weight: 400;
   color: var(--c-ink);
   white-space: nowrap;
+  padding: 4px 0;
 }
-.nav__links a.special { color: var(--c-special); }
+.nav__links a.special { color: var(--c-burgundy); }
 .nav__links a:hover { color: var(--c-burgundy); }
 
-.search {
-  margin-left: auto;
-  display: flex; align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid var(--c-line);
-  padding: 6px 0;
-  width: 200px;
+/* Right cluster (search + icons) */
+.nav__right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: none;
 }
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 124px;
+  margin-right: 12px;
+}
+.search__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.search__row svg { width: 10px; height: 10px; stroke: var(--c-ink); fill: none; stroke-width: 1.5; flex: none; }
 .search input {
   border: 0; outline: 0;
   background: transparent;
   font-family: inherit;
   font-size: 14px;
-  width: 100%;
+  line-height: 14px;
+  letter-spacing: -0.02em;
   color: var(--c-ink);
+  flex: 1;
+  width: 100%;
+  padding: 0;
 }
-.search input::placeholder { color: var(--c-ink-soft); }
-.search svg { width: 16px; height: 16px; stroke: var(--c-ink); fill: none; stroke-width: 1.5; flex: none; }
+.search input::placeholder { color: var(--c-ink); opacity: 1; }
+.search__rule {
+  height: 1px;
+  background: var(--c-ink);
+  width: 108px;
+}
 
-.nav__icons { display: flex; gap: 22px; justify-content: flex-end; align-items: center; }
+.nav__icons { display: flex; align-items: center; }
 .nav__icons button {
-  background: none; border: 0; padding: 0; color: var(--c-ink);
-  display: flex; align-items: center; gap: 4px;
-  position: relative;
+  background: none; border: 0;
+  padding: 8px 16px;
+  color: var(--c-ink);
+  display: inline-flex; align-items: center; gap: 4px;
 }
 .nav__icons .cart-count {
   font-size: 14px;
+  line-height: 14px;
+  letter-spacing: -0.02em;
   font-weight: 400;
 }
-.icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.4; }
 
 /* ============================================================
    PRODUCT LAYOUT  (sticky pair lives here)
@@ -1040,38 +1072,51 @@ html.is-unlocked .gate { display: none; }
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- HEADER (Figma node 66-3180) -->
 <header>
   <nav class="nav">
-    <div class="logo">TRIUMPH<span class="crown">♛</span></div>
+    <!-- LEFT: Triumph wordmark + crown -->
+    <a class="logo" href="#" aria-label="Triumph">
+      <span class="logo__word">TRIUMPH</span>
+      <svg class="logo__crown" viewBox="0 0 24 14" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 4l4 10h16l4-10-6 2-3-4-3 4-3-4-3 4-6-2z"/>
+        <rect x="3" y="11.5" width="18" height="1.5"/>
+      </svg>
+    </a>
 
-    <div class="nav__center">
-      <ul class="nav__links">
-        <li><a href="#" class="special">Special Deals</a></li>
-        <li><a href="#">Bras</a></li>
-        <li><a href="#">Knickers</a></li>
-        <li><a href="#">Shapewear</a></li>
-        <li><a href="#">Activewear</a></li>
-        <li><a href="#">Sleep &amp; Lounge</a></li>
-        <li><a href="#">Swimwear</a></li>
-      </ul>
+    <!-- CENTER: nav -->
+    <ul class="nav__links">
+      <li><a href="#" class="special">Special Deals</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Knickers</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Activewear</a></li>
+      <li><a href="#">Sleep &amp; Lounge</a></li>
+      <li><a href="#">Swimwear</a></li>
+    </ul>
+
+    <!-- RIGHT: search + icons -->
+    <div class="nav__right">
       <label class="search" aria-label="Suche">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
-        <input type="search" placeholder="Search" />
+        <span class="search__row">
+          <svg viewBox="0 0 10 10"><circle cx="4.5" cy="4.5" r="3"/><path d="M7 7l2 2" stroke-linecap="round"/></svg>
+          <input type="search" placeholder="Search" />
+        </span>
+        <span class="search__rule" aria-hidden="true"></span>
       </label>
-    </div>
 
-    <div class="nav__icons">
-      <button aria-label="Konto">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-      </button>
-      <button aria-label="Wunschliste">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
-      </button>
-      <button aria-label="Warenkorb">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-        <span class="cart-count">(2)</span>
-      </button>
+      <div class="nav__icons">
+        <button aria-label="Wunschliste">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+        </button>
+        <button aria-label="Konto">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </button>
+        <button aria-label="Warenkorb">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="cart-count">(2)</span>
+        </button>
+      </div>
     </div>
   </nav>
 </header>
