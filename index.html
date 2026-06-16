@@ -23,7 +23,7 @@
 }
 @font-face {
   font-family: "Alliance No1";
-  src: url("./fonts/Alliance%20No.1%20Regular/Alliance%20No.1%20Regular.otf") format("opentype");
+  src: url("./fonts/AllianceNo1-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -68,6 +68,7 @@ body {
   font-weight: 300;
   font-size: 14px;
   line-height: 1.45;
+  letter-spacing: -0.02em;            /* Figma Title H9 spec */
   -webkit-font-smoothing: antialiased;
   min-width: 1440px;
 }
@@ -246,8 +247,8 @@ header {
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: 24px;
-  line-height: 1.18;
-  letter-spacing: -.01em;
+  line-height: 1.12;
+  letter-spacing: -0.02em;            /* Figma Title H9 - 16 */
   flex: 1;
 }
 .title-fav {
@@ -457,7 +458,17 @@ header {
 .acc {
   border-top: 1px solid var(--c-line);
 }
-.acc:last-of-type { border-bottom: 1px solid var(--c-line); }
+.acc:last-child { border-bottom: 1px solid var(--c-line); }
+
+/* Accordion row that is actually just a single link (no toggle). */
+.acc--link {
+  padding: 18px 0;
+}
+.acc--link__a {
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
 .acc__btn {
   width: 100%;
   background: none; border: 0; padding: 18px 0;
@@ -1020,15 +1031,9 @@ html.is-unlocked .gate { display: none; }
         </div>
       </details>
 
-      <details class="acc">
-        <summary class="acc__btn">
-          Verfügbarkeit in der Filiale
-          <svg class="chev" viewBox="0 0 14 8"><path d="m1 1 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </summary>
-        <div class="acc__body">
-          <p>Prüfen Sie die Verfügbarkeit dieses Artikels in einer Filiale in Ihrer Nähe.</p>
-        </div>
-      </details>
+      <div class="acc acc--link">
+        <a href="#" class="link-underline acc--link__a">Verfügbarkeit in der Filiale</a>
+      </div>
 
       <details class="acc">
         <summary class="acc__btn">
