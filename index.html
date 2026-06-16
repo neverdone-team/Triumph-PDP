@@ -106,21 +106,13 @@ header {
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   color: var(--c-ink);
   flex: none;
 }
-.logo__word {
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: 18px;
-  letter-spacing: .22em;
-  line-height: 1;
-}
-.logo__crown {
-  width: 24px; height: 14px;
-  fill: currentColor;
-  flex: none;
+.logo__img {
+  width: 156px;
+  height: 20px;
+  display: block;
 }
 
 /* Nav links (center) */
@@ -1076,13 +1068,9 @@ html.is-unlocked .gate { display: none; }
 <!-- HEADER (Figma node 66-3180) -->
 <header>
   <nav class="nav">
-    <!-- LEFT: Triumph wordmark + crown -->
+    <!-- LEFT: Triumph wordmark + crown (SVG asset) -->
     <a class="logo" href="#" aria-label="Triumph">
-      <span class="logo__word">TRIUMPH</span>
-      <svg class="logo__crown" viewBox="0 0 24 14" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 4l4 10h16l4-10-6 2-3-4-3 4-3-4-3 4-6-2z"/>
-        <rect x="3" y="11.5" width="18" height="1.5"/>
-      </svg>
+      <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
     </a>
 
     <!-- CENTER: nav -->
