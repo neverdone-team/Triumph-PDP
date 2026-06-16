@@ -135,11 +135,14 @@ header {
 .nav__links a.special { color: var(--c-burgundy); }
 .nav__links a:hover { color: var(--c-burgundy); }
 
-/* Right cluster (search + icons), evenly spaced */
+/* Right cluster (search + icons). Spacing comes from each icon
+   button's symmetric horizontal padding (16px), so the icon
+   centerlines are evenly spaced regardless of the cart's "(2)"
+   text. The search is offset from the icons by margin-right. */
 .nav__right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 0;
   flex: none;
 }
 
@@ -148,6 +151,7 @@ header {
   flex-direction: column;
   gap: 4px;
   width: 124px;
+  margin-right: 16px;
 }
 .search__row {
   display: flex;
@@ -174,12 +178,19 @@ header {
   width: 108px;
 }
 
-.nav__icons { display: flex; align-items: center; gap: 24px; }
+.nav__icons { display: flex; align-items: center; gap: 0; }
 .nav__icons button {
   background: none; border: 0;
-  padding: 0;
+  padding: 8px 16px;
   color: var(--c-ink);
   display: inline-flex; align-items: center; gap: 4px;
+}
+/* Icon stays in its own 20×20 box so the optional "(2)" cart
+   text sits outside the icon's centering and can't shift the
+   icon off the shared rhythm. */
+.nav__icons .icon-box {
+  width: 20px; height: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
 }
 .nav__icons .cart-count {
   font-size: 14px;
@@ -187,8 +198,7 @@ header {
   letter-spacing: -0.02em;
   font-weight: 400;
 }
-.icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.4; }
-.nav__icons button[aria-label="Wunschliste"] .icon { width: 20px; height: 20px; }
+.icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.4; }
 
 /* ============================================================
    PRODUCT LAYOUT  (sticky pair lives here)
@@ -1096,13 +1106,19 @@ html.is-unlocked .gate { display: none; }
 
       <div class="nav__icons">
         <button aria-label="Wunschliste">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+          <span class="icon-box">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+          </span>
         </button>
         <button aria-label="Konto">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          <span class="icon-box">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          </span>
         </button>
         <button aria-label="Warenkorb">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="icon-box">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          </span>
           <span class="cart-count">(2)</span>
         </button>
       </div>
