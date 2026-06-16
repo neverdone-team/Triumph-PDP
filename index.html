@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=1440" />
 <title>Gefütterter Bügel-BH – Aura Spotlight | Triumph</title>
+<script>
+  /* Pre-render gate check so unlocked visitors never see a flash. */
+  if (localStorage.getItem('triumph-pdp-unlocked') === '1') {
+    document.documentElement.classList.add('is-unlocked');
+  }
+</script>
 <style>
 /* ============================================================
    FONTS (local — Alliance No.1 Light + Regular)
@@ -725,6 +731,84 @@ body[data-mode="v2"] .field--sizes { display: none; }
 }
 
 /* ============================================================
+   PASSWORD GATE (prototype access control)
+   ============================================================ */
+html:not(.is-unlocked) { overflow: hidden; }
+html:not(.is-unlocked) body { overflow: hidden; height: 100vh; }
+html.is-unlocked .gate { display: none; }
+
+.gate {
+  position: fixed; inset: 0;
+  background: var(--c-ink);
+  color: #fff;
+  z-index: 99999;
+  display: flex;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  font-family: var(--font-sans);
+}
+.gate__card {
+  background: #fff;
+  color: var(--c-ink);
+  padding: 48px 40px;
+  width: 380px;
+  text-align: center;
+}
+.gate__card.shake { animation: gateShake .35s ease-in-out; }
+@keyframes gateShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.gate__brand {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: .22em;
+  margin-bottom: 32px;
+}
+.gate__title {
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+.gate__sub {
+  font-size: 13px;
+  color: var(--c-ink-soft);
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+.gate__form { display: flex; flex-direction: column; gap: 12px; }
+.gate__input {
+  padding: 14px 16px;
+  border: 1px solid var(--c-line);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+  color: var(--c-ink);
+  width: 100%;
+}
+.gate__input:focus { border-color: var(--c-ink); }
+.gate__btn {
+  background: var(--c-ink);
+  color: #fff;
+  border: 0;
+  padding: 14px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.gate__btn:hover { background: #1a1a1a; }
+.gate__err {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #B0282A;
+}
+
+/* ============================================================
    Toast
    ============================================================ */
 .toast {
@@ -740,6 +824,20 @@ body[data-mode="v2"] .field--sizes { display: none; }
 </style>
 </head>
 <body>
+
+<!-- ============ PASSWORD GATE ============ -->
+<div class="gate" id="gate" role="dialog" aria-label="Passwort">
+  <div class="gate__card" id="gateCard">
+    <div class="gate__brand">TRIUMPH</div>
+    <h2 class="gate__title">Vorschau geschützt</h2>
+    <p class="gate__sub">Bitte gib das Passwort ein, um den Prototyp anzusehen.</p>
+    <form class="gate__form" id="gateForm" autocomplete="off">
+      <input type="password" id="gateInput" class="gate__input" placeholder="Passwort" autocomplete="off" />
+      <button type="submit" class="gate__btn">Anzeigen</button>
+    </form>
+    <div class="gate__err" id="gateErr" hidden>Falsches Passwort.</div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -1208,6 +1306,35 @@ body[data-mode="v2"] .field--sizes { display: none; }
 <div class="toast" id="toast">In den Warenkorb hinzugefügt</div>
 
 <script>
+  /* -----------------------------------------------------------
+     PASSWORD GATE
+     ----------------------------------------------------------- */
+  (() => {
+    const GATE_PASSWORD = 'neverdone_2026';
+    const gateForm  = document.getElementById('gateForm');
+    const gateInput = document.getElementById('gateInput');
+    const gateErr   = document.getElementById('gateErr');
+    const gateCard  = document.getElementById('gateCard');
+    const isLocked  = !document.documentElement.classList.contains('is-unlocked');
+
+    if (isLocked) gateInput.focus();
+
+    gateForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (gateInput.value === GATE_PASSWORD) {
+        try { localStorage.setItem('triumph-pdp-unlocked', '1'); } catch (_) {}
+        document.documentElement.classList.add('is-unlocked');
+        gateErr.hidden = true;
+      } else {
+        gateErr.hidden = false;
+        gateCard.classList.remove('shake');
+        void gateCard.offsetWidth;       // re-trigger animation
+        gateCard.classList.add('shake');
+        gateInput.select();
+      }
+    });
+  })();
+
   /* Star rating */
   const starsEl = document.getElementById('stars');
   const filledStar = '<svg viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
