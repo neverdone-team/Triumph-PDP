@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Aura Spotlight Bra | Triumph — Mobile</title>
+<style>
+/* ============================================================
+   FONTS (local — Alliance No.1 Light + Regular)
+   ============================================================ */
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Regular.otf") format("opentype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+/* ============================================================
+   TOKENS (from Figma node 180:35458)
+   ============================================================ */
+:root {
+  --c-bg:       #FFFFFF;
+  --c-ink:      #000000;
+  --c-ink-50:   rgba(0,0,0,.5);
+  --c-line:     #DADADA;
+  --c-cta-line: #747474;
+  --c-swatch:   rgba(0,0,0,.05);
+  --font-sans:  "Alliance No1", "Helvetica Neue", Arial, sans-serif;
+
+  --gutter: 16px;
+  --frame:  480px;          /* prototype frame width */
+  --header-h: 50px;
+  --bar-h: 76px;            /* sticky size-bar height incl. safe area */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #efe9e9;
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -.01em;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* The centered mobile frame */
+.phone {
+  position: relative;
+  max-width: var(--frame);
+  margin: 0 auto;
+  background: var(--c-bg);
+  min-height: 100vh;
+  /* room so content can scroll fully clear of the fixed bar */
+  padding-bottom: calc(var(--bar-h) + 24px);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.hdr {
+  position: sticky; top: 0; z-index: 40;
+  height: var(--header-h);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 var(--gutter);
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-line);
+}
+.hdr__logo {
+  font-size: 18px; font-weight: 400; letter-spacing: .18em;
+  text-transform: uppercase; margin-right: auto;
+}
+.hdr__icons { display: flex; align-items: center; gap: 14px; }
+.hdr__icons button {
+  background: none; border: 0; padding: 0; position: relative;
+  width: 22px; height: 22px; color: var(--c-ink);
+}
+.hdr__icons svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+.cart-badge {
+  position: absolute; top: -4px; right: -6px;
+  font-size: 9px; line-height: 1; color: var(--c-ink);
+}
+.hdr__menu {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 4px; width: 22px; height: 22px;
+}
+.hdr__menu span { width: 20px; height: 1.4px; background: var(--c-ink); display: block; }
+
+/* ============================================================
+   HERO GALLERY (horizontal snap + dots)
+   ============================================================ */
+.gallery { position: relative; }
+.gallery__rail {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.gallery__rail::-webkit-scrollbar { display: none; }
+.gallery__rail figure {
+  margin: 0; flex: 0 0 100%; scroll-snap-align: start;
+  aspect-ratio: 375 / 527; background: #f4efef;
+}
+.gallery__rail img { width: 100%; height: 100%; object-fit: cover; }
+.dots {
+  position: absolute; left: 0; right: 0; bottom: 14px;
+  display: flex; justify-content: center; gap: 7px;
+}
+.dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,.55); transition: background .2s, transform .2s;
+}
+.dots span.is-active { background: #fff; transform: scale(1.15); }
+
+/* ============================================================
+   TITLE BLOCK
+   ============================================================ */
+.info { padding: 24px var(--gutter) 4px; }
+.title-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.eyebrow {
+  font-size: 14px; font-weight: 400; letter-spacing: .56px;
+  text-transform: uppercase; margin: 0;
+}
+.pname {
+  font-size: 14px; font-weight: 300; letter-spacing: .56px;
+  margin: 8px 0 0; color: var(--c-ink);
+}
+.fav {
+  flex: 0 0 auto; background: none; border: 0; padding: 0;
+  width: 24px; height: 24px; color: var(--c-ink);
+}
+.fav svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+.fav[data-active="true"] svg { fill: var(--c-ink); }
+
+.price-row {
+  display: flex; align-items: baseline; gap: 6px; margin: 40px 0 0;
+}
+.price { font-size: 14px; font-weight: 400; letter-spacing: -.28px; }
+.vat   { font-size: 12px; font-weight: 300; color: var(--c-ink-50); }
+
+/* swatches */
+.swatches { display: flex; gap: 4px; margin: 32px 0 14px; }
+.swatch {
+  width: 53.76px; height: 64px; border: 0; padding: 0;
+  background: var(--c-swatch);
+  border-bottom: 2px solid transparent;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s;
+}
+.swatch[data-sel="true"] { border-bottom-color: var(--c-ink); }
+.swatch img {
+  width: 43.5px; height: 43.5px; object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.2));
+}
+.color-label { font-size: 14px; font-weight: 300; letter-spacing: .56px; }
+
+/* ============================================================
+   COMPLETE THE SET
+   ============================================================ */
+.section { padding: 32px var(--gutter) 0; }
+.section__title {
+  font-size: 13px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.set-tile {
+  display: grid; grid-template-columns: 96px 1fr auto; align-items: center;
+  gap: 14px; padding: 14px 0;
+}
+.set-tile__thumb { width: 96px; aspect-ratio: 96/120; background: #f4efef; }
+.set-tile__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.set-tile__eb { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.set-tile__nm { font-size: 14px; font-weight: 300; margin: 3px 0 6px; }
+.set-tile__pr { font-size: 13px; }
+.set-tile__pr .vat { margin-left: 5px; }
+.set-tile__add {
+  width: 36px; height: 36px; border: 1px solid var(--c-line);
+  background: #fff; display: flex; align-items: center; justify-content: center;
+}
+.set-tile__add svg { width: 16px; height: 16px; stroke: var(--c-ink); stroke-width: 1.4; }
+
+/* ============================================================
+   ACCORDIONS
+   ============================================================ */
+.acc__head {
+  width: 100%; background: none; border: 0; padding: 14px var(--gutter);
+  display: flex; align-items: baseline; justify-content: flex-start; gap: 12px;
+  font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink);
+}
+.acc__sign {
+  order: -1; font-size: 18px; font-weight: 300; line-height: 1;
+  transition: transform .2s;
+}
+.acc[open] .acc__sign { transform: rotate(45deg); }
+.acc__body { padding: 0 var(--gutter) 20px; font-size: 13px; font-weight: 300; color: #444; line-height: 1.6; }
+.acc__head::-webkit-details-marker { display: none; }
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+
+/* category links */
+.cat-links {
+  display: flex; gap: 18px; padding: 22px var(--gutter); flex-wrap: wrap;
+}
+.cat-links a {
+  font-size: 13px; font-weight: 300;
+  border-bottom: 1px solid var(--c-ink); padding-bottom: 1px;
+}
+
+/* ============================================================
+   CAROUSELS
+   ============================================================ */
+.recs { padding: 24px 0 8px; }
+.recs__title { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 14px; padding: 0 var(--gutter); }
+.recs__rail {
+  display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 0 var(--gutter); scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.recs__rail::-webkit-scrollbar { display: none; }
+.card { flex: 0 0 46%; scroll-snap-align: start; display: flex; flex-direction: column; }
+.card__img { display: block; width: 100%; background: #f4efef; }
+.card__img img { display: block; width: 100%; aspect-ratio: 3/4; height: auto; object-fit: cover; }
+.card__eb { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-top: 8px; }
+.card__nm { display: block; font-size: 13px; font-weight: 300; margin: 2px 0 4px; }
+.card__pr { display: block; font-size: 13px; }
+
+/* ============================================================
+   STICKY "SELECT YOUR SIZE"  ← the animated bar
+   ============================================================ */
+.size-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  background: #FFFFFF;
+  border-top: 1px solid var(--c-line);
+  padding: 14px var(--gutter) calc(14px + env(safe-area-inset-bottom));
+  /* the slide animation */
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform .42s cubic-bezier(.32,.72,0,1), opacity .3s ease;
+  will-change: transform;
+}
+.size-bar__inner { max-width: var(--frame); margin: 0 auto; }
+.size-bar.is-hidden {
+  transform: translateY(140%);
+  opacity: 0;
+  pointer-events: none;
+}
+.size-cta {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  background: transparent; color: var(--c-ink);
+  border: 1px solid var(--c-cta-line); border-radius: 0;
+  padding: 16px; font-size: 14px; font-weight: 400; letter-spacing: .56px;
+  text-transform: uppercase; white-space: nowrap;
+  transition: background .2s, color .2s;
+}
+.size-cta:active { background: var(--c-ink); color: #fff; }
+
+/* ============================================================
+   SIZE SHEET (bottom sheet) — opened by the CTA
+   ============================================================ */
+.backdrop {
+  position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.backdrop[data-show="true"] { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 80;
+  background: #fff; border-radius: 0;
+  max-width: var(--frame); margin: 0 auto;
+  padding: 20px var(--gutter) calc(20px + env(safe-area-inset-bottom));
+  transform: translateY(100%); transition: transform .38s cubic-bezier(.32,.72,0,1);
+  max-height: 80vh; overflow-y: auto;
+}
+.sheet[data-show="true"] { transform: translateY(0); }
+.sheet__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.sheet__title { font-size: 15px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; margin: 0; }
+.sheet__close { background: none; border: 0; font-size: 22px; line-height: 1; color: var(--c-ink); padding: 4px; }
+.sheet__guide { margin: 18px 0 22px; }
+.sheet__guide a { font-size: 13px; font-weight: 300; border-bottom: 1px solid var(--c-ink); padding-bottom: 1px; }
+.sizes {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 18px;
+}
+.size {
+  border: 1px solid var(--c-line); background: #fff; color: var(--c-ink);
+  height: 42px; font-size: 13px; transition: all .15s;
+}
+.size[data-sel="true"] { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+.size.oos { color: var(--c-line); position: relative; cursor: not-allowed; }
+.sheet__cta {
+  width: 100%; background: var(--c-ink); color: #fff; border: 1px solid var(--c-ink);
+  height: 50px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
+}
+
+/* toast */
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--bar-h) + 16px); transform: translateX(-50%) translateY(10px);
+  background: var(--c-ink); color: #fff; font-size: 12px; padding: 10px 16px; border-radius: 4px;
+  opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 90; white-space: nowrap;
+}
+.toast[data-show="true"] { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr__logo">Triumph</div>
+    <div class="hdr__icons">
+      <button aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M16 16l5 5" stroke-linecap="round"/></svg></button>
+      <button aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button>
+      <button aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg></button>
+      <button aria-label="Cart"><svg viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg><span class="cart-badge">0</span></button>
+      <button class="hdr__menu" aria-label="Menu"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <!-- HERO GALLERY -->
+  <div class="gallery">
+    <div class="gallery__rail" id="galleryRail">
+      <figure><img src="./Assets/figma/web/img04.jpg" alt="Aura Spotlight bra, front view" /></figure>
+      <figure><img src="./Assets/figma/web/img03.jpg" alt="Lace detail" /></figure>
+      <figure><img src="./Assets/figma/web/img01.jpg" alt="Product view" /></figure>
+      <figure><img src="./Assets/figma/web/img10.jpg" alt="Side view" /></figure>
+      <figure><img src="./Assets/figma/web/img08.jpg" alt="Seated view" /></figure>
+    </div>
+    <div class="dots" id="dots">
+      <span class="is-active"></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- TITLE BLOCK -->
+  <section class="info">
+    <div class="title-row">
+      <div>
+        <h1 class="eyebrow">Aura Spotlight Bra</h1>
+        <p class="pname">Padded Underwire Bra</p>
+      </div>
+      <button class="fav" data-active="false" aria-label="Add to wishlist">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="price-row">
+      <span class="price">£59.95</span>
+      <span class="vat">incl. VAT</span>
+    </div>
+
+    <div class="swatches" id="swatches">
+      <button class="swatch" data-name="Creamy Dream" data-sel="true" aria-label="Creamy Dream">
+        <img src="./Assets/figma/web/img02.png" alt="" />
+      </button>
+      <button class="swatch" data-name="Black" data-sel="false" aria-label="Black">
+        <img src="./Assets/figma/web/img06.png" alt="" />
+      </button>
+    </div>
+    <div class="color-label" id="colorLabel">Creamy Dream</div>
+  </section>
+
+  <!-- COMPLETE THE SET -->
+  <section class="section">
+    <h2 class="section__title">Complete the set</h2>
+    <a class="set-tile" href="#">
+      <span class="set-tile__thumb"><img src="./Assets/figma/web/img05.jpg" alt="Panty" /></span>
+      <span>
+        <span class="set-tile__eb">Aura Spotlight</span>
+        <span class="set-tile__nm" style="display:block">Panty</span>
+        <span class="set-tile__pr">£59.95<span class="vat">incl. VAT</span></span>
+      </span>
+      <button class="set-tile__add" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>
+    </a>
+    <a class="set-tile" href="#">
+      <span class="set-tile__thumb"><img src="./Assets/figma/web/img11.jpg" alt="Long-sleeve top" /></span>
+      <span>
+        <span class="set-tile__eb">Aura Spotlight</span>
+        <span class="set-tile__nm" style="display:block">Long-Sleeve Top</span>
+        <span class="set-tile__pr">£69.95<span class="vat">incl. VAT</span></span>
+      </span>
+      <button class="set-tile__add" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>
+    </a>
+  </section>
+
+  <!-- ACCORDIONS -->
+  <div style="margin-top:32px">
+    <details class="acc"><summary class="acc__head">Features <span class="acc__sign">+</span></summary>
+      <div class="acc__body">Padded underwire cups for a smooth, lifted shape. Delicate floral lace across the cups and wings. Adjustable straps and a hook-and-eye back closure.</div>
+    </details>
+    <details class="acc"><summary class="acc__head">Shipping &amp; Returns <span class="acc__sign">+</span></summary>
+      <div class="acc__body">Free standard delivery for MyTriumph members. Returns accepted within 30 days.</div>
+    </details>
+    <details class="acc"><summary class="acc__head">Care <span class="acc__sign">+</span></summary>
+      <div class="acc__body">Hand wash cold. Do not bleach. Do not tumble dry. Reshape and dry flat.</div>
+    </details>
+    <details class="acc"><summary class="acc__head">Standards &amp; Traceability <span class="acc__sign">+</span></summary>
+      <div class="acc__body">Made with responsibly sourced materials. Full supply-chain traceability.</div>
+    </details>
+  </div>
+
+  <!-- CATEGORY LINKS -->
+  <nav class="cat-links">
+    <a href="#">Padded Bras</a>
+    <a href="#">Underwire Bras</a>
+    <a href="#">Moulded Bras</a>
+  </nav>
+
+  <!-- YOU MIGHT LIKE THIS -->
+  <section class="recs">
+    <h2 class="recs__title">You might like this</h2>
+    <div class="recs__rail">
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img12.jpg" alt=""></span><span class="card__eb">Aura Spotlight</span><span class="card__nm">Panty</span><span class="card__pr">£59.95</span></a>
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img13.jpg" alt=""></span><span class="card__eb">Aura Spotlight</span><span class="card__nm">Bralette</span><span class="card__pr">£49.95</span></a>
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img14.jpg" alt=""></span><span class="card__eb">Amourette</span><span class="card__nm">Underwire Bra</span><span class="card__pr">£54.95</span></a>
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img15.jpg" alt=""></span><span class="card__eb">Amourette</span><span class="card__nm">Lace Set</span><span class="card__pr">£64.95</span></a>
+    </div>
+  </section>
+
+  <!-- RECENTLY VIEWED -->
+  <section class="recs">
+    <h2 class="recs__title">Recently viewed</h2>
+    <div class="recs__rail">
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img07.jpg" alt=""></span><span class="card__eb">Aura Spotlight</span><span class="card__nm">Brief</span><span class="card__pr">£39.95</span></a>
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img09.jpg" alt=""></span><span class="card__eb">Aura Spotlight</span><span class="card__nm">Soft Bra</span><span class="card__pr">£42.95</span></a>
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img05.jpg" alt=""></span><span class="card__eb">Aura Spotlight</span><span class="card__nm">Lace Brief</span><span class="card__pr">£24.95</span></a>
+      <a class="card" href="#"><span class="card__img"><img src="./Assets/figma/web/img11.jpg" alt=""></span><span class="card__eb">Aura Spotlight</span><span class="card__nm">Knit Sweater</span><span class="card__pr">£52.95</span></a>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ STICKY SELECT-YOUR-SIZE BAR (animated) ============ -->
+<div class="size-bar" id="sizeBar">
+  <div class="size-bar__inner">
+    <button class="size-cta" id="sizeCta">Select your size</button>
+  </div>
+</div>
+
+<!-- ============ SIZE SHEET ============ -->
+<div class="backdrop" id="backdrop"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-hidden="true" aria-label="Select size">
+  <div class="sheet__top">
+    <h2 class="sheet__title">Select your size</h2>
+    <button class="sheet__close" id="sheetClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="sheet__guide"><a href="#">Find my bra size</a></div>
+  <div class="sizes" id="sheetGrid"></div>
+  <button class="sheet__cta" id="sheetAdd">Add to bag</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  /* ---------- 1. THE ANIMATION: hide on scroll, reveal on stop ---------- */
+  var bar = document.getElementById('sizeBar');
+  var idleTimer = null;
+  var IDLE_MS = 180;          // how long after the last scroll tick we wait
+  var lastY = window.scrollY;
+
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    // Only treat real movement as "scrolling" (ignore rubber-band jitter ~0px)
+    if (Math.abs(y - lastY) > 2) {
+      bar.classList.add('is-hidden');   // slide out
+    }
+    lastY = y;
+
+    // Reset the idle timer on every tick; when it finally fires, scrolling stopped.
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      bar.classList.remove('is-hidden'); // slide back in
+    }, IDLE_MS);
+  }, { passive: true });
+
+  /* ---------- 2. Gallery dots ---------- */
+  var rail = document.getElementById('galleryRail');
+  var dots = Array.prototype.slice.call(document.querySelectorAll('#dots span'));
+  rail.addEventListener('scroll', function () {
+    var i = Math.round(rail.scrollLeft / rail.clientWidth);
+    dots.forEach(function (d, n) { d.classList.toggle('is-active', n === i); });
+  }, { passive: true });
+
+  /* ---------- 3. Swatches ---------- */
+  var swatches = document.getElementById('swatches');
+  var colorLabel = document.getElementById('colorLabel');
+  swatches.addEventListener('click', function (e) {
+    var btn = e.target.closest('.swatch'); if (!btn) return;
+    swatches.querySelectorAll('.swatch').forEach(function (s) { s.dataset.sel = 'false'; });
+    btn.dataset.sel = 'true';
+    colorLabel.textContent = btn.dataset.name;
+  });
+
+  /* ---------- 4. Favourite toggle ---------- */
+  var fav = document.querySelector('.fav');
+  fav.addEventListener('click', function () {
+    fav.dataset.active = fav.dataset.active === 'true' ? 'false' : 'true';
+  });
+
+  /* ---------- 5. Size sheet ---------- */
+  var BANDS = ['65','70','75','80','85','90','95','100'];
+  var CUPS  = ['A','B','C','D','E','F'];
+  var OOS   = { '65F': 1, '100A': 1, '100F': 1, '95F': 1 };
+  var picked = null;
+  var grid = document.getElementById('sheetGrid');
+  BANDS.forEach(function (b) {
+    CUPS.forEach(function (c) {
+      var code = b + c;
+      var el = document.createElement('button');
+      el.className = 'size' + (OOS[code] ? ' oos' : '');
+      el.textContent = code;
+      if (OOS[code]) el.disabled = true;
+      el.dataset.size = code;
+      grid.appendChild(el);
+    });
+  });
+
+  var sheet = document.getElementById('sheet');
+  var backdrop = document.getElementById('backdrop');
+  function openSheet() {
+    sheet.dataset.show = 'true'; backdrop.dataset.show = 'true';
+    sheet.setAttribute('aria-hidden', 'false');
+    document.documentElement.style.overflow = 'hidden';
+  }
+  function closeSheet() {
+    sheet.dataset.show = 'false'; backdrop.dataset.show = 'false';
+    sheet.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+  }
+  document.getElementById('sizeCta').addEventListener('click', openSheet);
+  document.getElementById('sheetClose').addEventListener('click', closeSheet);
+  backdrop.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheet.dataset.show === 'true') closeSheet();
+  });
+
+  grid.addEventListener('click', function (e) {
+    var b = e.target.closest('.size:not(.oos)'); if (!b) return;
+    grid.querySelectorAll('.size').forEach(function (x) { x.dataset.sel = 'false'; });
+    b.dataset.sel = 'true';
+    picked = b.dataset.size;
+    document.getElementById('sizeCta').textContent = 'Size ' + picked + ' · Change';
+  });
+
+  /* ---------- 6. Toast + add to bag ---------- */
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg) {
+    toast.textContent = msg; toast.dataset.show = 'true';
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.dataset.show = 'false'; }, 2200);
+  }
+  document.getElementById('sheetAdd').addEventListener('click', function () {
+    if (!picked) { showToast('Please select a size'); return; }
+    showToast('Added to bag · Size ' + picked);
+    closeSheet();
+  });
+})();
+</script>
+</body>
+</html>
