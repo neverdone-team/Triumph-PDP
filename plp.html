@@ -163,7 +163,28 @@ body[data-version="v5"] .hero img { display: none; }
 }
 
 /* ============================================================
-   RESULTS ROW
+   CATEGORY TEASER (Figma 802-3999 desktop / 803-5278 mobile)
+   replaces the Blush & Pink banner in versions 1, 2 and 4
+   ============================================================ */
+.cat-teaser {
+  max-width: 1440px; margin: 0 auto;
+  padding: 0 var(--pad-x) 24px;
+  display: flex; gap: 16px;
+}
+.cat { display: flex; flex-direction: column; gap: 8px; width: 164px; flex: none; }
+.cat__img { display: block; aspect-ratio: 688 / 905; overflow: hidden; background: var(--c-offwhite); }
+.cat__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease-out); }
+.cat:hover .cat__img img { transform: scale(1.05); }
+.cat__label {
+  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+}
+/* teaser in v1/v2/v4 — the Blush & Pink hero only in v5 */
+body:is([data-version="v5"], [data-version="v6"]) .cat-teaser { display: none; }
+body:not([data-version="v5"]):not([data-version="v6"]) .hero { display: none; }
+
+/* ============================================================
+   RESULTS ROW — title left, filter chips right (Figma 853-8773)
    ============================================================ */
 /* sticky wrapper — full-width white bar pinned below the nav */
 .results-bar {
@@ -172,15 +193,28 @@ body[data-version="v5"] .hero img { display: none; }
 }
 .results-row {
   max-width: 1440px; margin: 0 auto; /* never wider than the navbar */
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 40px var(--pad-x) 24px;
-  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
-  font-weight: 300;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 24px var(--pad-x);
 }
-.results-row button {
-  font-size: inherit; font-weight: inherit;
-  letter-spacing: inherit; text-transform: inherit;
+.results-title {
+  font-size: 16px; line-height: 24px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
 }
+/* the title follows the version: category view vs Blush & Pink collection */
+.results-title span { display: none; }
+body:not([data-version="v5"]):not([data-version="v6"]) .results-title .t-bras { display: inline; }
+body:is([data-version="v5"], [data-version="v6"]) .results-title .t-blush { display: inline; }
+.filters { display: flex; gap: 20px; align-items: center; }
+.filters button, .filters-mobile {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+  white-space: nowrap;
+}
+.filters button svg { width: 7px; height: 4px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.filters button:hover, .filters-mobile:hover { opacity: .55; }
+.filters-mobile { display: none; }
+.filters-mobile svg { width: 10px; height: 10px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
 
 /* ============================================================
    GRID + CARD (flush columns, like Figma)
@@ -192,7 +226,7 @@ body[data-version="v5"] .hero img { display: none; }
   margin-bottom: 120px;
 }
 .card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
-.card, .editorial {
+.card, .editorial, .break {
   position: relative;
   /* scroll reveal — blurred rise-and-fade, row by row */
   opacity: 0;
@@ -202,9 +236,9 @@ body[data-version="v5"] .hero img { display: none; }
               transform 1.4s var(--ease-reveal),
               filter 1.4s var(--ease-reveal);
 }
-.card.is-visible, .editorial.is-visible { opacity: 1; transform: none; filter: none; }
+.card.is-visible, .editorial.is-visible, .break.is-visible { opacity: 1; transform: none; filter: none; }
 @media (prefers-reduced-motion: reduce) {
-  .card, .editorial { opacity: 1; transform: none; filter: none; transition: none; }
+  .card, .editorial, .break { opacity: 1; transform: none; filter: none; transition: none; }
 }
 
 .card__img {
@@ -226,6 +260,41 @@ body[data-version="v5"] .hero img { display: none; }
   background: #fff;
 }
 .card__img .ph--variant.is-on { opacity: 1; }
+
+/* hover gallery — a different photo fades in, chevrons page through 4 */
+.card__img .ph--hover {
+  opacity: 0;
+  transition: opacity .38s var(--ease-out);
+  background: #fff;
+}
+.card__img .ph--hover.is-on { opacity: 1; }
+.gal-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 4;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s var(--ease-out);
+}
+.gal-nav svg { width: 12px; height: 12px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; transition: transform .2s var(--ease-out); }
+.gal-nav:hover svg { transform: scale(1.25); }
+.gal-nav--prev { left: 12px; }
+.gal-nav--next { right: 12px; }
+.card__img:hover .gal-nav { opacity: 1; pointer-events: auto; }
+@media (hover: none) { .gal-nav { display: none; } }
+
+/* wishlist heart — top right of every product photo (Figma 853-8773) */
+.wish {
+  position: absolute; top: 16px; right: 16px; z-index: 6;
+  width: 24px; height: 24px;
+}
+.wish svg {
+  width: 24px; height: 24px;
+  fill: #fff; stroke: var(--c-ink); stroke-width: 1;
+  transition: fill .2s var(--ease-out), transform .2s var(--ease-out);
+}
+.wish:hover svg { transform: scale(1.1); }
+.wish[data-on="true"] svg { fill: var(--c-ink); }
 
 .card__info { padding: 12px; display: flex; flex-direction: column; }
 .card__cat {
@@ -266,38 +335,40 @@ body[data-version="v5"] .hero img { display: none; }
 .thumb img { object-fit: cover; background: #fff; border: 1px solid rgba(0,0,0,.06); }
 .thumb:hover { border-bottom-color: var(--c-line); }
 .thumb[data-sel="true"] { border-bottom-color: var(--c-ink); }
+/* the currently worn colour — full product photo cropped to the bra */
+.thumb--current img { object-position: 50% 22%; }
 
 /* ============================================================
    V1 — INLINE SWAP (label + price morph into thumbs, zero shift)
    thumbs anchor to the LEFT edge of the row and stay inside the card
    ============================================================ */
 .cvar__thumbs {
-  position: absolute; left: 0; top: 50%;
+  position: absolute; right: 0; top: 0;
   max-width: 100%; overflow: hidden;
-  transform: translateY(calc(-50% + 18px));
-  display: flex; gap: 6px; align-items: center;
+  transform: translateY(10px);
+  display: flex; gap: 8px; align-items: flex-start; justify-content: flex-end;
   opacity: 0; pointer-events: none;
   transition: opacity .28s var(--ease-out), transform .28s var(--ease-out);
 }
-.cvar__thumbs .thumb img { width: 32px; height: 32px; }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .card__pr { opacity: 0; }
+.cvar__thumbs .thumb img { width: 56px; height: 56px; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .card__pr { opacity: 0; }
 .cvar__thumbs .thumb {
   opacity: 0; transform: translateY(4px);
   transition: opacity .3s var(--ease-out), transform .3s var(--ease-out), border-color .2s;
 }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__label { opacity: 0; transform: translateY(-6px); }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs {
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__label { opacity: 0; transform: translateY(-6px); }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs {
   opacity: 1; pointer-events: auto;
-  transform: translateY(calc(-50% + 12px)); /* sits lower — clear air below the title */
+  transform: translateY(4px); /* drops in from the "+N colors" spot, grows downwards */
 }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb { opacity: 1; transform: translateY(0); }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb { opacity: 1; transform: translateY(0); }
 /* stagger */
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(2) { transition-delay: .04s; }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(3) { transition-delay: .08s; }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(4) { transition-delay: .12s; }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(5) { transition-delay: .16s; }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(6) { transition-delay: .20s; }
-body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(7) { transition-delay: .24s; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(2) { transition-delay: .04s; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(3) { transition-delay: .08s; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(4) { transition-delay: .12s; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(5) { transition-delay: .16s; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(6) { transition-delay: .20s; }
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(7) { transition-delay: .24s; }
 
 /* ============================================================
    V2 — SWATCH STRIP over the photo
@@ -351,7 +422,7 @@ body[data-version="v2"] .card.is-open .strip { transform: translateY(0); }
 body[data-version="v4"] .card.is-open .panel {
   opacity: 1; pointer-events: auto; transform: translateY(0);
 }
-body:is([data-version="v1"], [data-version="v5"]) .cvar__label,
+body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .cvar__label,
 body[data-version="v4"] .cvar__label { cursor: pointer; }
 body[data-version="v4"] .cvar { cursor: pointer; }
 
@@ -369,8 +440,28 @@ body:not([data-version="v5"]) .editorial { display: none; }
 body[data-version="v5"] .card--extra { display: block; }
 /* tiles keep the product-photo proportions so rows stay aligned */
 .ed--car   { grid-column: span 2; aspect-ratio: 1376 / 905; }
+.ed--car img { object-position: 50% 28%; } /* landscape crop of a portrait photo — keep her face in frame */
 .ed--tulip { aspect-ratio: 688 / 905; }
 .ed--lips  { grid-column: span 2; grid-row: span 2; aspect-ratio: 720 / 1129; }
+
+/* ============================================================
+   V6 — LAYOUT BREAK: editorial images sit inset in the grid,
+   with white space around them (Figma 853-8773 / 853-9733)
+   ============================================================ */
+.break { position: relative; }
+body:not([data-version="v6"]) .break { display: none; }
+/* more air between rows — 80px + 40% */
+body[data-version="v6"] .grid { row-gap: 112px; }
+.break img { width: 100%; height: 100%; object-fit: cover; }
+/* portrait tile — image floats between two columns, white space both sides */
+.br--portrait { grid-column: span 2; }
+.br--portrait img { width: 58%; height: auto; margin: 0 auto; aspect-ratio: 418 / 553; }
+/* tall tile — full bleed over two columns and two rows */
+.br--tall { grid-column: span 2; grid-row: span 2; overflow: hidden; }
+.br--tall img { position: absolute; inset: 0; }
+/* wide tile — landscape image with side margins, top-aligned with the row */
+.br--wide { grid-column: span 2; }
+.br--wide img { width: 89%; height: auto; margin: 0 auto; aspect-ratio: 640 / 474; }
 
 /* ============================================================
    RESPONSIVE — tablet step + mobile design (Figma 833-15105)
@@ -400,11 +491,20 @@ body[data-version="v5"] .card--extra { display: block; }
   .hero { height: 300px; }
   .hero h1 { font-size: 16px; font-weight: 400; letter-spacing: .04em; text-indent: .04em; }
 
-  /* results bar */
-  .results-row { padding: 16px 16px 12px; font-size: 10px; letter-spacing: .04em; }
+  /* category teaser — horizontal scroll strip (Figma 803-5278) */
+  .cat-teaser { padding: 0 16px 24px; overflow-x: auto; scrollbar-width: none; }
+  .cat-teaser::-webkit-scrollbar { display: none; }
+  .cat { width: 102px; }
+  .cat__label { font-size: 10px; line-height: 16px; }
+
+  /* results bar — title + "Sort & Filter +" (Figma 853-9733) */
+  .results-row { padding: 16px 16px 12px; }
+  .results-title { font-size: 12px; line-height: 16px; }
+  .filters { display: none; }
+  .filters-mobile { display: inline-flex; }
 
   /* grid — 2 columns */
-  .grid { grid-template-columns: repeat(2, 1fr); row-gap: 48px; margin-bottom: 80px; }
+  .grid, body[data-version="v6"] .grid { grid-template-columns: repeat(2, 1fr); row-gap: 48px; margin-bottom: 80px; }
 
   /* card — +N colors on its own line below price (name-first order is global now) */
   .card__info { padding: 8px 4px 0; }
@@ -412,14 +512,24 @@ body[data-version="v5"] .card--extra { display: block; }
   .card__row { flex-direction: column; align-items: flex-start; gap: 4px; min-height: 0; }
   .card__pr { font-size: 12px; }
   .card__pr .rrp { font-size: 10px; }
-  .cvar__thumbs { top: auto; bottom: 0; transform: translateY(6px); }
-  body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs { transform: translateY(0); }
+  .cvar__thumbs { left: 0; right: auto; justify-content: flex-start; top: auto; bottom: 0; transform: translateY(6px); }
+  .cvar__thumbs .thumb img { width: 40px; height: 40px; }
+  body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs { transform: translateY(0); }
+
+  /* hearts sit closer to the corner on small cards */
+  .wish { top: 10px; right: 10px; width: 20px; height: 20px; }
+  .wish svg { width: 20px; height: 20px; }
 
   /* v5 editorial tiles — car becomes a single portrait tile, lips go full width */
   .ed--car { grid-column: span 1; aspect-ratio: 688 / 905; }
   .ed--lips { grid-column: 1 / -1; grid-row: auto; }
   body[data-version="v5"] .card--extra { display: none; } /* keeps mobile pairs even */
-  body[data-version="v5"] .grid { grid-auto-flow: dense; } /* backfill so lips close the page */
+  body:is([data-version="v5"], [data-version="v6"]) .grid { grid-auto-flow: dense; } /* backfill so tiles close the page */
+
+  /* v6 layout-break tiles — full row, image inset with 24px margins */
+  .br--portrait, .br--tall, .br--wide { grid-column: 1 / -1; grid-row: auto; overflow: visible; }
+  .br--portrait img, .br--wide img { width: calc(100% - 48px); margin: 0 auto; aspect-ratio: 327 / 247; }
+  .br--tall img { position: static; width: calc(100% - 48px); margin: 0 auto; height: auto; aspect-ratio: 327 / 299; }
 
   /* variant overlays — fit the narrow cards (and never widen the page) */
   .panel { flex-wrap: wrap; gap: 8px; padding: 8px 48px 8px 4px; overflow: hidden; }
@@ -516,7 +626,16 @@ body[data-version="v5"] .card--extra { display: block; }
     <a href="#">Home</a><span>•</span><a href="#">Bras</a><span>•</span><b>Blush &amp; Pink</b>
   </nav>
 
-  <!-- HERO — still image everywhere, video in the Blush & Pink version -->
+  <!-- CATEGORY TEASER — versions 1, 2 and 4 (Figma 802-3999 / 803-5278) -->
+  <section class="cat-teaser" aria-label="Bra categories">
+    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-lacey.jpg" alt="" /></span><span class="cat__label">Lacey Bras</span></a>
+    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-padded.jpg" alt="" /></span><span class="cat__label">Padded Bras</span></a>
+    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-sports.jpg" alt="" /></span><span class="cat__label">Sports Bras</span></a>
+    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-wired.jpg" alt="" /></span><span class="cat__label">Wired Bras</span></a>
+    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-unwired.jpg" alt="" /></span><span class="cat__label">Unwired Bras</span></a>
+  </section>
+
+  <!-- HERO — Blush & Pink version only -->
   <section class="hero">
     <img src="./Assets/plp/hero.jpg" alt="" />
     <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -526,8 +645,19 @@ body[data-version="v5"] .card--extra { display: block; }
   <!-- RESULTS (sticky below the nav while scrolling the grid) -->
   <div class="results-bar">
     <div class="results-row">
-      <span>38 Results</span>
-      <button>Filter &amp; Sort</button>
+      <h2 class="results-title">
+        <span class="t-bras">Bras (38)</span>
+        <span class="t-blush">Blush &amp; Pink Collection (38)</span>
+      </h2>
+      <div class="filters" aria-label="Filter">
+        <button>Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Series <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Standards <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+      </div>
+      <button class="filters-mobile">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
     </div>
   </div>
 
@@ -543,6 +673,7 @@ body[data-version="v5"] .card--extra { display: block; }
   <button data-v="v2">2 · Image strip</button>
   <button data-v="v4">4 · Expanding panel</button>
   <button data-v="v5">Blush &amp; Pink</button>
+  <button data-v="v6">Layout break</button>
 </div>
 
 <script>
@@ -581,15 +712,29 @@ const PRODUCTS = [
    ============================================================ */
 const grid = document.getElementById('grid');
 
+/* alternate product photos for the hover gallery (4 per card) */
+const GALLERY_POOL = [
+  './Assets/plp/card1.jpg', './Assets/plp/card2.jpg', './Assets/plp/card3.jpg', './Assets/plp/card4.jpg',
+  './Assets/plp/cat-padded.jpg', './Assets/plp/cat-wired.jpg', './Assets/plp/cat-unwired.jpg', './Assets/plp/cat-sports.jpg',
+];
+
 PRODUCTS.forEach((p, i) => {
-  // only the OTHER colours — the currently selected one is not repeated
-  const variants = VARIANT_POOL.slice(0, p.colors);
+  // the currently selected colour leads the list, followed by the other colours
+  const variants = [
+    { name: 'Blush Rosé (selected)', img: p.ph, current: true },
+    ...VARIANT_POOL.slice(0, p.colors),
+  ];
+
+  /* 4 hover photos: the card's own + 3 rotating alternates */
+  const others = GALLERY_POOL.filter(src => src !== p.ph);
+  const gallery = [p.ph, others[i % others.length], others[(i + 2) % others.length], others[(i + 4) % others.length]];
 
   const card = document.createElement('article');
   card.className = 'card' + (p.extra ? ' card--extra' : '');
+  card.dataset.gallery = gallery.join('|');
 
   const thumbTpl = (v, j) => `
-    <button class="thumb" data-img="${v.img}" data-idx="${j}" data-sel="false" aria-label="${v.name}" title="${v.name}">
+    <button class="thumb${v.current ? ' thumb--current' : ''}" data-img="${v.img}" data-idx="${j}" data-sel="${!!v.current}" aria-label="${v.name}" title="${v.name}">
       <img src="${v.img}" alt="${v.name}" loading="lazy" />
     </button>`;
   const thumbsHtml = variants.map(thumbTpl).join('');
@@ -605,11 +750,17 @@ PRODUCTS.forEach((p, i) => {
   };
   const panelThumbsHtml = variants.length > 4 ? moreTile(variants, 4) : thumbsHtml;
   const stripThumbsHtml = variants.length > 6 ? moreTile(variants, 6) : thumbsHtml;
+  /* v1 inline row — big 56px tiles, at most 5 fit the card width */
+  const rowThumbsHtml = variants.length > 5 ? moreTile(variants, 5) : thumbsHtml;
 
   card.innerHTML = `
     <div class="card__img">
       <img class="ph ph--base" src="${p.ph}" alt="${p.nm}" />
       <img class="ph ph--variant" src="${p.ph}" alt="" aria-hidden="true" />
+      <img class="ph ph--hover" src="${gallery[1]}" alt="" aria-hidden="true" />
+      <button class="gal-nav gal-nav--prev" aria-label="Previous photo"><svg viewBox="0 0 10 10"><path d="M6.5 1 2.5 5l4 4"/></svg></button>
+      <button class="gal-nav gal-nav--next" aria-label="Next photo"><svg viewBox="0 0 10 10"><path d="M3.5 1l4 4-4 4"/></svg></button>
+      <button class="wish" data-on="false" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg></button>
       <div class="strip" role="group" aria-label="Colours">${stripThumbsHtml}</div>
     </div>
     <div class="card__info">
@@ -619,7 +770,7 @@ PRODUCTS.forEach((p, i) => {
         <span class="card__pr">${p.pr}<span class="rrp">RRP</span></span>
         <span class="cvar">
           <button class="cvar__label">+${p.colors} colors</button>
-          <span class="cvar__thumbs" role="group" aria-label="Colours">${thumbsHtml}</span>
+          <span class="cvar__thumbs" role="group" aria-label="Colours">${rowThumbsHtml}</span>
         </span>
       </div>
       <div class="panel" role="group" aria-label="Colours">${panelThumbsHtml}<button class="panel__close">Close</button></div>
@@ -633,7 +784,7 @@ PRODUCTS.forEach((p, i) => {
    inserted before the Nth product card so the grid flows around them
    ============================================================ */
 const EDITORIALS = [
-  { cls: 'ed--car',   src: './Assets/plp/moody-car.jpg',   before: 5  },
+  { cls: 'ed--car',   src: './Assets/plp/break-portrait.jpg', before: 5 },
   { cls: 'ed--tulip', src: './Assets/plp/moody-tulip.jpg', before: 7  },
   { cls: 'ed--lips',  src: './Assets/plp/moody-lips.jpg',  before: 15 },
 ];
@@ -644,6 +795,25 @@ const EDITORIALS = [
     tile.className = 'editorial ' + e.cls;
     tile.innerHTML = `<img src="${e.src}" alt="" loading="lazy" />`;
     grid.insertBefore(tile, cardEls[e.before] || null);
+  });
+}
+
+/* ============================================================
+   V6 — layout-break tiles: editorial images inset in the grid
+   (Figma 853-8773 desktop / 853-9733 mobile)
+   ============================================================ */
+const BREAKS = [
+  { cls: 'br--portrait', src: './Assets/plp/break-portrait.jpg', before: 5  },
+  { cls: 'br--tall',     src: './Assets/plp/break-tall.jpg',     before: 12 },
+  { cls: 'br--wide',     src: './Assets/plp/break-wide.jpg',     before: 14 },
+];
+{
+  const cardEls = [...grid.querySelectorAll('.card')];
+  BREAKS.forEach(b => {
+    const tile = document.createElement('div');
+    tile.className = 'break ' + b.cls;
+    tile.innerHTML = `<img src="${b.src}" alt="" loading="lazy" />`;
+    grid.insertBefore(tile, cardEls[b.before] || null);
   });
 }
 
@@ -659,15 +829,16 @@ const setHeaderH = () =>
 setHeaderH();
 window.addEventListener('resize', setHeaderH);
 
-/* v5 — the lips tile spans two rows; trim it so it ends exactly at the
-   bottom of the neighbouring cards' photos (info text hangs below) */
-const lipsTile = grid.querySelector('.ed--lips');
+/* v5 lips / v6 tall tile span two rows; trim them so they end exactly at
+   the bottom of the neighbouring cards' photos (info text hangs below) */
+const trimTiles = [grid.querySelector('.ed--lips'), grid.querySelector('.br--tall')].filter(Boolean);
 function alignLips() {
-  if (!lipsTile) return;
-  if (window.innerWidth <= 760) { lipsTile.style.height = ''; return; } // full-width tile keeps its aspect
-  const neighbor = grid.querySelector('.card--extra') || cards[cards.length - 1];
-  const info = neighbor.querySelector('.card__info');
-  lipsTile.style.height = info.offsetHeight ? `calc(100% - ${info.offsetHeight}px)` : '';
+  if (!trimTiles.length) return;
+  const info = cards[0].querySelector('.card__info'); // all cards share the same info height
+  trimTiles.forEach(tile => {
+    if (window.innerWidth <= 760) { tile.style.height = ''; return; } // full-width tiles keep their aspect
+    tile.style.height = info.offsetHeight ? `calc(100% - ${info.offsetHeight}px)` : '';
+  });
 }
 alignLips();
 window.addEventListener('resize', alignLips);
@@ -719,21 +890,47 @@ cards.forEach(card => {
   const label = card.querySelector('.cvar__label');
 
   /* clicking the product (photo or title) opens the PDP;
-     colour thumbs / labels / panels keep their own behaviour */
+     colour thumbs / labels / panels / gallery / heart keep their own behaviour */
   card.addEventListener('click', e => {
-    if (e.target.closest('.thumb, .cvar, .panel, .strip')) return;
+    if (e.target.closest('.thumb, .cvar, .panel, .strip, .gal-nav, .wish')) return;
     window.location.href = './pdp.html';
+  });
+
+  /* hover gallery — entering the photo shows a different shot,
+     chevrons page through all 4; leaving restores the base photo */
+  const gallery = card.dataset.gallery.split('|');
+  const hoverImg = card.querySelector('.ph--hover');
+  const imgWrap = card.querySelector('.card__img');
+  let galIdx = 0;
+  function showGal(i) {
+    galIdx = (i + gallery.length) % gallery.length;
+    if (galIdx === 0) { hoverImg.classList.remove('is-on'); return; }
+    hoverImg.src = gallery[galIdx];
+    if (hoverImg.complete) hoverImg.classList.add('is-on');
+    else hoverImg.onload = () => hoverImg.classList.add('is-on');
+  }
+  card._resetGallery = () => showGal(0);
+  imgWrap.addEventListener('mouseenter', () => showGal(1));
+  imgWrap.addEventListener('mouseleave', () => showGal(0));
+  card.querySelector('.gal-nav--prev').addEventListener('click', e => { e.stopPropagation(); showGal(galIdx - 1); });
+  card.querySelector('.gal-nav--next').addEventListener('click', e => { e.stopPropagation(); showGal(galIdx + 1); });
+
+  /* wishlist heart */
+  const wish = card.querySelector('.wish');
+  wish.addEventListener('click', e => {
+    e.stopPropagation();
+    wish.dataset.on = wish.dataset.on === 'true' ? 'false' : 'true';
   });
 
   /* V1 + V4 — open on label hover/click */
   label.addEventListener('mouseenter', () => {
     const v = body.dataset.version;
-    if (v === 'v1' || v === 'v5') { closeAll(card); card.classList.add('is-open'); }
+    if (v === 'v1' || v === 'v5' || v === 'v6') { closeAll(card); card.classList.add('is-open'); }
   });
   label.addEventListener('click', e => {
     e.stopPropagation();
     const v = body.dataset.version;
-    if (v === 'v1' || v === 'v4' || v === 'v5') {
+    if (v === 'v1' || v === 'v4' || v === 'v5' || v === 'v6') {
       const open = card.classList.contains('is-open');
       closeAll(card);
       card.classList.toggle('is-open', !open);
@@ -749,7 +946,7 @@ cards.forEach(card => {
   /* leaving the card closes v1 (hover pattern); v4 stays until click-out */
   card.addEventListener('mouseleave', () => {
     const v = body.dataset.version;
-    if (v === 'v1' || v === 'v5') card.classList.remove('is-open');
+    if (v === 'v1' || v === 'v5' || v === 'v6') card.classList.remove('is-open');
     /* v2: reset preview to the selected colour, or back to the card's own photo */
     if (body.dataset.version === 'v2') swapImage(card, card.dataset.selImg || null);
   });
@@ -758,6 +955,7 @@ cards.forEach(card => {
   card.querySelectorAll('.thumb:not(.thumb--more)').forEach(th => {
     th.addEventListener('mouseenter', () => {
       if (body.dataset.version === 'v2' && th.closest('.strip')) {
+        card._resetGallery(); // colour preview wins over the hover gallery
         swapImage(card, th.dataset.img);
       }
     });
@@ -782,10 +980,11 @@ document.addEventListener('click', e => {
    VERSION SWITCHER
    ============================================================ */
 const HINTS = {
-  v1: 'Hover or click “+N colors” — price & label morph into thumbnails, left-aligned',
+  v1: 'Hover or click “+N colors” — big colour tiles drop in on the right, where the label was',
   v2: 'Hover a card — thumbnails float in over the photo, hover one to preview',
   v4: 'Click “+N colors” — the colours cover the product info, “Close” dismisses',
   v5: 'Blush & Pink — moody editorial imagery breaks up the grid; colours swap inline like version 1',
+  v6: 'Layout break — editorial images sit inset in the grid with white space around them',
 };
 const hint = document.getElementById('hint');
 const switcher = document.querySelector('.switcher');
@@ -793,11 +992,12 @@ const switcher = document.querySelector('.switcher');
 function setVersion(v) {
   body.dataset.version = v;
   closeAll();
-  /* reset all variant selections + previews */
+  /* reset all variant selections + previews (back to the current colour) */
   cards.forEach(card => {
     card.querySelector('.ph--variant').classList.remove('is-on');
+    card._resetGallery();
     delete card.dataset.selImg;
-    card.querySelectorAll('.thumb:not(.thumb--more)').forEach(t => t.dataset.sel = 'false');
+    card.querySelectorAll('.thumb:not(.thumb--more)').forEach(t => t.dataset.sel = String(t.dataset.idx === '0'));
   });
   switcher.querySelectorAll('button').forEach(b => b.dataset.on = (b.dataset.v === v));
   hint.textContent = HINTS[v];
