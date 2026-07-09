@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blush &amp; Pink – Bras | Triumph</title>
+<style>
+/* ============================================================
+   FONTS (local — Alliance No.1 Light + Regular)
+   ============================================================ */
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS (from Figma)
+   ============================================================ */
+:root {
+  --c-bg:        #FFFFFF;
+  --c-ink:       #000000;
+  --c-ink-soft:  #747474;
+  --c-line:      #DADADA;
+  --c-offwhite:  #F8F3F3;
+  --c-burgundy:  #5E2039;
+  --c-special:   #B0282A;
+
+  --font-sans: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --pad-x: 24px; /* full-bleed layout — only text rows keep side padding */
+  --header-h: 80px; /* measured on load (see JS) — sticky offset for the results bar */
+
+  --ease-out: cubic-bezier(.22,.61,.36,1);
+  --ease-reveal: cubic-bezier(.22,1,.36,1); /* fast start, long glide-out */
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; background: none; border: 0; padding: 0; color: inherit; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+h1, h2, h3 { margin: 0; font-weight: 400; }
+
+
+/* ============================================================
+   HEADER (same as PDP prototype)
+   ============================================================ */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--c-bg); /* solid white — no translucency */
+}
+.nav {
+  max-width: 1440px; margin: 0 auto;
+  padding: 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.logo { display: inline-flex; align-items: center; flex: none; }
+.logo__img { width: 156px; height: 20px; display: block; }
+.nav__links { display: flex; gap: 24px; }
+.nav__links a {
+  font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 300; /* Alliance Light — new nav (817-5636) */
+  padding-bottom: 2px; border-bottom: 1px solid transparent;
+  transition: border-color .25s var(--ease-out);
+}
+.nav__links a:hover { border-bottom-color: var(--c-ink); }
+.nav__right { display: flex; align-items: center; gap: 20px; }
+/* filled search field — grey box, icon inside, "SUCHE" label */
+.search {
+  display: flex; align-items: center; gap: 4px;
+  height: 32px; padding: 0 16px 0 8px;
+  background: #F1F1F1;
+}
+.search svg { width: 16px; height: 16px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.search input {
+  border: 0; outline: 0; background: transparent;
+  font-family: inherit; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 300;
+  width: 64px; color: var(--c-ink);
+}
+.search input::placeholder { color: var(--c-ink); opacity: 1; }
+.nav__icons { display: flex; align-items: center; gap: 20px; }
+.nav__icons .icon { width: 18px; height: 18px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
+/* count sits tight against the bag, aligned to its top (Figma) */
+.nav__icons button[aria-label="Cart"] { display: inline-flex; align-items: flex-start; gap: 2px; }
+.cart-count { font-size: 12px; font-weight: 300; letter-spacing: .04em; line-height: 1; }
+.burger { display: none; } /* mobile only */
+.burger svg { width: 20px; height: 8px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; display: block; }
+
+/* ============================================================
+   BREADCRUMB
+   ============================================================ */
+.breadcrumb {
+  max-width: 1440px; margin: 0 auto; /* never wider than the navbar */
+  display: flex; gap: 12px; align-items: center;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 300;
+  color: var(--c-ink-soft);
+  padding: 20px var(--pad-x) 24px;
+}
+.breadcrumb b { font-weight: 400; color: var(--c-ink); }
+.breadcrumb span { opacity: .5; }
+
+/* ============================================================
+   HERO — "List Interuptor" 1280x440
+   ============================================================ */
+.hero {
+  position: relative;
+  height: 440px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero img, .hero video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  animation: heroIn 1.6s var(--ease-out) both;
+}
+/* video only in the Blush & Pink version (v5) */
+.hero video { display: none; }
+body[data-version="v5"] .hero video { display: block; }
+body[data-version="v5"] .hero img { display: none; }
+@keyframes heroIn {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1); }
+}
+.hero h1 {
+  position: relative;
+  color: #fff;
+  font-weight: 300;
+  font-size: 28px;
+  letter-spacing: .38em;
+  text-indent: .38em; /* optically recenter tracked text */
+  text-transform: uppercase;
+  animation: heroTitle 1.1s .25s var(--ease-out) both;
+}
+@keyframes heroTitle {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   RESULTS ROW
+   ============================================================ */
+/* sticky wrapper — full-width white bar pinned below the nav */
+.results-bar {
+  position: sticky; top: var(--header-h); z-index: 40;
+  background: var(--c-bg);
+}
+.results-row {
+  max-width: 1440px; margin: 0 auto; /* never wider than the navbar */
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 40px var(--pad-x) 24px;
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 300;
+}
+.results-row button {
+  font-size: inherit; font-weight: inherit;
+  letter-spacing: inherit; text-transform: inherit;
+}
+
+/* ============================================================
+   GRID + CARD (flush columns, like Figma)
+   ============================================================ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 80px; /* Figma: gap between product rows */
+  margin-bottom: 120px;
+}
+.card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
+.card, .editorial {
+  position: relative;
+  /* scroll reveal — blurred rise-and-fade, row by row */
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(3px);
+  transition: opacity 1.4s var(--ease-reveal),
+              transform 1.4s var(--ease-reveal),
+              filter 1.4s var(--ease-reveal);
+}
+.card.is-visible, .editorial.is-visible { opacity: 1; transform: none; filter: none; }
+@media (prefers-reduced-motion: reduce) {
+  .card, .editorial { opacity: 1; transform: none; filter: none; transition: none; }
+}
+
+.card__img {
+  position: relative;
+  aspect-ratio: 688 / 905; /* Figma full-width card image */
+  overflow: hidden;
+  background: var(--c-offwhite);
+}
+.card__img .ph {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .9s var(--ease-out);
+}
+.card:hover .card__img .ph--base { transform: scale(1.04); }
+/* variant overlay photo — crossfades on top of the base */
+.card__img .ph--variant {
+  opacity: 0;
+  transition: opacity .38s var(--ease-out);
+  background: #fff;
+}
+.card__img .ph--variant.is-on { opacity: 1; }
+
+.card__info { padding: 12px; display: flex; flex-direction: column; }
+.card__cat {
+  font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 400; /* Alliance Regular — new PLP direction (817-5636) */
+  line-height: 20px;
+  margin-top: 4px;
+}
+.card__nm {
+  font-size: 12px; line-height: 20px;
+  font-weight: 300; letter-spacing: .04em; /* Alliance Light */
+  order: -1; /* name reads above the collection line */
+}
+.card__row {
+  position: relative;
+  margin-top: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 24px;
+}
+.card__pr { font-size: 14px; transition: opacity .28s var(--ease-out); }
+.card__pr .rrp { font-size: 10px; color: var(--c-ink-soft); margin-left: 6px; text-decoration: line-through; }
+
+/* ============================================================
+   SHARED — colour label + thumbnails
+   ============================================================ */
+.cvar { display: flex; align-items: center; }
+.cvar__label {
+  font-size: 12px; font-weight: 300; letter-spacing: .04em;
+  transition: opacity .28s var(--ease-out), transform .28s var(--ease-out);
+  white-space: nowrap;
+}
+.thumb {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color .2s var(--ease-out);
+  flex: none;
+}
+.thumb img { object-fit: cover; background: #fff; border: 1px solid rgba(0,0,0,.06); }
+.thumb:hover { border-bottom-color: var(--c-line); }
+.thumb[data-sel="true"] { border-bottom-color: var(--c-ink); }
+
+/* ============================================================
+   V1 — INLINE SWAP (label + price morph into thumbs, zero shift)
+   thumbs anchor to the LEFT edge of the row and stay inside the card
+   ============================================================ */
+.cvar__thumbs {
+  position: absolute; left: 0; top: 50%;
+  max-width: 100%; overflow: hidden;
+  transform: translateY(calc(-50% + 18px));
+  display: flex; gap: 6px; align-items: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s var(--ease-out), transform .28s var(--ease-out);
+}
+.cvar__thumbs .thumb img { width: 32px; height: 32px; }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .card__pr { opacity: 0; }
+.cvar__thumbs .thumb {
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .3s var(--ease-out), transform .3s var(--ease-out), border-color .2s;
+}
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__label { opacity: 0; transform: translateY(-6px); }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs {
+  opacity: 1; pointer-events: auto;
+  transform: translateY(calc(-50% + 12px)); /* sits lower — clear air below the title */
+}
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb { opacity: 1; transform: translateY(0); }
+/* stagger */
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(2) { transition-delay: .04s; }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(3) { transition-delay: .08s; }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(4) { transition-delay: .12s; }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(5) { transition-delay: .16s; }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(6) { transition-delay: .20s; }
+body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs .thumb:nth-child(7) { transition-delay: .24s; }
+
+/* ============================================================
+   V2 — SWATCH STRIP over the photo
+   ============================================================ */
+.strip {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; gap: 8px; justify-content: center; align-items: center;
+  padding: 0 8px 12px;
+  transform: translateY(110%);
+  transition: transform .42s var(--ease-out);
+}
+.strip .thumb { padding-bottom: 3px; }
+.strip .thumb img { width: 40px; height: 40px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+body[data-version="v2"] .card:hover .strip,
+body[data-version="v2"] .card.is-open .strip { transform: translateY(0); }
+
+/* ============================================================
+   V4 — COLOUR PANEL covering the title/price info area
+   ============================================================ */
+.card__info { position: relative; }
+.panel {
+  position: absolute; inset: 0;
+  z-index: 5;
+  display: flex; gap: 12px; align-items: center;
+  padding: 12px 64px 12px 12px;
+  background: #fff;
+  opacity: 0; pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity .32s var(--ease-out), transform .32s var(--ease-out);
+}
+.panel .thumb img { width: 44px; height: 44px; }
+.panel__close {
+  /* same spot as the "+N colors" label: right end of the price row */
+  position: absolute; bottom: 16px; right: 12px;
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 300; /* matches .link-underline in index.html */
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--c-ink);
+  transition: opacity .2s;
+}
+.panel__close:hover { opacity: .5; }
+
+/* "+N" overflow tile */
+.thumb--more { position: relative; cursor: pointer; }
+.thumb--more img { opacity: .3; }
+.thumb--more span {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+body[data-version="v4"] .card.is-open .panel {
+  opacity: 1; pointer-events: auto; transform: translateY(0);
+}
+body:is([data-version="v1"], [data-version="v5"]) .cvar__label,
+body[data-version="v4"] .cvar__label { cursor: pointer; }
+body[data-version="v4"] .cvar { cursor: pointer; }
+
+/* ============================================================
+   V5 — BLUSH & PINK: moody editorial tiles woven into the grid
+   (Figma 803-5629 desktop / 803-5789 mobile)
+   ============================================================ */
+.editorial { overflow: hidden; align-self: start; }
+.editorial img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+}
+body:not([data-version="v5"]) .editorial { display: none; }
+.card--extra { display: none; } /* 17th card — fills the last desktop row in v5 only */
+body[data-version="v5"] .card--extra { display: block; }
+/* tiles keep the product-photo proportions so rows stay aligned */
+.ed--car   { grid-column: span 2; aspect-ratio: 1376 / 905; }
+.ed--tulip { aspect-ratio: 688 / 905; }
+.ed--lips  { grid-column: span 2; grid-row: span 2; aspect-ratio: 720 / 1129; }
+
+/* ============================================================
+   RESPONSIVE — tablet step + mobile design (Figma 833-15105)
+   ============================================================ */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px) {
+  /* header — 50px bar: logo · suche · account · bag · burger */
+  .nav { padding: 12px 16px; gap: 16px; }
+  .logo__img { width: 100px; height: 13px; }
+  .nav__links { display: none; }
+  .nav__right { gap: 16px; }
+  .nav__icons { gap: 16px; }
+  .nav__icons .icon { width: 16px; height: 16px; }
+  .nav__icons button[aria-label="Wishlist"] { display: none; }
+  .burger { display: inline-flex; }
+  .search { height: 26px; padding: 0 12px 0 8px; }
+  .search svg { width: 14px; height: 14px; }
+  .search input { width: 60px; } /* fits the full "SUCHE" label */
+
+  /* breadcrumb — Label/Default/S, current page muted */
+  .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 12px 16px; gap: 12px; color: var(--c-ink); }
+  .breadcrumb b { font-weight: 300; color: var(--c-ink-soft); }
+
+  /* hero */
+  .hero { height: 300px; }
+  .hero h1 { font-size: 16px; font-weight: 400; letter-spacing: .04em; text-indent: .04em; }
+
+  /* results bar */
+  .results-row { padding: 16px 16px 12px; font-size: 10px; letter-spacing: .04em; }
+
+  /* grid — 2 columns */
+  .grid { grid-template-columns: repeat(2, 1fr); row-gap: 48px; margin-bottom: 80px; }
+
+  /* card — +N colors on its own line below price (name-first order is global now) */
+  .card__info { padding: 8px 4px 0; }
+  .card__cat { font-size: 12px; line-height: 16px; }
+  .card__row { flex-direction: column; align-items: flex-start; gap: 4px; min-height: 0; }
+  .card__pr { font-size: 12px; }
+  .card__pr .rrp { font-size: 10px; }
+  .cvar__thumbs { top: auto; bottom: 0; transform: translateY(6px); }
+  body:is([data-version="v1"], [data-version="v5"]) .card.is-open .cvar__thumbs { transform: translateY(0); }
+
+  /* v5 editorial tiles — car becomes a single portrait tile, lips go full width */
+  .ed--car { grid-column: span 1; aspect-ratio: 688 / 905; }
+  .ed--lips { grid-column: 1 / -1; grid-row: auto; }
+  body[data-version="v5"] .card--extra { display: none; } /* keeps mobile pairs even */
+  body[data-version="v5"] .grid { grid-auto-flow: dense; } /* backfill so lips close the page */
+
+  /* variant overlays — fit the narrow cards (and never widen the page) */
+  .panel { flex-wrap: wrap; gap: 8px; padding: 8px 48px 8px 4px; overflow: hidden; }
+  .panel .thumb img { width: 32px; height: 32px; }
+  .panel__close { bottom: 10px; right: 8px; }
+  .strip { flex-wrap: wrap; gap: 4px; }
+  .strip .thumb img { width: 32px; height: 32px; }
+
+  /* prototype chrome */
+  .switcher button { padding: 6px 10px; font-size: 11px; }
+  .switcher__hint { display: none; }
+}
+
+/* ============================================================
+   VERSION SWITCHER (prototype chrome)
+   ============================================================ */
+.switcher {
+  position: fixed; left: 50%; bottom: 24px; z-index: 100;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(0,0,0,.88);
+  backdrop-filter: blur(8px);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.switcher button {
+  color: rgba(255,255,255,.65);
+  font-size: 12px; letter-spacing: .04em;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: color .25s, background .25s;
+  white-space: nowrap;
+}
+.switcher button:hover { color: #fff; }
+.switcher button[data-on="true"] { background: #fff; color: #000; }
+.switcher__hint {
+  position: fixed; left: 50%; bottom: 68px; z-index: 100;
+  transform: translateX(-50%);
+  font-size: 11px; letter-spacing: .04em;
+  color: var(--c-ink-soft);
+  background: rgba(255,255,255,.9);
+  padding: 4px 12px; border-radius: 999px;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+</style>
+</head>
+<body data-version="v1">
+
+<!-- HEADER -->
+<header>
+  <nav class="nav">
+    <a class="logo" href="./index.html" aria-label="Triumph">
+      <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
+    </a>
+    <ul class="nav__links">
+      <li><a href="#">Special Deals</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Knickers</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Activewear</a></li>
+      <li><a href="#">Sleep &amp; Lounge</a></li>
+      <li><a href="#">Swimwear</a></li>
+    </ul>
+    <div class="nav__right">
+      <label class="search" aria-label="Search">
+        <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Suche" />
+      </label>
+      <div class="nav__icons">
+        <button aria-label="Account">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </button>
+        <button aria-label="Wishlist">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+        </button>
+        <button aria-label="Cart">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="burger" aria-label="Menu">
+          <svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="#">Home</a><span>•</span><a href="#">Bras</a><span>•</span><b>Blush &amp; Pink</b>
+  </nav>
+
+  <!-- HERO — still image everywhere, video in the Blush & Pink version -->
+  <section class="hero">
+    <img src="./Assets/plp/hero.jpg" alt="" />
+    <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+    <h1>Blush &amp; Pink</h1>
+  </section>
+
+  <!-- RESULTS (sticky below the nav while scrolling the grid) -->
+  <div class="results-bar">
+    <div class="results-row">
+      <span>38 Results</span>
+      <button>Filter &amp; Sort</button>
+    </div>
+  </div>
+
+  <!-- GRID (cards rendered by JS) -->
+  <section class="grid" id="grid"></section>
+
+</main>
+
+<!-- VERSION SWITCHER -->
+<div class="switcher__hint" id="hint"></div>
+<div class="switcher" role="tablist" aria-label="Prototype version">
+  <button data-v="v1" data-on="true">1 · Inline swap</button>
+  <button data-v="v2">2 · Image strip</button>
+  <button data-v="v4">4 · Expanding panel</button>
+  <button data-v="v5">Blush &amp; Pink</button>
+</div>
+
+<script>
+/* ============================================================
+   DATA — products from Figma node 817-5636,
+   colour variants from the provided Assets/*.webp images
+   ============================================================ */
+/* only the two provided crops — repeated when a card needs more colours */
+const ROSE  = { name: 'Rosé',  img: './Assets/plp/variant-rose.png' };
+const BLACK = { name: 'Black', img: './Assets/plp/variant-black.png' };
+const VARIANT_POOL = [ROSE, BLACK, ROSE, BLACK, ROSE, BLACK];
+
+const PRODUCTS = [
+  { cat: 'LACE BALCONETTE BRA',    nm: 'Midnight Bloom',  pr: '£45.00', colors: 3, ph: './Assets/plp/card1.jpg' },
+  { cat: 'SEAMLESS T-SHIRT BRA',   nm: 'Cloud Nine',      pr: '£38.50', colors: 5, ph: './Assets/plp/card2.jpg' },
+  { cat: 'STRAPLESS PUSH-UP BRA',  nm: 'Velvet Kiss',     pr: '£52.00', colors: 2, ph: './Assets/plp/card3.jpg' },
+  { cat: 'SPORTS PERFORMANCE BRA', nm: 'Active Edge',     pr: '£34.95', colors: 4, ph: './Assets/plp/card4.jpg' },
+  { cat: 'PLUNGE LACE BRA',        nm: 'Scarlet Muse',    pr: '£49.99', colors: 6, ph: './Assets/plp/card1.jpg' },
+  { cat: 'WIRELESS COMFORT BRA',   nm: 'Soft Touch',      pr: '£29.95', colors: 2, ph: './Assets/plp/card2.jpg' },
+  { cat: 'DEMI CUP SATIN BRA',     nm: 'Pearl Luxe',      pr: '£55.00', colors: 3, ph: './Assets/plp/card3.jpg' },
+  { cat: 'FULL COVERAGE BRA',      nm: 'Daily Essential', pr: '£32.00', colors: 4, ph: './Assets/plp/card4.jpg' },
+  { cat: 'BRALETTE TRIANGLE',      nm: 'Free Spirit',     pr: '£24.95', colors: 2, ph: './Assets/plp/card1.jpg' },
+  { cat: 'HALTER NECK BRA',        nm: 'Summer Glow',     pr: '£42.50', colors: 5, ph: './Assets/plp/card2.jpg' },
+  { cat: 'CONVERTIBLE MULTI-WAY BRA', nm: 'Flex Fit',     pr: '£47.00', colors: 3, ph: './Assets/plp/card3.jpg' },
+  { cat: 'LONGLINE LACE BRA',      nm: 'Elegance',        pr: '£62.00', colors: 4, ph: './Assets/plp/card4.jpg' },
+  { cat: 'MINIMIZER BRA',          nm: 'Sleek Silhouette', pr: '£39.95', colors: 2, ph: './Assets/plp/card1.jpg' },
+  { cat: 'NURSING SUPPORT BRA',    nm: 'Gentle Hold',     pr: '£36.00', colors: 3, ph: './Assets/plp/card2.jpg' },
+  { cat: 'RACERBACK SPORTS BRA',   nm: 'Power Move',      pr: '£28.50', colors: 5, ph: './Assets/plp/card3.jpg' },
+  { cat: 'EMBROIDERED UNDERWIRE BRA', nm: 'Flora Belle',  pr: '£58.00', colors: 4, ph: './Assets/plp/card4.jpg' },
+  /* v5 only — fills the last desktop row next to the editorial collage */
+  { cat: 'PADDED UNDERWIRE BRA',   nm: 'Aura Spotlight',  pr: '£59.95', colors: 4, ph: './Assets/plp/card2.jpg', extra: true },
+];
+
+/* ============================================================
+   RENDER CARDS
+   ============================================================ */
+const grid = document.getElementById('grid');
+
+PRODUCTS.forEach((p, i) => {
+  // only the OTHER colours — the currently selected one is not repeated
+  const variants = VARIANT_POOL.slice(0, p.colors);
+
+  const card = document.createElement('article');
+  card.className = 'card' + (p.extra ? ' card--extra' : '');
+
+  const thumbTpl = (v, j) => `
+    <button class="thumb" data-img="${v.img}" data-idx="${j}" data-sel="false" aria-label="${v.name}" title="${v.name}">
+      <img src="${v.img}" alt="${v.name}" loading="lazy" />
+    </button>`;
+  const thumbsHtml = variants.map(thumbTpl).join('');
+
+  /* overflow: show at most MAX tiles; last one becomes a "+N" tile */
+  const moreTile = (list, max) => {
+    const hidden = list.length - (max - 1);
+    return list.slice(0, max - 1).map(thumbTpl).join('') + `
+      <button class="thumb thumb--more" aria-label="${hidden} more colours" title="View all colours">
+        <img src="${list[max - 1].img}" alt="" loading="lazy" />
+        <span>+${hidden}</span>
+      </button>`;
+  };
+  const panelThumbsHtml = variants.length > 4 ? moreTile(variants, 4) : thumbsHtml;
+  const stripThumbsHtml = variants.length > 6 ? moreTile(variants, 6) : thumbsHtml;
+
+  card.innerHTML = `
+    <div class="card__img">
+      <img class="ph ph--base" src="${p.ph}" alt="${p.nm}" />
+      <img class="ph ph--variant" src="${p.ph}" alt="" aria-hidden="true" />
+      <div class="strip" role="group" aria-label="Colours">${stripThumbsHtml}</div>
+    </div>
+    <div class="card__info">
+      <div class="card__cat">${p.cat}</div>
+      <div class="card__nm">${p.nm}</div>
+      <div class="card__row">
+        <span class="card__pr">${p.pr}<span class="rrp">RRP</span></span>
+        <span class="cvar">
+          <button class="cvar__label">+${p.colors} colors</button>
+          <span class="cvar__thumbs" role="group" aria-label="Colours">${thumbsHtml}</span>
+        </span>
+      </div>
+      <div class="panel" role="group" aria-label="Colours">${panelThumbsHtml}<button class="panel__close">Close</button></div>
+    </div>`;
+
+  grid.appendChild(card);
+});
+
+/* ============================================================
+   V5 — editorial "moody" interruptors (Figma 803-5629 / 803-5789)
+   inserted before the Nth product card so the grid flows around them
+   ============================================================ */
+const EDITORIALS = [
+  { cls: 'ed--car',   src: './Assets/plp/moody-car.jpg',   before: 5  },
+  { cls: 'ed--tulip', src: './Assets/plp/moody-tulip.jpg', before: 7  },
+  { cls: 'ed--lips',  src: './Assets/plp/moody-lips.jpg',  before: 15 },
+];
+{
+  const cardEls = [...grid.querySelectorAll('.card')];
+  EDITORIALS.forEach(e => {
+    const tile = document.createElement('div');
+    tile.className = 'editorial ' + e.cls;
+    tile.innerHTML = `<img src="${e.src}" alt="" loading="lazy" />`;
+    grid.insertBefore(tile, cardEls[e.before] || null);
+  });
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+const body = document.body;
+const cards = [...document.querySelectorAll('.card')];
+
+/* keep the sticky results bar flush below the nav, whatever its real height */
+const setHeaderH = () =>
+  document.documentElement.style.setProperty('--header-h', document.querySelector('header').offsetHeight + 'px');
+setHeaderH();
+window.addEventListener('resize', setHeaderH);
+
+/* v5 — the lips tile spans two rows; trim it so it ends exactly at the
+   bottom of the neighbouring cards' photos (info text hangs below) */
+const lipsTile = grid.querySelector('.ed--lips');
+function alignLips() {
+  if (!lipsTile) return;
+  if (window.innerWidth <= 760) { lipsTile.style.height = ''; return; } // full-width tile keeps its aspect
+  const neighbor = grid.querySelector('.card--extra') || cards[cards.length - 1];
+  const info = neighbor.querySelector('.card__info');
+  lipsTile.style.height = info.offsetHeight ? `calc(100% - ${info.offsetHeight}px)` : '';
+}
+alignLips();
+window.addEventListener('resize', alignLips);
+window.addEventListener('load', alignLips);
+
+/* ============================================================
+   SCROLL REVEAL — one-shot blurred rise per row
+   (each card observed individually; a row enters the viewport
+   together, so the per-column delay cascades it left → right)
+   ============================================================ */
+/* delay follows the RENDERED column (not the DOM index), so rows always
+   sweep 1 → 2 → 3 → 4 even when editorial tiles span columns */
+function setRevealDelays() {
+  const gRect = grid.getBoundingClientRect();
+  const nCols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+  [...grid.children].forEach(c => {
+    const col = Math.round((c.getBoundingClientRect().left - gRect.left) / (gRect.width / nCols));
+    c.style.transitionDelay = col * 120 + 'ms';
+  });
+}
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  [...grid.children].forEach(c => c.classList.add('is-visible'));
+} else {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-visible');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
+  setRevealDelays();
+  window.addEventListener('resize', setRevealDelays);
+  [...grid.children].forEach(c => io.observe(c));
+}
+
+function closeAll(except) {
+  cards.forEach(c => { if (c !== except) c.classList.remove('is-open'); });
+}
+
+function swapImage(card, src) {
+  const overlay = card.querySelector('.ph--variant');
+  if (!src) { overlay.classList.remove('is-on'); return; }
+  overlay.src = src;
+  if (overlay.complete) overlay.classList.add('is-on');
+  else overlay.onload = () => overlay.classList.add('is-on');
+}
+
+cards.forEach(card => {
+  const label = card.querySelector('.cvar__label');
+
+  /* clicking the product (photo or title) opens the PDP;
+     colour thumbs / labels / panels keep their own behaviour */
+  card.addEventListener('click', e => {
+    if (e.target.closest('.thumb, .cvar, .panel, .strip')) return;
+    window.location.href = './pdp.html';
+  });
+
+  /* V1 + V4 — open on label hover/click */
+  label.addEventListener('mouseenter', () => {
+    const v = body.dataset.version;
+    if (v === 'v1' || v === 'v5') { closeAll(card); card.classList.add('is-open'); }
+  });
+  label.addEventListener('click', e => {
+    e.stopPropagation();
+    const v = body.dataset.version;
+    if (v === 'v1' || v === 'v4' || v === 'v5') {
+      const open = card.classList.contains('is-open');
+      closeAll(card);
+      card.classList.toggle('is-open', !open);
+    }
+  });
+
+  /* close button (v4 panel) */
+  card.querySelector('.panel__close').addEventListener('click', e => {
+    e.stopPropagation();
+    card.classList.remove('is-open');
+  });
+
+  /* leaving the card closes v1 (hover pattern); v4 stays until click-out */
+  card.addEventListener('mouseleave', () => {
+    const v = body.dataset.version;
+    if (v === 'v1' || v === 'v5') card.classList.remove('is-open');
+    /* v2: reset preview to the selected colour, or back to the card's own photo */
+    if (body.dataset.version === 'v2') swapImage(card, card.dataset.selImg || null);
+  });
+
+  /* thumbnails — hover previews (v2), click selects (all versions) */
+  card.querySelectorAll('.thumb:not(.thumb--more)').forEach(th => {
+    th.addEventListener('mouseenter', () => {
+      if (body.dataset.version === 'v2' && th.closest('.strip')) {
+        swapImage(card, th.dataset.img);
+      }
+    });
+
+    th.addEventListener('click', e => {
+      e.stopPropagation();
+      /* select this colour in every group of the card (match by index — images repeat) */
+      card.querySelectorAll('.thumb:not(.thumb--more)').forEach(t =>
+        t.dataset.sel = (t.dataset.idx === th.dataset.idx));
+      card.dataset.selImg = th.dataset.img;
+      swapImage(card, th.dataset.img);
+    });
+  });
+});
+
+/* click outside closes open reveals */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.card')) closeAll();
+});
+
+/* ============================================================
+   VERSION SWITCHER
+   ============================================================ */
+const HINTS = {
+  v1: 'Hover or click “+N colors” — price & label morph into thumbnails, left-aligned',
+  v2: 'Hover a card — thumbnails float in over the photo, hover one to preview',
+  v4: 'Click “+N colors” — the colours cover the product info, “Close” dismisses',
+  v5: 'Blush & Pink — moody editorial imagery breaks up the grid; colours swap inline like version 1',
+};
+const hint = document.getElementById('hint');
+const switcher = document.querySelector('.switcher');
+
+function setVersion(v) {
+  body.dataset.version = v;
+  closeAll();
+  /* reset all variant selections + previews */
+  cards.forEach(card => {
+    card.querySelector('.ph--variant').classList.remove('is-on');
+    delete card.dataset.selImg;
+    card.querySelectorAll('.thumb:not(.thumb--more)').forEach(t => t.dataset.sel = 'false');
+  });
+  switcher.querySelectorAll('button').forEach(b => b.dataset.on = (b.dataset.v === v));
+  hint.textContent = HINTS[v];
+  alignLips();
+  setRevealDelays();
+  /* hero video runs only while the Blush & Pink version is showing */
+  const heroVideo = document.querySelector('.hero video');
+  if (v === 'v5') heroVideo.play();
+  else { heroVideo.pause(); heroVideo.currentTime = 0; }
+}
+
+switcher.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-v]');
+  if (btn) setVersion(btn.dataset.v);
+});
+
+/* deep-link: plp.html?v=v2&open=2 (open forces the nth card open — for review/screenshots) */
+const params = new URLSearchParams(location.search);
+if (params.get('v')) setVersion(params.get('v'));
+else hint.textContent = HINTS.v1;
+if (params.get('open')) {
+  const n = Math.max(1, parseInt(params.get('open'), 10) || 1) - 1;
+  requestAnimationFrame(() => (cards[n] || cards[0]).classList.add('is-open'));
+}
+</script>
+
+</body>
+</html>
