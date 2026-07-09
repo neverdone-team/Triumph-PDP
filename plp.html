@@ -172,11 +172,11 @@ body[data-version="v5"] .hero img { display: none; }
   display: flex; gap: 16px;
 }
 .cat { display: flex; flex-direction: column; gap: 8px; width: 164px; flex: none; }
-.cat__img { display: block; aspect-ratio: 688 / 905; overflow: hidden; background: var(--c-offwhite); }
+.cat__img { display: block; aspect-ratio: 1 / 1; overflow: hidden; background: var(--c-offwhite); }
 .cat__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease-out); }
 .cat:hover .cat__img img { transform: scale(1.05); }
 .cat__label {
-  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  font-size: 12px; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
 }
 /* teaser in v1/v2/v4 — the Blush & Pink hero only in v5 */
@@ -200,6 +200,10 @@ body:not([data-version="v5"]):not([data-version="v6"]) .hero { display: none; }
   font-size: 16px; line-height: 24px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
 }
+/* result count — one type step smaller, muted
+   (display:inline outranks the span-hiding rule below; a hidden
+   parent title still hides its count) */
+.results-title .count { display: inline; font-size: 14px; font-weight: 300; color: var(--c-ink-soft); }
 /* the title follows the version: category view vs Blush & Pink collection */
 .results-title span { display: none; }
 body:not([data-version="v5"]):not([data-version="v6"]) .results-title .t-bras { display: inline; }
@@ -500,6 +504,7 @@ body[data-version="v6"] .grid { row-gap: 112px; }
   /* results bar — title + "Sort & Filter +" (Figma 853-9733) */
   .results-row { padding: 16px 16px 12px; }
   .results-title { font-size: 12px; line-height: 16px; }
+  .results-title .count { font-size: 10px; }
   .filters { display: none; }
   .filters-mobile { display: inline-flex; }
 
@@ -646,8 +651,8 @@ body[data-version="v6"] .grid { row-gap: 112px; }
   <div class="results-bar">
     <div class="results-row">
       <h2 class="results-title">
-        <span class="t-bras">Bras (38)</span>
-        <span class="t-blush">Blush &amp; Pink Collection (38)</span>
+        <span class="t-bras">Bras <span class="count">(38)</span></span>
+        <span class="t-blush">Blush &amp; Pink Collection <span class="count">(38)</span></span>
       </h2>
       <div class="filters" aria-label="Filter">
         <button>Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
