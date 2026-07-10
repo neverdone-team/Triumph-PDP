@@ -74,7 +74,7 @@ header {
   background: var(--c-bg);
 }
 .nav {
-  max-width: 1440px; margin: 0 auto;
+  max-width: 2400px; margin: 0 auto;
   padding: 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
@@ -126,15 +126,23 @@ header {
 }
 
 /* ============================================================
-   MAIN — gallery (720) + info (440) on a 1440 canvas
+   MAIN — gallery + info keep their 1440-canvas proportions
+   (720/120/440) but stretch full width up to 2400px
    ============================================================ */
 .main {
-  max-width: 1440px; margin: 0 auto;
+  max-width: 2400px; margin: 0 auto;
   display: flex;
   gap: 8.333%;              /* 120 / 1440 */
 }
 .gallery { width: 50%; flex: none; }   /* 720 / 1440 */
 .info    { width: 30.556%; flex: none; padding-top: 100px; } /* 440 / 1440 */
+
+/* desktop: the buy box holds still while the gallery scrolls past,
+   and only starts scrolling itself once the gallery reaches its end
+   (sticky needs the column's own height, hence align-self) */
+@media (min-width: 761px) {
+  .info { position: sticky; top: 0; align-self: flex-start; }
+}
 
 /* --- gallery ------------------------------------------------ */
 .gallery__hero {
@@ -338,6 +346,10 @@ header {
   column-gap: 60px;
   row-gap: 80px;
 }
+/* very wide screens — six recommendations per row */
+@media (min-width: 1800px) {
+  .recs__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
 .rec { position: relative; }
 .rec__img {
   position: relative;
@@ -368,7 +380,9 @@ header {
 }
 .rec__nm {
   flex: 1; min-width: 0;
-  font-size: 14px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+  /* same title style as the complete-your-set items */
+  font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .rec__pr { font-size: 14px; font-weight: 400; line-height: 16px; letter-spacing: 0; flex: none; }
@@ -377,7 +391,7 @@ header {
    BOTTOM EDITORIAL COLLAGE
    ============================================================ */
 .collage {
-  max-width: 1440px; margin: 120px auto 0;
+  max-width: 2400px; margin: 120px auto 0;
   display: flex;
 }
 .collage__tile {
@@ -509,7 +523,7 @@ header {
   }
   .rec__img { aspect-ratio: 155.5 / 204.6; }
   .rec__info { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .rec__nm { width: 100%; }
+  .rec__nm { width: 100%; font-size: 12px; font-weight: 300; } /* matches the set-item mobile titles */
   .rec__sale { left: 8px; bottom: 8px; font-size: 12px; line-height: 18px; }
 
   /* bottom collage — swipeable row of 240x320 tiles */
@@ -530,14 +544,54 @@ header {
   .sticky-cta { display: block; }
   body.has-sticky { padding-bottom: 80px; }
 }
+
+/* ============================================================
+   PDP V2 — the "You might like" grid runs edge to edge:
+   no side padding, 40px between the cards (desktop only;
+   the images take their size from the wider columns)
+   ============================================================ */
+@media (min-width: 761px) {
+  body[data-version="v2"] .recs { max-width: 2400px; } /* cards fill the full width up to 2400 */
+  body[data-version="v2"] .recs__grid {
+    padding: 0;
+    column-gap: 40px;
+  }
+  body[data-version="v2"] .rec__info { padding-left: 12px; padding-right: 12px; }
+}
+
+/* ============================================================
+   VERSION SWITCHER — same chrome as the PLP prototype
+   ============================================================ */
+.switcher {
+  position: fixed; left: 50%; bottom: 24px; z-index: 100;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(0,0,0,.88);
+  backdrop-filter: blur(8px);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.switcher button {
+  color: rgba(255,255,255,.65);
+  font-size: 12px; letter-spacing: .04em;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: color .25s, background .25s;
+  white-space: nowrap;
+}
+.switcher button:hover { color: #fff; }
+.switcher button[data-on="true"] { background: #fff; color: #000; }
+/* keep clear of the mobile sticky CTA */
+body.has-sticky .switcher { bottom: 96px; }
 </style>
 </head>
-<body>
+<body data-version="v1">
 
 <!-- HEADER -->
 <header>
   <nav class="nav">
-    <a class="logo" href="./index.html" aria-label="Triumph">
+    <a class="logo" href="./plp.html" aria-label="Triumph">
       <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
     </a>
     <ul class="nav__links">
@@ -798,6 +852,18 @@ const RECS = [
   { nm: 'Top',       pr: '£59.95', img: 'rec-base.jpg', sale: true, noAlt: true },
   { nm: 'Lacey bra', pr: '£59.95', img: 'rec-8.jpg',   sale: true },
   { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-9.jpg', sale: true },
+  { nm: 'Balconette bra', pr: '£54.95', img: 'rec-3.jpg' },
+  { nm: 'Jersey',         pr: '£49.95', img: 'rec-6.jpg' },
+  { nm: 'Top',            pr: '£39.95', img: 'rec-1.jpg' },
+  { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-4.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '£44.95', img: 'rec-7.jpg' },
+  { nm: 'Top',            pr: '£34.95', img: 'rec-2.jpg' },
+  { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-5.jpg', sale: true },
+  { nm: 'Jersey',         pr: '£29.95', img: 'rec-8.jpg' },
+  { nm: 'Balconette bra', pr: '£52.00', img: 'rec-9.jpg' },
+  { nm: 'Top',            pr: '£39.95', img: 'rec-3.jpg', sale: true },
+  { nm: 'Jersey',         pr: '£49.95', img: 'rec-1.jpg' },
+  { nm: 'Lacey bra',      pr: '£57.00', img: 'rec-6.jpg' },
 ];
 
 const recsGrid = document.getElementById('recsGrid');
@@ -912,6 +978,29 @@ new IntersectionObserver(([en]) => {
   stickyCta.classList.toggle('is-on', goneAbove);
   document.body.classList.toggle('has-sticky', goneAbove);
 }, { threshold: 0 }).observe(ctaBlock);
+</script>
+
+<!-- VERSION SWITCHER -->
+<div class="switcher" role="tablist" aria-label="Prototype version">
+  <button data-v="v1" data-on="true">V1</button>
+  <button data-v="v2">V2</button>
+</div>
+
+<script>
+/* version switcher — V2 = flush "You might like" grid with 40px gaps
+   deep link: pdp.html?v=v2 */
+const switcher = document.querySelector('.switcher');
+function setVersion(v) {
+  if (!['v1', 'v2'].includes(v)) v = 'v1';
+  document.body.dataset.version = v;
+  switcher.querySelectorAll('button').forEach(b => b.dataset.on = (b.dataset.v === v));
+}
+switcher.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-v]');
+  if (btn) setVersion(btn.dataset.v);
+});
+const pv = new URLSearchParams(location.search).get('v');
+if (pv) setVersion(pv);
 </script>
 
 </body>
