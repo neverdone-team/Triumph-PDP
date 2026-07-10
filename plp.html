@@ -48,7 +48,7 @@
    RESET
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overflow-x: clip; }
 body {
   background: var(--c-bg);
   color: var(--c-ink);
@@ -176,7 +176,7 @@ header {
 .results-bar { background: var(--c-bg); }
 .results-row {
   max-width: 1440px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
   padding: 36px var(--pad-x);
 }
 .results-title {
@@ -184,6 +184,7 @@ header {
   text-transform: uppercase; font-weight: 400;
 }
 .results-title .count { font-size: 12px; font-weight: 300; color: var(--c-ink-soft); }
+.results-title .nowrap { white-space: nowrap; }
 .filters { display: none; gap: 20px; align-items: center; }
 .filters button, .filters-single, .filters-mobile {
   display: inline-flex; align-items: center; gap: 6px;
@@ -435,9 +436,14 @@ body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
   background: #fff;
   display: flex; flex-direction: column;
   transform: translateX(100%);
+  visibility: hidden; /* fully out of the layout when closed — keeps mobile from widening */
+  transition: transform .45s var(--ease-out), visibility 0s .45s;
+}
+body.drawer-open .drawer {
+  transform: translateX(0);
+  visibility: visible;
   transition: transform .45s var(--ease-out);
 }
-body.drawer-open .drawer { transform: translateX(0); }
 .drawer__head {
   flex: none;
   height: 72px; padding: 0 24px;
@@ -534,13 +540,16 @@ body.drawer-open .drawer { transform: translateX(0); }
 
   .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 12px 16px; gap: 8px; }
 
-  /* hero */
+  /* hero — banner title at half size */
   .hero { height: 300px; }
+  .hero h1 { font-size: 10px; }
 
-  /* results bar — title + "Sort & Filter +" */
+  /* results bar — title left (wraps under itself), "Sort & Filter +" right,
+     both aligned along the bottom edge */
   .results-row { padding: 20px 16px 16px; }
-  .results-title { font-size: 12px; line-height: 16px; }
+  .results-title { flex: 1; font-size: 12px; line-height: 16px; }
   .results-title .count { font-size: 10px; }
+  .filters-mobile { line-height: 16px; }
   .filters, .filters-single { display: none !important; }
   .filters-mobile { display: inline-flex; }
 
@@ -552,7 +561,7 @@ body.drawer-open .drawer { transform: translateX(0); }
   /* card info */
   .card__info { padding: 10px 4px 0; }
   body:is([data-version="v4"], [data-version="v5"]) .card__info { padding-left: 0; padding-right: 0; }
-  .card__cat { font-size: 12px; line-height: 16px; }
+  .card__cat { font-size: 10px; line-height: 16px; }
   .card__pr { margin-top: 2px; font-size: 12px; }
   .cvar__label { margin-top: 4px; font-size: 11px; }
 
@@ -565,7 +574,12 @@ body.drawer-open .drawer { transform: translateX(0); }
   .thumb img { width: 32px; height: 32px; }
   .panel__close { right: 8px; }
 
-  /* editorials — full row on mobile (Figma 931-14018 / 931-19249) */
+  /* gallery — swipe only, no chevrons */
+  .gal-nav { display: none; }
+
+  /* editorials — full row on mobile (Figma 931-14018 / 931-19249);
+     no zoom on the first tile, so its padding matches the others */
+  .ed--row2 img { transform: none; }
   .ed--row2, .ed--tall, .ed--last {
     grid-column: 1 / -1 !important; grid-row: auto;
     height: auto !important;
@@ -670,7 +684,8 @@ body.drawer-open .drawer { transform: translateX(0); }
   <!-- RESULTS (sticky below the nav while scrolling the grid) -->
   <div class="results-bar">
     <div class="results-row">
-      <h2 class="results-title">Blush &amp; Burgundy Collection <span class="count">(36)</span></h2>
+      <!-- the last word and the count are glued together, so "(36)" never wraps alone -->
+      <h2 class="results-title">Blush &amp; Burgundy <span class="nowrap">Collection <span class="count">(36)</span></span></h2>
 
       <!-- default chips — V1-V5 (Figma 848-5899) -->
       <div class="filters filters--full" aria-label="Filter">
@@ -960,10 +975,25 @@ cards.forEach(card => {
     else hoverImg.onload = () => hoverImg.classList.add('is-on');
   }
   card._resetGallery = () => showGal(0);
-  imgWrap.addEventListener('mouseenter', () => showGal(1));
-  imgWrap.addEventListener('mouseleave', () => showGal(0));
+  /* hover gallery is pointer-only — a tap on touch devices must not swap the photo */
+  const isTouch = window.matchMedia('(hover: none)').matches;
+  if (!isTouch) {
+    imgWrap.addEventListener('mouseenter', () => showGal(1));
+    imgWrap.addEventListener('mouseleave', () => showGal(0));
+  }
   card.querySelector('.gal-nav--prev').addEventListener('click', e => { e.stopPropagation(); showGal(galIdx - 1); });
   card.querySelector('.gal-nav--next').addEventListener('click', e => { e.stopPropagation(); showGal(galIdx + 1); });
+
+  /* touch — swipe left/right pages through the gallery */
+  let tX = 0, tY = 0;
+  imgWrap.addEventListener('touchstart', e => {
+    tX = e.touches[0].clientX; tY = e.touches[0].clientY;
+  }, { passive: true });
+  imgWrap.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tX;
+    const dy = e.changedTouches[0].clientY - tY;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) showGal(galIdx + (dx < 0 ? 1 : -1));
+  }, { passive: true });
 
   /* wishlist heart */
   const wish = card.querySelector('.wish');
