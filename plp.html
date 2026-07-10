@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Blush &amp; Pink – Bras | Triumph</title>
+<title>Blush &amp; Burgundy – Bras | Triumph</title>
 <style>
 /* ============================================================
    FONTS (local — Alliance No.1 Light + Regular)
@@ -29,19 +29,19 @@
 :root {
   --c-bg:        #FFFFFF;
   --c-ink:       #000000;
-  --c-ink-soft:  #747474;
+  --c-ink-soft:  rgba(0,0,0,.5);
   --c-line:      #DADADA;
   --c-offwhite:  #F8F3F3;
   --c-burgundy:  #5E2039;
-  --c-special:   #B0282A;
 
   --font-sans: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
 
-  --pad-x: 24px; /* full-bleed layout — only text rows keep side padding */
+  --pad-x: 24px;
   --header-h: 80px; /* measured on load (see JS) — sticky offset for the results bar */
+  --row-gap: 112px; /* 80px + 40% */
 
   --ease-out: cubic-bezier(.22,.61,.36,1);
-  --ease-reveal: cubic-bezier(.22,1,.36,1); /* fast start, long glide-out */
+  --ease-reveal: cubic-bezier(.22,1,.36,1);
 }
 
 /* ============================================================
@@ -65,13 +65,12 @@ a { color: inherit; text-decoration: none; }
 ul { margin: 0; padding: 0; list-style: none; }
 h1, h2, h3 { margin: 0; font-weight: 400; }
 
-
 /* ============================================================
    HEADER (same as PDP prototype)
    ============================================================ */
 header {
   position: sticky; top: 0; z-index: 50;
-  background: var(--c-bg); /* solid white — no translucency */
+  background: var(--c-bg);
 }
 .nav {
   max-width: 1440px; margin: 0 auto;
@@ -83,13 +82,12 @@ header {
 .nav__links { display: flex; gap: 24px; }
 .nav__links a {
   font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
-  font-weight: 300; /* Alliance Light — new nav (817-5636) */
+  font-weight: 300;
   padding-bottom: 2px; border-bottom: 1px solid transparent;
   transition: border-color .25s var(--ease-out);
 }
 .nav__links a:hover { border-bottom-color: var(--c-ink); }
 .nav__right { display: flex; align-items: center; gap: 20px; }
-/* filled search field — grey box, icon inside, "SUCHE" label */
 .search {
   display: flex; align-items: center; gap: 4px;
   height: 32px; padding: 0 16px 0 8px;
@@ -105,32 +103,31 @@ header {
 .search input::placeholder { color: var(--c-ink); opacity: 1; }
 .nav__icons { display: flex; align-items: center; gap: 20px; }
 .nav__icons .icon { width: 18px; height: 18px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
-/* count sits tight against the bag, aligned to its top (Figma) */
 .nav__icons button[aria-label="Cart"] { display: inline-flex; align-items: flex-start; gap: 2px; }
 .cart-count { font-size: 12px; font-weight: 300; letter-spacing: .04em; line-height: 1; }
-.burger { display: none; } /* mobile only */
+.burger { display: none; }
 .burger svg { width: 20px; height: 8px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; display: block; }
 
 /* ============================================================
-   BREADCRUMB
+   BREADCRUMB — HOME / BRAS / BLUSH & BURGUNDY
    ============================================================ */
 .breadcrumb {
-  max-width: 1440px; margin: 0 auto; /* never wider than the navbar */
-  display: flex; gap: 12px; align-items: center;
+  max-width: 1440px; margin: 0 auto;
+  display: flex; gap: 8px; align-items: center;
   font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
   font-weight: 300;
-  color: var(--c-ink-soft);
+  color: var(--c-ink);
   padding: 20px var(--pad-x) 24px;
 }
-.breadcrumb b { font-weight: 400; color: var(--c-ink); }
-.breadcrumb span { opacity: .5; }
+.breadcrumb b { font-weight: 300; color: var(--c-ink-soft); }
+.breadcrumb span { opacity: .4; }
 
 /* ============================================================
-   HERO — "List Interuptor" 1280x440
+   HERO — burgundy petal "List Interuptor" 1440x440
    ============================================================ */
 .hero {
   position: relative;
-  height: 440px;
+  height: 500px;
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
@@ -139,98 +136,132 @@ header {
   width: 100%; height: 100%; object-fit: cover;
   animation: heroIn 1.6s var(--ease-out) both;
 }
-/* video only in the Blush & Pink version (v5) */
-.hero video { display: none; }
-body[data-version="v5"] .hero video { display: block; }
-body[data-version="v5"] .hero img { display: none; }
+/* darker, red-shifted grade */
+.hero video { filter: brightness(.72) saturate(1.35) sepia(.22) hue-rotate(-18deg) contrast(1.05); }
+/* burgundy tint wash */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: rgba(94,32,57,.25);
+  mix-blend-mode: multiply;
+}
+/* film grain — retro noise */
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: .3;
+  mix-blend-mode: overlay;
+}
 @keyframes heroIn {
   from { transform: scale(1.06); }
   to   { transform: scale(1); }
 }
+/* the title fades in once the video has played through */
 .hero h1 {
-  position: relative;
+  position: relative; z-index: 2;
   color: #fff;
-  font-weight: 300;
-  font-size: 28px;
-  letter-spacing: .38em;
-  text-indent: .38em; /* optically recenter tracked text */
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: .04em;
   text-transform: uppercase;
-  animation: heroTitle 1.1s .25s var(--ease-out) both;
+  text-align: center;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
 }
-@keyframes heroTitle {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.hero.is-ended h1 { opacity: 1; transform: translateY(0); }
 
 /* ============================================================
-   CATEGORY TEASER (Figma 802-3999 desktop / 803-5278 mobile)
-   replaces the Blush & Pink banner in versions 1, 2 and 4
+   RESULTS ROW — title left, filters right (Figma 937-27214)
+   three filter variants share the row; the version decides
    ============================================================ */
-.cat-teaser {
-  max-width: 1440px; margin: 0 auto;
-  padding: 0 var(--pad-x) 24px;
-  display: flex; gap: 16px;
-}
-.cat { display: flex; flex-direction: column; gap: 8px; width: 164px; flex: none; }
-.cat__img { display: block; aspect-ratio: 1 / 1; overflow: hidden; background: var(--c-offwhite); }
-.cat__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease-out); }
-.cat:hover .cat__img img { transform: scale(1.05); }
-.cat__label {
-  font-size: 12px; line-height: 20px; letter-spacing: .04em;
-  text-transform: uppercase; font-weight: 400;
-}
-/* teaser in v1/v2/v4 — the Blush & Pink hero only in v5 */
-body:is([data-version="v5"], [data-version="v6"]) .cat-teaser { display: none; }
-body:not([data-version="v5"]):not([data-version="v6"]) .hero { display: none; }
-
-/* ============================================================
-   RESULTS ROW — title left, filter chips right (Figma 853-8773)
-   ============================================================ */
-/* sticky wrapper — full-width white bar pinned below the nav */
-.results-bar {
-  position: sticky; top: var(--header-h); z-index: 40;
-  background: var(--c-bg);
-}
+.results-bar { background: var(--c-bg); }
 .results-row {
-  max-width: 1440px; margin: 0 auto; /* never wider than the navbar */
+  max-width: 1440px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 24px var(--pad-x);
+  padding: 36px var(--pad-x);
 }
 .results-title {
-  font-size: 16px; line-height: 24px; letter-spacing: .04em;
+  font-size: 12px; line-height: 24px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
 }
-/* result count — one type step smaller, muted
-   (display:inline outranks the span-hiding rule below; a hidden
-   parent title still hides its count) */
-.results-title .count { display: inline; font-size: 14px; font-weight: 300; color: var(--c-ink-soft); }
-/* the title follows the version: category view vs Blush & Pink collection */
-.results-title span { display: none; }
-body:not([data-version="v5"]):not([data-version="v6"]) .results-title .t-bras { display: inline; }
-body:is([data-version="v5"], [data-version="v6"]) .results-title .t-blush { display: inline; }
-.filters { display: flex; gap: 20px; align-items: center; }
-.filters button, .filters-mobile {
+.results-title .count { font-size: 12px; font-weight: 300; color: var(--c-ink-soft); }
+.filters { display: none; gap: 20px; align-items: center; }
+.filters button, .filters-single, .filters-mobile {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12px; line-height: 16px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
   white-space: nowrap;
 }
 .filters button svg { width: 7px; height: 4px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
-.filters button:hover, .filters-mobile:hover { opacity: .55; }
+.filters button .plus, .filters-single svg, .filters-mobile svg { width: 10px; height: 10px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.filters button:hover, .filters-single:hover, .filters-mobile:hover { opacity: .55; }
+.filters-single { display: none; }
 .filters-mobile { display: none; }
-.filters-mobile svg { width: 10px; height: 10px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+
+/* Filter V1 — the "More" chips reveal in place */
+.filters__extra { display: contents; }
+.filters__extra[hidden] { display: none; }
+
+/* Filter V1 — chip dropdown (Figma 931-26774) */
+.results-row { position: relative; }
+.dropdown {
+  position: absolute; z-index: 60;
+  width: 240px;
+  background: #fff;
+  border: 1px solid var(--c-ink);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  padding: 4px 0 8px;
+  display: none;
+}
+.dropdown.is-open { display: block; }
+.dropdown__row {
+  display: flex; gap: 12px; align-items: center;
+  width: 100%; padding: 10px 12px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400; text-align: left;
+  transition: background .15s;
+}
+.dropdown__row:hover, .dropdown__row[data-on="true"] { background: #F9FAFB; }
+.dropdown__row .sw { width: 20px; height: 20px; flex: none; border: 1px solid rgba(0,0,0,.08); }
+.dropdown__row .lbl { flex: 1; }
+.dropdown__row .tick {
+  width: 16px; height: 16px; flex: none;
+  fill: none; stroke: var(--c-ink); stroke-width: 1.5;
+  opacity: 0;
+}
+.dropdown__row[data-on="true"] .tick { opacity: 1; }
+.dropdown__foot {
+  display: flex; justify-content: space-between;
+  border-top: 1px solid var(--c-line);
+  margin: 4px 12px 0;
+  padding: 14px 0 2px;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase;
+}
+.dropdown__foot button { font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.dropdown__foot button:hover { opacity: .55; }
+
+/* which filter row shows depends on the version */
+body:not([data-version="fv1"]):not([data-version="fv2"]) .filters--full { display: flex; }
+body[data-version="fv1"] .filters--reduced { display: flex; }
+body[data-version="fv2"] .filters-single { display: inline-flex; }
 
 /* ============================================================
-   GRID + CARD (flush columns, like Figma)
+   GRID — 4 flush columns; v4/v5 add 24px margins + gutters
    ============================================================ */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  row-gap: 80px; /* Figma: gap between product rows */
+  grid-auto-flow: dense;
+  row-gap: var(--row-gap);
   margin-bottom: 120px;
 }
+body:is([data-version="v4"], [data-version="v5"]) .grid {
+  padding: 0 24px;
+  column-gap: 24px;
+}
+/* V6 — V1 layout with 52px between the product cards (desktop only) */
+body[data-version="v6"] .grid { column-gap: 52px; }
 .card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
-.card, .editorial, .break {
+.card, .ed {
   position: relative;
   /* scroll reveal — blurred rise-and-fade, row by row */
   opacity: 0;
@@ -240,14 +271,18 @@ body:is([data-version="v5"], [data-version="v6"]) .results-title .t-blush { disp
               transform 1.4s var(--ease-reveal),
               filter 1.4s var(--ease-reveal);
 }
-.card.is-visible, .editorial.is-visible, .break.is-visible { opacity: 1; transform: none; filter: none; }
+.card.is-visible, .ed.is-visible { opacity: 1; transform: none; filter: none; }
 @media (prefers-reduced-motion: reduce) {
-  .card, .editorial, .break { opacity: 1; transform: none; filter: none; transition: none; }
+  .card, .ed { opacity: 1; transform: none; filter: none; transition: none; }
 }
+
+/* the 3 extra products only exist in V3 (its smaller editorials
+   free up three grid slots) */
+body:not([data-version="v3"]) .card--extra { display: none; }
 
 .card__img {
   position: relative;
-  aspect-ratio: 688 / 905; /* Figma full-width card image */
+  aspect-ratio: 688 / 905; /* Figma card image */
   overflow: hidden;
   background: var(--c-offwhite);
 }
@@ -287,7 +322,7 @@ body:is([data-version="v5"], [data-version="v6"]) .results-title .t-blush { disp
 .card__img:hover .gal-nav { opacity: 1; pointer-events: auto; }
 @media (hover: none) { .gal-nav { display: none; } }
 
-/* wishlist heart — top right of every product photo (Figma 853-8773) */
+/* wishlist heart — top right of every product photo */
 .wish {
   position: absolute; top: 16px; right: 16px; z-index: 6;
   width: 24px; height: 24px;
@@ -300,180 +335,190 @@ body:is([data-version="v5"], [data-version="v6"]) .results-title .t-blush { disp
 .wish:hover svg { transform: scale(1.1); }
 .wish[data-on="true"] svg { fill: var(--c-ink); }
 
-.card__info { padding: 12px; display: flex; flex-direction: column; }
+/* ============================================================
+   CARD INFO (Figma 937-27218) — title / price+RRP / "N colors"
+   the colour count sits on the LEFT, below the price
+   ============================================================ */
+.card__info { position: relative; padding: 16px 12px 0; }
+/* v4/v5 — info text sits flush with the image edge */
+body:is([data-version="v4"], [data-version="v5"]) .card__info { padding-left: 0; padding-right: 0; }
+body:is([data-version="v4"], [data-version="v5"]) .panel { padding-left: 0; }
 .card__cat {
-  font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
-  font-weight: 400; /* Alliance Regular — new PLP direction (817-5636) */
-  line-height: 20px;
-  margin-top: 4px;
+  font-size: 12px; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
 }
-.card__nm {
-  font-size: 12px; line-height: 20px;
-  font-weight: 300; letter-spacing: .04em; /* Alliance Light */
-  order: -1; /* name reads above the collection line */
+.card__pr {
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 4px; padding-top: 2px;
+  font-size: 12px; line-height: 14px;
 }
-.card__row {
-  position: relative;
-  margin-top: 4px;
-  display: flex; align-items: center; justify-content: space-between;
-  min-height: 24px;
-}
-.card__pr { font-size: 14px; transition: opacity .28s var(--ease-out); }
-.card__pr .rrp { font-size: 10px; color: var(--c-ink-soft); margin-left: 6px; text-decoration: line-through; }
-
-/* ============================================================
-   SHARED — colour label + thumbnails
-   ============================================================ */
-.cvar { display: flex; align-items: center; }
+.card__pr .rrp { font-size: 10px; line-height: 12px; font-weight: 300; color: var(--c-ink-soft); }
 .cvar__label {
-  font-size: 12px; font-weight: 300; letter-spacing: .04em;
-  transition: opacity .28s var(--ease-out), transform .28s var(--ease-out);
-  white-space: nowrap;
+  display: block;
+  margin-top: 7px; /* mobile overrides back to 4px below */
+  font-size: 12px; line-height: 14px; font-weight: 400;
+  transition: opacity .2s var(--ease-out);
 }
-.thumb {
-  border-bottom: 1px solid transparent;
-  padding-bottom: 2px;
-  transition: border-color .2s var(--ease-out);
-  flex: none;
-}
-.thumb img { object-fit: cover; background: #fff; border: 1px solid rgba(0,0,0,.06); }
-.thumb:hover { border-bottom-color: var(--c-line); }
-.thumb[data-sel="true"] { border-bottom-color: var(--c-ink); }
-/* the currently worn colour — full product photo cropped to the bra */
-.thumb--current img { object-position: 50% 22%; }
+.cvar__label:hover { opacity: .55; }
 
 /* ============================================================
-   V1 — INLINE SWAP (label + price morph into thumbs, zero shift)
-   thumbs anchor to the LEFT edge of the row and stay inside the card
+   EXPANDING COLOUR PANEL — covers the info area on open
+   swatches from /Colour Swatches (black · red · mauve lace)
    ============================================================ */
-.cvar__thumbs {
-  position: absolute; right: 0; top: 0;
-  max-width: 100%; overflow: hidden;
-  transform: translateY(10px);
-  display: flex; gap: 8px; align-items: flex-start; justify-content: flex-end;
-  opacity: 0; pointer-events: none;
-  transition: opacity .28s var(--ease-out), transform .28s var(--ease-out);
-}
-.cvar__thumbs .thumb img { width: 56px; height: 56px; }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .card__pr { opacity: 0; }
-.cvar__thumbs .thumb {
-  opacity: 0; transform: translateY(4px);
-  transition: opacity .3s var(--ease-out), transform .3s var(--ease-out), border-color .2s;
-}
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__label { opacity: 0; transform: translateY(-6px); }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs {
-  opacity: 1; pointer-events: auto;
-  transform: translateY(4px); /* drops in from the "+N colors" spot, grows downwards */
-}
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb { opacity: 1; transform: translateY(0); }
-/* stagger */
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(2) { transition-delay: .04s; }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(3) { transition-delay: .08s; }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(4) { transition-delay: .12s; }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(5) { transition-delay: .16s; }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(6) { transition-delay: .20s; }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs .thumb:nth-child(7) { transition-delay: .24s; }
-
-/* ============================================================
-   V2 — SWATCH STRIP over the photo
-   ============================================================ */
-.strip {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: flex; gap: 8px; justify-content: center; align-items: center;
-  padding: 0 8px 12px;
-  transform: translateY(110%);
-  transition: transform .42s var(--ease-out);
-}
-.strip .thumb { padding-bottom: 3px; }
-.strip .thumb img { width: 40px; height: 40px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
-body[data-version="v2"] .card:hover .strip,
-body[data-version="v2"] .card.is-open .strip { transform: translateY(0); }
-
-/* ============================================================
-   V4 — COLOUR PANEL covering the title/price info area
-   ============================================================ */
-.card__info { position: relative; }
 .panel {
   position: absolute; inset: 0;
   z-index: 5;
-  display: flex; gap: 12px; align-items: center;
+  display: flex; gap: 6px; align-items: center;
   padding: 12px 64px 12px 12px;
   background: #fff;
   opacity: 0; pointer-events: none;
   transform: translateY(6px);
   transition: opacity .32s var(--ease-out), transform .32s var(--ease-out);
 }
-.panel .thumb img { width: 44px; height: 44px; }
+.card.is-open .panel { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.thumb {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color .2s var(--ease-out);
+  flex: none;
+}
+.thumb img { width: 44px; height: 44px; object-fit: cover; background: #fff; border: 1px solid rgba(0,0,0,.06); }
+.thumb:hover { border-bottom-color: var(--c-line); }
+.thumb[data-sel="true"] { border-bottom-color: var(--c-ink); }
+/* the currently worn colour — product photo cropped to the bra */
+.thumb--current img { object-position: 50% 22%; }
 .panel__close {
-  /* same spot as the "+N colors" label: right end of the price row */
-  position: absolute; bottom: 16px; right: 12px;
+  position: absolute; top: 50%; transform: translateY(-50%); right: 12px;
   font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
-  font-weight: 300; /* matches .link-underline in index.html */
+  font-weight: 300;
   padding-bottom: 1px;
   border-bottom: 1px solid var(--c-ink);
   transition: opacity .2s;
 }
 .panel__close:hover { opacity: .5; }
 
-/* "+N" overflow tile */
-.thumb--more { position: relative; cursor: pointer; }
-.thumb--more img { opacity: .3; }
-.thumb--more span {
-  position: absolute; left: 0; right: 0; top: 0; bottom: 3px;
+/* ============================================================
+   EDITORIAL INTERRUPTORS — car (row 2 + last row) and lips (tall)
+   base: full-bleed; versions add insets (see below)
+   ============================================================ */
+.ed { overflow: hidden; }
+.ed img { width: 100%; height: 100%; object-fit: cover; }
+.ed--row2, .ed--last, .ed--tall { grid-column: span 2; align-self: start; }
+.ed--row2 img { object-position: 50% 55%; transform: scale(1.15); } /* peony bouquet — zoomed in slightly */
+.ed--last img { object-position: 50% 50%; } /* hydrangea face close-up */
+.ed--tall img { object-position: 50% 52%; } /* love letter on the velvet sofa */
+
+/* V2 — editorials inset 24px inside their slots (Figma 931-16566) */
+body[data-version="v2"] .ed { padding: 0 24px; }
+/* V3 — small floating editorials with generous white space (931-16973) */
+body[data-version="v3"] .ed {
+  grid-column: span 1;
+  padding: 0 60px;
+}
+/* V5 — guttered grid + editorials inset another 40px (931-18585) */
+body[data-version="v5"] .ed { padding: 0 40px; }
+
+/* ============================================================
+   OFF-CANVAS FILTER & SORT — Filter V2 (Figma 931-25755)
+   420px right drawer · dim scrim · accordions · Show results
+   ============================================================ */
+.scrim {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s var(--ease-out);
+}
+body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 95;
+  width: 420px; max-width: 92vw;
+  background: #fff;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .45s var(--ease-out);
+}
+body.drawer-open .drawer { transform: translateX(0); }
+.drawer__head {
+  flex: none;
+  height: 72px; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--c-line);
+}
+.drawer__head span { font-size: 14px; line-height: 20px; letter-spacing: .02em; }
+.drawer__close { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.drawer__close svg { width: 14px; height: 14px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
+.drawer__close:hover { opacity: .5; }
+.drawer__body { flex: 1; overflow-y: auto; padding: 24px; }
+.facet { border-bottom: 1px solid var(--c-line); margin-bottom: 16px; }
+.facet__head {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 16px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+  text-align: left;
+}
+.facet__head svg {
+  width: 10px; height: 6px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none;
+  transition: transform .3s var(--ease-out);
+}
+.facet.is-open .facet__head svg { transform: rotate(180deg); }
+.facet__body {
+  max-height: 0; overflow: hidden;
+  transition: max-height .4s var(--ease-out);
+}
+.facet.is-open .facet__body { max-height: 320px; }
+.facet__body ul { padding-bottom: 16px; }
+.facet__body li button {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0;
+  font-size: 12px; line-height: 16px; font-weight: 300; letter-spacing: .02em;
+}
+.facet__body li button:hover { opacity: .55; }
+.facet__body li button[data-on="true"] { font-weight: 400; }
+.facet__body li button[data-on="true"]::after { content: "✓"; font-size: 10px; }
+.facet__body img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+/* size chips */
+.facet__sizes { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; }
+.facet__sizes button {
+  min-width: 44px; height: 32px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-line);
+  font-size: 12px; font-weight: 300;
+  transition: border-color .2s, background .2s;
+}
+.facet__sizes button:hover { border-color: var(--c-ink); }
+.facet__sizes button[data-on="true"] { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+.drawer__foot { flex: none; padding: 24px; display: flex; gap: 12px; }
+/* secondary — only shows once at least one filter is set */
+.drawer__clear {
+  flex: 1; height: 44px;
+  background: #fff; color: var(--c-ink);
+  border: 1px solid var(--c-ink);
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px;
+  transition: opacity .2s;
 }
-body[data-version="v4"] .card.is-open .panel {
-  opacity: 1; pointer-events: auto; transform: translateY(0);
+.drawer__clear:hover { opacity: .55; }
+.drawer__clear[hidden] { display: none; }
+.drawer__cta {
+  flex: 1; height: 44px;
+  background: var(--c-ink); color: #fff;
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .2s;
 }
-body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .cvar__label,
-body[data-version="v4"] .cvar__label { cursor: pointer; }
-body[data-version="v4"] .cvar { cursor: pointer; }
+.drawer__cta:hover { opacity: .85; }
 
 /* ============================================================
-   V5 — BLUSH & PINK: moody editorial tiles woven into the grid
-   (Figma 803-5629 desktop / 803-5789 mobile)
-   ============================================================ */
-.editorial { overflow: hidden; align-self: start; }
-.editorial img {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%; object-fit: cover;
-}
-body:not([data-version="v5"]) .editorial { display: none; }
-.card--extra { display: none; } /* 17th card — fills the last desktop row in v5 only */
-body[data-version="v5"] .card--extra { display: block; }
-/* tiles keep the product-photo proportions so rows stay aligned */
-.ed--car   { grid-column: span 2; aspect-ratio: 1376 / 905; }
-.ed--car img { object-position: 50% 28%; } /* landscape crop of a portrait photo — keep her face in frame */
-.ed--tulip { aspect-ratio: 688 / 905; }
-.ed--lips  { grid-column: span 2; grid-row: span 2; aspect-ratio: 720 / 1129; }
-
-/* ============================================================
-   V6 — LAYOUT BREAK: editorial images sit inset in the grid,
-   with white space around them (Figma 853-8773 / 853-9733)
-   ============================================================ */
-.break { position: relative; }
-body:not([data-version="v6"]) .break { display: none; }
-/* more air between rows — 80px + 40% */
-body[data-version="v6"] .grid { row-gap: 112px; }
-.break img { width: 100%; height: 100%; object-fit: cover; }
-/* portrait tile — image floats between two columns, white space both sides */
-.br--portrait { grid-column: span 2; }
-.br--portrait img { width: 58%; height: auto; margin: 0 auto; aspect-ratio: 418 / 553; }
-/* tall tile — full bleed over two columns and two rows */
-.br--tall { grid-column: span 2; grid-row: span 2; overflow: hidden; }
-.br--tall img { position: absolute; inset: 0; }
-/* wide tile — landscape image with side margins, top-aligned with the row */
-.br--wide { grid-column: span 2; }
-.br--wide img { width: 89%; height: auto; margin: 0 auto; aspect-ratio: 640 / 474; }
-
-/* ============================================================
-   RESPONSIVE — tablet step + mobile design (Figma 833-15105)
+   RESPONSIVE — tablet step + mobile designs (931-14018 etc.)
    ============================================================ */
 @media (max-width: 1100px) {
   .grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 760px) {
+  :root { --row-gap: 56px; } /* 40px + 40% */
+
   /* header — 50px bar: logo · suche · account · bag · burger */
   .nav { padding: 12px 16px; gap: 16px; }
   .logo__img { width: 100px; height: 13px; }
@@ -485,67 +530,60 @@ body[data-version="v6"] .grid { row-gap: 112px; }
   .burger { display: inline-flex; }
   .search { height: 26px; padding: 0 12px 0 8px; }
   .search svg { width: 14px; height: 14px; }
-  .search input { width: 60px; } /* fits the full "SUCHE" label */
+  .search input { width: 60px; }
 
-  /* breadcrumb — Label/Default/S, current page muted */
-  .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 12px 16px; gap: 12px; color: var(--c-ink); }
-  .breadcrumb b { font-weight: 300; color: var(--c-ink-soft); }
+  .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 12px 16px; gap: 8px; }
 
   /* hero */
   .hero { height: 300px; }
-  .hero h1 { font-size: 16px; font-weight: 400; letter-spacing: .04em; text-indent: .04em; }
 
-  /* category teaser — horizontal scroll strip (Figma 803-5278) */
-  .cat-teaser { padding: 0 16px 24px; overflow-x: auto; scrollbar-width: none; }
-  .cat-teaser::-webkit-scrollbar { display: none; }
-  .cat { width: 102px; }
-  .cat__label { font-size: 10px; line-height: 16px; }
-
-  /* results bar — title + "Sort & Filter +" (Figma 853-9733) */
-  .results-row { padding: 16px 16px 12px; }
+  /* results bar — title + "Sort & Filter +" */
+  .results-row { padding: 20px 16px 16px; }
   .results-title { font-size: 12px; line-height: 16px; }
   .results-title .count { font-size: 10px; }
-  .filters { display: none; }
+  .filters, .filters-single { display: none !important; }
   .filters-mobile { display: inline-flex; }
 
   /* grid — 2 columns */
-  .grid, body[data-version="v6"] .grid { grid-template-columns: repeat(2, 1fr); row-gap: 48px; margin-bottom: 80px; }
+  .grid { grid-template-columns: repeat(2, 1fr) !important; margin-bottom: 80px; }
+  body[data-version="v6"] .grid { column-gap: 0; } /* the 52px gap is desktop-only */
+  body:is([data-version="v4"], [data-version="v5"]) .grid { padding: 0 16px; column-gap: 16px; }
 
-  /* card — +N colors on its own line below price (name-first order is global now) */
-  .card__info { padding: 8px 4px 0; }
+  /* card info */
+  .card__info { padding: 10px 4px 0; }
+  body:is([data-version="v4"], [data-version="v5"]) .card__info { padding-left: 0; padding-right: 0; }
   .card__cat { font-size: 12px; line-height: 16px; }
-  .card__row { flex-direction: column; align-items: flex-start; gap: 4px; min-height: 0; }
-  .card__pr { font-size: 12px; }
-  .card__pr .rrp { font-size: 10px; }
-  .cvar__thumbs { left: 0; right: auto; justify-content: flex-start; top: auto; bottom: 0; transform: translateY(6px); }
-  .cvar__thumbs .thumb img { width: 40px; height: 40px; }
-  body:is([data-version="v1"], [data-version="v5"], [data-version="v6"]) .card.is-open .cvar__thumbs { transform: translateY(0); }
+  .card__pr { margin-top: 2px; font-size: 12px; }
+  .cvar__label { margin-top: 4px; font-size: 11px; }
 
   /* hearts sit closer to the corner on small cards */
   .wish { top: 10px; right: 10px; width: 20px; height: 20px; }
   .wish svg { width: 20px; height: 20px; }
 
-  /* v5 editorial tiles — car becomes a single portrait tile, lips go full width */
-  .ed--car { grid-column: span 1; aspect-ratio: 688 / 905; }
-  .ed--lips { grid-column: 1 / -1; grid-row: auto; }
-  body[data-version="v5"] .card--extra { display: none; } /* keeps mobile pairs even */
-  body:is([data-version="v5"], [data-version="v6"]) .grid { grid-auto-flow: dense; } /* backfill so tiles close the page */
+  /* colour panel — fit the narrow cards */
+  .panel { flex-wrap: wrap; gap: 4px; padding: 8px 48px 8px 4px; overflow: hidden; }
+  .thumb img { width: 32px; height: 32px; }
+  .panel__close { right: 8px; }
 
-  /* v6 layout-break tiles — full row, image inset with 24px margins */
-  .br--portrait, .br--tall, .br--wide { grid-column: 1 / -1; grid-row: auto; overflow: visible; }
-  .br--portrait img, .br--wide img { width: calc(100% - 48px); margin: 0 auto; aspect-ratio: 327 / 247; }
-  .br--tall img { position: static; width: calc(100% - 48px); margin: 0 auto; height: auto; aspect-ratio: 327 / 299; }
+  /* editorials — full row on mobile (Figma 931-14018 / 931-19249) */
+  .ed--row2, .ed--tall, .ed--last {
+    grid-column: 1 / -1 !important; grid-row: auto;
+    height: auto !important;
+    aspect-ratio: 375 / 247;
+  }
+  body[data-version="v2"] .ed { padding: 0 24px; }
+  body:is([data-version="v3"], [data-version="v5"]) .ed { padding: 0 40px !important; }
 
-  /* variant overlays — fit the narrow cards (and never widen the page) */
-  .panel { flex-wrap: wrap; gap: 8px; padding: 8px 48px 8px 4px; overflow: hidden; }
-  .panel .thumb img { width: 32px; height: 32px; }
-  .panel__close { bottom: 10px; right: 8px; }
-  .strip { flex-wrap: wrap; gap: 4px; }
-  .strip .thumb img { width: 32px; height: 32px; }
+  /* drawer */
+  .drawer { width: 100%; max-width: 100vw; }
+  .drawer__head, .drawer__body, .drawer__foot { padding-left: 20px; padding-right: 20px; }
+  .drawer__body { padding-top: 24px; }
+  .drawer__foot { padding-top: 0; padding-bottom: 24px; }
 
-  /* prototype chrome */
+  /* prototype chrome — filter versions are desktop-only */
+  .switcher { max-width: calc(100vw - 24px); overflow-x: auto; }
   .switcher button { padding: 6px 10px; font-size: 11px; }
-  .switcher__hint { display: none; }
+  .switcher button[data-v="fv1"], .switcher button[data-v="fv2"] { display: none; }
 }
 
 /* ============================================================
@@ -571,16 +609,7 @@ body[data-version="v6"] .grid { row-gap: 112px; }
 }
 .switcher button:hover { color: #fff; }
 .switcher button[data-on="true"] { background: #fff; color: #000; }
-.switcher__hint {
-  position: fixed; left: 50%; bottom: 68px; z-index: 100;
-  transform: translateX(-50%);
-  font-size: 11px; letter-spacing: .04em;
-  color: var(--c-ink-soft);
-  background: rgba(255,255,255,.9);
-  padding: 4px 12px; border-radius: 999px;
-  pointer-events: none;
-  transition: opacity .3s;
-}
+.switcher .sep { width: 1px; height: 16px; background: rgba(255,255,255,.25); flex: none; }
 </style>
 </head>
 <body data-version="v1">
@@ -628,33 +657,23 @@ body[data-version="v6"] .grid { row-gap: 112px; }
 
   <!-- BREADCRUMB -->
   <nav class="breadcrumb" aria-label="Breadcrumb">
-    <a href="#">Home</a><span>•</span><a href="#">Bras</a><span>•</span><b>Blush &amp; Pink</b>
+    <a href="#">Home</a><span>/</span><a href="#">Bras</a><span>/</span><b>Blush &amp; Burgundy</b>
   </nav>
 
-  <!-- CATEGORY TEASER — versions 1, 2 and 4 (Figma 802-3999 / 803-5278) -->
-  <section class="cat-teaser" aria-label="Bra categories">
-    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-lacey.jpg" alt="" /></span><span class="cat__label">Lacey Bras</span></a>
-    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-padded.jpg" alt="" /></span><span class="cat__label">Padded Bras</span></a>
-    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-sports.jpg" alt="" /></span><span class="cat__label">Sports Bras</span></a>
-    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-wired.jpg" alt="" /></span><span class="cat__label">Wired Bras</span></a>
-    <a class="cat" href="#"><span class="cat__img"><img src="./Assets/plp/cat-unwired.jpg" alt="" /></span><span class="cat__label">Unwired Bras</span></a>
-  </section>
-
-  <!-- HERO — Blush & Pink version only -->
+  <!-- HERO — burgundy petal (Figma List Interuptor) -->
   <section class="hero">
-    <img src="./Assets/plp/hero.jpg" alt="" />
-    <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-    <h1>Blush &amp; Pink</h1>
+    <img src="./Assets/plp/hero-burgundy.jpg" alt="Blush &amp; Burgundy" />
+    <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" autoplay muted playsinline aria-hidden="true"></video>
+    <h1>A Love Story in Blush &amp; Burgundy</h1>
   </section>
 
   <!-- RESULTS (sticky below the nav while scrolling the grid) -->
   <div class="results-bar">
     <div class="results-row">
-      <h2 class="results-title">
-        <span class="t-bras">Bras <span class="count">(38)</span></span>
-        <span class="t-blush">Blush &amp; Pink Collection <span class="count">(38)</span></span>
-      </h2>
-      <div class="filters" aria-label="Filter">
+      <h2 class="results-title">Blush &amp; Burgundy Collection <span class="count">(36)</span></h2>
+
+      <!-- default chips — V1-V5 (Figma 848-5899) -->
+      <div class="filters filters--full" aria-label="Filter">
         <button>Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
         <button>Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
         <button>Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
@@ -662,6 +681,24 @@ body[data-version="v6"] .grid { row-gap: 112px; }
         <button>Standards <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
         <button>Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
       </div>
+
+      <!-- Filter V1 — reduced chips + More/Less (Figma 931-23661), dropdowns from 931-26774 -->
+      <div class="filters filters--reduced" aria-label="Filter">
+        <button data-f="size">Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="colour">Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="series">Series <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <span class="filters__extra" hidden>
+          <button data-f="fabric">Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+          <button data-f="standards">Standards <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+          <button data-f="sort">Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        </span>
+        <button class="more-toggle">More <svg class="plus" viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+      </div>
+
+      <!-- Filter V2 — single trigger, opens the off-canvas (Figma 931-24643) -->
+      <button class="filters-single" id="drawerTrigger">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+
+      <!-- mobile — all versions -->
       <button class="filters-mobile">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
     </div>
   </div>
@@ -671,46 +708,91 @@ body[data-version="v6"] .grid { row-gap: 112px; }
 
 </main>
 
+<!-- OFF-CANVAS FILTER & SORT (Filter V2, Figma 931-25755) -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" aria-label="Filter and sort" aria-hidden="true">
+  <div class="drawer__head">
+    <span>Sort and Filter</span>
+    <button class="drawer__close" aria-label="Close">
+      <svg viewBox="0 0 14 14"><path d="M1 1l12 12M13 1L1 13"/></svg>
+    </button>
+  </div>
+  <div class="drawer__body" id="facets"></div>
+  <div class="drawer__foot">
+    <button class="drawer__clear" hidden>Reset filters</button>
+    <button class="drawer__cta">Show results</button>
+  </div>
+</aside>
+
 <!-- VERSION SWITCHER -->
-<div class="switcher__hint" id="hint"></div>
 <div class="switcher" role="tablist" aria-label="Prototype version">
-  <button data-v="v1" data-on="true">1 · Inline swap</button>
-  <button data-v="v2">2 · Image strip</button>
-  <button data-v="v4">4 · Expanding panel</button>
-  <button data-v="v5">Blush &amp; Pink</button>
-  <button data-v="v6">Layout break</button>
+  <button data-v="v1" data-on="true">V1</button>
+  <button data-v="v2">V2</button>
+  <button data-v="v3">V3</button>
+  <button data-v="v4">V4</button>
+  <button data-v="v5">V5</button>
+  <button data-v="v6">V6</button>
+  <span class="sep"></span>
+  <button data-v="fv1">Filter V1</button>
+  <button data-v="fv2">Filter V2</button>
 </div>
 
 <script>
 /* ============================================================
-   DATA — products from Figma node 817-5636,
-   colour variants from the provided Assets/*.webp images
+   DATA — products from Figma 937-27178 (Blush & Burgundy),
+   colour swatches from /Colour Swatches (black · red · mauve)
    ============================================================ */
-/* only the two provided crops — repeated when a card needs more colours */
-const ROSE  = { name: 'Rosé',  img: './Assets/plp/variant-rose.png' };
-const BLACK = { name: 'Black', img: './Assets/plp/variant-black.png' };
-const VARIANT_POOL = [ROSE, BLACK, ROSE, BLACK, ROSE, BLACK];
-
-const PRODUCTS = [
-  { cat: 'LACE BALCONETTE BRA',    nm: 'Midnight Bloom',  pr: '£45.00', colors: 3, ph: './Assets/plp/card1.jpg' },
-  { cat: 'SEAMLESS T-SHIRT BRA',   nm: 'Cloud Nine',      pr: '£38.50', colors: 5, ph: './Assets/plp/card2.jpg' },
-  { cat: 'STRAPLESS PUSH-UP BRA',  nm: 'Velvet Kiss',     pr: '£52.00', colors: 2, ph: './Assets/plp/card3.jpg' },
-  { cat: 'SPORTS PERFORMANCE BRA', nm: 'Active Edge',     pr: '£34.95', colors: 4, ph: './Assets/plp/card4.jpg' },
-  { cat: 'PLUNGE LACE BRA',        nm: 'Scarlet Muse',    pr: '£49.99', colors: 6, ph: './Assets/plp/card1.jpg' },
-  { cat: 'WIRELESS COMFORT BRA',   nm: 'Soft Touch',      pr: '£29.95', colors: 2, ph: './Assets/plp/card2.jpg' },
-  { cat: 'DEMI CUP SATIN BRA',     nm: 'Pearl Luxe',      pr: '£55.00', colors: 3, ph: './Assets/plp/card3.jpg' },
-  { cat: 'FULL COVERAGE BRA',      nm: 'Daily Essential', pr: '£32.00', colors: 4, ph: './Assets/plp/card4.jpg' },
-  { cat: 'BRALETTE TRIANGLE',      nm: 'Free Spirit',     pr: '£24.95', colors: 2, ph: './Assets/plp/card1.jpg' },
-  { cat: 'HALTER NECK BRA',        nm: 'Summer Glow',     pr: '£42.50', colors: 5, ph: './Assets/plp/card2.jpg' },
-  { cat: 'CONVERTIBLE MULTI-WAY BRA', nm: 'Flex Fit',     pr: '£47.00', colors: 3, ph: './Assets/plp/card3.jpg' },
-  { cat: 'LONGLINE LACE BRA',      nm: 'Elegance',        pr: '£62.00', colors: 4, ph: './Assets/plp/card4.jpg' },
-  { cat: 'MINIMIZER BRA',          nm: 'Sleek Silhouette', pr: '£39.95', colors: 2, ph: './Assets/plp/card1.jpg' },
-  { cat: 'NURSING SUPPORT BRA',    nm: 'Gentle Hold',     pr: '£36.00', colors: 3, ph: './Assets/plp/card2.jpg' },
-  { cat: 'RACERBACK SPORTS BRA',   nm: 'Power Move',      pr: '£28.50', colors: 5, ph: './Assets/plp/card3.jpg' },
-  { cat: 'EMBROIDERED UNDERWIRE BRA', nm: 'Flora Belle',  pr: '£58.00', colors: 4, ph: './Assets/plp/card4.jpg' },
-  /* v5 only — fills the last desktop row next to the editorial collage */
-  { cat: 'PADDED UNDERWIRE BRA',   nm: 'Aura Spotlight',  pr: '£59.95', colors: 4, ph: './Assets/plp/card2.jpg', extra: true },
+const SWATCHES = [
+  { name: 'Black Lace', sw: './Assets/plp/swatch-black.jpg', photo: './Assets/plp/card4.jpg' },
+  { name: 'Deep Red',   sw: './Assets/plp/swatch-red.jpg',   photo: './Assets/plp/card5.jpg' },
+  { name: 'Mauve',      sw: './Assets/plp/swatch-mauve.jpg', photo: './Assets/plp/card3.jpg' },
 ];
+
+const P = n => `./Assets/plp/card${n}.jpg`;
+const PRODUCTS = [
+  { cat: 'LACE BALCONETTE BRA',       pr: '£59.95', colors: 4, ph: P(6) },
+  { cat: 'PADDED UNDERWIRE BRA',      pr: '£50.95', colors: 4, ph: P(2) },
+  { cat: 'SEAMLESS T-SHIRT BRA',      pr: '£38.50', colors: 3, ph: P(3) },
+  { cat: 'PLUNGE LACE BRA',           pr: '£59.95', colors: 4, ph: P(5) },
+  { cat: 'WIRELESS COMFORT BRA',      pr: '£29.95', colors: 3, ph: P(1) },
+  /* dark red — sits right of the peony interruptor */
+  { cat: 'STRAPLESS PUSH-UP BRA',     pr: '£52.00', colors: 4, ph: P(4) },
+  { cat: 'DEMI CUP SATIN BRA',        pr: '£55.00', colors: 3, ph: P(3) },
+  { cat: 'SPORTS PERFORMANCE BRA',    pr: '£34.95', colors: 4, ph: P(2) },
+  { cat: 'FULL COVERAGE BRA',         pr: '£32.00', colors: 3, ph: P(6) },
+  { cat: 'BRALETTE TRIANGLE',         pr: '£24.95', colors: 4, ph: P(5) },
+  /* two bright pink bras — sit left of the tulle interruptor */
+  { cat: 'HALTER NECK BRA',           pr: '£42.50', colors: 4, ph: P(1) },
+  { cat: 'EMBROIDERED UNDERWIRE BRA', pr: '£58.00', colors: 3, ph: P(3) },
+  { cat: 'CONVERTIBLE MULTI-WAY BRA', pr: '£47.00', colors: 4, ph: P(2) },
+  { cat: 'LONGLINE LACE BRA',         pr: '£62.00', colors: 3, ph: P(3) },
+  { cat: 'MINIMIZER BRA',             pr: '£39.95', colors: 4, ph: P(6) },
+  { cat: 'NURSING SUPPORT BRA',       pr: '£36.00', colors: 3, ph: P(1) },
+  { cat: 'RACERBACK SPORTS BRA',      pr: '£28.50', colors: 4, ph: P(5) },
+  { cat: 'PADDED UNDERWIRE BRA',      pr: '£59.95', colors: 3, ph: P(4) },
+  { cat: 'SOFT LACE BRALETTE',        pr: '£27.95', colors: 4, ph: P(2) },
+  { cat: 'UNWIRED SPACER BRA',        pr: '£44.95', colors: 3, ph: P(6) },
+  { cat: 'HIGH APEX LACE BRA',        pr: '£49.95', colors: 4, ph: P(1) },
+  { cat: 'SATIN TRIM BRA',            pr: '£41.00', colors: 3, ph: P(3) },
+  /* V3 only — its smaller editorials leave room for 3 more cards */
+  { cat: 'BALCONETTE MESH BRA',       pr: '£46.50', colors: 4, ph: P(5), extra: true },
+  { cat: 'TRIANGLE SATIN BRA',        pr: '£33.95', colors: 3, ph: P(4), extra: true },
+  { cat: 'LIGHTLY PADDED BRA',        pr: '£37.50', colors: 4, ph: P(2), extra: true },
+];
+
+/* editorial interruptor slots per version:
+   row2/last = car photo · tall = lips photo (spans 2 rows)
+   numbers = card index the tile is inserted before */
+const LAYOUTS = {
+  v1:  { row2: 5, tall: 12, last: 20 },
+  v2:  { row2: 6, tall: 12, last: 20 },
+  v3:  { row2: 6, tall: 11, last: 23 }, /* lips sit LEFT, small tiles take 1 column */
+  v4:  { row2: 5, tall: 12, last: 20 },
+  v5:  { row2: 5, tall: 12, last: 20 },
+  v6:  { row2: 5, tall: 12, last: 20 }, /* V1 layout + 52px card gaps on desktop */
+  fv1: { row2: 5, tall: 12, last: 20 },
+  fv2: { row2: 5, tall: 12, last: 20 },
+};
 
 /* ============================================================
    RENDER CARDS
@@ -718,18 +800,9 @@ const PRODUCTS = [
 const grid = document.getElementById('grid');
 
 /* alternate product photos for the hover gallery (4 per card) */
-const GALLERY_POOL = [
-  './Assets/plp/card1.jpg', './Assets/plp/card2.jpg', './Assets/plp/card3.jpg', './Assets/plp/card4.jpg',
-  './Assets/plp/cat-padded.jpg', './Assets/plp/cat-wired.jpg', './Assets/plp/cat-unwired.jpg', './Assets/plp/cat-sports.jpg',
-];
+const GALLERY_POOL = [P(1), P(2), P(3), P(4), P(5), P(6)];
 
 PRODUCTS.forEach((p, i) => {
-  // the currently selected colour leads the list, followed by the other colours
-  const variants = [
-    { name: 'Blush Rosé (selected)', img: p.ph, current: true },
-    ...VARIANT_POOL.slice(0, p.colors),
-  ];
-
   /* 4 hover photos: the card's own + 3 rotating alternates */
   const others = GALLERY_POOL.filter(src => src !== p.ph);
   const gallery = [p.ph, others[i % others.length], others[(i + 2) % others.length], others[(i + 4) % others.length]];
@@ -738,95 +811,74 @@ PRODUCTS.forEach((p, i) => {
   card.className = 'card' + (p.extra ? ' card--extra' : '');
   card.dataset.gallery = gallery.join('|');
 
-  const thumbTpl = (v, j) => `
-    <button class="thumb${v.current ? ' thumb--current' : ''}" data-img="${v.img}" data-idx="${j}" data-sel="${!!v.current}" aria-label="${v.name}" title="${v.name}">
-      <img src="${v.img}" alt="${v.name}" loading="lazy" />
-    </button>`;
-  const thumbsHtml = variants.map(thumbTpl).join('');
-
-  /* overflow: show at most MAX tiles; last one becomes a "+N" tile */
-  const moreTile = (list, max) => {
-    const hidden = list.length - (max - 1);
-    return list.slice(0, max - 1).map(thumbTpl).join('') + `
-      <button class="thumb thumb--more" aria-label="${hidden} more colours" title="View all colours">
-        <img src="${list[max - 1].img}" alt="" loading="lazy" />
-        <span>+${hidden}</span>
-      </button>`;
-  };
-  const panelThumbsHtml = variants.length > 4 ? moreTile(variants, 4) : thumbsHtml;
-  const stripThumbsHtml = variants.length > 6 ? moreTile(variants, 6) : thumbsHtml;
-  /* v1 inline row — big 56px tiles, at most 5 fit the card width */
-  const rowThumbsHtml = variants.length > 5 ? moreTile(variants, 5) : thumbsHtml;
+  /* panel thumbs: the worn colour (product photo crop) + fabric swatches */
+  const swatchThumbs = SWATCHES.slice(0, p.colors - 1).map((s, j) => `
+    <button class="thumb" data-photo="${s.photo}" data-idx="${j + 1}" data-sel="false" aria-label="${s.name}" title="${s.name}">
+      <img src="${s.sw}" alt="${s.name}" loading="lazy" />
+    </button>`).join('');
 
   card.innerHTML = `
     <div class="card__img">
-      <img class="ph ph--base" src="${p.ph}" alt="${p.nm}" />
+      <img class="ph ph--base" src="${p.ph}" alt="${p.cat}" />
       <img class="ph ph--variant" src="${p.ph}" alt="" aria-hidden="true" />
       <img class="ph ph--hover" src="${gallery[1]}" alt="" aria-hidden="true" />
       <button class="gal-nav gal-nav--prev" aria-label="Previous photo"><svg viewBox="0 0 10 10"><path d="M6.5 1 2.5 5l4 4"/></svg></button>
       <button class="gal-nav gal-nav--next" aria-label="Next photo"><svg viewBox="0 0 10 10"><path d="M3.5 1l4 4-4 4"/></svg></button>
       <button class="wish" data-on="false" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg></button>
-      <div class="strip" role="group" aria-label="Colours">${stripThumbsHtml}</div>
     </div>
     <div class="card__info">
       <div class="card__cat">${p.cat}</div>
-      <div class="card__nm">${p.nm}</div>
-      <div class="card__row">
-        <span class="card__pr">${p.pr}<span class="rrp">RRP</span></span>
-        <span class="cvar">
-          <button class="cvar__label">+${p.colors} colors</button>
-          <span class="cvar__thumbs" role="group" aria-label="Colours">${rowThumbsHtml}</span>
-        </span>
+      <div class="card__pr">${p.pr}<span class="rrp">RRP</span></div>
+      <button class="cvar__label">${p.colors} colors</button>
+      <div class="panel" role="group" aria-label="Colours">
+        <button class="thumb thumb--current" data-photo="${p.ph}" data-idx="0" data-sel="true" aria-label="Selected colour" title="Selected colour">
+          <img src="${p.ph}" alt="" loading="lazy" />
+        </button>
+        ${swatchThumbs}
+        <button class="panel__close">Close</button>
       </div>
-      <div class="panel" role="group" aria-label="Colours">${panelThumbsHtml}<button class="panel__close">Close</button></div>
     </div>`;
 
   grid.appendChild(card);
 });
 
 /* ============================================================
-   V5 — editorial "moody" interruptors (Figma 803-5629 / 803-5789)
-   inserted before the Nth product card so the grid flows around them
+   EDITORIAL INTERRUPTORS — created once, re-slotted per version
    ============================================================ */
-const EDITORIALS = [
-  { cls: 'ed--car',   src: './Assets/plp/break-portrait.jpg', before: 5 },
-  { cls: 'ed--tulip', src: './Assets/plp/moody-tulip.jpg', before: 7  },
-  { cls: 'ed--lips',  src: './Assets/plp/moody-lips.jpg',  before: 15 },
-];
-{
-  const cardEls = [...grid.querySelectorAll('.card')];
-  EDITORIALS.forEach(e => {
-    const tile = document.createElement('div');
-    tile.className = 'editorial ' + e.cls;
-    tile.innerHTML = `<img src="${e.src}" alt="" loading="lazy" />`;
-    grid.insertBefore(tile, cardEls[e.before] || null);
-  });
-}
+const mkTile = (cls, src) => {
+  const t = document.createElement('div');
+  t.className = 'ed ' + cls;
+  t.innerHTML = `<img src="${src}" alt="" loading="lazy" />`;
+  return t;
+};
+const edRow2 = mkTile('ed--row2', './Assets/plp/ed-peonies-wide.jpg');
+const edTall = mkTile('ed--tall', './Assets/plp/ed-loveletter.jpg');
+const edLast = mkTile('ed--last', './Assets/plp/ed-hydrangea.jpg');
 
-/* ============================================================
-   V6 — layout-break tiles: editorial images inset in the grid
-   (Figma 853-8773 desktop / 853-9733 mobile)
-   ============================================================ */
-const BREAKS = [
-  { cls: 'br--portrait', src: './Assets/plp/break-portrait.jpg', before: 5  },
-  { cls: 'br--tall',     src: './Assets/plp/break-tall.jpg',     before: 12 },
-  { cls: 'br--wide',     src: './Assets/plp/break-wide.jpg',     before: 14 },
-];
-{
-  const cardEls = [...grid.querySelectorAll('.card')];
-  BREAKS.forEach(b => {
-    const tile = document.createElement('div');
-    tile.className = 'break ' + b.cls;
-    tile.innerHTML = `<img src="${b.src}" alt="" loading="lazy" />`;
-    grid.insertBefore(tile, cardEls[b.before] || null);
-  });
+const cards = []; /* filled below, before the first placeTiles() */
+
+function placeTiles(v) {
+  const cfg = LAYOUTS[v] || LAYOUTS.v1;
+  grid.insertBefore(edRow2, cards[cfg.row2] || null);
+  grid.insertBefore(edTall, cards[cfg.tall] || null);
+  grid.insertBefore(edLast, cards[cfg.last] || null);
 }
 
 /* ============================================================
    INTERACTIONS
    ============================================================ */
 const body = document.body;
-const cards = [...document.querySelectorAll('.card')];
+cards.push(...document.querySelectorAll('.card'));
+placeTiles('v1');
+
+/* hero video plays once and freezes on its last frame;
+   the title fades in a second after playback starts */
+const hero = document.querySelector('.hero');
+const heroVideo = hero.querySelector('video');
+const showHeroTitle = () => hero.classList.add('is-ended');
+heroVideo.addEventListener('playing', () => setTimeout(showHeroTitle, 1000), { once: true });
+heroVideo.addEventListener('error', showHeroTitle);
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) showHeroTitle();
 
 /* keep the sticky results bar flush below the nav, whatever its real height */
 const setHeaderH = () =>
@@ -834,34 +886,29 @@ const setHeaderH = () =>
 setHeaderH();
 window.addEventListener('resize', setHeaderH);
 
-/* v5 lips / v6 tall tile span two rows; trim them so they end exactly at
-   the bottom of the neighbouring cards' photos (info text hangs below) */
-const trimTiles = [grid.querySelector('.ed--lips'), grid.querySelector('.br--tall')].filter(Boolean);
-function alignLips() {
-  if (!trimTiles.length) return;
-  const info = cards[0].querySelector('.card__info'); // all cards share the same info height
-  trimTiles.forEach(tile => {
-    if (window.innerWidth <= 760) { tile.style.height = ''; return; } // full-width tiles keep their aspect
-    tile.style.height = info.offsetHeight ? `calc(100% - ${info.offsetHeight}px)` : '';
-  });
+/* editorial tiles are trimmed so their images end level with the
+   neighbouring photos (row2/last) or the second photo row (tall) */
+function alignTiles() {
+  const mobile = window.innerWidth <= 760;
+  if (mobile) { [edRow2, edTall, edLast].forEach(t => t.style.height = ''); return; }
+  const ref = cards.find(c => c.offsetParent) || cards[0];
+  const photoH = ref.querySelector('.card__img').offsetHeight;
+  [edRow2, edTall, edLast].forEach(t => t.style.height = photoH + 'px');
 }
-alignLips();
-window.addEventListener('resize', alignLips);
-window.addEventListener('load', alignLips);
+window.addEventListener('resize', alignTiles);
+window.addEventListener('load', alignTiles);
 
 /* ============================================================
    SCROLL REVEAL — one-shot blurred rise per row
-   (each card observed individually; a row enters the viewport
-   together, so the per-column delay cascades it left → right)
+   (delay follows the RENDERED column, so rows sweep left → right
+   even when editorial tiles span columns)
    ============================================================ */
-/* delay follows the RENDERED column (not the DOM index), so rows always
-   sweep 1 → 2 → 3 → 4 even when editorial tiles span columns */
 function setRevealDelays() {
   const gRect = grid.getBoundingClientRect();
   const nCols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
   [...grid.children].forEach(c => {
     const col = Math.round((c.getBoundingClientRect().left - gRect.left) / (gRect.width / nCols));
-    c.style.transitionDelay = col * 120 + 'ms';
+    c.style.transitionDelay = Math.max(0, col) * 120 + 'ms';
   });
 }
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -892,12 +939,10 @@ function swapImage(card, src) {
 }
 
 cards.forEach(card => {
-  const label = card.querySelector('.cvar__label');
-
   /* clicking the product (photo or title) opens the PDP;
-     colour thumbs / labels / panels / gallery / heart keep their own behaviour */
+     colour label / panel / gallery / heart keep their own behaviour */
   card.addEventListener('click', e => {
-    if (e.target.closest('.thumb, .cvar, .panel, .strip, .gal-nav, .wish')) return;
+    if (e.target.closest('.thumb, .cvar__label, .panel, .gal-nav, .wish')) return;
     window.location.href = './pdp.html';
   });
 
@@ -927,91 +972,210 @@ cards.forEach(card => {
     wish.dataset.on = wish.dataset.on === 'true' ? 'false' : 'true';
   });
 
-  /* V1 + V4 — open on label hover/click */
-  label.addEventListener('mouseenter', () => {
-    const v = body.dataset.version;
-    if (v === 'v1' || v === 'v5' || v === 'v6') { closeAll(card); card.classList.add('is-open'); }
-  });
-  label.addEventListener('click', e => {
+  /* "N colors" — expanding panel over the info area */
+  card.querySelector('.cvar__label').addEventListener('click', e => {
     e.stopPropagation();
-    const v = body.dataset.version;
-    if (v === 'v1' || v === 'v4' || v === 'v5' || v === 'v6') {
-      const open = card.classList.contains('is-open');
-      closeAll(card);
-      card.classList.toggle('is-open', !open);
-    }
+    const open = card.classList.contains('is-open');
+    closeAll(card);
+    card.classList.toggle('is-open', !open);
   });
-
-  /* close button (v4 panel) */
   card.querySelector('.panel__close').addEventListener('click', e => {
     e.stopPropagation();
     card.classList.remove('is-open');
   });
 
-  /* leaving the card closes v1 (hover pattern); v4 stays until click-out */
-  card.addEventListener('mouseleave', () => {
-    const v = body.dataset.version;
-    if (v === 'v1' || v === 'v5' || v === 'v6') card.classList.remove('is-open');
-    /* v2: reset preview to the selected colour, or back to the card's own photo */
-    if (body.dataset.version === 'v2') swapImage(card, card.dataset.selImg || null);
-  });
-
-  /* thumbnails — hover previews (v2), click selects (all versions) */
-  card.querySelectorAll('.thumb:not(.thumb--more)').forEach(th => {
-    th.addEventListener('mouseenter', () => {
-      if (body.dataset.version === 'v2' && th.closest('.strip')) {
-        card._resetGallery(); // colour preview wins over the hover gallery
-        swapImage(card, th.dataset.img);
-      }
-    });
-
+  /* swatch thumbnails — click selects + swaps the photo */
+  card.querySelectorAll('.thumb').forEach(th => {
     th.addEventListener('click', e => {
       e.stopPropagation();
-      /* select this colour in every group of the card (match by index — images repeat) */
-      card.querySelectorAll('.thumb:not(.thumb--more)').forEach(t =>
-        t.dataset.sel = (t.dataset.idx === th.dataset.idx));
-      card.dataset.selImg = th.dataset.img;
-      swapImage(card, th.dataset.img);
+      card.querySelectorAll('.thumb').forEach(t => t.dataset.sel = String(t === th));
+      /* the current-colour thumb restores the card's own photo */
+      swapImage(card, th.dataset.idx === '0' ? null : th.dataset.photo);
     });
   });
 });
 
-/* click outside closes open reveals */
+/* click outside closes open panels */
 document.addEventListener('click', e => {
   if (!e.target.closest('.card')) closeAll();
 });
 
 /* ============================================================
-   VERSION SWITCHER
+   OFF-CANVAS FILTER & SORT (Filter V2)
    ============================================================ */
-const HINTS = {
-  v1: 'Hover or click “+N colors” — big colour tiles drop in on the right, where the label was',
-  v2: 'Hover a card — thumbnails float in over the photo, hover one to preview',
-  v4: 'Click “+N colors” — the colours cover the product info, “Close” dismisses',
-  v5: 'Blush & Pink — moody editorial imagery breaks up the grid; colours swap inline like version 1',
-  v6: 'Layout break — editorial images sit inset in the grid with white space around them',
+const FACETS = [
+  { label: 'Sort by',  type: 'list',   items: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'], on: 0 },
+  { label: 'Size',     type: 'sizes',  items: ['70A', '70B', '75A', '75B', '75C', '80B', '80C', '85B'] },
+  { label: 'Colour',   type: 'colors', items: SWATCHES },
+  { label: 'Fabrics',  type: 'list',   items: ['Lace', 'Satin', 'Mesh', 'Cotton'] },
+  { label: 'Price',    type: 'list',   items: ['Under £30', '£30 – £50', 'Over £50'] },
+  { label: 'Series',   type: 'list',   items: ['Love in Lace', 'Aura Spotlight', 'Signature Sheer', 'Body Make-Up'] },
+  { label: 'Product standards & traceability', type: 'list', items: ['OEKO-TEX Standard 100', 'Recycled materials', 'Organic cotton'] },
+];
+
+const facetsEl = document.getElementById('facets');
+FACETS.forEach(f => {
+  const facet = document.createElement('div');
+  facet.className = 'facet';
+  let bodyHtml = '';
+  if (f.type === 'sizes') {
+    bodyHtml = `<div class="facet__sizes">${f.items.map(s => `<button data-on="false">${s}</button>`).join('')}</div>`;
+  } else if (f.type === 'colors') {
+    bodyHtml = `<ul>${f.items.map(s => `<li><button data-on="false"><img src="${s.sw}" alt="" />${s.name}</button></li>`).join('')}</ul>`;
+  } else {
+    bodyHtml = `<ul>${f.items.map((s, j) => `<li><button data-on="${j === f.on}">${s}</button></li>`).join('')}</ul>`;
+  }
+  facet.innerHTML = `
+    <button class="facet__head">${f.label}
+      <svg viewBox="0 0 10 6"><path d="M.5.5 5 5 9.5.5"/></svg>
+    </button>
+    <div class="facet__body">${bodyHtml}</div>`;
+  facet.querySelector('.facet__head').addEventListener('click', () => facet.classList.toggle('is-open'));
+  /* toggle options (radio for sort, checkbox elsewhere) */
+  facet.querySelectorAll('.facet__body button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (f.label === 'Sort by') facet.querySelectorAll('.facet__body button').forEach(b => b.dataset.on = 'false');
+      btn.dataset.on = btn.dataset.on === 'true' ? 'false' : 'true';
+    });
+  });
+  facetsEl.appendChild(facet);
+});
+
+/* "Reset filters" appears once at least one filter is set (sort default doesn't count) */
+const clearBtn = document.querySelector('.drawer__clear');
+const filterFacets = [...facetsEl.querySelectorAll('.facet')].slice(1); /* skip "Sort by" */
+function updateClear() {
+  clearBtn.hidden = !filterFacets.some(f => f.querySelector('.facet__body button[data-on="true"]'));
+}
+facetsEl.addEventListener('click', updateClear);
+clearBtn.addEventListener('click', () => {
+  filterFacets.forEach(f => f.querySelectorAll('.facet__body button').forEach(b => b.dataset.on = 'false'));
+  updateClear();
+});
+
+const drawer = document.querySelector('.drawer');
+function setDrawer(open) {
+  body.classList.toggle('drawer-open', open);
+  drawer.setAttribute('aria-hidden', String(!open));
+}
+document.getElementById('drawerTrigger').addEventListener('click', () => setDrawer(true));
+document.querySelector('.drawer__close').addEventListener('click', () => setDrawer(false));
+document.querySelector('.drawer__cta').addEventListener('click', () => setDrawer(false));
+document.getElementById('scrim').addEventListener('click', () => setDrawer(false));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
+
+/* ============================================================
+   FILTER V1 — chip dropdowns (Figma 931-26774) + More/Less
+   ============================================================ */
+const DD_ITEMS = {
+  size: ['70A', '70B', '75A', '75B', '75C', '80B', '80C', '85B'],
+  colour: [
+    { name: 'Red',   c: '#C1003F' }, { name: 'Blue',  c: '#3B82F6' },
+    { name: 'Green', c: '#10B981' }, { name: 'Black', c: '#000000' },
+    { name: 'White', c: '#FFFFFF' }, { name: 'Pink',  c: '#EC4899' },
+    { name: 'Grey',  c: '#6B7280' },
+  ],
+  series: ['Love in Lace', 'Aura Spotlight', 'Signature Sheer', 'Body Make-Up'],
+  fabric: ['Lace', 'Satin', 'Mesh', 'Cotton'],
+  standards: ['OEKO-TEX Standard 100', 'Recycled materials', 'Organic cotton'],
+  sort: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'],
 };
-const hint = document.getElementById('hint');
+const ddState = { sort: new Set([0]) }; /* per facet: selected indices */
+
+const resultsRow = document.querySelector('.results-row');
+const dropdown = document.createElement('div');
+dropdown.className = 'dropdown';
+resultsRow.appendChild(dropdown);
+let ddChip = null;
+
+function openDropdown(chip) {
+  const key = chip.dataset.f;
+  const items = DD_ITEMS[key];
+  const sel = ddState[key] || (ddState[key] = new Set());
+
+  dropdown.innerHTML = items.map((it, i) => {
+    const name = typeof it === 'string' ? it : it.name;
+    const sw = typeof it === 'string' ? '' : `<span class="sw" style="background:${it.c}"></span>`;
+    return `<button class="dropdown__row" data-i="${i}" data-on="${sel.has(i)}">${sw}<span class="lbl">${name}</span>
+      <svg class="tick" viewBox="0 0 16 16"><path d="M2.5 8.5 6.5 12.5 13.5 4"/></svg></button>`;
+  }).join('') + `
+    <div class="dropdown__foot"><button class="dd-reset">Reset</button><button class="dd-save">Save</button></div>`;
+
+  /* sits below the clicked chip, kept inside the row */
+  const rowRect = resultsRow.getBoundingClientRect();
+  const r = chip.getBoundingClientRect();
+  dropdown.style.left = Math.min(r.left - rowRect.left, resultsRow.clientWidth - 240 - 24) + 'px';
+  dropdown.style.top = (r.bottom - rowRect.top + 8) + 'px';
+  dropdown.classList.add('is-open');
+  ddChip = chip;
+
+  dropdown.querySelectorAll('.dropdown__row').forEach(rowBtn => {
+    rowBtn.addEventListener('click', () => {
+      const i = +rowBtn.dataset.i;
+      if (key === 'sort') { /* single choice */
+        sel.clear(); sel.add(i);
+        dropdown.querySelectorAll('.dropdown__row').forEach(b => b.dataset.on = 'false');
+        rowBtn.dataset.on = 'true';
+        return;
+      }
+      sel.has(i) ? sel.delete(i) : sel.add(i);
+      rowBtn.dataset.on = String(sel.has(i));
+    });
+  });
+  dropdown.querySelector('.dd-reset').addEventListener('click', () => {
+    sel.clear();
+    dropdown.querySelectorAll('.dropdown__row').forEach(b => b.dataset.on = 'false');
+  });
+  dropdown.querySelector('.dd-save').addEventListener('click', closeDropdown);
+}
+function closeDropdown() {
+  dropdown.classList.remove('is-open');
+  ddChip = null;
+}
+document.querySelectorAll('.filters--reduced [data-f]').forEach(chip => {
+  chip.addEventListener('click', e => {
+    e.stopPropagation();
+    if (ddChip === chip) { closeDropdown(); return; }
+    openDropdown(chip);
+  });
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown, .filters--reduced')) closeDropdown();
+});
+
+/* More reveals the remaining chips, then reads Less */
+const moreToggle = document.querySelector('.more-toggle');
+const extraChips = document.querySelector('.filters__extra');
+moreToggle.addEventListener('click', () => {
+  const show = extraChips.hidden;
+  extraChips.hidden = !show;
+  moreToggle.innerHTML = show
+    ? 'Less <svg class="plus" viewBox="0 0 10 10"><path d="M0 5h10"/></svg>'
+    : 'More <svg class="plus" viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg>';
+  closeDropdown();
+});
+
+/* ============================================================
+   VERSION SWITCHER — V1-V5 + the two desktop filter directions
+   ============================================================ */
 const switcher = document.querySelector('.switcher');
 
 function setVersion(v) {
+  if (!LAYOUTS[v]) v = 'v1';
   body.dataset.version = v;
   closeAll();
-  /* reset all variant selections + previews (back to the current colour) */
+  setDrawer(false);
+  closeDropdown();
+  placeTiles(v);
+  /* reset all variant selections + previews (back to the worn colour) */
   cards.forEach(card => {
     card.querySelector('.ph--variant').classList.remove('is-on');
     card._resetGallery();
-    delete card.dataset.selImg;
-    card.querySelectorAll('.thumb:not(.thumb--more)').forEach(t => t.dataset.sel = String(t.dataset.idx === '0'));
+    card.querySelectorAll('.thumb').forEach(t => t.dataset.sel = String(t.dataset.idx === '0'));
   });
   switcher.querySelectorAll('button').forEach(b => b.dataset.on = (b.dataset.v === v));
-  hint.textContent = HINTS[v];
-  alignLips();
+  alignTiles();
   setRevealDelays();
-  /* hero video runs only while the Blush & Pink version is showing */
-  const heroVideo = document.querySelector('.hero video');
-  if (v === 'v5') heroVideo.play();
-  else { heroVideo.pause(); heroVideo.currentTime = 0; }
 }
 
 switcher.addEventListener('click', e => {
@@ -1019,10 +1183,15 @@ switcher.addEventListener('click', e => {
   if (btn) setVersion(btn.dataset.v);
 });
 
-/* deep-link: plp.html?v=v2&open=2 (open forces the nth card open — for review/screenshots) */
+/* deep-link: plp.html?v=v3&open=2 (open forces the nth card open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 if (params.get('v')) setVersion(params.get('v'));
-else hint.textContent = HINTS.v1;
+else alignTiles();
+if (params.get('drawer')) setDrawer(true);
+if (params.get('dd')) {
+  const chip = document.querySelector(`.filters--reduced [data-f="${params.get('dd')}"]`);
+  if (chip) requestAnimationFrame(() => openDropdown(chip));
+}
 if (params.get('open')) {
   const n = Math.max(1, parseInt(params.get('open'), 10) || 1) - 1;
   requestAnimationFrame(() => (cards[n] || cards[0]).classList.add('is-open'));
