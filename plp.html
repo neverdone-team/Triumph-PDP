@@ -409,6 +409,9 @@ body:is([data-version="v4"], [data-version="v5"]) .panel { padding-left: 0; }
 .ed--last img { object-position: 50% 50%; } /* hydrangea face close-up */
 .ed--tall img { object-position: 50% 52%; } /* love letter on the velvet sofa */
 
+/* the peony zoom would bleed over the insets — full padding wins in v3/v5 */
+body:is([data-version="v3"], [data-version="v5"]) .ed--row2 img { transform: none; }
+
 /* V2 — editorials inset 24px inside their slots (Figma 931-16566) */
 body[data-version="v2"] .ed { padding: 0 24px; }
 /* V3 — small floating editorials with generous white space (931-16973) */
