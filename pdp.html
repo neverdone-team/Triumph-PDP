@@ -376,16 +376,18 @@ header {
 }
 .rec__info {
   padding-top: 16px;
-  display: flex; gap: 12px; align-items: flex-end;
+  /* centring (not flex-end) keeps the price on the title's visual axis
+     despite their different line-heights (20px vs 14px) */
+  display: flex; gap: 12px; align-items: center;
 }
 .rec__nm {
   flex: 1; min-width: 0;
-  /* same title style as the complete-your-set items */
-  font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: .04em;
+  /* same title style as the PLP cards */
+  font-size: 12px; font-weight: 400; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.rec__pr { font-size: 14px; font-weight: 400; line-height: 16px; letter-spacing: 0; flex: none; }
+.rec__pr { font-size: 12px; font-weight: 400; line-height: 14px; flex: none; }
 
 /* ============================================================
    BOTTOM EDITORIAL COLLAGE
@@ -523,7 +525,8 @@ header {
   }
   .rec__img { aspect-ratio: 155.5 / 204.6; }
   .rec__info { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .rec__nm { width: 100%; font-size: 12px; font-weight: 300; } /* matches the set-item mobile titles */
+  .rec__nm { width: 100%; font-size: 11px; line-height: 16px; } /* matches the PLP mobile card titles */
+  .rec__pr { font-size: 10px; }
   .rec__sale { left: 8px; bottom: 8px; font-size: 12px; line-height: 18px; }
 
   /* bottom collage — swipeable row of 240x320 tiles */
@@ -642,16 +645,18 @@ body.has-sticky .switcher { bottom: 96px; }
       </div>
       <div class="gallery__bars" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
 
-      <!-- desktop-only editorial rows -->
-      <div class="gallery__row">
-        <div class="gallery__tile gallery__note rv">
-          <p>A whisper-soft floral lace bra, blending modern romance with a desire for comfort. Invisible under T-Shirts, combining beauty with comfort.</p>
+      <!-- desktop-only editorial rows — fade in together as one block -->
+      <div class="gallery__rows rv">
+        <div class="gallery__row">
+          <div class="gallery__tile gallery__note">
+            <p>A whisper-soft floral lace bra, blending modern romance with a desire for comfort. Invisible under T-Shirts, combining beauty with comfort.</p>
+          </div>
+          <div class="gallery__tile"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
         </div>
-        <div class="gallery__tile rv"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
-      </div>
-      <div class="gallery__row">
-        <div class="gallery__tile rv"><img src="./Assets/pdp/gallery-3.jpg" alt="" loading="lazy" /></div>
-        <div class="gallery__tile rv"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
+        <div class="gallery__row">
+          <div class="gallery__tile"><img src="./Assets/pdp/gallery-3.jpg" alt="" loading="lazy" /></div>
+          <div class="gallery__tile"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
+        </div>
       </div>
     </section>
 
@@ -885,23 +890,9 @@ RECS.forEach(r => {
 });
 
 /* ============================================================
-   SCROLL REVEAL — one-shot blurred rise, column-staggered
-   (same recipe as the PLP prototype)
+   SCROLL REVEAL — one-shot blurred rise; everything entering the
+   viewport animates together (no stagger, same as the PLP)
    ============================================================ */
-function setRevealDelays() {
-  const gRect = recsGrid.getBoundingClientRect();
-  const nCols = getComputedStyle(recsGrid).gridTemplateColumns.split(' ').length;
-  [...recsGrid.children].forEach(c => {
-    const col = Math.round((c.getBoundingClientRect().left - gRect.left) / (gRect.width / nCols));
-    c.style.transitionDelay = col * 120 + 'ms';
-  });
-  // gallery tile pairs sweep left → right too
-  document.querySelectorAll('.gallery__row').forEach(row =>
-    [...row.children].forEach((t, i) => t.style.transitionDelay = i * 120 + 'ms'));
-  // bottom collage sweeps across
-  document.querySelectorAll('.collage__tile').forEach((t, i) => t.style.transitionDelay = i * 120 + 'ms');
-}
-
 const rvEls = [...document.querySelectorAll('.rv')];
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   rvEls.forEach(el => el.classList.add('is-visible'));
@@ -913,8 +904,6 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       io.unobserve(en.target);
     });
   }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
-  setRevealDelays();
-  window.addEventListener('resize', setRevealDelays);
   rvEls.forEach(el => io.observe(el));
 }
 

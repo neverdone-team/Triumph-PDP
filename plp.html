@@ -38,7 +38,8 @@
 
   --pad-x: 24px;
   --header-h: 80px; /* measured on load (see JS) — sticky offset for the results bar */
-  --row-gap: 112px; /* 80px + 40% */
+  /* fluid: ~51px on a 1280 desktop, ~58px at 1440, full 84px (60px + 40%) from ~2100px up */
+  --row-gap: clamp(48px, 4vw, 84px);
 
   --ease-out: cubic-bezier(.22,.61,.36,1);
   --ease-reveal: cubic-bezier(.22,1,.36,1);
@@ -117,7 +118,7 @@ header {
   font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
   font-weight: 300;
   color: var(--c-ink);
-  padding: 20px var(--pad-x) 24px;
+  padding: 8px var(--pad-x) 24px;
 }
 .breadcrumb b { font-weight: 300; color: var(--c-ink-soft); }
 .breadcrumb span { opacity: .4; }
@@ -278,8 +279,9 @@ body:is([data-version="v4"], [data-version="v5"]) .grid {
   padding: 0 24px;
   column-gap: 24px;
 }
-/* V6 — V1 layout with 40px between the product cards (desktop only) */
-body[data-version="v6"] .grid { column-gap: 40px; }
+/* V6 — V1 layout with 40px between the product cards (desktop only)
+   "live" duplicates V6 but shows uk.triumph.com photos, no mood tiles */
+body:is([data-version="v6"], [data-version="live"]) .grid { column-gap: 40px; }
 .card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
 .card, .ed {
   position: relative;
@@ -547,7 +549,7 @@ body.drawer-open .drawer {
   .search svg { width: 14px; height: 14px; }
   .search input { width: 60px; }
 
-  .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 12px 16px; gap: 8px; }
+  .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 8px 16px 12px; gap: 8px; }
 
   /* hero — banner title at half size */
   .hero { height: 300px; }
@@ -564,7 +566,7 @@ body.drawer-open .drawer {
 
   /* grid — 2 columns */
   .grid { grid-template-columns: repeat(2, 1fr) !important; margin-bottom: 80px; }
-  body[data-version="v6"] .grid { column-gap: 0; } /* the 40px gap is desktop-only */
+  body:is([data-version="v6"], [data-version="live"]) .grid { column-gap: 0; } /* the 40px gap is desktop-only */
   body:is([data-version="v4"], [data-version="v5"]) .grid { padding: 0 16px; column-gap: 16px; }
 
   /* card info */
@@ -755,6 +757,7 @@ body.drawer-open .drawer {
   <button data-v="v6">V6</button>
   <button data-v="price">Price</button>
   <button data-v="title">Title</button>
+  <button data-v="live">Triumph live</button>
   <span class="sep"></span>
   <button data-v="fv1">Filter V1</button>
   <button data-v="fv2">Filter V2</button>
@@ -810,6 +813,7 @@ const LAYOUTS = {
   v6:  { row2: 5, tall: 12, last: 20 }, /* V1 layout + 52px card gaps on desktop */
   price: { row2: 5, tall: 12, last: 20 }, /* V1 layout + swatches inline with the price */
   title: { row2: 5, tall: 12, last: 20 }, /* V1 layout + grey "36 Products" instead of the collection name */
+  live: {}, /* V6 duplicate — live uk.triumph.com photos, product cards only (no mood tiles) */
   fv1: { row2: 5, tall: 12, last: 20 },
   fv2: { row2: 5, tall: 12, last: 20 },
 };
@@ -877,9 +881,41 @@ const cards = []; /* filled below, before the first placeTiles() */
 
 function placeTiles(v) {
   const cfg = LAYOUTS[v] || LAYOUTS.v1;
-  grid.insertBefore(edRow2, cards[cfg.row2] || null);
-  grid.insertBefore(edTall, cards[cfg.tall] || null);
-  grid.insertBefore(edLast, cards[cfg.last] || null);
+  /* a version without a slot for a tile drops it from the grid ("live") */
+  const slot = (tile, i) => i == null ? tile.remove() : grid.insertBefore(tile, cards[i] || null);
+  slot(edRow2, cfg.row2);
+  slot(edTall, cfg.tall);
+  slot(edLast, cfg.last);
+}
+
+/* ============================================================
+   "TRIUMPH LIVE" PHOTOS — tile images scraped from
+   https://uk.triumph.com/bras (one per product, page order);
+   swapped in for this version only, restored on leaving it
+   ============================================================ */
+const LIVE_PHOTOS = Array.from({ length: 22 }, (_, i) =>
+  `./Assets/plp/live/live${String(i + 1).padStart(2, '0')}.webp`);
+
+function applyPhotos(v) {
+  const live = v === 'live';
+  cards.forEach((card, i) => {
+    if (!card.dataset.galleryHome) card.dataset.galleryHome = card.dataset.gallery;
+    const n = LIVE_PHOTOS.length;
+    const gal = live
+      ? [LIVE_PHOTOS[i % n], LIVE_PHOTOS[(i + 5) % n], LIVE_PHOTOS[(i + 11) % n], LIVE_PHOTOS[(i + 17) % n]]
+      : card.dataset.galleryHome.split('|');
+    card.dataset.gallery = gal.join('|');
+    card.querySelector('.ph--base').src = gal[0];
+    card.querySelector('.ph--variant').src = gal[0];
+    const cur = card.querySelector('.thumb--current');
+    cur.dataset.photo = gal[0];
+    cur.querySelector('img').src = gal[0];
+    /* colour swatches preview other live shots instead of the Figma photos */
+    card.querySelectorAll('.panel .thumb:not(.thumb--current)').forEach((t, j) => {
+      if (!t.dataset.photoHome) t.dataset.photoHome = t.dataset.photo;
+      t.dataset.photo = live ? gal[(j + 1) % gal.length] : t.dataset.photoHome;
+    });
+  });
 }
 
 /* ============================================================
@@ -955,12 +991,13 @@ cards.forEach(card => {
   });
 
   /* hover gallery — entering the photo shows a different shot,
-     chevrons page through all 4; leaving restores the base photo */
-  const gallery = card.dataset.gallery.split('|');
+     chevrons page through all 4; leaving restores the base photo
+     (the photo set is read per call — versions may swap it) */
   const hoverImg = card.querySelector('.ph--hover');
   const imgWrap = card.querySelector('.card__img');
   let galIdx = 0;
   function showGal(i) {
+    const gallery = card.dataset.gallery.split('|');
     galIdx = (i + gallery.length) % gallery.length;
     if (galIdx === 0) { hoverImg.classList.remove('is-on'); return; }
     hoverImg.src = gallery[galIdx];
@@ -1247,6 +1284,7 @@ function setVersion(v) {
   setDrawer(false);
   closeDropdown();
   placeTiles(v);
+  applyPhotos(v);
   /* reset all variant selections + previews (back to the worn colour) */
   cards.forEach(card => {
     card.querySelector('.ph--variant').classList.remove('is-on');
