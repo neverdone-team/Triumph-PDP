@@ -784,7 +784,7 @@ body.dash-open .dash { display: flex; }
   <!-- HERO — burgundy petal (Figma List Interuptor) -->
   <section class="hero">
     <img src="./Assets/plp/hero-burgundy.jpg" alt="Blush &amp; Burgundy" />
-    <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" autoplay muted playsinline aria-hidden="true"></video>
+    <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
     <h1>A Love Story in Blush &amp; Burgundy</h1>
   </section>
 
@@ -1099,7 +1099,7 @@ const body = document.body;
 cards.push(...document.querySelectorAll('.card'));
 placeTiles();
 
-/* hero video plays once and freezes on its last frame;
+/* hero video loops forever;
    the title fades in a second after playback starts */
 const hero = document.querySelector('.hero');
 const heroVideo = hero.querySelector('video');
