@@ -347,6 +347,11 @@ body[data-side="max"] .grid { padding: 0 48px; }
 }
 .wish:hover svg { transform: scale(1.1); }
 .wish[data-on="true"] svg { fill: var(--c-ink); }
+/* two glyphs from the saved favorite*.svg files — the outline (.ho)
+   shows at rest, the solid heart (.hs) joins it when selected, which
+   reads much crisper than tinting the 1px outline */
+.wish svg .hs { display: none; stroke: none; }
+.wish[data-on="true"] svg .hs { display: block; }
 
 /* HEART 1 — no white fill, white stroke, blurred dark disc behind */
 body[data-heart="h1"] .wish {
@@ -356,9 +361,8 @@ body[data-heart="h1"] .wish {
   background: rgba(0,0,0,.3);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
 }
-/* the glyph sits low in its 24-unit viewBox (~3px more air above than
-   below) — the bottom margin nudges it up so it reads centred in the disc */
-body[data-heart="h1"] .wish svg { width: 22px; height: 22px; fill: none; stroke: #fff; margin-bottom: 3px; }
+/* native 24px — scaling the svg puts the 1px stroke between pixels and blurs it */
+body[data-heart="h1"] .wish svg { width: 24px; height: 24px; fill: none; stroke: #fff; }
 body[data-heart="h1"] .wish[data-on="true"] svg { fill: #fff; }
 
 /* HEART 3 — white outline heart in the photo, no disc behind it */
@@ -380,6 +384,19 @@ body[data-heart="h2"] .wish {
   width: 24px; height: 24px; flex: none;
 }
 body[data-heart="h2"] .wish svg { width: 24px; height: 24px; }
+
+/* HEART 5 — no heart at rest, in the photo or below it; hovering
+   "+ N colors" (tap on mobile) opens the colour panel and only then
+   the heart fades in top right, level with the product title, above
+   the panel (the node lives in .card__info for this option) */
+body[data-heart="h5"] .wish {
+  top: 50%; right: 12px; /* centred on the open swatch row */
+  z-index: 6;
+  opacity: 0; pointer-events: none;
+  transform: translateY(calc(-50% + 6px));
+  transition: opacity .32s var(--ease-out), transform .32s var(--ease-out);
+}
+body[data-heart="h5"] .card.is-open .wish { opacity: 1; pointer-events: auto; transform: translateY(-50%); }
 
 /* ============================================================
    CARD INFO — title / price / colour label; the dashboard decides
@@ -646,7 +663,8 @@ body.drawer-open .drawer {
   .wish { top: 10px; right: 10px; width: 20px; height: 20px; }
   .wish svg { width: 20px; height: 20px; }
   body[data-heart="h1"] .wish { width: 28px; height: 28px; }
-  body[data-heart="h1"] .wish svg { width: 20px; height: 20px; margin-bottom: 2px; }
+  body[data-heart="h1"] .wish svg { width: 20px; height: 20px; }
+  body[data-heart="h5"] .wish { right: 4px; }
   body[data-heart="h2"] .wish { width: 20px; height: 20px; margin: -2px 0 -2px auto; }
   body[data-heart="h2"] .wish svg { width: 20px; height: 20px; }
 
@@ -760,7 +778,7 @@ body.dash-open .dash { display: flex; }
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
         </button>
         <button aria-label="Wishlist">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z" stroke-linejoin="round"/></svg>
         </button>
         <button aria-label="Cart">
           <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
@@ -907,6 +925,7 @@ body.dash-open .dash { display: flex; }
       <button data-k="heart" data-val="h2">Heart 2</button>
       <button data-k="heart" data-val="h3">Heart 3</button>
       <button data-k="heart" data-val="h4">Heart 4</button>
+      <button data-k="heart" data-val="h5">Heart 5</button>
     </div>
   </div>
 </aside>
@@ -981,7 +1000,7 @@ PRODUCTS.forEach((p, i) => {
       <img class="ph ph--hover" src="${gallery[1]}" alt="" aria-hidden="true" />
       <button class="gal-nav gal-nav--prev" aria-label="Previous photo"><svg viewBox="0 0 10 10"><path d="M6.5 1 2.5 5l4 4"/></svg></button>
       <button class="gal-nav gal-nav--next" aria-label="Next photo"><svg viewBox="0 0 10 10"><path d="M3.5 1l4 4-4 4"/></svg></button>
-      <button class="wish" data-on="false" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" stroke-linejoin="round"/></svg></button>
+      <button class="wish" data-on="false" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path class="hs" d="M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z"/><path class="ho" d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z"/></svg></button>
     </div>
     <div class="card__info">
       <div class="card__cat">${p.cat}</div>
@@ -1034,7 +1053,8 @@ edLast.appendChild(moodCta);
 function applyHeart(v) {
   cards.forEach(card => {
     const wish = card.querySelector('.wish');
-    (v === 'h2' ? card.querySelector('.card__cat') : card.querySelector('.card__img')).appendChild(wish);
+    const slot = v === 'h2' ? '.card__cat' : v === 'h5' ? '.card__info' : '.card__img';
+    card.querySelector(slot).appendChild(wish);
   });
 }
 
@@ -1482,7 +1502,7 @@ const CONTROLS = {
   colors:  ['newline', 'inline'],
   wording: ['count', 'other'],
   images:  ['new', 'live'],
-  heart:   ['h1', 'h2', 'h3', 'h4'],
+  heart:   ['h1', 'h2', 'h3', 'h4', 'h5'],
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
