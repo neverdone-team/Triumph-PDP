@@ -1485,6 +1485,19 @@ const CONTROLS = {
   heart:   ['h1', 'h2', 'h3', 'h4'],
 };
 
+/* the URL mirrors the panel — options at their default drop out of the
+   query string, so the address bar is always a minimal shareable link */
+const DEFAULTS = Object.fromEntries(Object.keys(CONTROLS).map(k => [k, body.dataset[k]]));
+function syncURL() {
+  const qs = new URLSearchParams(location.search);
+  Object.keys(CONTROLS).forEach(k => {
+    if (body.dataset[k] === DEFAULTS[k]) qs.delete(k);
+    else qs.set(k, body.dataset[k]);
+  });
+  const q = qs.toString();
+  try { history.replaceState(null, '', location.pathname + (q ? '?' + q : '') + location.hash); } catch (e) {}
+}
+
 function setOption(key, val) {
   if (!CONTROLS[key] || !CONTROLS[key].includes(val)) return;
   body.dataset[key] = val;
@@ -1503,6 +1516,7 @@ function setOption(key, val) {
   if (key === 'filters') { setDrawer(false); closeDropdown(); }
   closeAll();
   dash.querySelectorAll(`button[data-k="${key}"]`).forEach(b => b.dataset.on = String(b.dataset.val === val));
+  syncURL();
   alignTiles();
 }
 
