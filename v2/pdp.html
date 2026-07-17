@@ -421,14 +421,16 @@ header {
 .collage__tile:hover img { transform: scale(1.04); }
 .badge {
   position: relative;
-  min-width: 104px; height: 28px;
+  height: 28px; line-height: 28px;   /* hug the label width, no min-width */
   padding: 0 10px;
-  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  cursor: pointer;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   background: rgba(255,255,255,.2);
   font-size: 14px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase;
 }
+.badge:hover { text-decoration: underline; }
 .badge--light { color: #fff; }
 
 /* ============================================================
@@ -552,7 +554,7 @@ header {
     aspect-ratio: 240 / 320;
     scroll-snap-align: start;
   }
-  .badge { min-width: 88px; height: 26px; font-size: 12px; }
+  .badge { height: 26px; line-height: 26px; font-size: 12px; }
 
   .sticky-cta { display: block; }
   body.has-sticky { padding-bottom: 80px; }
