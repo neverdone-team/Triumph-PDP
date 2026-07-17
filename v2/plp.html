@@ -822,8 +822,6 @@ body.dash-open .dash { display: flex; }
   /* the dashboard becomes a bottom sheet */
   .dash { left: 12px; right: 12px; width: auto; bottom: 64px; max-height: 55vh; }
   .dash-toggle { left: 12px; bottom: 12px; }
-  /* desktop-only filter treatments — the control has no effect here */
-  .dash__group--filters { display: none; }
 }
 </style>
 </head>
@@ -972,15 +970,8 @@ body.dash-open .dash { display: flex; }
       <button data-k="herosize" data-val="large">Large</button>
     </div>
   </div>
-  <div class="dash__group dash__group--filters">
-    <div class="dash__label">Filters</div>
-    <div class="dash__seg">
-      <!-- "All" and "None" hidden for now — kept in code, remove hidden to restore -->
-      <button data-k="filters" data-val="all" hidden>All</button>
-      <button data-k="filters" data-val="some" data-on="true">Some</button>
-      <button data-k="filters" data-val="none" hidden>None</button>
-    </div>
-  </div>
+  <!-- Filters control removed from the panel: only "some" is active and there's
+       nothing to toggle. The filter behaviour + deep-link (?filters=all|some|none) still work. -->
   <div class="dash__group">
     <div class="dash__label">Colour label position</div>
     <div class="dash__seg">
