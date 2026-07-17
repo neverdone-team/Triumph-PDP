@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blush &amp; Burgundy – Bras | Triumph</title>
+<style>
+/* ============================================================
+   FONTS (local — Alliance No.1 Light + Regular)
+   ============================================================ */
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS (from Figma)
+   ============================================================ */
+:root {
+  --c-bg:        #FFFFFF;
+  --c-ink:       #000000;
+  --c-ink-soft:  rgba(0,0,0,.5);
+  --c-line:      #DADADA;
+  --c-offwhite:  #F8F3F3;
+  --c-burgundy:  #5E2039;
+
+  --font-sans: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --pad-x: 24px;
+  --header-h: 80px; /* measured on load (see JS) — sticky offset for the results bar */
+  /* fluid: ~51px on a 1280 desktop, ~58px at 1440, full 84px (60px + 40%) from ~2100px up */
+  --row-gap: clamp(48px, 4vw, 84px);
+
+  --ease-out: cubic-bezier(.22,.61,.36,1);
+  --ease-reveal: cubic-bezier(.22,1,.36,1);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; overflow-x: clip; }
+body {
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; background: none; border: 0; padding: 0; color: inherit; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+h1, h2, h3 { margin: 0; font-weight: 400; }
+
+/* ============================================================
+   HEADER (same as PDP prototype)
+   ============================================================ */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--c-bg);
+}
+.nav {
+  max-width: 2400px; margin: 0 auto;
+  padding: 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.logo { display: inline-flex; align-items: center; flex: none; }
+.logo__img { width: 156px; height: 20px; display: block; }
+.nav__links { display: flex; gap: 24px; }
+.nav__links a {
+  font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 300;
+  padding-bottom: 2px; border-bottom: 1px solid transparent;
+  transition: border-color .25s var(--ease-out);
+}
+.nav__links a:hover { border-bottom-color: var(--c-ink); }
+.nav__right { display: flex; align-items: center; gap: 20px; }
+.search {
+  display: flex; align-items: center; gap: 4px;
+  height: 32px; padding: 0 16px 0 8px;
+  background: #F1F1F1;
+}
+.search svg { width: 16px; height: 16px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.search input {
+  border: 0; outline: 0; background: transparent;
+  font-family: inherit; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 300;
+  width: 64px; color: var(--c-ink);
+}
+.search input::placeholder { color: var(--c-ink); opacity: 1; }
+.nav__icons { display: flex; align-items: center; gap: 20px; }
+.nav__icons .icon { width: 18px; height: 18px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
+.nav__icons button[aria-label="Cart"] { display: inline-flex; align-items: flex-start; gap: 2px; }
+.cart-count { font-size: 12px; font-weight: 300; letter-spacing: .04em; line-height: 1; }
+.burger { display: none; }
+.burger svg { width: 20px; height: 8px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; display: block; }
+
+/* ============================================================
+   BREADCRUMB — HOME / BRAS / BLUSH & BURGUNDY
+   ============================================================ */
+.breadcrumb {
+  max-width: 2400px; margin: 0 auto;
+  display: flex; gap: 8px; align-items: center;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 300;
+  color: var(--c-ink);
+  padding: 8px var(--pad-x) 24px;
+}
+.breadcrumb b { font-weight: 300; color: var(--c-ink-soft); }
+.breadcrumb span { opacity: .4; }
+
+/* ============================================================
+   HERO — burgundy petal "List Interuptor" 1440x440
+   ============================================================ */
+.hero {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: flex-start;
+}
+/* hero banner width option — adds height over the default size */
+body[data-herosize="med"] .hero   { height: 650px; }  /* +30% */
+body[data-herosize="large"] .hero { height: 800px; }  /* +60% */
+.hero img, .hero video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  animation: heroIn 1.6s var(--ease-out) both;
+}
+/* mild darkening only — keeps the white title legible, no pink/red cast
+   (the burgundy tint wash + red-shifted grade were removed on request) */
+.hero video { filter: brightness(.85) contrast(1.03); }
+/* film grain — retro noise */
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: .3;
+  mix-blend-mode: overlay;
+}
+@keyframes heroIn {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1); }
+}
+/* the title fades in once the video has played through */
+.hero h1 {
+  position: relative; z-index: 2;
+  width: 100%;
+  padding: 0 var(--pad-x);
+  color: #fff;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  text-align: left;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
+}
+.hero.is-ended h1 { opacity: 1; transform: translateY(0); }
+
+/* ============================================================
+   RESULTS ROW — title left, filters right (Figma 937-27214)
+   three filter variants share the row; the version decides
+   ============================================================ */
+.results-bar { background: var(--c-bg); }
+.results-row {
+  max-width: 2400px; margin: 0 auto;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+  padding: 36px var(--pad-x);
+}
+.results-title {
+  font-size: 12px; line-height: 24px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+}
+.results-title .count { font-size: 12px; font-weight: 300; color: var(--c-ink-soft); }
+.results-title .nowrap { white-space: nowrap; }
+.filters { display: none; gap: 20px; align-items: center; }
+.filters button, .filters-single, .filters-mobile {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+  white-space: nowrap;
+}
+.filters button svg { width: 7px; height: 4px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.filters button .plus, .filters-single svg, .filters-mobile svg { width: 10px; height: 10px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.filters button:hover, .filters-single:hover, .filters-mobile:hover { opacity: .55; }
+.filters-single { display: none; }
+.filters-mobile { display: none; }
+
+/* Filter V1 — chip dropdown (Figma 931-26774) */
+.results-row { position: relative; }
+.dropdown {
+  position: absolute; z-index: 60;
+  width: 240px;
+  background: #fff;
+  border: 1px solid var(--c-ink);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  padding: 4px 0 8px;
+  max-height: min(480px, 60vh); overflow-y: auto;
+  display: none;
+}
+.dropdown.is-open { display: block; }
+.dropdown__row {
+  display: flex; gap: 12px; align-items: center;
+  width: 100%; padding: 10px 12px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400; text-align: left;
+  transition: background .15s;
+}
+.dropdown__row:hover, .dropdown__row[data-on="true"] { background: #F9FAFB; }
+.dropdown__row .sw { width: 20px; height: 20px; flex: none; border: 1px solid rgba(0,0,0,.08); }
+.dropdown__row .lbl { flex: 1; }
+.dropdown__row .tick {
+  width: 16px; height: 16px; flex: none;
+  fill: none; stroke: var(--c-ink); stroke-width: 1.5;
+  opacity: 0;
+}
+.dropdown__row[data-on="true"] .tick { opacity: 1; }
+/* the "More" dropdown — each filter expands its options in place */
+.dd-group__head {
+  display: flex; gap: 12px; align-items: center;
+  width: 100%; padding: 10px 12px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400; text-align: left;
+  transition: background .15s;
+}
+.dd-group__head:hover { background: #F9FAFB; }
+.dd-group__head .lbl { flex: 1; }
+.dd-group__head .chev {
+  width: 7px; height: 4px; flex: none;
+  fill: none; stroke: var(--c-ink); stroke-width: 1;
+  transition: transform .2s var(--ease-out);
+}
+.dd-group__head[data-open="true"] .chev { transform: rotate(180deg); }
+/* options one step below the 12px group heads — same hierarchy as the drawer */
+.dd-group__body .dropdown__row { padding-left: 24px; font-size: 11px; }
+.dropdown__foot {
+  display: flex; justify-content: space-between;
+  border-top: 1px solid var(--c-line);
+  margin: 4px 12px 0;
+  padding: 14px 0 2px;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase;
+}
+.dropdown__foot button { font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.dropdown__foot button:hover { opacity: .55; }
+
+/* which filter row shows — the dashboard "Filters" control */
+body[data-filters="all"] .filters--full { display: flex; }
+body[data-filters="some"] .filters--reduced { display: flex; }
+body[data-filters="none"] .filters-single { display: inline-flex; }
+
+/* ============================================================
+   GRID — 4 columns; card gap + side padding from the dashboard
+   ============================================================ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: dense;
+  row-gap: var(--row-gap);
+  margin-bottom: 120px;
+}
+/* gap between the cards (desktop values, mobile below) */
+body[data-gap="med"] .grid { column-gap: 24px; }
+body[data-gap="max"] .grid { column-gap: 40px; }
+/* padding left + right of the grid */
+body[data-side="med"] .grid { padding: 0 24px; }
+body[data-side="max"] .grid { padding: 0 48px; }
+.card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
+.card, .ed {
+  position: relative;
+  /* scroll reveal — blurred rise-and-fade, row by row */
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(3px);
+  transition: opacity 1.4s var(--ease-reveal),
+              transform 1.4s var(--ease-reveal),
+              filter 1.4s var(--ease-reveal);
+}
+.card.is-visible, .ed.is-visible { opacity: 1; transform: none; filter: none; }
+@media (prefers-reduced-motion: reduce) {
+  .card, .ed { opacity: 1; transform: none; filter: none; transition: none; }
+}
+
+.card__img {
+  position: relative;
+  aspect-ratio: 688 / 905; /* Figma card image */
+  overflow: hidden;
+  background: var(--c-offwhite);
+  container-type: inline-size; /* so the v2 SALE wordmark scales with card width */
+}
+.card__img .ph {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .9s var(--ease-out);
+}
+.card:hover .card__img .ph--base { transform: scale(1.04); }
+/* variant overlay photo — crossfades on top of the base */
+.card__img .ph--variant {
+  opacity: 0;
+  transition: opacity .38s var(--ease-out);
+  background: #fff;
+}
+.card__img .ph--variant.is-on { opacity: 1; }
+
+/* hover gallery — a different photo fades in, chevrons page through 4 */
+.card__img .ph--hover {
+  opacity: 0;
+  transition: opacity .38s var(--ease-out);
+  background: #fff;
+}
+.card__img .ph--hover.is-on { opacity: 1; }
+.gal-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 4;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s var(--ease-out);
+}
+.gal-nav svg { width: 12px; height: 12px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; transition: transform .2s var(--ease-out); }
+.gal-nav:hover svg { transform: scale(1.25); }
+.gal-nav--prev { left: 12px; }
+.gal-nav--next { right: 12px; }
+.card__img:hover .gal-nav { opacity: 1; pointer-events: auto; }
+@media (hover: none) { .gal-nav { display: none; } }
+
+/* wishlist heart — top right of every product photo */
+.wish {
+  position: absolute; top: 16px; right: 16px; z-index: 6;
+  width: 24px; height: 24px;
+}
+.wish svg {
+  width: 24px; height: 24px;
+  fill: #fff; stroke: var(--c-ink); stroke-width: 1;
+  transition: fill .2s var(--ease-out), transform .2s var(--ease-out);
+}
+.wish:hover svg { transform: scale(1.1); }
+.wish[data-on="true"] svg { fill: var(--c-ink); }
+/* two glyphs from the saved favorite*.svg files — the outline (.ho)
+   shows at rest, the solid heart (.hs) joins it when selected, which
+   reads much crisper than tinting the 1px outline */
+.wish svg .hs { display: none; stroke: none; }
+.wish[data-on="true"] svg .hs { display: block; }
+
+/* HEART 1 — no white fill, white stroke, blurred dark disc behind */
+body[data-heart="h1"] .wish {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(0,0,0,.3);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+/* native 24px — scaling the svg puts the 1px stroke between pixels and blurs it;
+   1px nudge down: the heart's optical centre sits above its geometric one,
+   so dead-centre reads too high in the disc */
+body[data-heart="h1"] .wish svg { width: 24px; height: 24px; fill: none; stroke: #fff; position: relative; top: 1px; }
+body[data-heart="h1"] .wish[data-on="true"] svg { fill: #fff; }
+
+/* HEART 3 — white outline heart in the photo, no disc behind it */
+body[data-heart="h3"] .wish svg { fill: none; stroke: #fff; }
+body[data-heart="h3"] .wish[data-on="true"] svg { fill: #fff; }
+
+/* HEART 4 — black outline heart in the photo, no fill, no disc */
+body[data-heart="h4"] .wish svg { fill: none; }
+body[data-heart="h4"] .wish[data-on="true"] svg { fill: var(--c-ink); }
+
+/* HEART 2 — the classic heart (white fill, black stroke) moves out of
+   the photo onto the title line, flush right (JS re-slots the node);
+   rendered at its native 24px so the 1px stroke stays sharp, negative
+   margins keep the 20px title line-height intact */
+body[data-heart="h2"] .card__cat { display: flex; align-items: center; gap: 12px; }
+body[data-heart="h2"] .wish {
+  position: static;
+  margin: -2px 0 -2px auto;
+  width: 24px; height: 24px; flex: none;
+}
+body[data-heart="h2"] .wish svg { width: 24px; height: 24px; }
+
+/* HEART 5 — no heart at rest, in the photo or below it; hovering
+   "+ N colors" (tap on mobile) opens the colour panel and only then
+   the heart fades in top right, level with the product title, above
+   the panel (the node lives in .card__info for this option) */
+body[data-heart="h5"] .wish {
+  top: 50%; right: 12px; /* centred on the open swatch row */
+  z-index: 6;
+  opacity: 0; pointer-events: none;
+  transform: translateY(calc(-50% + 6px));
+  transition: opacity .32s var(--ease-out), transform .32s var(--ease-out);
+}
+body[data-heart="h5"] .card.is-open .wish { opacity: 1; pointer-events: auto; transform: translateY(-50%); }
+
+/* HEART 6 — frosted heart: the blurred dark glass is the glyph itself
+   rather than a disc behind it — the backdrop blur is clipped to the
+   solid heart path (.hs, native 24px coords) under a dark grey outline */
+body[data-heart="h6"] .wish::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.25);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  clip-path: path('M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z');
+}
+/* position:relative lifts the svg above the ::before — the absolutely
+   positioned frost otherwise paints on top of the glyph and tints it */
+body[data-heart="h6"] .wish svg { position: relative; fill: none; stroke: #3d3d3d; }
+/* stroke goes black too — the grey outline sits on top of the fill and
+   would otherwise leave a grey rim around the selected heart */
+body[data-heart="h6"] .wish[data-on="true"] svg { fill: #000; stroke: #000; }
+/* no hover scale — the frosted ::before can't animate with the svg,
+   so the generic svg-only scale makes the outline drift off the fill */
+body[data-heart="h6"] .wish:hover svg { transform: none; }
+
+/* HEART 7 — same black outline as Heart 4, but hidden at rest: it fades
+   in only while the card is hovered (or once favourited, so a selected
+   heart never disappears). On touch devices (mobile) it's always shown. */
+body[data-heart="h7"] .wish svg { fill: none; }
+body[data-heart="h7"] .wish[data-on="true"] svg { fill: var(--c-ink); }
+body[data-heart="h7"] .wish {
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s var(--ease-out), transform .2s var(--ease-out);
+}
+body[data-heart="h7"] .card:hover .wish,
+body[data-heart="h7"] .wish[data-on="true"] { opacity: 1; pointer-events: auto; }
+@media (hover: none) {
+  body[data-heart="h7"] .wish { opacity: 1; pointer-events: auto; }
+}
+
+/* ============================================================
+   SALES BANNER — a "SALE" flag on the photo of cards that carry
+   sale data; the dashboard picks the treatment (Figma 1135-22770 /
+   1273-24563). Only rendered on sale cards, so it never shows here
+   unless a version is active.
+   ============================================================ */
+.sale-flag { display: none; }
+/* v1 — solid pink badge, bottom-left of the image (--surface/sales #C1003F) */
+body[data-salebanner="v1"] .sale-flag {
+  display: inline-flex; align-items: baseline; justify-content: center;
+  position: absolute; left: 12px; bottom: 12px; z-index: 4;
+  padding: 2px 8px 0;
+  background: #C1003F; color: #fff;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400; white-space: nowrap;
+}
+/* v2 — large translucent white wordmark, regular weight, pushed hard into
+   the bottom-left corner so its baseline touches the rim (negative offsets
+   drop the descender space below the clipped edge) */
+body[data-salebanner="v2"] .sale-flag {
+  display: block;
+  position: absolute; left: -0.04em; bottom: -0.08em; z-index: 4;
+  color: rgba(255,255,255,.6);
+  font-size: 24cqw; line-height: 1; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 300; white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ============================================================
+   CARD INFO — title / price / colour label; the dashboard decides
+   whether the colour label gets its own line or joins the price line
+   ============================================================ */
+.card__info { position: relative; padding: 16px 12px 0; } /* 12px side insets on desktop (mobile keeps its own) */
+body:not([data-side="none"]) .card__info { padding-right: 0; }
+.card__cat {
+  font-size: 12px; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+}
+.card__pr {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+  margin-top: 4px; padding-top: 2px;
+  font-size: 12px; line-height: 14px;
+}
+/* burgundy sale + member price (the old "Price" exploration) — its own
+   dashboard toggle now: "standard" = plain price, "sale" = struck price
+   + burgundy reduced price + member price on the cards with sale data */
+.card__sale { display: none; }
+body[data-pricing="sale"] .card__pr.is-sale > .pr-now { text-decoration: line-through; color: var(--c-ink-soft); }
+/* discounted + member price sit on the price line, to the right of the
+   current price (not on their own line below the colour variations) */
+body[data-pricing="sale"] .card__sale {
+  display: inline;
+  font-size: inherit; line-height: 14px; /* matches the regular price at every breakpoint */
+  color: var(--c-burgundy);
+}
+/* member price — dark burgundy, next to the reduced price */
+.card__sale .mem { margin-left: 12px; color: #38101F; }
+.cvar__label {
+  flex-basis: 100%; /* wraps onto its own line below the price */
+  margin-top: 3px;  /* + the row's 4px gap ≈ the old 7px offset */
+  text-align: left;
+  font-size: 12px; line-height: 14px; font-weight: 400;
+  transition: opacity .2s var(--ease-out);
+}
+/* "second line" — the colour label joins the price line (two-line card) */
+body[data-colors="inline"] .cvar__label { flex-basis: auto; margin-top: 0; margin-left: 12px; }
+.cvar__label:hover { opacity: .55; }
+
+/* ============================================================
+   EXPANDING COLOUR PANEL — covers the info area on open
+   swatches from /Colour Swatches (black · red · mauve lace)
+   ============================================================ */
+.panel {
+  position: absolute; inset: 0;
+  z-index: 5;
+  display: flex; gap: 6px; align-items: center;
+  padding: 12px; /* swatches line up with the 12px text inset */
+  background: #fff;
+  opacity: 0; pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity .32s var(--ease-out), transform .32s var(--ease-out);
+}
+.card.is-open .panel { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.thumb {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color .2s var(--ease-out);
+  flex: none;
+}
+.thumb img { width: 44px; height: 44px; object-fit: cover; background: #fff; border: 1px solid rgba(0,0,0,.06); }
+.thumb:hover { border-bottom-color: var(--c-line); }
+.thumb[data-sel="true"] { border-bottom-color: var(--c-ink); }
+/* the currently worn colour — product photo cropped to the bra */
+.thumb--current img { object-position: 50% 22%; }
+
+/* ============================================================
+   EDITORIAL INTERRUPTORS — car (row 2 + last row) and lips (tall)
+   base: full-bleed; versions add insets (see below)
+   ============================================================ */
+.ed { overflow: hidden; }
+.ed img { width: 100%; height: 100%; object-fit: cover; }
+.ed--row2, .ed--last, .ed--tall { grid-column: span 2; align-self: start; }
+.ed--row2 img { object-position: 50% 55%; transform: scale(1.15); } /* peony bouquet — zoomed in slightly */
+.ed--last img { object-position: 50% 50%; } /* hydrangea face close-up */
+.ed--tall img { object-position: 50% 15%; } /* pink-memories mood — focus the top centre (the sign) */
+
+/* "Triumph live" images — a pure product grid: no editorial/mood tiles,
+   whatever the view; the cards close ranks over the freed slots */
+body[data-images="live"] .ed { display: none; }
+
+/* CONTENT TYPES view — the tall slot plays a video, the last slot
+   shows a screenshot with a "Discover this product" CTA; the media
+   swap is scoped to this view only */
+.ed video {
+  display: none;
+  width: 100%; height: 100%; object-fit: cover;
+}
+body[data-view="content"] .ed--tall img { display: none; }
+body[data-view="content"] .ed--tall video { display: block; }
+body[data-view="content"] .ed--last img { object-position: 50% 0; }
+/* CTA — frosted badge from Figma 727-2261: white 20% + 10px blur,
+   Alliance Regular 14/20, 4% tracking, uppercase, 10px padding */
+.mood-cta {
+  position: absolute; left: 24px; bottom: 24px;
+  z-index: 3;
+  display: none; align-items: center; justify-content: center;
+  padding: 10px;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400; white-space: nowrap;
+  color: var(--c-ink);
+  background: rgba(255,255,255,.2);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: background .25s var(--ease-out);
+}
+.mood-cta:hover { background: rgba(255,255,255,.4); }
+body[data-view="content"] .ed--last .mood-cta { display: flex; }
+
+/* ============================================================
+   OFF-CANVAS FILTER & SORT — Filter V2 (Figma 931-25755)
+   420px right drawer · dim scrim · accordions · Show results
+   ============================================================ */
+.scrim {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s var(--ease-out);
+}
+body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 95;
+  width: 420px; max-width: 92vw;
+  background: #fff;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  visibility: hidden; /* fully out of the layout when closed — keeps mobile from widening */
+  transition: transform .45s var(--ease-out), visibility 0s .45s;
+}
+body.drawer-open .drawer {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform .45s var(--ease-out);
+}
+.drawer__head {
+  flex: none;
+  height: 72px; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--c-line);
+}
+.drawer__head span { font-size: 14px; line-height: 20px; letter-spacing: .02em; }
+.drawer__close { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.drawer__close svg { width: 14px; height: 14px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
+.drawer__close:hover { opacity: .5; }
+.drawer__body { flex: 1; overflow-y: auto; padding: 24px; }
+.facet { border-bottom: 1px solid var(--c-line); margin-bottom: 16px; }
+.facet__head {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 16px;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400;
+  text-align: left;
+}
+.facet__head svg {
+  width: 10px; height: 6px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none;
+  transition: transform .3s var(--ease-out);
+}
+.facet.is-open .facet__head svg { transform: rotate(180deg); }
+.facet__body {
+  max-height: 0; overflow: hidden;
+  transition: max-height .4s var(--ease-out);
+}
+.facet.is-open .facet__body { max-height: 320px; }
+.facet__body ul { padding-bottom: 16px; }
+.facet__body li button {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0;
+  /* one step below the 12px facet heads — visual hierarchy */
+  font-size: 11px; line-height: 16px; font-weight: 300; letter-spacing: .02em;
+}
+.facet__body li button:hover { opacity: .55; }
+.facet__body li button[data-on="true"] { font-weight: 400; }
+.facet__body li button[data-on="true"]::after { content: "✓"; font-size: 10px; }
+.facet__body img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+/* size chips */
+.facet__sizes { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; }
+.facet__sizes button {
+  min-width: 44px; height: 32px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-line);
+  font-size: 11px; font-weight: 300;
+  transition: border-color .2s, background .2s;
+}
+.facet__sizes button:hover { border-color: var(--c-ink); }
+.facet__sizes button[data-on="true"] { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+.drawer__foot { flex: none; padding: 24px; display: flex; gap: 12px; }
+/* secondary — only shows once at least one filter is set */
+.drawer__clear {
+  flex: 1; height: 44px;
+  background: #fff; color: var(--c-ink);
+  border: 1px solid var(--c-ink);
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .2s;
+}
+.drawer__clear:hover { opacity: .55; }
+.drawer__clear[hidden] { display: none; }
+.drawer__cta {
+  flex: 1; height: 44px;
+  background: var(--c-ink); color: #fff;
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .2s;
+}
+.drawer__cta:hover { opacity: .85; }
+
+/* ============================================================
+   RESPONSIVE — tablet step + mobile designs (931-14018 etc.)
+   ============================================================ */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px) {
+  :root { --row-gap: 40px; }
+
+  /* header — 50px bar: logo · suche · account · bag · burger */
+  .nav { padding: 12px 16px; gap: 16px; }
+  .logo__img { width: 100px; height: 13px; }
+  .nav__links { display: none; }
+  .nav__right { gap: 16px; }
+  .nav__icons { gap: 16px; }
+  .nav__icons .icon { width: 16px; height: 16px; }
+  .nav__icons button[aria-label="Wishlist"] { display: none; }
+  .burger { display: inline-flex; }
+  .search { height: 26px; padding: 0 12px 0 8px; }
+  .search svg { width: 14px; height: 14px; }
+  .search input { width: 60px; }
+
+  .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 8px 16px 12px; gap: 8px; }
+
+  /* hero — larger banner title on mobile, left aligned */
+  .hero { height: 300px; }
+  body[data-herosize="med"] .hero   { height: 390px; }  /* +30% */
+  body[data-herosize="large"] .hero { height: 480px; }  /* +60% */
+  .hero h1 { font-size: 15px; padding: 0 16px; }
+
+  /* results bar — title left (wraps under itself), "Sort & Filter +" right,
+     both aligned along the bottom edge */
+  .results-row { padding: 20px 16px 16px; }
+  .results-title { flex: 1; font-size: 12px; line-height: 16px; }
+  .results-title .count { font-size: 10px; }
+  .filters-mobile { line-height: 16px; }
+  .filters, .filters-single { display: none !important; }
+  .filters-mobile { display: inline-flex; }
+
+  /* grid — 2 columns */
+  .grid { grid-template-columns: repeat(2, 1fr) !important; margin-bottom: 80px; }
+  /* the desktop gaps are too wide for 2 columns — step them down */
+  body[data-gap="med"] .grid { column-gap: 12px; }
+  body[data-gap="max"] .grid { column-gap: 16px; }
+  body[data-side="med"] .grid { padding: 0 16px; }
+  body[data-side="max"] .grid { padding: 0 24px; }
+
+  /* card info */
+  .card__info { padding: 10px 4px 0; }
+  body:not([data-side="none"]) .card__info { padding-left: 0; padding-right: 0; }
+  .card__cat { font-size: 11px; line-height: 16px; }
+  .card__pr { margin-top: 2px; font-size: 10px; }
+  /* .card__sale inherits the regular price size (10px here); keep the member gap tighter */
+  .card__sale .mem { margin-left: 8px; }
+  .cvar__label { margin-top: 0; font-size: 10px; }
+  body[data-colors="inline"] .cvar__label { margin-left: 8px; }
+
+  /* hearts sit closer to the corner on small cards */
+  .wish { top: 10px; right: 10px; width: 20px; height: 20px; }
+  .wish svg { width: 20px; height: 20px; }
+  body[data-heart="h1"] .wish { width: 28px; height: 28px; }
+  body[data-heart="h1"] .wish svg { width: 20px; height: 20px; }
+  body[data-heart="h5"] .wish { right: 4px; }
+  /* keep h6 at 24px — the clip-path coords are fixed in the 24px viewBox */
+  body[data-heart="h6"] .wish { width: 24px; height: 24px; }
+  body[data-heart="h6"] .wish svg { width: 24px; height: 24px; }
+  body[data-heart="h2"] .wish { width: 20px; height: 20px; margin: -2px 0 -2px auto; }
+  body[data-heart="h2"] .wish svg { width: 20px; height: 20px; }
+
+  /* sales banner — smaller pink badge on the narrow cards */
+  body[data-salebanner="v1"] .sale-flag { font-size: 11px; line-height: 16px; padding: 2px 6px 0; left: 8px; bottom: 8px; }
+
+  /* colour panel — fit the narrow cards */
+  .panel { flex-wrap: wrap; gap: 4px; padding: 8px 4px; overflow: hidden; }
+  body:not([data-side="none"]) .panel { padding-left: 0; }
+  .thumb img { width: 32px; height: 32px; }
+
+  /* gallery — swipe only, no chevrons */
+  .gal-nav { display: none; }
+
+  /* editorials — full row on mobile (Figma 931-14018 / 931-19249);
+     no zoom on the first tile, so its padding matches the others */
+  .ed--row2 img { transform: none; }
+  .ed--row2, .ed--tall, .ed--last {
+    grid-column: 1 / -1 !important; grid-row: auto;
+    height: auto !important;
+    aspect-ratio: 375 / 247;
+  }
+  .mood-cta { left: 16px; bottom: 16px; padding: 8px; font-size: 12px; line-height: 16px; }
+
+  /* drawer */
+  .drawer { width: 100%; max-width: 100vw; }
+  .drawer__head, .drawer__body, .drawer__foot { padding-left: 20px; padding-right: 20px; }
+  .drawer__body { padding-top: 24px; }
+  .drawer__foot { padding-top: 0; padding-bottom: 24px; }
+
+}
+
+/* ============================================================
+   DASHBOARD (prototype chrome) — every option is independent
+   ============================================================ */
+.dash-toggle {
+  position: fixed; left: 24px; bottom: 24px; z-index: 101;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,0,0,.88); color: #fff;
+  backdrop-filter: blur(8px);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  transition: background .25s;
+}
+.dash-toggle:hover { background: rgba(0,0,0,.72); }
+.dash-toggle svg { width: 10px; height: 6px; fill: none; stroke: #fff; stroke-width: 1.2; transition: transform .3s var(--ease-out); }
+body.dash-open .dash-toggle svg { transform: rotate(180deg); }
+.dash {
+  position: fixed; left: 24px; bottom: 72px; z-index: 100;
+  width: 272px; max-height: calc(100vh - 120px); overflow-y: auto;
+  background: rgba(0,0,0,.88);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 20px;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  display: none; flex-direction: column; gap: 16px;
+}
+body.dash-open .dash { display: flex; }
+.dash__group--view { padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.15); }
+.dash__label {
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 6px;
+}
+.dash__seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.dash__seg button {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 11px; letter-spacing: .03em;
+  color: rgba(255,255,255,.65);
+  background: rgba(255,255,255,.08);
+  white-space: nowrap;
+  transition: color .2s, background .2s;
+}
+.dash__seg button:hover { color: #fff; }
+.dash__seg button[data-on="true"] { background: #fff; color: #000; }
+@media (max-width: 760px) {
+  /* the dashboard becomes a bottom sheet */
+  .dash { left: 12px; right: 12px; width: auto; bottom: 64px; max-height: 55vh; }
+  .dash-toggle { left: 12px; bottom: 12px; }
+  /* desktop-only filter treatments — the control has no effect here */
+  .dash__group--filters { display: none; }
+}
+</style>
+</head>
+<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-colors="newline" data-pricing="standard" data-salebanner="v1" data-images="new" data-heart="h4" data-herosize="default">
+
+<!-- HEADER -->
+<header>
+  <nav class="nav">
+    <a class="logo" href="./plp.html" aria-label="Triumph">
+      <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
+    </a>
+    <ul class="nav__links">
+      <li><a href="#">Special Deals</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Knickers</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Activewear</a></li>
+      <li><a href="#">Sleep &amp; Lounge</a></li>
+      <li><a href="#">Swimwear</a></li>
+    </ul>
+    <div class="nav__right">
+      <label class="search" aria-label="Search">
+        <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Suche" />
+      </label>
+      <div class="nav__icons">
+        <button aria-label="Account">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </button>
+        <button aria-label="Wishlist">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z" stroke-linejoin="round"/></svg>
+        </button>
+        <button aria-label="Cart">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="burger" aria-label="Menu">
+          <svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="#">Home</a><span>/</span><a href="#">Bras</a><span>/</span><b>Blush &amp; Burgundy</b>
+  </nav>
+
+  <!-- HERO — burgundy petal (Figma List Interuptor) -->
+  <section class="hero">
+    <img src="./Assets/plp/hero-burgundy.jpg" alt="Blush &amp; Burgundy" />
+    <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+    <h1>ODE TO BURGUNDY AND BLUSH</h1>
+  </section>
+
+  <!-- RESULTS (sticky below the nav while scrolling the grid) -->
+  <div class="results-bar">
+    <div class="results-row">
+      <!-- the last word and the count are glued together, so "(36)" never wraps alone -->
+      <h2 class="results-title">Blush &amp; Burgundy <span class="nowrap">Collection <span class="count">(36)</span></span></h2>
+
+      <!-- default chips — V1-V5 (Figma 848-5899) -->
+      <div class="filters filters--full" aria-label="Filter">
+        <button>Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Price <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Series <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Standards <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+      </div>
+
+      <!-- Filter V1 — reduced chips (Figma 931-23661); "More" lists the
+           remaining filters in a dropdown, option dropdowns from 931-26774 -->
+      <div class="filters filters--reduced" aria-label="Filter">
+        <button data-f="sort">Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="size">Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="colour">Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button class="more-toggle">More <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+      </div>
+
+      <!-- Filter V2 — single trigger, opens the off-canvas (Figma 931-24643) -->
+      <button class="filters-single" id="drawerTrigger">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+
+      <!-- mobile — all versions -->
+      <button class="filters-mobile">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+    </div>
+  </div>
+
+  <!-- GRID (cards rendered by JS) -->
+  <section class="grid" id="grid"></section>
+
+</main>
+
+<!-- OFF-CANVAS FILTER & SORT (Filter V2, Figma 931-25755) -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" aria-label="Filter and sort" aria-hidden="true">
+  <div class="drawer__head">
+    <span>Sort and Filter</span>
+    <button class="drawer__close" aria-label="Close">
+      <svg viewBox="0 0 14 14"><path d="M1 1l12 12M13 1L1 13"/></svg>
+    </button>
+  </div>
+  <div class="drawer__body" id="facets"></div>
+  <div class="drawer__foot">
+    <button class="drawer__clear" hidden>Reset filters</button>
+    <button class="drawer__cta">Show results</button>
+  </div>
+</aside>
+
+<!-- DASHBOARD (prototype chrome) -->
+<button class="dash-toggle" aria-expanded="true">Options
+  <svg viewBox="0 0 10 6"><path d="M.5.5 5 5 9.5.5"/></svg>
+</button>
+<aside class="dash" aria-label="Prototype options">
+  <div class="dash__group dash__group--view">
+    <div class="dash__label">View</div>
+    <div class="dash__seg">
+      <button data-k="view" data-val="products" data-on="true">Mood images</button>
+      <button data-k="view" data-val="content">All formats</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Padding between cards</div>
+    <div class="dash__seg">
+      <button data-k="gap" data-val="med" data-on="true">Medium</button>
+      <button data-k="gap" data-val="max">Max</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Padding on the sides</div>
+    <div class="dash__seg">
+      <button data-k="side" data-val="none">None</button>
+      <button data-k="side" data-val="med" data-on="true">Medium</button>
+      <button data-k="side" data-val="max">Max</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Hero banner width</div>
+    <div class="dash__seg">
+      <button data-k="herosize" data-val="default" data-on="true">Default</button>
+      <button data-k="herosize" data-val="med">Medium</button>
+      <button data-k="herosize" data-val="large">Large</button>
+    </div>
+  </div>
+  <div class="dash__group dash__group--filters">
+    <div class="dash__label">Filters</div>
+    <div class="dash__seg">
+      <!-- "All" and "None" hidden for now — kept in code, remove hidden to restore -->
+      <button data-k="filters" data-val="all" hidden>All</button>
+      <button data-k="filters" data-val="some" data-on="true">Some</button>
+      <button data-k="filters" data-val="none" hidden>None</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Colour label position</div>
+    <div class="dash__seg">
+      <button data-k="colors" data-val="newline" data-on="true">New line</button>
+      <button data-k="colors" data-val="inline">Second line</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Pricing</div>
+    <div class="dash__seg">
+      <button data-k="pricing" data-val="standard" data-on="true">Standard</button>
+      <button data-k="pricing" data-val="sale">Sale + member</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Sales banner</div>
+    <div class="dash__seg">
+      <button data-k="salebanner" data-val="v1" data-on="true">Sale banner V1</button>
+      <button data-k="salebanner" data-val="v2">Sale banner V2</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Images</div>
+    <div class="dash__seg">
+      <button data-k="images" data-val="new" data-on="true">New images</button>
+      <button data-k="images" data-val="live">Triumph live</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Wishlist heart</div>
+    <div class="dash__seg">
+      <button data-k="heart" data-val="h4" data-on="true">Heart 1</button>
+      <button data-k="heart" data-val="h7">Heart 2</button>
+      <button data-k="heart" data-val="h2">Heart 3</button>
+      <!-- earlier explorations hidden for now — kept in code, remove hidden to restore -->
+      <button data-k="heart" data-val="h1" hidden>Heart 1 (frosted disc)</button>
+      <button data-k="heart" data-val="h3" hidden>Heart 3 (white outline)</button>
+      <button data-k="heart" data-val="h5" hidden>Heart 5 (reveal on panel)</button>
+      <button data-k="heart" data-val="h6" hidden>Heart 6 (frosted glyph)</button>
+    </div>
+  </div>
+</aside>
+
+<script>
+/* ============================================================
+   DATA — products from Figma 937-27178 (Blush & Burgundy),
+   colour swatches from /Colour Swatches (black · red · mauve)
+   ============================================================ */
+/* colour swatches — new pngs from /Colour Swatches (added today) */
+const SWATCHES = [
+  { name: 'Black',    sw: './Assets/plp/swatch-black.png',    photo: './Assets/plp/products/prod07.jpg' },
+  { name: 'Burgundy', sw: './Assets/plp/swatch-burgundy.png', photo: './Assets/plp/products/prod08.jpg' },
+  { name: 'Red',      sw: './Assets/plp/swatch-red.png',      photo: './Assets/plp/products/prod09.jpg' },
+  { name: 'Pink',     sw: './Assets/plp/swatch-pink.png',     photo: './Assets/plp/products/prod10.jpg' },
+  { name: 'Teal',     sw: './Assets/plp/swatch-teal.png',     photo: './Assets/plp/products/prod11.jpg' },
+];
+
+const P = n => `./Assets/plp/card${n}.jpg`;
+/* sale: reduced price — the "price" version shows it on its own line under the price */
+const PRODUCTS = [
+  { cat: 'LACE BALCONETTE BRA',       pr: '£59.95', colors: 4, ph: P(6), sale: '£41.95', mem: '£37.75' },
+  { cat: 'PADDED UNDERWIRE BRA',      pr: '£50.95', colors: 4, ph: P(2) },
+  { cat: 'SEAMLESS T-SHIRT BRA',      pr: '£38.50', colors: 3, ph: P(3) },
+  { cat: 'PLUNGE LACE BRA',           pr: '£59.95', colors: 4, ph: P(5), sale: '£47.95', mem: '£43.15' },
+  { cat: 'WIRELESS COMFORT BRA',      pr: '£29.95', colors: 3, ph: P(1) },
+  /* dark red — sits right of the peony interruptor */
+  { cat: 'STRAPLESS PUSH-UP BRA',     pr: '£52.00', colors: 4, ph: P(4) },
+  { cat: 'DEMI CUP SATIN BRA',        pr: '£55.00', colors: 3, ph: P(3), sale: '£38.50', mem: '£34.65' },
+  { cat: 'SPORTS PERFORMANCE BRA',    pr: '£34.95', colors: 4, ph: P(2) },
+  { cat: 'FULL COVERAGE BRA',         pr: '£32.00', colors: 3, ph: P(6) },
+  { cat: 'BRALETTE TRIANGLE',         pr: '£24.95', colors: 4, ph: P(5), sale: '£17.95', mem: '£16.15' },
+  /* two bright pink bras — sit left of the tulle interruptor */
+  { cat: 'HALTER NECK BRA',           pr: '£42.50', colors: 4, ph: P(1) },
+  { cat: 'EMBROIDERED UNDERWIRE BRA', pr: '£58.00', colors: 3, ph: P(3) },
+  { cat: 'CONVERTIBLE MULTI-WAY BRA', pr: '£47.00', colors: 4, ph: P(2), sale: '£32.95', mem: '£29.65' },
+  { cat: 'LONGLINE LACE BRA',         pr: '£62.00', colors: 3, ph: P(3) },
+  { cat: 'MINIMIZER BRA',             pr: '£39.95', colors: 4, ph: P(6) },
+  { cat: 'NURSING SUPPORT BRA',       pr: '£36.00', colors: 3, ph: P(1), sale: '£25.00', mem: '£22.50' },
+  { cat: 'RACERBACK SPORTS BRA',      pr: '£28.50', colors: 4, ph: P(5) },
+  { cat: 'PADDED UNDERWIRE BRA',      pr: '£59.95', colors: 3, ph: P(4) },
+  { cat: 'SOFT LACE BRALETTE',        pr: '£27.95', colors: 4, ph: P(2), sale: '£19.95', mem: '£17.95' },
+  { cat: 'UNWIRED SPACER BRA',        pr: '£44.95', colors: 3, ph: P(6) },
+  { cat: 'HIGH APEX LACE BRA',        pr: '£49.95', colors: 4, ph: P(1) },
+  { cat: 'SATIN TRIM BRA',            pr: '£41.00', colors: 3, ph: P(3) },
+];
+
+/* new Blush & Burgundy product photos — from
+   /FOR NEVER DONE BLUSH AND BURGUNDY/Colors combined (copied in) */
+const PROD = n => `./Assets/plp/products/prod${String(n).padStart(2, '0')}.jpg`;
+const PROD_PHOTOS = Array.from({ length: 23 }, (_, i) => PROD(i + 1));
+/* photos hand-ordered: blush (B) and burgundy (Bu) alternate so a blush
+   product always sits beside a burgundy one, AND look-alike shots are
+   spread apart — the mauve-on-dark trio (5/6/7/20) and the redheads
+   (3/13 · 10/14) never land next to each other. prod22 (2nd plaid
+   redhead, a near-dupe of 10) is dropped for prod23 (burgundy dress). */
+const PHOTO_ORDER = [1, 2, 5, 8, 6, 10, 16, 9, 4, 11, 7, 14, 20, 15, 13, 17, 3, 18, 19, 21, 12, 23];
+PRODUCTS.forEach((p, i) => { p.ph = PROD(PHOTO_ORDER[i % PHOTO_ORDER.length]); });
+
+/* ============================================================
+   RENDER CARDS
+   ============================================================ */
+const grid = document.getElementById('grid');
+
+/* alternate product photos for the hover gallery (4 per card) */
+const GALLERY_POOL = PROD_PHOTOS;
+
+PRODUCTS.forEach((p, i) => {
+  /* 4 hover photos: the card's own + 3 rotating alternates */
+  const others = GALLERY_POOL.filter(src => src !== p.ph);
+  const gallery = [p.ph, others[i % others.length], others[(i + 2) % others.length], others[(i + 4) % others.length]];
+
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.dataset.gallery = gallery.join('|');
+
+  /* panel thumbs: the worn colour (product photo crop) + fabric swatches */
+  const swatchThumbs = SWATCHES.slice(0, p.colors - 1).map((s, j) => `
+    <button class="thumb" data-photo="${s.photo}" data-idx="${j + 1}" data-sel="false" aria-label="${s.name}" title="${s.name}">
+      <img src="${s.sw}" alt="${s.name}" loading="lazy" />
+    </button>`).join('');
+
+  card.innerHTML = `
+    <div class="card__img">
+      <img class="ph ph--base" src="${p.ph}" alt="${p.cat}" />
+      <img class="ph ph--variant" src="${p.ph}" alt="" aria-hidden="true" />
+      <img class="ph ph--hover" src="${gallery[1]}" alt="" aria-hidden="true" />
+      ${p.sale ? '<span class="sale-flag">SALE</span>' : ''}
+      <button class="gal-nav gal-nav--prev" aria-label="Previous photo"><svg viewBox="0 0 10 10"><path d="M6.5 1 2.5 5l4 4"/></svg></button>
+      <button class="gal-nav gal-nav--next" aria-label="Next photo"><svg viewBox="0 0 10 10"><path d="M3.5 1l4 4-4 4"/></svg></button>
+      <button class="wish" data-on="false" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path class="hs" d="M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z"/><path class="ho" d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z"/></svg></button>
+    </div>
+    <div class="card__info">
+      <div class="card__cat">${p.cat}</div>
+      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}<span class="mem">Member price ${p.mem}</span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
+      <div class="panel" role="group" aria-label="Colours">
+        <button class="thumb thumb--current" data-photo="${p.ph}" data-idx="0" data-sel="true" aria-label="Selected colour" title="Selected colour">
+          <img src="${p.ph}" alt="" loading="lazy" />
+        </button>
+        ${swatchThumbs}
+      </div>
+    </div>`;
+
+  grid.appendChild(card);
+});
+
+/* ============================================================
+   EDITORIAL INTERRUPTORS — created once, re-slotted per version
+   ============================================================ */
+const mkTile = (cls, src) => {
+  const t = document.createElement('div');
+  t.className = 'ed ' + cls;
+  t.innerHTML = `<img src="${src}" alt="" loading="lazy" />`;
+  return t;
+};
+const edRow2 = mkTile('ed--row2', './Assets/plp/ed-peonies-wide.jpg');
+const edTall = mkTile('ed--tall', './Assets/plp/ed-mood-pinkmemories.jpg');
+const edLast = mkTile('ed--last', './Assets/plp/ed-hydrangea.jpg');
+
+/* CONTENT TYPES media — a muted looping video replaces the second mood
+   image (tall slot), the screenshot + "Discover this product" CTA
+   replace the third (last slot); CSS scopes both to the "content"
+   view, applyView() swaps the image source back and forth */
+const moodVideo = document.createElement('video');
+moodVideo.src = './Assets/plp/hero.mp4'; /* same clip as the hero banner */
+moodVideo.muted = true;
+moodVideo.loop = true;
+moodVideo.playsInline = true;
+moodVideo.preload = 'metadata';
+edTall.appendChild(moodVideo);
+
+const moodCta = document.createElement('button');
+moodCta.className = 'mood-cta';
+moodCta.textContent = 'Discover this product';
+moodCta.addEventListener('click', () => { window.location.href = './pdp.html'; });
+edLast.appendChild(moodCta);
+
+/* HEART 2 — the wishlist heart lives in the photo for Heart 1/3 and
+   moves onto the title line for Heart 2 (state travels with the node) */
+function applyHeart(v) {
+  cards.forEach(card => {
+    const wish = card.querySelector('.wish');
+    const slot = v === 'h2' ? '.card__cat' : v === 'h5' ? '.card__info' : '.card__img';
+    card.querySelector(slot).appendChild(wish);
+  });
+}
+
+const ED_LAST_SRC = './Assets/plp/ed-hydrangea.jpg';
+const edLastImg = edLast.querySelector('img');
+function applyView(v) {
+  const content = v === 'content';
+  edLastImg.src = content ? './Assets/plp/mood-screenshot.png' : ED_LAST_SRC;
+  if (content) moodVideo.play().catch(() => {});
+  else moodVideo.pause();
+}
+
+const cards = []; /* filled below, before the first placeTiles() */
+
+/* editorial interruptor slots — before cards 5 (row 2), 12 (tall), 20 (last) */
+function placeTiles() {
+  grid.insertBefore(edRow2, cards[5] || null);
+  grid.insertBefore(edTall, cards[12] || null);
+  grid.insertBefore(edLast, cards[20] || null);
+}
+
+/* ============================================================
+   "TRIUMPH LIVE" PHOTOS — tile images scraped from
+   https://uk.triumph.com/bras (one per product, page order);
+   swapped in while the Images option is on "Triumph live"
+   ============================================================ */
+const LIVE_PHOTOS = Array.from({ length: 22 }, (_, i) =>
+  `./Assets/plp/live/live${String(i + 1).padStart(2, '0')}.webp`);
+
+function applyPhotos(live) {
+  cards.forEach((card, i) => {
+    if (!card.dataset.galleryHome) card.dataset.galleryHome = card.dataset.gallery;
+    const n = LIVE_PHOTOS.length;
+    const gal = live
+      ? [LIVE_PHOTOS[i % n], LIVE_PHOTOS[(i + 5) % n], LIVE_PHOTOS[(i + 11) % n], LIVE_PHOTOS[(i + 17) % n]]
+      : card.dataset.galleryHome.split('|');
+    card.dataset.gallery = gal.join('|');
+    card.querySelector('.ph--base').src = gal[0];
+    card.querySelector('.ph--variant').src = gal[0];
+    const cur = card.querySelector('.thumb--current');
+    cur.dataset.photo = gal[0];
+    cur.querySelector('img').src = gal[0];
+    /* colour swatches preview other live shots instead of the Figma photos */
+    card.querySelectorAll('.panel .thumb:not(.thumb--current)').forEach((t, j) => {
+      if (!t.dataset.photoHome) t.dataset.photoHome = t.dataset.photo;
+      t.dataset.photo = live ? gal[(j + 1) % gal.length] : t.dataset.photoHome;
+    });
+  });
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+const body = document.body;
+cards.push(...document.querySelectorAll('.card'));
+placeTiles();
+
+/* hero video loops forever;
+   the title fades in a second after playback starts */
+const hero = document.querySelector('.hero');
+const heroVideo = hero.querySelector('video');
+const showHeroTitle = () => hero.classList.add('is-ended');
+heroVideo.addEventListener('playing', () => setTimeout(showHeroTitle, 1000), { once: true });
+heroVideo.addEventListener('error', showHeroTitle);
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) showHeroTitle();
+
+/* keep the sticky results bar flush below the nav, whatever its real height */
+const setHeaderH = () =>
+  document.documentElement.style.setProperty('--header-h', document.querySelector('header').offsetHeight + 'px');
+setHeaderH();
+window.addEventListener('resize', setHeaderH);
+
+/* editorial tiles are trimmed so their images end level with the
+   neighbouring photos (row2/last) or the second photo row (tall) */
+function alignTiles() {
+  const mobile = window.innerWidth <= 760;
+  if (mobile) { [edRow2, edTall, edLast].forEach(t => t.style.height = ''); return; }
+  const ref = cards.find(c => c.offsetParent) || cards[0];
+  const photoH = ref.querySelector('.card__img').offsetHeight;
+  [edRow2, edTall, edLast].forEach(t => t.style.height = photoH + 'px');
+}
+window.addEventListener('resize', alignTiles);
+window.addEventListener('load', alignTiles);
+
+/* ============================================================
+   SCROLL REVEAL — one-shot blurred rise; everything entering the
+   viewport animates together (no per-card stagger, so rows stay
+   top-aligned during the fade-in)
+   ============================================================ */
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  [...grid.children].forEach(c => c.classList.add('is-visible'));
+} else {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-visible');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
+  [...grid.children].forEach(c => io.observe(c));
+}
+
+function closeAll(except) {
+  cards.forEach(c => { if (c !== except) c.classList.remove('is-open'); });
+}
+
+function swapImage(card, src) {
+  const overlay = card.querySelector('.ph--variant');
+  if (!src) { overlay.classList.remove('is-on'); return; }
+  overlay.src = src;
+  if (overlay.complete) overlay.classList.add('is-on');
+  else overlay.onload = () => overlay.classList.add('is-on');
+}
+
+cards.forEach(card => {
+  /* clicking the product (photo or title) opens the PDP;
+     colour label / panel / gallery / heart keep their own behaviour */
+  card.addEventListener('click', e => {
+    if (e.target.closest('.thumb, .cvar__label, .panel, .gal-nav, .wish')) return;
+    window.location.href = './pdp.html';
+  });
+
+  /* hover gallery — entering the photo shows a different shot,
+     chevrons page through all 4; leaving restores the base photo
+     (the photo set is read per call — versions may swap it) */
+  const hoverImg = card.querySelector('.ph--hover');
+  const imgWrap = card.querySelector('.card__img');
+  let galIdx = 0;
+  function showGal(i) {
+    const gallery = card.dataset.gallery.split('|');
+    galIdx = (i + gallery.length) % gallery.length;
+    if (galIdx === 0) { hoverImg.classList.remove('is-on'); return; }
+    hoverImg.src = gallery[galIdx];
+    if (hoverImg.complete) hoverImg.classList.add('is-on');
+    else hoverImg.onload = () => hoverImg.classList.add('is-on');
+  }
+  card._resetGallery = () => showGal(0);
+  /* hover gallery is pointer-only — a tap on touch devices must not swap the photo */
+  const isTouch = window.matchMedia('(hover: none)').matches;
+  if (!isTouch) {
+    imgWrap.addEventListener('mouseenter', () => showGal(1));
+    imgWrap.addEventListener('mouseleave', () => showGal(0));
+  }
+  card.querySelector('.gal-nav--prev').addEventListener('click', e => { e.stopPropagation(); showGal(galIdx - 1); });
+  card.querySelector('.gal-nav--next').addEventListener('click', e => { e.stopPropagation(); showGal(galIdx + 1); });
+
+  /* touch — swipe left/right pages through the gallery */
+  let tX = 0, tY = 0;
+  imgWrap.addEventListener('touchstart', e => {
+    tX = e.touches[0].clientX; tY = e.touches[0].clientY;
+  }, { passive: true });
+  imgWrap.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tX;
+    const dy = e.changedTouches[0].clientY - tY;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) showGal(galIdx + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  /* wishlist heart */
+  const wish = card.querySelector('.wish');
+  wish.addEventListener('click', e => {
+    e.stopPropagation();
+    wish.dataset.on = wish.dataset.on === 'true' ? 'false' : 'true';
+  });
+
+  /* colour panel — desktop: hovering the label reveals it, leaving the
+     info area closes it · touch: tap toggles, tap on the panel
+     background closes */
+  const cvarLabel = card.querySelector('.cvar__label');
+  if (isTouch) {
+    cvarLabel.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = card.classList.contains('is-open');
+      closeAll(card);
+      card.classList.toggle('is-open', !open);
+    });
+  } else {
+    cvarLabel.addEventListener('mouseenter', () => { closeAll(card); card.classList.add('is-open'); });
+  }
+  if (!isTouch) {
+    card.querySelector('.card__info').addEventListener('mouseleave', () => card.classList.remove('is-open'));
+  }
+  card.querySelector('.panel').addEventListener('click', e => {
+    e.stopPropagation();
+    if (!e.target.closest('.thumb')) card.classList.remove('is-open');
+  });
+
+  /* swatch thumbnails — click selects + swaps the photo */
+  card.querySelectorAll('.thumb').forEach(th => {
+    th.addEventListener('click', e => {
+      e.stopPropagation();
+      card.querySelectorAll('.thumb').forEach(t => t.dataset.sel = String(t === th));
+      /* the current-colour thumb restores the card's own photo */
+      swapImage(card, th.dataset.idx === '0' ? null : th.dataset.photo);
+    });
+  });
+});
+
+/* click outside closes open panels */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.card')) closeAll();
+});
+
+/* ============================================================
+   OFF-CANVAS FILTER & SORT (Filter V2)
+   ============================================================ */
+const FACETS = [
+  { label: 'Sort by',  type: 'list',   items: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'], on: 0 },
+  { label: 'Size',     type: 'sizes',  items: ['70A', '70B', '75A', '75B', '75C', '80B', '80C', '85B'] },
+  { label: 'Colour',   type: 'colors', items: SWATCHES },
+  { label: 'Fabrics',  type: 'list',   items: ['Lace', 'Satin', 'Mesh', 'Cotton'] },
+  { label: 'Price',    type: 'list',   items: ['Under £30', '£30 – £50', 'Over £50'] },
+  { label: 'Series',   type: 'list',   items: ['Love in Lace', 'Aura Spotlight', 'Signature Sheer', 'Body Make-Up'] },
+  { label: 'Product standards & traceability', type: 'list', items: ['OEKO-TEX Standard 100', 'Recycled materials', 'Organic cotton'] },
+];
+
+const facetsEl = document.getElementById('facets');
+FACETS.forEach(f => {
+  const facet = document.createElement('div');
+  facet.className = 'facet';
+  let bodyHtml = '';
+  if (f.type === 'sizes') {
+    bodyHtml = `<div class="facet__sizes">${f.items.map(s => `<button data-on="false">${s}</button>`).join('')}</div>`;
+  } else if (f.type === 'colors') {
+    bodyHtml = `<ul>${f.items.map(s => `<li><button data-on="false"><img src="${s.sw}" alt="" />${s.name}</button></li>`).join('')}</ul>`;
+  } else {
+    bodyHtml = `<ul>${f.items.map((s, j) => `<li><button data-on="${j === f.on}">${s}</button></li>`).join('')}</ul>`;
+  }
+  facet.innerHTML = `
+    <button class="facet__head">${f.label}
+      <svg viewBox="0 0 10 6"><path d="M.5.5 5 5 9.5.5"/></svg>
+    </button>
+    <div class="facet__body">${bodyHtml}</div>`;
+  /* exclusive accordion — opening a facet closes the current one */
+  facet.querySelector('.facet__head').addEventListener('click', () => {
+    const open = facet.classList.contains('is-open');
+    facetsEl.querySelectorAll('.facet').forEach(f => f.classList.remove('is-open'));
+    facet.classList.toggle('is-open', !open);
+  });
+  /* toggle options (radio for sort, checkbox elsewhere) */
+  facet.querySelectorAll('.facet__body button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (f.label === 'Sort by') facet.querySelectorAll('.facet__body button').forEach(b => b.dataset.on = 'false');
+      btn.dataset.on = btn.dataset.on === 'true' ? 'false' : 'true';
+    });
+  });
+  facetsEl.appendChild(facet);
+});
+
+/* "Reset filters" appears once at least one filter is set (sort default doesn't count) */
+const clearBtn = document.querySelector('.drawer__clear');
+const filterFacets = [...facetsEl.querySelectorAll('.facet')].slice(1); /* skip "Sort by" */
+function updateClear() {
+  clearBtn.hidden = !filterFacets.some(f => f.querySelector('.facet__body button[data-on="true"]'));
+}
+facetsEl.addEventListener('click', updateClear);
+clearBtn.addEventListener('click', () => {
+  filterFacets.forEach(f => f.querySelectorAll('.facet__body button').forEach(b => b.dataset.on = 'false'));
+  updateClear();
+});
+
+const drawer = document.querySelector('.drawer');
+function setDrawer(open) {
+  body.classList.toggle('drawer-open', open);
+  drawer.setAttribute('aria-hidden', String(!open));
+}
+document.getElementById('drawerTrigger').addEventListener('click', () => setDrawer(true));
+document.querySelector('.drawer__close').addEventListener('click', () => setDrawer(false));
+document.querySelector('.drawer__cta').addEventListener('click', () => setDrawer(false));
+document.getElementById('scrim').addEventListener('click', () => setDrawer(false));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
+
+/* ============================================================
+   FILTER V1 — chip dropdowns (Figma 931-26774) + More dropdown
+   ============================================================ */
+const DD_ITEMS = {
+  size: ['70A', '70B', '75A', '75B', '75C', '80B', '80C', '85B'],
+  colour: [
+    { name: 'Red',   c: '#C1003F' }, { name: 'Blue',  c: '#3B82F6' },
+    { name: 'Green', c: '#10B981' }, { name: 'Black', c: '#000000' },
+    { name: 'White', c: '#FFFFFF' }, { name: 'Pink',  c: '#EC4899' },
+    { name: 'Grey',  c: '#6B7280' },
+  ],
+  series: ['Love in Lace', 'Aura Spotlight', 'Signature Sheer', 'Body Make-Up'],
+  fabric: ['Lace', 'Satin', 'Mesh', 'Cotton'],
+  price: ['Under £30', '£30 – £50', 'Over £50'],
+  standards: ['OEKO-TEX Standard 100', 'Recycled materials', 'Organic cotton'],
+  sort: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'],
+};
+const ddState = { sort: new Set([0]) }; /* per facet: selected indices */
+
+const resultsRow = document.querySelector('.results-row');
+const dropdown = document.createElement('div');
+dropdown.className = 'dropdown';
+resultsRow.appendChild(dropdown);
+let ddChip = null;
+
+/* sits below the anchor chip, kept inside the row */
+function anchorDropdown(chip) {
+  const rowRect = resultsRow.getBoundingClientRect();
+  const r = chip.getBoundingClientRect();
+  dropdown.style.left = Math.min(r.left - rowRect.left, resultsRow.clientWidth - 240 - 24) + 'px';
+  dropdown.style.top = (r.bottom - rowRect.top + 8) + 'px';
+  dropdown.classList.add('is-open');
+  ddChip = chip;
+}
+
+/* option rows for one facet — shared by the chip dropdowns and the
+   "More" accordion */
+function optionRowsHTML(key) {
+  const sel = ddState[key] || (ddState[key] = new Set());
+  return DD_ITEMS[key].map((it, i) => {
+    const name = typeof it === 'string' ? it : it.name;
+    const sw = typeof it === 'string' ? '' : `<span class="sw" style="background:${it.c}"></span>`;
+    return `<button class="dropdown__row" data-key="${key}" data-i="${i}" data-on="${sel.has(i)}">${sw}<span class="lbl">${name}</span>
+      <svg class="tick" viewBox="0 0 16 16"><path d="M2.5 8.5 6.5 12.5 13.5 4"/></svg></button>`;
+  }).join('');
+}
+
+function bindOptionRows() {
+  dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(rowBtn => {
+    rowBtn.addEventListener('click', () => {
+      const key = rowBtn.dataset.key;
+      const sel = ddState[key];
+      const i = +rowBtn.dataset.i;
+      if (key === 'sort') { /* single choice */
+        sel.clear(); sel.add(i);
+        dropdown.querySelectorAll('.dropdown__row[data-key="sort"]').forEach(b => b.dataset.on = 'false');
+        rowBtn.dataset.on = 'true';
+        return;
+      }
+      sel.has(i) ? sel.delete(i) : sel.add(i);
+      rowBtn.dataset.on = String(sel.has(i));
+    });
+  });
+}
+
+function bindFoot(keys) {
+  dropdown.querySelector('.dd-reset').addEventListener('click', () => {
+    keys.forEach(k => ddState[k] && ddState[k].clear());
+    dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(b => b.dataset.on = 'false');
+  });
+  dropdown.querySelector('.dd-save').addEventListener('click', closeDropdown);
+}
+
+function openDropdown(chip, key = chip.dataset.f) {
+  dropdown.innerHTML = optionRowsHTML(key) + `
+    <div class="dropdown__foot"><button class="dd-reset">Reset</button><button class="dd-save">Save</button></div>`;
+  anchorDropdown(chip);
+  bindOptionRows();
+  bindFoot([key]);
+}
+function closeDropdown() {
+  dropdown.classList.remove('is-open');
+  ddChip = null;
+}
+document.querySelectorAll('.filters--reduced [data-f]').forEach(chip => {
+  chip.addEventListener('click', e => {
+    e.stopPropagation();
+    if (ddChip === chip) { closeDropdown(); return; }
+    openDropdown(chip);
+  });
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown, .filters--reduced')) closeDropdown();
+});
+
+/* "More" lists the remaining filters in ONE dropdown; each expands
+   its options in place (accordion), no separate view */
+const MORE_FILTERS = [
+  { key: 'fabric',    label: 'Fabric' },
+  { key: 'price',     label: 'Price' },
+  { key: 'series',    label: 'Series' },
+  { key: 'standards', label: 'Standards' },
+];
+const moreToggle = document.querySelector('.more-toggle');
+function openMoreList() {
+  dropdown.innerHTML = MORE_FILTERS.map(f => `
+    <div class="dd-group">
+      <button class="dd-group__head"><span class="lbl">${f.label}</span>
+        <svg class="chev" viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+      <div class="dd-group__body" hidden>${optionRowsHTML(f.key)}</div>
+    </div>`).join('') + `
+    <div class="dropdown__foot"><button class="dd-reset">Reset</button><button class="dd-save">Save</button></div>`;
+  anchorDropdown(moreToggle);
+  bindOptionRows();
+  bindFoot(MORE_FILTERS.map(f => f.key));
+  dropdown.querySelectorAll('.dd-group__head').forEach(head => {
+    head.addEventListener('click', () => {
+      const body = head.nextElementSibling;
+      const willOpen = body.hidden;
+      /* exclusive — opening a group closes the current one */
+      dropdown.querySelectorAll('.dd-group__body').forEach(b => b.hidden = true);
+      dropdown.querySelectorAll('.dd-group__head').forEach(h => h.dataset.open = 'false');
+      body.hidden = !willOpen;
+      head.dataset.open = String(willOpen);
+    });
+  });
+}
+moreToggle.addEventListener('click', e => {
+  e.stopPropagation();
+  if (ddChip === moreToggle) { closeDropdown(); return; }
+  openMoreList();
+});
+/* every Filter V1 chip opens on hover already (click stays for touch);
+   a short grace period lets the pointer travel into the dropdown or
+   across to the next chip */
+if (window.matchMedia('(hover: hover)').matches) {
+  let ddCloseTimer;
+  const cancelDdClose = () => clearTimeout(ddCloseTimer);
+  const scheduleDdClose = () => {
+    cancelDdClose();
+    ddCloseTimer = setTimeout(() => { if (ddChip) closeDropdown(); }, 200);
+  };
+  document.querySelectorAll('.filters--reduced button').forEach(chip => {
+    chip.addEventListener('mouseenter', () => {
+      cancelDdClose();
+      if (ddChip === chip) return;
+      chip === moreToggle ? openMoreList() : openDropdown(chip);
+    });
+    chip.addEventListener('mouseleave', scheduleDdClose);
+  });
+  dropdown.addEventListener('mouseenter', cancelDdClose);
+  dropdown.addEventListener('mouseleave', scheduleDdClose);
+}
+
+/* ============================================================
+   DASHBOARD — every option is independent; state lives in data
+   attributes on <body>, CSS reacts, a few options need JS hooks
+   ============================================================ */
+const dash = document.querySelector('.dash');
+const dashToggle = document.querySelector('.dash-toggle');
+
+const CONTROLS = {
+  view:     ['products', 'content'],
+  gap:      ['med', 'max'],
+  side:     ['none', 'med', 'max'],
+  filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
+  colors:   ['newline', 'inline'],
+  pricing:  ['standard', 'sale'],
+  salebanner: ['v1', 'v2'],
+  images:   ['new', 'live'],
+  heart:    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7'], /* h1/h3/h5/h6 hidden but kept */
+  herosize: ['default', 'med', 'large'],
+};
+
+/* the URL mirrors the panel — options at their default drop out of the
+   query string, so the address bar is always a minimal shareable link */
+const DEFAULTS = Object.fromEntries(Object.keys(CONTROLS).map(k => [k, body.dataset[k]]));
+function syncURL() {
+  const qs = new URLSearchParams(location.search);
+  Object.keys(CONTROLS).forEach(k => {
+    if (body.dataset[k] === DEFAULTS[k]) qs.delete(k);
+    else qs.set(k, body.dataset[k]);
+  });
+  const q = qs.toString();
+  try { history.replaceState(null, '', location.pathname + (q ? '?' + q : '') + location.hash); } catch (e) {}
+}
+
+function setOption(key, val) {
+  if (!CONTROLS[key] || !CONTROLS[key].includes(val)) return;
+  body.dataset[key] = val;
+  if (key === 'images') {
+    applyPhotos(val === 'live');
+    /* reset variant selections + previews (back to the worn colour) */
+    cards.forEach(card => {
+      card.querySelector('.ph--variant').classList.remove('is-on');
+      card._resetGallery();
+      card.querySelectorAll('.thumb').forEach(t => t.dataset.sel = String(t.dataset.idx === '0'));
+    });
+  }
+  if (key === 'view') applyView(val);
+  if (key === 'heart') applyHeart(val);
+  if (key === 'filters') { setDrawer(false); closeDropdown(); }
+  closeAll();
+  dash.querySelectorAll(`button[data-k="${key}"]`).forEach(b => b.dataset.on = String(b.dataset.val === val));
+  syncURL();
+  alignTiles();
+}
+
+dash.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-k]');
+  if (btn) setOption(btn.dataset.k, btn.dataset.val);
+});
+
+dashToggle.addEventListener('click', () => {
+  const open = body.classList.toggle('dash-open');
+  dashToggle.setAttribute('aria-expanded', String(open));
+});
+/* open by default on desktop, collapsed on mobile */
+if (window.innerWidth > 760) body.classList.add('dash-open');
+else dashToggle.setAttribute('aria-expanded', 'false');
+
+/* deep-link: plp.html?view=content&gap=max&side=med&filters=some
+   &colors=inline&images=live&heart=h2&herosize=large&open=2
+   (open forces the nth colour panel open — for review/screenshots) */
+const params = new URLSearchParams(location.search);
+Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
+alignTiles();
+if (params.get('drawer')) setDrawer(true);
+if (params.get('dd')) {
+  const chip = document.querySelector(`.filters--reduced [data-f="${params.get('dd')}"]`);
+  if (chip) requestAnimationFrame(() => openDropdown(chip));
+}
+if (params.get('open')) {
+  const n = Math.max(1, parseInt(params.get('open'), 10) || 1) - 1;
+  requestAnimationFrame(() => (cards[n] || cards[0]).classList.add('is-open'));
+}
+</script>
+
+</body>
+</html>

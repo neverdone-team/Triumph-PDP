@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AURA SPOTLIGHT – Triumph</title>
+<style>
+/* ============================================================
+   FONTS  (from Figma styleguide)
+   ============================================================ */
+@font-face {
+  font-family: "Aimee";
+  src: url("./fonts/Aimee.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No2";
+  src: url("./fonts/AllianceNo2-Light.otf") format("opentype");
+  font-weight: 300;
+  font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --c-bg:        #FBFAF7;   /* warm paper */
+  --c-surface:   #FFFFFF;
+  --c-ink:       #1A1916;   /* near-black text */
+  --c-ink-soft:  #6F6C64;   /* secondary text */
+  --c-line:      #E4E0D8;   /* hairline borders */
+  --c-line-2:    #CFCAC0;
+  --c-sand:      #E7D8C3;   /* "Creamy Dream" swatch */
+  --c-black:     #1A1916;
+  --c-accent:    #1A1916;
+
+  --font-display: "Aimee", "Times New Roman", serif;
+  --font-sans:    "Alliance No1", "Helvetica Neue", Arial, sans-serif;
+
+  --maxw: 1440px;
+  --gutter: clamp(16px, 4vw, 56px);
+
+  /* 8px spacing scale */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: .01em;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+
+/* ============================================================
+   TOP / HEADER
+   ============================================================ */
+.announce {
+  background: var(--c-ink);
+  color: #F4F1EA;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+}
+
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(251,250,247,.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--c-line);
+}
+.nav {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  height: 72px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.nav__links { display: flex; gap: 28px; }
+.nav__links a {
+  font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--c-ink); padding: 6px 0; position: relative;
+}
+.nav__links a::after {
+  content:""; position:absolute; left:0; bottom:0; height:1px; width:0;
+  background: var(--c-ink); transition: width .3s ease;
+}
+.nav__links a:hover::after { width: 100%; }
+.logo {
+  font-family: var(--font-display);
+  font-size: 26px; letter-spacing: .28em;
+  text-transform: uppercase; text-align: center;
+  padding-left: .28em;
+}
+.nav__icons { display: flex; gap: 22px; justify-content: flex-end; align-items:center; }
+.nav__icons button { background:none; border:0; padding:0; color: var(--c-ink); display:flex; }
+.icon { width: 21px; height: 21px; stroke: currentColor; fill: none; stroke-width: 1.3; }
+.burger { display: none; }
+
+/* ============================================================
+   BREADCRUMB
+   ============================================================ */
+.breadcrumb {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 18px var(--gutter) 0;
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+.breadcrumb a:hover { color: var(--c-ink); }
+.breadcrumb span { margin: 0 8px; opacity: .5; }
+
+/* ============================================================
+   PRODUCT LAYOUT
+   ============================================================ */
+.product {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: 24px var(--gutter) var(--s9);
+  display: grid;
+  grid-template-columns: minmax(0,1.55fr) minmax(380px,1fr);
+  gap: clamp(28px, 4vw, 72px);
+  align-items: start;
+}
+
+/* ---- Gallery ---- */
+.gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gallery figure { margin: 0; background: #F1EDE6; overflow: hidden; }
+.gallery img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4/5; transition: transform .9s ease; }
+.gallery figure:hover img { transform: scale(1.03); }
+.gallery .span-2 { grid-column: 1 / -1; }
+.gallery .span-2 img { aspect-ratio: 3/4; }
+
+/* mobile carousel (hidden on desktop) */
+.gallery-mobile { display: none; }
+
+/* ---- Info panel ---- */
+.info { position: sticky; top: 96px; }
+.info__cat { margin-bottom: 12px; }
+.info__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.04;
+  letter-spacing: .01em;
+  margin: 0 0 14px;
+}
+.info__price { font-size: 19px; letter-spacing: .02em; margin-bottom: 4px; }
+.info__tax { font-size: 11px; color: var(--c-ink-soft); letter-spacing: .04em; }
+
+.rule { height: 1px; background: var(--c-line); margin: 28px 0; border: 0; }
+
+.field__head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 14px;
+}
+.field__label { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+.field__value { font-size: 13px; color: var(--c-ink-soft); letter-spacing: .02em; }
+.link-underline {
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  border-bottom: 1px solid var(--c-line-2); padding-bottom: 2px;
+}
+.link-underline:hover { border-color: var(--c-ink); }
+
+/* swatches */
+.swatches { display: flex; gap: 12px; }
+.swatch {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--c-line-2);
+  position: relative; padding: 0; background-clip: padding-box;
+  transition: box-shadow .2s ease;
+}
+.swatch[data-sel="true"] { box-shadow: 0 0 0 1px var(--c-bg), 0 0 0 2px var(--c-ink); }
+.swatch.sand  { background: var(--c-sand); }
+.swatch.black { background: var(--c-black); }
+
+/* sizes */
+.sizes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.size {
+  border: 1px solid var(--c-line-2);
+  background: transparent; color: var(--c-ink);
+  padding: 11px 0; font-size: 13px; letter-spacing: .04em;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.size:hover { border-color: var(--c-ink); }
+.size[data-sel="true"] { background: var(--c-ink); color: #FFF; border-color: var(--c-ink); }
+.size.oos { color: var(--c-line-2); border-color: var(--c-line); cursor: not-allowed; position: relative; }
+.size.oos::after {
+  content:""; position:absolute; inset:0; background:
+    linear-gradient(to top left, transparent calc(50% - 1px), var(--c-line) 50%, transparent calc(50% + 1px));
+}
+
+/* CTA */
+.cta {
+  width: 100%; margin-top: 26px;
+  background: var(--c-ink); color: #FFF; border: 1px solid var(--c-ink);
+  padding: 18px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+  transition: background .2s ease, color .2s ease;
+}
+.cta:hover { background: transparent; color: var(--c-ink); }
+.pay-note { text-align: center; font-size: 11px; color: var(--c-ink-soft); margin-top: 12px; letter-spacing: .03em; }
+.assurances { display: flex; gap: 22px; margin-top: 22px; flex-wrap: wrap; }
+.assurance { display: flex; gap: 8px; align-items: center; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--c-ink-soft); }
+.assurance svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.3; }
+
+/* accordion */
+.accordion { margin-top: 8px; }
+.acc { border-top: 1px solid var(--c-line); }
+.acc:last-child { border-bottom: 1px solid var(--c-line); }
+.acc__btn {
+  width: 100%; background: none; border: 0; padding: 20px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--c-ink);
+}
+.acc__sign { position: relative; width: 13px; height: 13px; flex: none; }
+.acc__sign::before, .acc__sign::after {
+  content:""; position:absolute; background: var(--c-ink); transition: transform .25s ease;
+}
+.acc__sign::before { top: 6px; left: 0; width: 13px; height: 1px; }
+.acc__sign::after  { left: 6px; top: 0; width: 1px; height: 13px; }
+.acc[open] .acc__sign::after { transform: scaleY(0); }
+.acc__body { padding: 0 0 24px; color: var(--c-ink-soft); font-size: 14px; max-width: 46ch; }
+.acc__body p { margin: 0 0 14px; }
+.acc__body dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 24px; margin: 0; }
+.acc__body dt { color: var(--c-ink); }
+.acc__body ul.dots li { position: relative; padding-left: 18px; margin-bottom: 6px; }
+.acc__body ul.dots li::before { content:""; position:absolute; left:0; top:9px; width:5px; height:5px; border-radius:50%; background: var(--c-line-2); }
+
+/* complete the look (inside panel) */
+.complete { margin-top: 34px; }
+.complete h3 { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 16px; font-weight: 400; }
+.complete__row { display: flex; gap: 14px; }
+.complete__item { flex: 1; }
+.complete__item .thumb { background: #F1EDE6; aspect-ratio: 1/1; overflow: hidden; }
+.complete__item .thumb img { width:100%; height:100%; object-fit: cover; }
+.complete__item .nm { font-size: 12px; margin-top: 8px; letter-spacing: .04em; }
+.complete__item .pr { font-size: 12px; color: var(--c-ink-soft); }
+
+/* ============================================================
+   RECOMMENDATIONS
+   ============================================================ */
+.recs { max-width: var(--maxw); margin: 0 auto; padding: var(--s8) var(--gutter) var(--s9); }
+.recs__head { text-align: center; margin-bottom: 44px; }
+.recs__head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(24px,2.6vw,34px); margin: 0; letter-spacing: .02em; }
+.recs__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.6vw, 24px); }
+.card .card__img { background: #F1EDE6; aspect-ratio: 4/5; overflow: hidden; position: relative; }
+.card .card__img img { width:100%; height:100%; object-fit: cover; transition: transform .9s ease; }
+.card:hover .card__img img { transform: scale(1.04); }
+.card .tag {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--c-bg); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 9px; color: var(--c-ink-soft);
+}
+.card__cat { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-ink-soft); margin: 14px 0 5px; }
+.card__nm { font-size: 14px; letter-spacing: .03em; }
+.card__pr { font-size: 13px; color: var(--c-ink-soft); margin-top: 3px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.news { border-top: 1px solid var(--c-line); }
+.news__inner { max-width: 720px; margin: 0 auto; padding: var(--s8) var(--gutter); text-align: center; }
+.news h2 { font-family: var(--font-display); font-weight: 400; font-size: 28px; margin: 0 0 12px; letter-spacing: .02em; }
+.news p { color: var(--c-ink-soft); margin: 0 0 28px; }
+.news__form { display: flex; max-width: 480px; margin: 0 auto; border-bottom: 1px solid var(--c-ink); }
+.news__form input { flex: 1; border: 0; background: none; padding: 12px 4px; font-family: inherit; font-size: 14px; outline: none; }
+.news__form button { background: none; border: 0; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 0 8px; }
+
+footer { background: var(--c-ink); color: #C9C5BC; }
+.foot { max-width: var(--maxw); margin: 0 auto; padding: var(--s8) var(--gutter) var(--s6);
+  display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 40px; }
+.foot__brand .logo { color: #F4F1EA; text-align: left; padding-left:0; margin-bottom: 16px; font-size: 24px; }
+.foot__brand p { font-size: 13px; max-width: 30ch; }
+.foot h4 { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #F4F1EA; margin: 0 0 18px; font-weight: 400; }
+.foot li { margin-bottom: 11px; }
+.foot a { font-size: 13px; color: #C9C5BC; }
+.foot a:hover { color: #FFF; }
+.foot__bottom { border-top: 1px solid rgba(255,255,255,.12); }
+.foot__bottom-inner { max-width: var(--maxw); margin: 0 auto; padding: 22px var(--gutter);
+  display:flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8E8A82; }
+
+/* ============================================================
+   RESPONSIVE  /  MOBILE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .recs__grid { grid-template-columns: repeat(2, 1fr); gap: 18px 14px; }
+}
+
+@media (max-width: 860px) {
+  .nav { grid-template-columns: 1fr auto 1fr; height: 60px; }
+  .nav__links { display: none; }
+  .burger { display: flex; background: none; border: 0; padding: 0; color: var(--c-ink); }
+  .logo { font-size: 21px; }
+
+  .product {
+    grid-template-columns: 1fr;
+    padding: 12px 0 var(--s8);
+    gap: 0;
+  }
+  .breadcrumb { display: none; }
+
+  /* swap desktop grid for mobile swipe carousel */
+  .gallery { display: none; }
+  .gallery-mobile { display: block; position: relative; }
+  .carousel {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+  .carousel figure { margin: 0; flex: 0 0 100%; scroll-snap-align: center; background: #F1EDE6; }
+  .carousel img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
+  .dots { display: flex; gap: 7px; justify-content: center; padding: 14px 0 2px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-line-2); border:0; padding:0; }
+  .dot[data-sel="true"] { background: var(--c-ink); }
+
+  .info { position: static; padding: 28px var(--gutter) 0; }
+  .complete__row { gap: 10px; }
+
+  .foot { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
+  .foot__brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 520px) {
+  .sizes { grid-template-columns: repeat(4, 1fr); }
+  .recs__grid { gap: 14px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT -->
+<div class="announce">Free shipping &amp; returns on all orders</div>
+
+<!-- HEADER -->
+<header>
+  <nav class="nav">
+    <button class="burger" aria-label="Menu">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <ul class="nav__links">
+      <li><a href="#">New In</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Briefs</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Swimwear</a></li>
+    </ul>
+    <div class="logo">Triumph</div>
+    <div class="nav__icons">
+      <button aria-label="Search"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+      <button aria-label="Account"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button>
+      <button aria-label="Bag"><svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg></button>
+    </div>
+  </nav>
+</header>
+
+<!-- BREADCRUMB -->
+<nav class="breadcrumb">
+  <a href="#">Home</a><span>/</span><a href="#">Bras</a><span>/</span><a href="#">Underwire</a><span>/</span>Aura Spotlight
+</nav>
+
+<!-- PRODUCT -->
+<section class="product">
+
+  <!-- GALLERY (desktop) -->
+  <div class="gallery" id="gallery">
+    <figure class="span-2"><img src="./Assets/10208018-6720_2.webp" alt="Aura Spotlight bra in Creamy Dream, front view" /></figure>
+    <figure><img src="./Assets/10208018-6720_1.webp" alt="Aura Spotlight bra product still" /></figure>
+    <figure><img src="./Assets/10208018-6720_5.webp" alt="Aura Spotlight lace detail" /></figure>
+    <figure><img src="./Assets/10208018-6720_4.webp" alt="Aura Spotlight bra seated view" /></figure>
+    <figure><img src="./Assets/10208018-6720_3.webp" alt="Aura Spotlight bra back view" /></figure>
+  </div>
+
+  <!-- GALLERY (mobile carousel) -->
+  <div class="gallery-mobile">
+    <div class="carousel" id="carousel">
+      <figure><img src="./Assets/10208018-6720_2.webp" alt="Aura Spotlight bra front view" /></figure>
+      <figure><img src="./Assets/10208018-6720_1.webp" alt="Aura Spotlight bra product still" /></figure>
+      <figure><img src="./Assets/10208018-6720_4.webp" alt="Aura Spotlight bra seated view" /></figure>
+      <figure><img src="./Assets/10208018-6720_5.webp" alt="Aura Spotlight lace detail" /></figure>
+      <figure><img src="./Assets/10208018-6720_3.webp" alt="Aura Spotlight bra back view" /></figure>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="info">
+    <div class="info__cat eyebrow">Padded Underwire Bra</div>
+    <h1 class="info__title">Aura Spotlight</h1>
+    <div class="info__price">&euro;&nbsp;60,95</div>
+    <div class="info__tax">incl. VAT, plus shipping</div>
+
+    <hr class="rule" />
+
+    <!-- COLOR -->
+    <div class="field">
+      <div class="field__head">
+        <span class="field__label">Colour</span>
+        <span class="field__value" id="colorName">Creamy Dream</span>
+      </div>
+      <div class="swatches" id="swatches">
+        <button class="swatch sand"  data-name="Creamy Dream" data-sel="true" aria-label="Creamy Dream"></button>
+        <button class="swatch black" data-name="Black" data-sel="false" aria-label="Black"></button>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <!-- SIZE -->
+    <div class="field">
+      <div class="field__head">
+        <span class="field__label">Size</span>
+        <a href="#" class="link-underline">Size guide</a>
+      </div>
+      <div class="sizes" id="sizes">
+        <button class="size">70B</button>
+        <button class="size">75B</button>
+        <button class="size">80B</button>
+        <button class="size">85B</button>
+        <button class="size oos" disabled>90B</button>
+        <button class="size">70C</button>
+        <button class="size">75C</button>
+        <button class="size">80C</button>
+        <button class="size">85C</button>
+        <button class="size">90C</button>
+        <button class="size">75D</button>
+        <button class="size">80D</button>
+        <button class="size">85D</button>
+        <button class="size oos" disabled>90D</button>
+        <button class="size">85E</button>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button class="cta" id="addBtn">Add to bag</button>
+    <div class="pay-note">or 3 interest-free payments of &euro;&nbsp;20,32</div>
+
+    <div class="assurances">
+      <span class="assurance"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v6l9 4 9-4V7"/></svg>Free delivery</span>
+      <span class="assurance"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0z"/><path d="M12 7v5l3 2"/></svg>Free 30-day returns</span>
+    </div>
+
+    <!-- ACCORDIONS -->
+    <div class="accordion" style="margin-top:30px;">
+      <details class="acc" open>
+        <summary class="acc__btn">Description <span class="acc__sign"></span></summary>
+        <div class="acc__body">
+          <p>A padded underwire bra that pairs luxurious patterned lace with exceptional everyday comfort. The plunging triangle neckline and delicate scalloped trim create an elegant, modern silhouette &mdash; sensual yet effortless to wear.</p>
+          <p>Lightly moulded cups offer optimal support and a smooth finish under low-cut garments, available up to cup&nbsp;F.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary class="acc__btn">Details &amp; Materials <span class="acc__sign"></span></summary>
+        <div class="acc__body">
+          <ul class="dots" style="margin:0 0 16px;">
+            <li>Underwired, lightly padded triangle cups</li>
+            <li>Signature patterned lace with scalloped edge</li>
+            <li>Adjustable straps &amp; two-row hook-and-eye back</li>
+          </ul>
+          <dl>
+            <dt>Main</dt><dd>54% Polyamide</dd>
+            <dt>Lace</dt><dd>35% Polyester</dd>
+            <dt>Elastane</dt><dd>11% Elastane</dd>
+          </dl>
+          <p style="margin-top:16px;">Hand wash only. Do not bleach, tumble dry, iron or dry clean.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary class="acc__btn">Delivery &amp; Returns <span class="acc__sign"></span></summary>
+        <div class="acc__body">
+          <p>Free standard delivery (2&ndash;4 working days) on all orders. Express delivery available at checkout.</p>
+          <p>Enjoy free returns within 30 days. Items must be unworn with original tags and hygiene strip intact.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- COMPLETE THE LOOK -->
+    <div class="complete">
+      <h3>Complete the look</h3>
+      <div class="complete__row">
+        <a class="complete__item" href="#">
+          <div class="thumb"><img src="./Assets/10208024-0004_1.webp" alt="Aura Spotlight Tanga" /></div>
+          <div class="nm">Aura Spotlight Tanga</div>
+          <div class="pr">&euro;&nbsp;25,95</div>
+        </a>
+        <a class="complete__item" href="#">
+          <div class="thumb"><img src="./Assets/10207997-0004_1.webp" alt="Aura Spotlight Maxi brief" /></div>
+          <div class="nm">Aura Spotlight Maxi</div>
+          <div class="pr">&euro;&nbsp;27,95</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RECOMMENDATIONS -->
+<section class="recs">
+  <div class="recs__head">
+    <h2>You may also like</h2>
+  </div>
+  <div class="recs__grid">
+    <a class="card" href="#">
+      <div class="card__img"><span class="tag">Bestseller</span><img src="./Assets/10215855-0004_1.webp" alt="Aura Spotlight Bralette in Black" /></div>
+      <div class="card__cat">Wireless Bra</div>
+      <div class="card__nm">Aura Spotlight Bralette</div>
+      <div class="card__pr">&euro;&nbsp;54,95</div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img"><img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight bra in Black" /></div>
+      <div class="card__cat">Padded Underwire Bra</div>
+      <div class="card__nm">Aura Spotlight &mdash; Black</div>
+      <div class="card__pr">&euro;&nbsp;60,95</div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img"><img src="./Assets/10214770-0003_1.webp" alt="Amourette Charm balconette bra" /></div>
+      <div class="card__cat">Balconette Bra</div>
+      <div class="card__nm">Amourette Charm</div>
+      <div class="card__pr">&euro;&nbsp;59,95</div>
+    </a>
+    <a class="card" href="#">
+      <div class="card__img"><span class="tag">New</span><img src="./Assets/10210668-0003_1.webp" alt="Body Make-Up soft bra in White" /></div>
+      <div class="card__cat">Soft Bra</div>
+      <div class="card__nm">Body Make-Up Soft Touch</div>
+      <div class="card__pr">&euro;&nbsp;45,95</div>
+    </a>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="news">
+  <div class="news__inner">
+    <h2>Join the Triumph world</h2>
+    <p>Sign up for early access to new collections, members-only offers and styling notes.</p>
+    <form class="news__form" onsubmit="return false;">
+      <input type="email" placeholder="Your email address" aria-label="Email" />
+      <button type="submit">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot">
+    <div class="foot__brand">
+      <div class="logo">Triumph</div>
+      <p>Lingerie crafted for fit, comfort and quiet confidence since 1886.</p>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">New In</a></li>
+        <li><a href="#">Bras</a></li>
+        <li><a href="#">Briefs</a></li>
+        <li><a href="#">Shapewear</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Size Guide</a></li>
+        <li><a href="#">Shipping</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>About</h4>
+      <ul>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Stores</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot__bottom">
+    <div class="foot__bottom-inner">
+      <span>&copy; 2026 Triumph. All rights reserved.</span>
+      <span>Privacy &middot; Terms &middot; Cookies</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ---- Colour swatches ---- */
+  const swatches = document.querySelectorAll('#swatches .swatch');
+  const colorName = document.getElementById('colorName');
+  swatches.forEach(s => s.addEventListener('click', () => {
+    swatches.forEach(x => x.dataset.sel = 'false');
+    s.dataset.sel = 'true';
+    colorName.textContent = s.dataset.name;
+  }));
+
+  /* ---- Size selection ---- */
+  document.querySelectorAll('#sizes .size:not(.oos)').forEach(b =>
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#sizes .size').forEach(x => x.dataset.sel = 'false');
+      b.dataset.sel = 'true';
+    })
+  );
+
+  /* ---- Add to bag ---- */
+  document.getElementById('addBtn').addEventListener('click', () => {
+    const size = document.querySelector('#sizes .size[data-sel="true"]');
+    const btn = document.getElementById('addBtn');
+    if (!size) { btn.textContent = 'Please select a size'; setTimeout(() => btn.textContent = 'Add to bag', 1600); return; }
+    btn.textContent = 'Added to bag ✓';
+    setTimeout(() => btn.textContent = 'Add to bag', 1600);
+  });
+
+  /* ---- Mobile carousel dots ---- */
+  const carousel = document.getElementById('carousel');
+  const dotsWrap = document.getElementById('dots');
+  if (carousel && dotsWrap) {
+    const slides = carousel.querySelectorAll('figure');
+    slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'dot';
+      d.dataset.sel = i === 0 ? 'true' : 'false';
+      d.addEventListener('click', () => carousel.children[i].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'}));
+      dotsWrap.appendChild(d);
+    });
+    carousel.addEventListener('scroll', () => {
+      const i = Math.round(carousel.scrollLeft / carousel.clientWidth);
+      dotsWrap.querySelectorAll('.dot').forEach((d, di) => d.dataset.sel = di === i ? 'true' : 'false');
+    }, { passive: true });
+  }
+</script>
+</body>
+</html>

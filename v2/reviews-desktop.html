@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amourette 300 · Reviews</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #faf8f6;
+    --bg-track: #ece8e3;
+    --text: #1c1a18;
+    --text-2: #6b655e;
+    --text-3: #9a958d;
+    --line: rgba(28, 26, 24, 0.12);
+    --gold: #c8a35b;
+    --success: #4a7a4f;
+    --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg-soft);
+    font-family: var(--sans);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    padding: 48px 24px;
+  }
+  .reviews {
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--bg);
+    border: 0.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0);
+  }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .head { text-align: center; margin-bottom: 36px; }
+  .head .eyebrow { margin-bottom: 8px; }
+  .head h2 {
+    margin: 0; font-family: var(--serif); font-size: 38px;
+    font-weight: 500; letter-spacing: -0.01em; line-height: 1.1;
+  }
+
+  /* Hero stat row */
+  .hero {
+    display: flex; align-items: center; justify-content: center;
+    gap: 48px; flex-wrap: wrap;
+    padding-bottom: 32px; border-bottom: 0.5px solid var(--line);
+  }
+  .hero-num {
+    font-family: var(--serif); font-size: 64px; font-weight: 500;
+    line-height: 0.95; letter-spacing: -0.02em;
+  }
+  .hero-num .pct { font-size: 30px; vertical-align: 16px; }
+  .stars { color: var(--gold); letter-spacing: 5px; }
+  .vrule { width: 0.5px; height: 90px; background: var(--line); }
+  .hero-center { text-align: center; }
+  .hero-center .label { font-size: 12px; color: var(--text-3); letter-spacing: 0.04em; }
+  .recommend-label {
+    font-size: 12px; letter-spacing: 0.06em; color: var(--text-2);
+    margin-top: 14px; max-width: 130px;
+  }
+  .dist { display: flex; flex-direction: column; gap: 9px; min-width: 180px; }
+  .dist-row { display: flex; align-items: center; gap: 12px; }
+  .dist-row .n { width: 10px; font-size: 12px; color: var(--text-3); }
+  .dist-track { flex: 1; height: 3px; background: var(--bg-track); }
+  .dist-fill { height: 100%; background: var(--gold); }
+
+  /* Fit gauges */
+  .fit {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    padding: 28px 0; border-bottom: 0.5px solid var(--line);
+  }
+  .fit-cell { text-align: center; padding: 0 18px; }
+  .fit-cell + .fit-cell { border-left: 0.5px solid var(--line); }
+  .fit-cell .label {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 16px;
+  }
+  .gauge {
+    height: 2px; background: var(--bg-track); position: relative;
+    margin: 0 6px 14px;
+  }
+  .gauge .dot {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 9px; height: 9px; border-radius: 50%; background: var(--text);
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+  .fit-verdict { font-family: var(--serif); font-size: 19px; font-weight: 500; }
+
+  /* Featured */
+  .featured { padding: 28px 0; border-bottom: 0.5px solid var(--line); text-align: center; }
+  .featured .eyebrow { margin-bottom: 14px; display: block; }
+  .featured blockquote {
+    font-family: var(--serif); font-size: 25px; line-height: 1.5;
+    margin: 0 auto; max-width: 540px; font-weight: 500;
+  }
+  .featured .by {
+    margin-top: 16px; font-size: 12px; letter-spacing: 0.05em; color: var(--text-2);
+  }
+  .featured .by .stars { font-size: 12px; letter-spacing: 1px; }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; padding: 24px 0 8px;
+  }
+  .tabs { display: flex; gap: 20px; }
+  .tab {
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-3); cursor: pointer; padding-bottom: 4px;
+    background: none; border: none; font-family: inherit;
+  }
+  .tab.on { color: var(--text); border-bottom: 0.5px solid var(--text); }
+  .sort {
+    border: none; background: transparent; font-family: inherit;
+    font-size: 13px; color: var(--text-2); cursor: pointer;
+  }
+
+  /* Review cards */
+  .rev { padding: 28px 0; border-bottom: 0.5px solid var(--line); }
+  .rev-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 10px;
+  }
+  .rev-id { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; color: #fff;
+  }
+  .rev-name { font-size: 14px; font-weight: 500; }
+  .verified { font-size: 11px; color: var(--success); margin-left: 4px; }
+  .rev-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .rev-title { font-family: var(--serif); font-size: 20px; font-weight: 500; margin: 0 0 6px 50px; }
+  .rev-body { margin: 0 0 0 50px; font-size: 14px; line-height: 1.7; color: var(--text-2); }
+  .rev-foot { margin: 14px 0 0 50px; display: flex; align-items: center; gap: 16px; }
+  .rev-foot .count { font-size: 12px; color: var(--text-3); }
+  .helpful {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-2); cursor: pointer; background: none; border: none;
+    font-family: inherit; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .helpful:hover { color: var(--text); }
+
+  .footer-cta { text-align: center; margin-top: 32px; }
+  .footer-cta a {
+    font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text); text-decoration: none;
+    border-bottom: 0.5px solid var(--text); padding-bottom: 4px; cursor: pointer;
+  }
+
+  svg.icon { width: 1em; height: 1em; vertical-align: -0.12em; fill: currentColor; }
+</style>
+</head>
+<body>
+
+<section class="reviews" aria-label="Customer reviews">
+  <p class="sr-only">Premium customer review section for the Triumph Amourette 300 bra.</p>
+
+  <div class="head">
+    <div class="eyebrow">Amourette 300 &middot; Reviews</div>
+    <h2>Loved by 328 women</h2>
+  </div>
+
+  <div class="hero">
+    <div class="hero-center">
+      <div class="hero-num">4.6</div>
+      <div class="stars" style="margin:10px 0 6px; font-size:17px;" aria-label="4.6 of 5 stars">★★★★<span style="opacity:.45">★</span></div>
+      <div class="label">out of 5</div>
+    </div>
+
+    <div class="vrule"></div>
+
+    <div class="hero-center">
+      <div class="hero-num">94<span class="pct">%</span></div>
+      <div class="recommend-label">would recommend to a friend</div>
+    </div>
+
+    <div class="vrule"></div>
+
+    <div class="dist" aria-label="Rating distribution">
+      <div class="dist-row"><span class="n">5</span><div class="dist-track"><div class="dist-fill" style="width:71%"></div></div></div>
+      <div class="dist-row"><span class="n">4</span><div class="dist-track"><div class="dist-fill" style="width:18%"></div></div></div>
+      <div class="dist-row"><span class="n">3</span><div class="dist-track"><div class="dist-fill" style="width:6%"></div></div></div>
+      <div class="dist-row"><span class="n">2</span><div class="dist-track"><div class="dist-fill" style="width:3%"></div></div></div>
+      <div class="dist-row"><span class="n">1</span><div class="dist-track"><div class="dist-fill" style="width:2%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="fit">
+    <div class="fit-cell">
+      <div class="label">Size</div>
+      <div class="gauge"><span class="dot" style="left:55%"></span></div>
+      <div class="fit-verdict">True to size</div>
+    </div>
+    <div class="fit-cell">
+      <div class="label">Cup fit</div>
+      <div class="gauge"><span class="dot" style="left:48%"></span></div>
+      <div class="fit-verdict">Perfectly spot on</div>
+    </div>
+    <div class="fit-cell">
+      <div class="label">Comfort</div>
+      <div class="gauge"><span class="dot" style="left:84%"></span></div>
+      <div class="fit-verdict">All-day soft</div>
+    </div>
+  </div>
+
+  <div class="featured">
+    <span class="eyebrow">Most loved review</span>
+    <blockquote>&ldquo;The first minimizer that smooths without that flattened feeling. The lace is delicate, the support is real &mdash; I wore it all day with zero adjusting.&rdquo;</blockquote>
+    <div class="by">Sandra K. &middot; bought 75D &middot; <span class="stars">★★★★★</span></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab on">All</button>
+      <button class="tab">With photos</button>
+      <button class="tab">My size</button>
+    </div>
+    <select class="sort" aria-label="Sort reviews">
+      <option>Most helpful</option>
+      <option>Most recent</option>
+      <option>Highest rated</option>
+    </select>
+  </div>
+
+  <div id="reviews"></div>
+
+  <div class="footer-cta">
+    <a href="#review-form">Share your experience</a>
+  </div>
+</section>
+
+<script>
+  const reviews = [
+    { ini: "ML", name: "Marie L.", date: "1 week ago", r: 5, title: "My everyday favourite", body: "Soft against the skin, no wire digging, and the black stays a true deep black wash after wash. I've already bought a second in skin tone.", bought: "80C", help: 28, color: "#993556" },
+    { ini: "AT", name: "Anja T.", date: "2 weeks ago", r: 4, title: "Lovely fit, straps could be sturdier", body: "Cup fit is perfect and true to size. The straps loosen slightly through the day so I re-tighten once — otherwise gorgeous and worth it.", bought: "75D", help: 15, color: "#534ab7" },
+    { ini: "CB", name: "Claudia B.", date: "3 weeks ago", r: 5, title: "Elegant and supportive", body: "Rare to find a minimizer this pretty. The lace detail feels luxurious and it holds shape beautifully under tailoring.", bought: "85C", help: 11, color: "#993c1d" },
+  ];
+
+  function stars(n) {
+    let out = "";
+    for (let i = 1; i <= 5; i++) {
+      out += '<span style="color:#c8a35b;opacity:' + (i <= n ? 1 : 0.3) + '">★</span>';
+    }
+    return '<span style="letter-spacing:1px;font-size:13px">' + out + '</span>';
+  }
+
+  function card(rv) {
+    return '<div class="rev">' +
+      '<div class="rev-head">' +
+        '<div class="rev-id">' +
+          '<div class="avatar" style="background:' + rv.color + '">' + rv.ini + '</div>' +
+          '<div>' +
+            '<div class="rev-name">' + rv.name +
+              '<span class="verified" title="Verified buyer">✓ Verified</span></div>' +
+            '<div class="rev-meta">' + rv.date + ' &middot; bought ' + rv.bought + '</div>' +
+          '</div>' +
+        '</div>' +
+        stars(rv.r) +
+      '</div>' +
+      '<div class="rev-title">' + rv.title + '</div>' +
+      '<p class="rev-body">' + rv.body + '</p>' +
+      '<div class="rev-foot">' +
+        '<span class="count">' + rv.help + ' found this helpful</span>' +
+        '<button class="helpful">▲ Helpful</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  document.getElementById("reviews").innerHTML = reviews.map(card).join("");
+
+  document.querySelectorAll(".tab").forEach(function (t) {
+    t.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("on"); });
+      t.classList.add("on");
+    });
+  });
+</script>
+
+</body>
+</html>
