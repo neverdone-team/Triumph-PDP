@@ -338,7 +338,9 @@ body[data-side="max"] .grid { padding: 0 48px; }
 
 /* wishlist heart — top right of every product photo */
 .wish {
-  position: absolute; top: 16px; right: 16px; z-index: 6;
+  /* top is 1px less than right: the heart glyph sits ~1px lower inside its
+     box than it does from the right, so equal offsets read as more top gap */
+  position: absolute; top: 15px; right: 16px; z-index: 6;
   width: 24px; height: 24px;
 }
 .wish svg {
@@ -468,8 +470,7 @@ body[data-salebanner="v2"] .sale-flag {
    CARD INFO — title / price / colour label; the dashboard decides
    whether the colour label gets its own line or joins the price line
    ============================================================ */
-.card__info { position: relative; padding: 16px 12px 0; } /* 12px side insets on desktop (mobile keeps its own) */
-body:not([data-side="none"]) .card__info { padding-right: 0; }
+.card__info { position: relative; padding: 16px 12px 0; } /* 12px insets on both sides (mobile keeps its own) */
 .card__cat {
   font-size: 12px; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
@@ -729,7 +730,7 @@ body.drawer-open .drawer {
   body[data-colors="inline"] .cvar__label { margin-left: 8px; }
 
   /* hearts sit closer to the corner on small cards */
-  .wish { top: 10px; right: 10px; width: 20px; height: 20px; }
+  .wish { top: 9px; right: 10px; width: 20px; height: 20px; }
   .wish svg { width: 20px; height: 20px; }
   body[data-heart="h1"] .wish { width: 28px; height: 28px; }
   body[data-heart="h1"] .wish svg { width: 20px; height: 20px; }
