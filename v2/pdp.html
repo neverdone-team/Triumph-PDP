@@ -137,11 +137,15 @@ header {
 .gallery { width: 50%; flex: none; }   /* 720 / 1440 */
 .info    { width: 30.556%; flex: none; padding-top: 100px; } /* 440 / 1440 */
 
-/* desktop: the buy box holds still while the gallery scrolls past,
-   and only starts scrolling itself once the gallery reaches its end
-   (sticky needs the column's own height, hence align-self) */
+/* desktop — Samsøe-style two-phase scroll:
+   phase 1: the buy box pins at the top while the gallery scrolls all the
+   way through; phase 2: the gallery pins bottom-aligned and the remaining
+   buy-box content scrolls to its own end. The gallery's negative top and
+   the .main min-height (gallery + buy-box overflow) are measured by the
+   syncScrollStage() script so the hand-over lands exactly. */
 @media (min-width: 761px) {
-  .info { position: sticky; top: 0; align-self: flex-start; }
+  .gallery { position: sticky; top: 0; align-self: flex-start; } /* top set by JS */
+  .info    { position: sticky; top: 0; align-self: flex-start; }
 }
 
 /* --- gallery ------------------------------------------------ */
@@ -311,18 +315,53 @@ header {
 .acc.is-open .acc__head svg { transform: rotate(180deg); }
 .acc__body {
   overflow: hidden;
-  max-height: 0;
+  max-height: 0; /* opened height is measured by JS (panels vary a lot) */
   opacity: 0;
   transition: max-height .55s var(--ease-reveal), opacity .45s var(--ease-out);
 }
-.acc.is-open .acc__body { max-height: 220px; opacity: 1; }
+.acc.is-open .acc__body { opacity: 1; }
 .acc__body p {
   margin: 0 0 16px;
   font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
   color: var(--c-ink);
   max-width: 400px;
 }
+.acc__body > :last-child { margin-bottom: 0; }
+/* bottom spacing lives inside the content so max-height:0 fully hides it
+   (padding would keep the closed body 24px tall and skew the tab rhythm) */
+.acc__body::after { content: ""; display: block; height: 24px; }
 .acc__line { border-bottom: 1px solid var(--c-line); }
+
+/* --- accordion content (Figma 1301-16515) ------------------- */
+/* availability row is a link out, not a fold-out */
+.acc__head--link:hover .lbl { text-decoration: underline; text-underline-position: from-font; }
+.acc__arrow { width: 11px; height: 11px; display: block; flex: none; }
+/* lead line — Alliance Regular, uppercase (e.g. material composition) */
+.acc__strong {
+  font-weight: 400; text-transform: uppercase;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  margin: 0 0 16px;
+}
+.acc__list {
+  list-style: disc; padding-left: 18px; margin: 0 0 16px;
+  font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+  max-width: 400px;
+}
+.acc__link { text-decoration: underline; text-underline-position: from-font; }
+.acc__link:hover { opacity: .5; }
+.acc__logo { margin-top: 4px; }
+.acc__logos { display: flex; gap: 20px; align-items: flex-start; margin-top: 4px; }
+.acc__logos img { display: block; }
+/* shipping — labelled groups with right-aligned prices */
+.acc__sec { margin-bottom: 12px; }
+.grp { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
+.grp p { margin: 0; }
+.prow {
+  display: flex; gap: 20px; align-items: flex-end;
+  font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+}
+.prow span { flex: 1; min-width: 0; }
+.prow b { font-weight: 300; white-space: nowrap; }
 
 /* discover more */
 .discover { margin-top: 80px; display: flex; flex-direction: column; gap: 24px; }
@@ -336,7 +375,7 @@ header {
 /* ============================================================
    YOU MIGHT LIKE THIS
    ============================================================ */
-.recs { max-width: 1440px; margin: 120px auto 0; }
+.recs { max-width: 2400px; margin: 120px auto 0; } /* match .main so wide screens fill out */
 .recs h2 {
   font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
   padding: 0 var(--pad-x);
@@ -349,8 +388,10 @@ header {
   column-gap: 60px;
   row-gap: 80px;
 }
-/* very wide screens — six recommendations per row */
+/* very wide screens — six per row, slimmer side padding so the
+   images grow instead of the whitespace */
 @media (min-width: 1800px) {
+  :root { --pad-x: 80px; }
   .recs__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
 .rec { position: relative; }
@@ -735,39 +776,97 @@ header {
       </div>
 
       <div class="accs rv" id="accs">
+        <!-- availability is a link out to the store finder, not a fold-out -->
         <div class="acc">
-          <button class="acc__head"><span class="lbl">Availability In-Store</span>
-            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
-          </button>
-          <div class="acc__body"><p>Check availability at your nearest Triumph store. Reserve online and try it on in the fitting room — no obligation to buy.</p></div>
+          <a class="acc__head acc__head--link" href="#"><span class="lbl">Availability In-Store</span>
+            <img class="acc__arrow" src="./Assets/pdp/acc-arrow-right.svg" alt="" />
+          </a>
           <div class="acc__line"></div>
         </div>
         <div class="acc">
           <button class="acc__head"><span class="lbl">Features</span>
             <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
           </button>
-          <div class="acc__body"><p>Lightly padded moulded cups with underwire support. Whisper-soft floral lace, adjustable straps and a smooth finish that stays invisible under T-shirts.</p></div>
+          <div class="acc__body">
+            <p class="acc__strong">75% Polyamide, 25% Elastane</p>
+            <p>This minimizer bra works its magic by creating a beautifully smooth silhouette that keeps everything perfectly in place. The wireless design thoughtfully reduces your bust by one cup size while maintaining natural comfort throughout the day. Experience seamless style that moves with you, offering the confidence that comes from a flawless fit.</p>
+            <ul class="acc__list">
+              <li>With LYCRA® fibre for unparalleled comfort and ultimate fit</li>
+              <li>Wireless minimizer bra design reduces bust by one cup size</li>
+              <li>Soft elastic shoulder straps with new jacquard design</li>
+              <li>Bonded and laminated construction for virtually seamless wear</li>
+              <li>Hook-and-eye fastener for optimum support and an adjustable fit</li>
+              <li>V-slides provide additional comfort and optimal support</li>
+            </ul>
+            <p>Item Nr.: 10210668 (7613108912163)</p>
+            <img class="acc__logo" src="./Assets/pdp/acc-lycra.png" alt="LYCRA" width="46" height="29" />
+          </div>
           <div class="acc__line"></div>
         </div>
         <div class="acc">
           <button class="acc__head"><span class="lbl">Shipping &amp; Returns</span>
             <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
           </button>
-          <div class="acc__body"><p>Free standard delivery on orders over £50. Free returns within 30 days — keep the hygiene seal intact.</p></div>
+          <div class="acc__body">
+            <div class="lbl acc__sec">Versand</div>
+            <div class="grp">
+              <div class="lbl">Kostenlos für MyTriumph Mitglieder</div>
+              <div class="prow"><span>Standardversand in 2-3 Werktagen<br />Jetzt beitreten</span><b>0,00 €</b></div>
+            </div>
+            <div class="grp">
+              <div class="lbl">Versand nach Hause</div>
+              <div class="prow"><span>Standardversand in 2-3 Werktagen</span><b>4,99 €</b></div>
+              <div class="prow"><span>Expressversand in 1-2 Werktagen</span><b>7,99 €</b></div>
+            </div>
+            <div class="grp">
+              <div class="lbl">Click &amp; Collect im Triumph-Store</div>
+              <div class="prow"><span>Kostenloser Versand in 2-3 Werktagen</span><b>0,00 €</b></div>
+            </div>
+            <div class="grp">
+              <div class="lbl">Rückgaben in Triumph Stores</div>
+              <div class="prow"><span>Kostenlos möglich</span><b>0,00 €</b></div>
+            </div>
+            <div class="lbl acc__sec">Rücksendung</div>
+            <div class="grp">
+              <div class="lbl">Rücksendungen per Post:</div>
+              <p>Rückerstattung auf eine Online-Geschenkkarte: kostenlos. Rückerstattung auf die ursprüngliche Zahlungsmethode: 2,95 € werden vom Rückerstattungsbetrag abgezogen.</p>
+            </div>
+            <div class="grp">
+              <div class="lbl">Nachhaltige Rücksendungen:</div>
+              <p>Dein Paket enthält kein Rücksende-Etikett, keine gedruckte Rechnung oder ein Rückgabeformular zum Ausfüllen. Weitere Informationen zu unserem neuen Rückgabe-Prozess findest du auf unserer Rückgabeseite.</p>
+            </div>
+          </div>
           <div class="acc__line"></div>
         </div>
         <div class="acc">
           <button class="acc__head"><span class="lbl">Care</span>
             <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
           </button>
-          <div class="acc__body"><p>Hand wash cold or machine wash in a lingerie bag at 30°C. Do not tumble dry. Reshape cups while damp.</p></div>
+          <div class="acc__body">
+            <ul class="acc__list">
+              <li>Delicate wash cycle up to 30°C</li>
+              <li>Do not bleach</li>
+              <li>Do not tumble dry</li>
+              <li>Do not iron or press</li>
+              <li>Do not dryclean</li>
+            </ul>
+          </div>
           <div class="acc__line"></div>
         </div>
         <div class="acc">
           <button class="acc__head"><span class="lbl">Standards &amp; Traceability</span>
             <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
           </button>
-          <div class="acc__body"><p>OEKO-TEX® Standard 100 certified. Made in audited facilities with full supply-chain traceability.</p></div>
+          <div class="acc__body">
+            <p class="acc__strong">Certified materials: 60% recycled pre-consumer Polyamide</p>
+            <p>Explore the journey of the product here: <a class="acc__link" href="https://uk.triumph.com/amourette/10210668.html?color=0004_Black#passportLinkModal" target="_blank" rel="noopener">Product Passport</a></p>
+            <p>Manufacturer: Triumph International GmbH<br />Hauptstr. 80<br />DE 73540 Heubach</p>
+            <p>The product contains minimum 60% GRS certified recycled polyamide.<br />Certified by Ecocert Greenlife<br />Licence no. 262425<br />Triumph Intertrade AG<br /><br />According to the GRS standard visible on<br /><a class="acc__link" href="https://textileexchange.org" target="_blank" rel="noopener">https://textileexchange.org</a></p>
+            <div class="acc__logos">
+              <img src="./Assets/pdp/acc-cert-1.png" alt="GRS — Global Recycled Standard" width="80" height="72" />
+              <img src="./Assets/pdp/acc-cert-2.png" alt="Ecocert Greenlife" width="80" height="87" />
+            </div>
+          </div>
           <div class="acc__line"></div>
         </div>
       </div>
@@ -868,6 +967,10 @@ RECS.forEach(r => {
    viewport animates together (no stagger, same as the PLP)
    ============================================================ */
 const rvEls = [...document.querySelectorAll('.rv')];
+/* the buy box reveals as ONE unit — its below-fold content (Complete Your
+   Set, accordions, discover) sits pinned during scroll phase 1 and would
+   otherwise fade in noticeably later than the content around it */
+const infoRv = [...document.querySelectorAll('.info .rv')];
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   rvEls.forEach(el => el.classList.add('is-visible'));
 } else {
@@ -878,8 +981,48 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       io.unobserve(en.target);
     });
   }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
-  rvEls.forEach(el => io.observe(el));
+  rvEls.filter(el => !infoRv.includes(el)).forEach(el => io.observe(el));
+  new IntersectionObserver(([en], obs) => {
+    if (!en.isIntersecting) return;
+    infoRv.forEach(el => el.classList.add('is-visible'));
+    obs.disconnect();
+  }, { threshold: 0 }).observe(document.querySelector('.info'));
 }
+
+/* ============================================================
+   TWO-PHASE SCROLL (desktop) — Samsøe-style hand-over
+   The page is exactly as tall as gallery + the buy box's overflow
+   beyond one viewport. The gallery gets a negative sticky top so it
+   pins the moment its last image reaches the viewport bottom — which
+   is the same scroll position where the container starts pushing the
+   top-pinned buy box, so phase 2 (buy box scrolling out its rest)
+   begins only once the gallery is fully through.
+   ============================================================ */
+const mainEl    = document.querySelector('.main');
+const galleryEl = document.querySelector('.gallery');
+const infoEl    = document.querySelector('.info');
+const desktopMq = window.matchMedia('(min-width: 761px)');
+
+function syncScrollStage() {
+  if (!desktopMq.matches) {           // mobile stacks — no sticky play
+    mainEl.style.minHeight = '';
+    galleryEl.style.top = '';
+    return;
+  }
+  const vh = window.innerHeight;
+  const g  = galleryEl.offsetHeight;
+  const i  = infoEl.offsetHeight;
+  mainEl.style.minHeight = g + Math.max(0, i - vh) + 'px';
+  galleryEl.style.top = Math.min(0, vh - g) + 'px';
+}
+/* re-measure on resize and whenever a column changes height
+   (accordion open/close, images loading in) */
+const stageRo = new ResizeObserver(syncScrollStage);
+stageRo.observe(galleryEl);
+stageRo.observe(infoEl);
+window.addEventListener('resize', syncScrollStage);
+desktopMq.addEventListener('change', syncScrollStage);
+syncScrollStage();
 
 /* ============================================================
    INTERACTIONS
@@ -916,12 +1059,23 @@ document.querySelectorAll('[data-add]').forEach(btn =>
     cartCount.textContent = +cartCount.textContent + 1;
   }));
 
-/* accordions — animated open/close, one at a time */
+/* accordions — animated open/close, one at a time; the opened height
+   is measured so long panels (shipping) unfold fully */
 document.querySelectorAll('.acc').forEach(acc => {
-  acc.querySelector('.acc__head').addEventListener('click', () => {
+  const head = acc.querySelector('button.acc__head');
+  const body = acc.querySelector('.acc__body');
+  if (!head || !body) return; // the availability row is a plain link out
+  head.addEventListener('click', () => {
     const open = acc.classList.contains('is-open');
-    document.querySelectorAll('.acc').forEach(a => a.classList.remove('is-open'));
-    acc.classList.toggle('is-open', !open);
+    document.querySelectorAll('.acc').forEach(a => {
+      a.classList.remove('is-open');
+      const b = a.querySelector('.acc__body');
+      if (b) b.style.maxHeight = '';
+    });
+    if (!open) {
+      acc.classList.add('is-open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
   });
 });
 
