@@ -84,10 +84,10 @@ header {
 .nav__links a {
   font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
   font-weight: 300;
-  padding-bottom: 2px; border-bottom: 1px solid transparent;
-  transition: border-color .25s var(--ease-out);
+  padding-bottom: 2px;
+  transition: color .25s var(--ease-out);
 }
-.nav__links a:hover { border-bottom-color: var(--c-ink); }
+.nav__links a:hover { color: #747474; } /* grey/medium — Figma 637-2373 hover state */
 .nav__right { display: flex; align-items: center; gap: 20px; }
 .search {
   display: flex; align-items: center; gap: 4px;
@@ -158,6 +158,10 @@ body[data-herosize="large"] .hero { height: 800px; }  /* +60% */
 .hero h1 {
   position: relative; z-index: 2;
   width: 100%;
+  /* same centred 2400px box as the breadcrumb, so the title never
+     starts further left than it on very wide screens */
+  max-width: 2400px;
+  margin: 0 auto;
   padding: 0 var(--pad-x);
   color: #fff;
   font-weight: 400;
