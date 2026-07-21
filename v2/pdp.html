@@ -184,7 +184,10 @@ header {
 /* white copy tile */
 .gallery__note { background: var(--c-bg); }
 .gallery__note p {
-  position: absolute; left: 16.6%; top: 41.5%;
+  /* keep the copy centered however wide the tile grows (16.6% + 240px
+     was only centered at the 720px design width) */
+  position: absolute; left: 50%; top: 41.5%;
+  transform: translateX(-50%);
   width: 240px; margin: 0;
   font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
 }
