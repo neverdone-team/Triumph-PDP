@@ -74,7 +74,7 @@ header {
   background: var(--c-bg);
 }
 .nav {
-  max-width: 2400px; margin: 0 auto;
+  max-width: 2200px; margin: 0 auto;
   padding: 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
@@ -126,16 +126,21 @@ header {
 }
 
 /* ============================================================
-   MAIN — gallery + info keep their 1440-canvas proportions
-   (720/120/440) but stretch full width up to 2400px
+   MAIN — Triumph breakpoints (responsive spec, Figma 1440-16050):
+   two columns from 1200px up. The gallery is fluid and caps at
+   1400px; the buy-box column is 50% capped at 800px with the
+   120/80 Figma paddings, and the content inside it caps at 440px
+   (its 380px minimum is guaranteed because the column is never
+   narrower than 600px once the 1200px layout kicks in). Beyond
+   2200px the whole page centers and white space grows both sides.
    ============================================================ */
 .main {
-  max-width: 2400px; margin: 0 auto;
+  max-width: 2200px; margin: 0 auto;
   display: flex;
-  gap: 8.333%;              /* 120 / 1440 */
 }
-.gallery { width: 50%; flex: none; }   /* 720 / 1440 */
-.info    { width: 30.556%; flex: none; padding-top: 100px; } /* 440 / 1440 */
+.gallery { flex: 1 1 auto; min-width: 0; max-width: 1400px; }
+.info    { width: 50%; max-width: 800px; flex: none; padding: 100px 80px 0 120px; }
+.info > * { max-width: 440px; }
 
 /* desktop — Samsøe-style two-phase scroll:
    phase 1: the buy box pins at the top while the gallery scrolls all the
@@ -143,7 +148,7 @@ header {
    buy-box content scrolls to its own end. The gallery's negative top and
    the .main min-height (gallery + buy-box overflow) are measured by the
    syncScrollStage() script so the hand-over lands exactly. */
-@media (min-width: 761px) {
+@media (min-width: 1200px) {
   .gallery { position: sticky; top: 0; align-self: flex-start; } /* top set by JS */
   .info    { position: sticky; top: 0; align-self: flex-start; }
 }
@@ -375,7 +380,7 @@ header {
 /* ============================================================
    YOU MIGHT LIKE THIS
    ============================================================ */
-.recs { max-width: 2400px; margin: 120px auto 0; } /* match .main so wide screens fill out */
+.recs { max-width: 2200px; margin: 120px auto 0; } /* match .main so wide screens fill out */
 .recs h2 {
   font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
   padding: 0 var(--pad-x);
@@ -388,11 +393,10 @@ header {
   column-gap: 60px;
   row-gap: 80px;
 }
-/* very wide screens — six per row, slimmer side padding so the
-   images grow instead of the whitespace */
-@media (min-width: 1800px) {
-  :root { --pad-x: 80px; }
-  .recs__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+/* xxl (Triumph's 1400 breakpoint) — five per row, mirroring the
+   site's own +1-tile bump at 1400px */
+@media (min-width: 1400px) {
+  .recs__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 .rec { position: relative; }
 .rec__img {
@@ -438,12 +442,12 @@ header {
    ============================================================ */
 /* headline — same treatment as the "You Might Like This" heading */
 .collage-head {
-  max-width: 2400px; margin: 120px auto 0;
+  max-width: 2200px; margin: 120px auto 0;
   font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
   padding: 0 var(--pad-x);
 }
 .collage {
-  max-width: 2400px; margin: 40px auto 0;
+  max-width: 2200px; margin: 40px auto 0;
   display: flex;
 }
 .collage__tile {
@@ -491,9 +495,11 @@ header {
 .sticky-cta.is-on { transform: translateY(0); }
 
 /* ============================================================
-   RESPONSIVE — mobile design (Figma 727-2264)
+   RESPONSIVE — stacked design (Figma 727-2264), applied below
+   Triumph's xl breakpoint per the responsive spec (1440-16050):
+   everything under 1200px stacks like the @375/@600/@900 frames
    ============================================================ */
-@media (max-width: 760px) {
+@media (max-width: 1199.98px) {
   /* header — same 50px bar as the PLP */
   .nav { padding: 12px 16px; gap: 16px; }
   .logo__img { width: 100px; height: 13px; }
@@ -539,7 +545,8 @@ header {
   }
   .gallery__bars i.is-on { background: var(--c-ink); }
 
-  .info { width: 100%; padding: 40px 16px 0; }
+  .info { width: 100%; max-width: none; padding: 40px 16px 0; }
+  .info > * { max-width: none; } /* the 440px cap is a two-column rule */
   .info > * + * { margin-top: 60px; }
 
   /* title block — name+style together, price after larger gap, incl. VAT note */
@@ -599,6 +606,13 @@ header {
 
   .sticky-cta { display: block; }
   body.has-sticky { padding-bottom: 80px; }
+}
+
+/* tablets (Triumph md/lg, 768–1199) — the swipe gallery shows the
+   next image alongside instead of going full width: slides shrink
+   to 610/900 of the viewport like the @900 frame (Figma 1435-8138) */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .gallery__hero, .gallery__slide { width: 67.8%; }
 }
 
 </style>
@@ -938,11 +952,8 @@ const RECS = [
   { nm: 'Top',            pr: '£34.95', img: 'rec-2.jpg' },
   { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-5.jpg', sale: true },
   { nm: 'Jersey',         pr: '£29.95', img: 'rec-8.jpg' },
-  { nm: 'Balconette bra', pr: '£52.00', img: 'rec-9.jpg' },
-  { nm: 'Top',            pr: '£39.95', img: 'rec-3.jpg', sale: true },
-  { nm: 'Jersey',         pr: '£49.95', img: 'rec-1.jpg' },
-  { nm: 'Lacey bra',      pr: '£57.00', img: 'rec-6.jpg' },
 ];
+/* 20 items — fills the grid evenly at every count: 10x2 / 5x4 / 4x5 */
 
 const recsGrid = document.getElementById('recsGrid');
 RECS.forEach(r => {
@@ -1001,7 +1012,7 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 const mainEl    = document.querySelector('.main');
 const galleryEl = document.querySelector('.gallery');
 const infoEl    = document.querySelector('.info');
-const desktopMq = window.matchMedia('(min-width: 761px)');
+const desktopMq = window.matchMedia('(min-width: 1200px)');
 
 function syncScrollStage() {
   if (!desktopMq.matches) {           // mobile stacks — no sticky play
@@ -1083,7 +1094,9 @@ document.querySelectorAll('.acc').forEach(acc => {
 const strip = document.getElementById('galleryStrip');
 const bars = [...document.querySelectorAll('.gallery__bars i')];
 strip.addEventListener('scroll', () => {
-  const i = Math.round(strip.scrollLeft / strip.clientWidth);
+  /* divide by the slide width, not the strip width — on tablets the
+     slides are narrower than the viewport (peek carousel) */
+  const i = Math.round(strip.scrollLeft / strip.firstElementChild.offsetWidth);
   bars.forEach((b, j) => b.classList.toggle('is-on', j === i));
 }, { passive: true });
 
