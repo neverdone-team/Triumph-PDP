@@ -74,7 +74,7 @@ header {
   background: var(--c-bg);
 }
 .nav {
-  max-width: 2400px; margin: 0 auto;
+  max-width: 2200px; margin: 0 auto;
   padding: 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
@@ -126,21 +126,24 @@ header {
 }
 
 /* ============================================================
-   MAIN — gallery + info keep their 1440-canvas proportions
-   (720/120/440) but stretch full width up to 2400px
+   MAIN — Triumph breakpoints (responsive spec, Figma 1440-16050):
+   two columns from 1200px up. The gallery is fluid and caps at
+   1400px; the buy-box column is 50% capped at 800px with the
+   120/80 Figma paddings, and the content inside it caps at 440px.
+   Beyond 2200px the whole page centers and white space grows.
    ============================================================ */
 .main {
-  max-width: 2400px; margin: 0 auto;
+  max-width: 2200px; margin: 0 auto;
   display: flex;
-  gap: 8.333%;              /* 120 / 1440 */
 }
-.gallery { width: 50%; flex: none; }   /* 720 / 1440 */
-.info    { width: 30.556%; flex: none; padding-top: 100px; } /* 440 / 1440 */
+.gallery { flex: 1 1 auto; min-width: 0; max-width: 1400px; }
+.info    { width: 50%; max-width: 800px; flex: none; padding: 100px 80px 0 120px; }
+.info > * { max-width: 440px; }
 
 /* desktop: the buy box holds still while the gallery scrolls past,
    and only starts scrolling itself once the gallery reaches its end
    (sticky needs the column's own height, hence align-self) */
-@media (min-width: 761px) {
+@media (min-width: 1200px) {
   .info { position: sticky; top: 0; align-self: flex-start; }
 }
 
@@ -309,6 +312,12 @@ header {
   transition: transform .45s var(--ease-out);
 }
 .acc.is-open .acc__head svg { transform: rotate(180deg); }
+/* the reviews head carries a star row too — keep the chevron rules off it */
+.acc__head svg.stars { width: 73px; height: 13px; stroke: none; }
+.acc.is-open .acc__head svg.stars { transform: none; }
+/* availability row points right (Figma arrow) — square icon, never rotates */
+.acc__head svg.arrow { width: 10.6px; height: 10.6px; }
+.acc.is-open .acc__head svg.arrow { transform: none; }
 .acc__body {
   overflow: hidden;
   max-height: 0;
@@ -324,6 +333,96 @@ header {
 }
 .acc__line { border-bottom: 1px solid var(--c-line); }
 
+/* ============================================================
+   REVIEWS ACCORDION — Airbnb-style content from Figma 1820:5579
+   (frames 1821-8027 collapsed / 1821-8028 expanded). Head carries
+   stars + count; body holds rating hero, stats strip, sort row,
+   the review list and the load-more/write actions.
+   ============================================================ */
+/* the generic accordion caps its body at 220px — reviews need room */
+.acc--reviews.is-open .acc__body { max-height: 3000px; }
+.rvw__headgrp { display: flex; align-items: center; gap: 8px; }
+.rvw__headstars { display: flex; align-items: center; gap: 4px; }
+/* 1px lift — the bracket glyphs hang below the digits, which reads as
+   sitting low next to the stars even when the boxes are centred */
+.rvw__count { font-size: 10px; font-weight: 300; line-height: 12px; letter-spacing: .04em; position: relative; top: -1px; }
+.stars { display: block; flex: none; }
+.rvw { display: flex; flex-direction: column; gap: 32px; padding: 12px 15px 16px 0; }
+.rvw p { margin: 0; max-width: none; }
+
+/* rating hero — big score, recommend line, summary, Bazaarvoice badge */
+.rvw__hero { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; text-align: center; }
+.rvw__score { font-size: 40px; line-height: 44px; font-weight: 300; letter-spacing: 0; }
+.rvw__herotxt { display: flex; flex-direction: column; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: .04em; }
+/* p selector keeps it ahead of the .acc__body p weight-300 rule */
+p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
+.rvw__sum { font-size: 12px; line-height: 16px; font-weight: 300; max-width: 425px; }
+.rvw__badge { width: 96px; height: 14px; }
+
+/* stats strip — 5..1 distribution left, Comfort/Quality/Fit columns */
+.rvw__stats { display: flex; align-items: stretch; min-height: 76px; }
+.rvw__hist { width: 150px; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-right: 18px; }
+.rvw__row { display: flex; align-items: center; gap: 8px; }
+.rvw__row i { font-style: normal; font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; width: 6px; flex: none; }
+.rvw__track { display: block; height: 2px; flex: 1; background: #F1F1F1; }
+.rvw__bar { display: block; height: 2px; background: var(--c-ink); }
+.rvw__col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  border-left: 1px solid var(--c-line);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.rvw__col b { font-weight: 400; font-size: 11px; line-height: 14px; }
+.rvw__col span { font-weight: 400; font-size: 16px; line-height: 24px; }
+.rvw__rule { border-bottom: 1px solid var(--c-line); }
+
+/* count + sort row */
+.rvw__toolbar { display: flex; align-items: center; justify-content: space-between; }
+.rvw__label10 { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; }
+.rvw__sortwrap { position: relative; }
+.rvw__sortbtn { display: flex; align-items: center; gap: 8px; }
+.rvw__sortbtn svg { width: 10.6px; height: 7px; flex: none; fill: none; stroke: var(--c-ink); stroke-width: .8; transition: transform .3s var(--ease-out); }
+.rvw__sortwrap.is-open .rvw__sortbtn svg { transform: rotate(180deg); }
+.rvw__sortmenu {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 8;
+  min-width: 140px;
+  display: flex; flex-direction: column;
+  background: #fff; border: 1px solid var(--c-line);
+  opacity: 0; pointer-events: none; transform: translateY(-4px);
+  transition: opacity .25s var(--ease-out), transform .25s var(--ease-out);
+}
+.rvw__sortwrap.is-open .rvw__sortmenu { opacity: 1; pointer-events: auto; transform: none; }
+.rvw__sortmenu button {
+  padding: 10px 12px; text-align: left;
+  font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  transition: background .2s var(--ease-out);
+}
+.rvw__sortmenu button:hover { background: #F8F3F3; }
+.rvw__sortmenu button[data-on="true"] { font-weight: 400; }
+/* the reviews accordion ends open without a closing rule — the design has
+   no line below LOAD MORE / WRITE A REVIEW (collapsed keeps its line) */
+.acc--reviews.is-open .acc__line { display: none; }
+
+/* review list */
+.rvw__list { display: flex; flex-direction: column; gap: 24px; }
+.rvw__item { display: flex; flex-direction: column; gap: 10px; }
+.rvw__item + .rvw__item { border-top: 1px solid var(--c-line); padding-top: 24px; }
+.rvw__ihead { display: flex; align-items: center; justify-content: space-between; }
+.rvw__date { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-50); }
+.rvw__ititle { font-size: 12px; line-height: 16px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.rvw__dots { display: flex; align-items: center; gap: 8px; font-size: 10px; line-height: 14px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; }
+.rvw__dots i { width: 3px; height: 3px; background: var(--c-ink); flex: none; }
+.rvw__itext { font-size: 12px; line-height: 20px; font-weight: 300; letter-spacing: .04em; }
+.rvw__report { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-50); margin-top: 6px; text-align: left; }
+.rvw__report:hover, .rvw__sortbtn:hover, .rvw__actions button:hover { opacity: .55; }
+
+/* footer actions */
+.rvw__actions { display: flex; align-items: center; justify-content: space-between; }
+.rvw__actions button {
+  font-size: 12px; line-height: 16px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: underline; text-underline-offset: 2px;
+  transition: opacity .2s var(--ease-out);
+}
+
 /* discover more */
 .discover { margin-top: 80px; display: flex; flex-direction: column; gap: 24px; }
 .discover__links { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
@@ -336,7 +435,7 @@ header {
 /* ============================================================
    YOU MIGHT LIKE THIS
    ============================================================ */
-.recs { max-width: 1440px; margin: 120px auto 0; }
+.recs { max-width: 2200px; margin: 120px auto 0; } /* match .main so wide screens fill out */
 .recs h2 {
   font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
   padding: 0 var(--pad-x);
@@ -349,9 +448,10 @@ header {
   column-gap: 60px;
   row-gap: 80px;
 }
-/* very wide screens — six recommendations per row */
-@media (min-width: 1800px) {
-  .recs__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+/* xxl (Triumph's 1400 breakpoint) — five per row, mirroring the
+   site's own +1-tile bump at 1400px */
+@media (min-width: 1400px) {
+  .recs__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 .rec { position: relative; }
 .rec__img {
@@ -397,12 +497,12 @@ header {
    ============================================================ */
 /* headline — same treatment as the "You Might Like This" heading */
 .collage-head {
-  max-width: 2400px; margin: 120px auto 0;
+  max-width: 2200px; margin: 120px auto 0;
   font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
   padding: 0 var(--pad-x);
 }
 .collage {
-  max-width: 2400px; margin: 40px auto 0;
+  max-width: 2200px; margin: 40px auto 0;
   display: flex;
 }
 .collage__tile {
@@ -452,7 +552,7 @@ header {
 /* ============================================================
    RESPONSIVE — mobile design (Figma 727-2264)
    ============================================================ */
-@media (max-width: 760px) {
+@media (max-width: 1199.98px) {
   /* header — same 50px bar as the PLP */
   .nav { padding: 12px 16px; gap: 16px; }
   .logo__img { width: 100px; height: 13px; }
@@ -498,7 +598,8 @@ header {
   }
   .gallery__bars i.is-on { background: var(--c-ink); }
 
-  .info { width: 100%; padding: 40px 16px 0; }
+  .info { width: 100%; max-width: none; padding: 40px 16px 0; }
+  .info > * { max-width: none; } /* the 440px cap is a two-column rule */
   .info > * + * { margin-top: 60px; }
 
   /* title block — name+style together, price after larger gap, incl. VAT note */
@@ -520,6 +621,9 @@ header {
   /* accordions breathe a little more on mobile */
   .accs { gap: 20px; }
   .acc__head { padding-bottom: 20px; }
+
+  /* reviews — tighter histogram so the three stat columns keep air */
+  .rvw__hist { width: 124px; padding-right: 12px; }
 
   /* discover more — links flow in a row */
   .discover__links { flex-direction: row; flex-wrap: wrap; gap: 16px; }
@@ -558,6 +662,29 @@ header {
 
   .sticky-cta { display: block; }
   body.has-sticky { padding-bottom: 80px; }
+}
+
+/* tablets (Triumph md/lg, 768–1199) — the swipe gallery shows the
+   next image alongside instead of going full width: slides shrink
+   to 610/900 of the viewport like the @900 frame (Figma 1435-8138) */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .gallery__hero, .gallery__slide { width: 67.8%; }
+}
+
+/* very small screens — the reviews stats strip regrids: histogram left with
+   shortened bars, Comfort/Quality/Fit stacked to the right of one shared divider */
+@media (max-width: 480px) {
+  .rvw__stats {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    min-height: 0;
+  }
+  .rvw__hist { grid-row: 1 / 4; width: auto; padding-right: 20px; align-self: center; }
+  .rvw__col {
+    flex-direction: row; justify-content: flex-start; align-items: baseline; gap: 8px;
+    padding: 7px 0 7px 20px;
+  }
+  .rvw__col span { font-size: 14px; line-height: 18px; }
 }
 
 </style>
@@ -737,7 +864,8 @@ header {
       <div class="accs rv" id="accs">
         <div class="acc">
           <button class="acc__head"><span class="lbl">Availability In-Store</span>
-            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+            <!-- right arrow from Figma 1820:5555 (Assets/pdp/arrow-right.svg) -->
+            <svg class="arrow" viewBox="0 0 10.6 10.6"><path d="M0 5.28H10"/><path d="M5 10.28 10 5.28 5 0.28"/></svg>
           </button>
           <div class="acc__body"><p>Check availability at your nearest Triumph store. Reserve online and try it on in the fitting room — no obligation to buy.</p></div>
           <div class="acc__line"></div>
@@ -768,6 +896,67 @@ header {
             <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
           </button>
           <div class="acc__body"><p>OEKO-TEX® Standard 100 certified. Made in audited facilities with full supply-chain traceability.</p></div>
+          <div class="acc__line"></div>
+        </div>
+        <div class="acc acc--reviews">
+          <!-- star glyph from the Figma export (Assets/pdp/reviews/stars-5.svg), one 13x13 cell -->
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+            <path id="rvw-star" d="M6.30965 0.590212C6.36926 0.405395 6.63074 0.405394 6.69035 0.590211L7.90702 4.3628C7.93372 4.44557 8.01084 4.5016 8.09781 4.50141L12.0617 4.49274C12.2559 4.49232 12.3367 4.74101 12.1794 4.8548L8.96739 7.17773C8.89693 7.22869 8.86747 7.31935 8.89452 7.40201L10.1277 11.1692C10.1881 11.3538 9.97655 11.5075 9.81969 11.393L6.61791 9.05606C6.54766 9.00479 6.45234 9.00479 6.38209 9.05606L3.18031 11.393C3.02345 11.5075 2.81191 11.3538 2.87232 11.1692L4.10548 7.40201C4.13253 7.31935 4.10307 7.22869 4.0326 7.17773L0.820637 4.8548C0.663285 4.74101 0.744087 4.49232 0.938277 4.49274L4.90219 4.50141C4.98916 4.5016 5.06628 4.44557 5.09298 4.3628L6.30965 0.590212Z"/>
+          </defs></svg>
+          <button class="acc__head">
+            <span class="rvw__headgrp">
+              <span class="lbl">Reviews</span>
+              <span class="rvw__headstars">
+                <svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true"><use href="#rvw-star" fill="#000"/><use href="#rvw-star" x="15" fill="#000"/><use href="#rvw-star" x="30" fill="#000"/><use href="#rvw-star" x="45" fill="#000"/><use href="#rvw-star" x="60" fill="#000"/></svg>
+                <span class="rvw__count">[ 61 ]</span>
+              </span>
+            </span>
+            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+          </button>
+          <div class="acc__body">
+            <div class="rvw">
+              <div class="rvw__hero">
+                <div class="rvw__score">4.9</div>
+                <div class="rvw__herotxt">
+                  <p class="rvw__rec">84% would recommend this product.</p>
+                  <p class="rvw__sum">Majority of customers value the comfortable lace and how it looks under a T-shirt. A few address issues with the fit.</p>
+                </div>
+                <img class="rvw__badge" src="./Assets/pdp/reviews/authentic-reviews-mono.png" alt="Authentic Reviews by Bazaarvoice" width="96" height="14" />
+              </div>
+              <div class="rvw__stats">
+                <div class="rvw__hist">
+                  <div class="rvw__row"><i>5</i><span class="rvw__track"><span class="rvw__bar" style="width:100%"></span></span></div>
+                  <div class="rvw__row"><i>4</i><span class="rvw__track"><span class="rvw__bar" style="width:14%"></span></span></div>
+                  <div class="rvw__row"><i>3</i><span class="rvw__track"><span class="rvw__bar" style="width:4.6%"></span></span></div>
+                  <div class="rvw__row"><i>2</i><span class="rvw__track"></span></div>
+                  <div class="rvw__row"><i>1</i><span class="rvw__track"><span class="rvw__bar" style="width:28%"></span></span></div>
+                </div>
+                <div class="rvw__col"><b>Comfort</b><span>4.4</span></div>
+                <div class="rvw__col"><b>Quality</b><span>4.7</span></div>
+                <div class="rvw__col"><b>Fit</b><span>4.1</span></div>
+              </div>
+              <div class="rvw__rule"></div>
+              <div class="rvw__toolbar">
+                <span class="rvw__label10">Reviews&nbsp;&nbsp;[ 61 ]</span>
+                <div class="rvw__sortwrap" id="rvwSortWrap">
+                  <button class="rvw__sortbtn" id="rvwSort" aria-haspopup="listbox">
+                    <span class="rvw__label10">Sort by: <span id="rvwSortLbl">Most recent</span></span>
+                    <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+                  </button>
+                  <div class="rvw__sortmenu" role="listbox">
+                    <button data-sort="top">Top rated</button>
+                    <button data-sort="recent" data-on="true">Most recent</button>
+                    <button data-sort="least">Least stars</button>
+                  </div>
+                </div>
+              </div>
+              <div class="rvw__list" id="rvwList"></div>
+              <div class="rvw__actions">
+                <button id="rvwMore">Load More Reviews</button>
+                <button>Write a Review</button>
+              </div>
+            </div>
+          </div>
           <div class="acc__line"></div>
         </div>
       </div>
@@ -839,11 +1028,8 @@ const RECS = [
   { nm: 'Top',            pr: '£34.95', img: 'rec-2.jpg' },
   { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-5.jpg', sale: true },
   { nm: 'Jersey',         pr: '£29.95', img: 'rec-8.jpg' },
-  { nm: 'Balconette bra', pr: '£52.00', img: 'rec-9.jpg' },
-  { nm: 'Top',            pr: '£39.95', img: 'rec-3.jpg', sale: true },
-  { nm: 'Jersey',         pr: '£49.95', img: 'rec-1.jpg' },
-  { nm: 'Lacey bra',      pr: '£57.00', img: 'rec-6.jpg' },
 ];
+/* 20 items — fills the grid evenly at every count: 10x2 / 5x4 / 4x5 */
 
 const recsGrid = document.getElementById('recsGrid');
 RECS.forEach(r => {
@@ -925,11 +1111,97 @@ document.querySelectorAll('.acc').forEach(acc => {
   });
 });
 
+/* ============================================================
+   REVIEWS — data-driven list (newest first); LOAD MORE reveals
+   the rest, the sort control cycles Newest / Top rated / Critical
+   ============================================================ */
+const RVW_REVIEWS = [
+  { s: 4, date: '2 hours ago', title: 'Good support', c: 4, q: 4, f: 4,
+    text: ['A beautiful wireless bra — good material and great support.', 'Customer recommends this product.'],
+    by: 'Anonymous', from: 'Switzerland', size: '85F' },
+  { s: 5, date: '2 days ago', title: 'Invisible under everything', c: 5, q: 5, f: 5,
+    text: ['Completely smooth under a tight T-shirt and the lace still feels special. My third one in this style.', 'Customer recommends this product.'],
+    by: 'Marie L.', from: 'Germany', size: '75C' },
+  { s: 5, date: '1 week ago', title: 'Perfect everyday bra', c: 5, q: 5, f: 4,
+    text: ['The straps stay put and the underwire never digs in. Washed it several times already — still looks like new.', 'Customer recommends this product.'],
+    by: 'Sophie', from: 'Austria', size: '80B' },
+  { s: 3, date: '1 month ago', title: 'Runs a little small', c: 3, q: 4, f: 2,
+    text: ['Lovely fabric and finish, but I had to go up a cup size. Order one size larger than usual.'],
+    by: 'Anonymous', from: 'United Kingdom', size: '70D' },
+  { s: 5, date: '2 months ago', title: 'Beautiful lace', c: 5, q: 5, f: 5,
+    text: ['The prettiest bra I own that I can actually wear all day. The lace detail is even nicer in person.', 'Customer recommends this product.'],
+    by: 'Elena', from: 'Italy', size: '75B' },
+  { s: 5, date: '3 months ago', title: 'Comfortable all day', c: 5, q: 4, f: 5,
+    text: ['Forgot I was wearing it by lunchtime. Great shape without any padding bulk.', 'Customer recommends this product.'],
+    by: 'Charlotte', from: 'France', size: '85C' },
+  { s: 4, date: '6 months ago', title: 'Great under shirts', c: 4, q: 5, f: 4,
+    text: ['Smooth cups, no lines under work shirts. The band is snug at first but relaxes after a few wears.', 'Customer recommends this product.'],
+    by: 'Anonymous', from: 'Netherlands', size: '80C' },
+  { s: 5, date: '1 year ago', title: 'My favourite bra', c: 5, q: 5, f: 5,
+    text: ['I keep coming back to this one. Bought it in two more colours during the sale.', 'Customer recommends this product.'],
+    by: 'Hannah', from: 'Switzerland', size: '75D' },
+];
+const RVW_PAGE = 4;
+const RVW_SORTS = {
+  top:    { label: 'Top rated',   fn: (a, b) => b.s - a.s || a.i - b.i },
+  recent: { label: 'Most recent', fn: (a, b) => a.i - b.i },
+  least:  { label: 'Least stars', fn: (a, b) => a.s - b.s || a.i - b.i },
+};
+const rvwList = document.getElementById('rvwList');
+const rvwMore = document.getElementById('rvwMore');
+const rvwSortLbl = document.getElementById('rvwSortLbl');
+const rvwSortWrap = document.getElementById('rvwSortWrap');
+let rvwShown = RVW_PAGE;
+let rvwSortKey = 'recent';
+
+const rvwStars = n => `<svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true">${
+  [0, 1, 2, 3, 4].map(i => `<use href="#rvw-star" x="${i * 15}" fill="${i < n ? '#000' : '#F1F1F1'}"></use>`).join('')}</svg>`;
+
+function rvwRender() {
+  const sorted = RVW_REVIEWS.map((r, i) => ({ ...r, i })).sort(RVW_SORTS[rvwSortKey].fn);
+  rvwList.innerHTML = sorted.slice(0, rvwShown).map(r => `
+    <div class="rvw__item">
+      <div class="rvw__ihead">${rvwStars(r.s)}<span class="rvw__date">${r.date}</span></div>
+      <div class="rvw__ititle">${r.title}</div>
+      <div class="rvw__dots"><span>Comfort ${r.c}</span><i></i><span>Quality ${r.q}</span><i></i><span>Fit ${r.f}</span></div>
+      <div class="rvw__itext">${r.text.map(t => `<p>${t}</p>`).join('')}</div>
+      <div class="rvw__dots"><span>By ${r.by}</span><i></i><span>From ${r.from}</span><i></i><span>Size ${r.size}</span></div>
+      <button class="rvw__report">Report</button>
+    </div>`).join('');
+  rvwMore.textContent = rvwShown >= RVW_REVIEWS.length ? 'Show Less Reviews' : 'Load More Reviews';
+}
+rvwRender();
+
+/* toggles between the full list and the first page */
+rvwMore.addEventListener('click', () => {
+  rvwShown = rvwShown >= RVW_REVIEWS.length ? RVW_PAGE : RVW_REVIEWS.length;
+  rvwRender();
+});
+
+/* sort — a small dropdown; picking an option re-sorts the list */
+document.getElementById('rvwSort').addEventListener('click', e => {
+  e.stopPropagation();
+  rvwSortWrap.classList.toggle('is-open');
+});
+rvwSortWrap.querySelectorAll('.rvw__sortmenu button').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    rvwSortKey = btn.dataset.sort;
+    rvwSortLbl.textContent = RVW_SORTS[rvwSortKey].label;
+    rvwSortWrap.querySelectorAll('.rvw__sortmenu button').forEach(b => b.dataset.on = String(b === btn));
+    rvwSortWrap.classList.remove('is-open');
+    rvwRender();
+  });
+});
+document.addEventListener('click', () => rvwSortWrap.classList.remove('is-open'));
+
 /* mobile gallery carousel — progress bars track the scroll */
 const strip = document.getElementById('galleryStrip');
 const bars = [...document.querySelectorAll('.gallery__bars i')];
 strip.addEventListener('scroll', () => {
-  const i = Math.round(strip.scrollLeft / strip.clientWidth);
+  /* divide by the slide width, not the strip width — on tablets the
+     slides are narrower than the viewport (peek carousel) */
+  const i = Math.round(strip.scrollLeft / strip.firstElementChild.offsetWidth);
   bars.forEach((b, j) => b.classList.toggle('is-on', j === i));
 }, { passive: true });
 
