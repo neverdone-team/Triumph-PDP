@@ -128,13 +128,13 @@ header {
    ============================================================ */
 .hero {
   position: relative;
-  height: 500px;
+  /* 500px up to 1440px viewports, then the banner keeps its proportion
+     (500/1440 ≈ 34.72vw) as the screen grows, capped at 700px (~2016px+)
+     so the first product row still peeks above the fold on big displays */
+  height: clamp(500px, 34.72vw, 700px);
   overflow: hidden;
   display: flex; align-items: center; justify-content: flex-start;
 }
-/* hero banner width option — adds height over the default size */
-body[data-herosize="med"] .hero   { height: 650px; }  /* +30% */
-body[data-herosize="large"] .hero { height: 800px; }  /* +60% */
 .hero img, .hero video {
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;
@@ -702,8 +702,6 @@ body.drawer-open .drawer {
 
   /* hero — larger banner title on mobile, left aligned */
   .hero { height: 300px; }
-  body[data-herosize="med"] .hero   { height: 390px; }  /* +30% */
-  body[data-herosize="large"] .hero { height: 480px; }  /* +60% */
   .hero h1 { font-size: 15px; padding: 0 16px; }
 
   /* results bar — title left (wraps under itself), "Sort & Filter +" right,
@@ -829,7 +827,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-colors="newline" data-pricing="standard" data-salebanner="v1" data-images="new" data-heart="h4" data-herosize="default">
+<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-colors="newline" data-pricing="standard" data-salebanner="v1" data-images="new" data-heart="h4">
 
 <!-- HEADER -->
 <header>
@@ -964,14 +962,6 @@ body.dash-open .dash { display: flex; }
       <button data-k="side" data-val="none">None</button>
       <button data-k="side" data-val="med" data-on="true">Medium</button>
       <button data-k="side" data-val="max">Max</button>
-    </div>
-  </div>
-  <div class="dash__group">
-    <div class="dash__label">Hero banner depth</div>
-    <div class="dash__seg">
-      <button data-k="herosize" data-val="default" data-on="true">Default</button>
-      <button data-k="herosize" data-val="med">Medium</button>
-      <button data-k="herosize" data-val="large">Large</button>
     </div>
   </div>
   <!-- Filters control removed from the panel: only "some" is active and there's
@@ -1601,7 +1591,6 @@ const CONTROLS = {
   salebanner: ['v1', 'v2'],
   images:   ['new', 'live'],
   heart:    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7'], /* h1/h3/h5/h6 hidden but kept */
-  herosize: ['default', 'med', 'large'],
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
@@ -1652,7 +1641,7 @@ if (window.innerWidth > 760) body.classList.add('dash-open');
 else dashToggle.setAttribute('aria-expanded', 'false');
 
 /* deep-link: plp.html?view=content&gap=max&side=med&filters=some
-   &colors=inline&images=live&heart=h2&herosize=large&open=2
+   &colors=inline&images=live&heart=h2&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
