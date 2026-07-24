@@ -395,8 +395,14 @@ header {
 /* ============================================================
    BOTTOM EDITORIAL COLLAGE
    ============================================================ */
-.collage {
+/* headline — same treatment as the "You Might Like This" heading */
+.collage-head {
   max-width: 2400px; margin: 120px auto 0;
+  font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  padding: 0 var(--pad-x);
+}
+.collage {
+  max-width: 2400px; margin: 40px auto 0;
   display: flex;
 }
 .collage__tile {
@@ -415,14 +421,16 @@ header {
 .collage__tile:hover img { transform: scale(1.04); }
 .badge {
   position: relative;
-  min-width: 104px; height: 28px;
+  height: 28px; line-height: 28px;   /* hug the label width, no min-width */
   padding: 0 10px;
-  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  cursor: pointer;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   background: rgba(255,255,255,.2);
   font-size: 14px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase;
 }
+.badge:hover { text-decoration: underline; }
 .badge--light { color: #fff; }
 
 /* ============================================================
@@ -533,8 +541,9 @@ header {
   .rec__sale { left: 8px; bottom: 8px; font-size: 12px; line-height: 18px; }
 
   /* bottom collage — swipeable row of 240x320 tiles */
+  .collage-head { margin-top: 80px; padding: 0 16px; }
   .collage {
-    margin-top: 80px;
+    margin-top: 32px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -545,54 +554,15 @@ header {
     aspect-ratio: 240 / 320;
     scroll-snap-align: start;
   }
-  .badge { min-width: 88px; height: 26px; font-size: 12px; }
+  .badge { height: 26px; line-height: 26px; font-size: 12px; }
 
   .sticky-cta { display: block; }
   body.has-sticky { padding-bottom: 80px; }
 }
 
-/* ============================================================
-   PDP V2 — the "You might like" grid runs edge to edge:
-   no side padding, 40px between the cards (desktop only;
-   the images take their size from the wider columns)
-   ============================================================ */
-@media (min-width: 761px) {
-  body[data-version="v2"] .recs { max-width: 2400px; } /* cards fill the full width up to 2400 */
-  body[data-version="v2"] .recs__grid {
-    padding: 0;
-    column-gap: 40px;
-  }
-  body[data-version="v2"] .rec__info { padding-left: 12px; padding-right: 12px; }
-}
-
-/* ============================================================
-   VERSION SWITCHER — same chrome as the PLP prototype
-   ============================================================ */
-.switcher {
-  position: fixed; left: 50%; bottom: 24px; z-index: 100;
-  transform: translateX(-50%);
-  display: flex; align-items: center; gap: 4px;
-  background: rgba(0,0,0,.88);
-  backdrop-filter: blur(8px);
-  padding: 4px;
-  border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
-}
-.switcher button {
-  color: rgba(255,255,255,.65);
-  font-size: 12px; letter-spacing: .04em;
-  padding: 8px 16px;
-  border-radius: 999px;
-  transition: color .25s, background .25s;
-  white-space: nowrap;
-}
-.switcher button:hover { color: #fff; }
-.switcher button[data-on="true"] { background: #fff; color: #000; }
-/* keep clear of the mobile sticky CTA */
-body.has-sticky .switcher { bottom: 96px; }
 </style>
 </head>
-<body data-version="v1">
+<body>
 
 <!-- HEADER -->
 <header>
@@ -732,7 +702,7 @@ body.has-sticky .switcher { bottom: 96px; }
         <div class="lbl">Complete Your Set</div>
         <div class="set__list">
           <div class="set-item">
-            <div class="set-item__img"><img src="./Assets/pdp/gallery-3.jpg" alt="Aura Spotlight Panty" loading="lazy" /></div>
+            <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Panty" loading="lazy" /></div>
             <div class="set-item__txt">
               <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Panty</strong></div>
               <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
@@ -752,7 +722,7 @@ body.has-sticky .switcher { bottom: 96px; }
             </button>
           </div>
           <div class="set-item">
-            <div class="set-item__img"><img src="./Assets/pdp/gallery-3.jpg" alt="Aura Spotlight Top" loading="lazy" /></div>
+            <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Top" loading="lazy" /></div>
             <div class="set-item__txt">
               <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Top</strong></div>
               <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
@@ -821,19 +791,20 @@ body.has-sticky .switcher { bottom: 96px; }
     <div class="recs__grid" id="recsGrid"></div>
   </section>
 
-  <!-- BOTTOM EDITORIAL COLLAGE -->
+  <!-- BOTTOM CATEGORY COLLAGE -->
+  <h2 class="collage-head rv">Swimwear, Loungewear, Briefs</h2>
   <section class="collage">
     <a class="collage__tile rv" href="./plp.html">
-      <img src="./Assets/pdp/bottom-1.jpg" alt="" loading="lazy" />
-      <span class="badge badge--light">Swimwear</span>
-    </a>
-    <a class="collage__tile rv" href="./plp.html">
-      <img src="./Assets/pdp/bottom-2.jpg" alt="" loading="lazy" />
+      <img src="./Assets/pdp/bottom-2.jpg" alt="Swimwear" loading="lazy" />
       <span class="badge">Swimwear</span>
     </a>
     <a class="collage__tile rv" href="./plp.html">
-      <img src="./Assets/pdp/bottom-3.jpg" alt="" loading="lazy" />
-      <span class="badge">Swimwear</span>
+      <img src="./Assets/pdp/bottom-3.jpg" alt="Loungewear" loading="lazy" />
+      <span class="badge">Loungewear</span>
+    </a>
+    <a class="collage__tile rv" href="./plp.html">
+      <img src="./Assets/pdp/bottom-1.jpg" alt="Briefs" loading="lazy" />
+      <span class="badge">Briefs</span>
     </a>
   </section>
 </main>
@@ -970,29 +941,6 @@ new IntersectionObserver(([en]) => {
   stickyCta.classList.toggle('is-on', goneAbove);
   document.body.classList.toggle('has-sticky', goneAbove);
 }, { threshold: 0 }).observe(ctaBlock);
-</script>
-
-<!-- VERSION SWITCHER -->
-<div class="switcher" role="tablist" aria-label="Prototype version">
-  <button data-v="v1" data-on="true">V1</button>
-  <button data-v="v2">V2</button>
-</div>
-
-<script>
-/* version switcher — V2 = flush "You might like" grid with 40px gaps
-   deep link: pdp.html?v=v2 */
-const switcher = document.querySelector('.switcher');
-function setVersion(v) {
-  if (!['v1', 'v2'].includes(v)) v = 'v1';
-  document.body.dataset.version = v;
-  switcher.querySelectorAll('button').forEach(b => b.dataset.on = (b.dataset.v === v));
-}
-switcher.addEventListener('click', e => {
-  const btn = e.target.closest('button[data-v]');
-  if (btn) setVersion(btn.dataset.v);
-});
-const pv = new URLSearchParams(location.search).get('v');
-if (pv) setVersion(pv);
 </script>
 
 </body>

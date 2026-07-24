@@ -128,23 +128,21 @@ header {
    ============================================================ */
 .hero {
   position: relative;
-  height: 500px;
+  /* 500px up to 1440px viewports, then the banner keeps its proportion
+     (500/1440 ≈ 34.72vw) as the screen grows, capped at 700px (~2016px+)
+     so the first product row still peeks above the fold on big displays */
+  height: clamp(500px, 34.72vw, 700px);
   overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: flex-start;
 }
 .hero img, .hero video {
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;
   animation: heroIn 1.6s var(--ease-out) both;
 }
-/* darker, red-shifted grade */
-.hero video { filter: brightness(.72) saturate(1.35) sepia(.22) hue-rotate(-18deg) contrast(1.05); }
-/* burgundy tint wash */
-.hero::before {
-  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: rgba(94,32,57,.25);
-  mix-blend-mode: multiply;
-}
+/* mild darkening only — keeps the white title legible, no pink/red cast
+   (the burgundy tint wash + red-shifted grade were removed on request) */
+.hero video { filter: brightness(.85) contrast(1.03); }
 /* film grain — retro noise */
 .hero::after {
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -159,12 +157,14 @@ header {
 /* the title fades in once the video has played through */
 .hero h1 {
   position: relative; z-index: 2;
+  width: 100%;
+  padding: 0 var(--pad-x);
   color: #fff;
   font-weight: 400;
   font-size: 20px;
   letter-spacing: .04em;
   text-transform: uppercase;
-  text-align: center;
+  text-align: left;
   opacity: 0; transform: translateY(10px);
   transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
 }
@@ -298,6 +298,7 @@ body[data-side="max"] .grid { padding: 0 48px; }
   aspect-ratio: 688 / 905; /* Figma card image */
   overflow: hidden;
   background: var(--c-offwhite);
+  container-type: inline-size; /* so the v2 SALE wordmark scales with card width */
 }
 .card__img .ph {
   position: absolute; inset: 0;
@@ -337,7 +338,9 @@ body[data-side="max"] .grid { padding: 0 48px; }
 
 /* wishlist heart — top right of every product photo */
 .wish {
-  position: absolute; top: 16px; right: 16px; z-index: 6;
+  /* top is 1px less than right: the heart glyph sits ~1px lower inside its
+     box than it does from the right, so equal offsets read as more top gap */
+  position: absolute; top: 15px; right: 16px; z-index: 6;
   width: 24px; height: 24px;
 }
 .wish svg {
@@ -420,12 +423,54 @@ body[data-heart="h6"] .wish[data-on="true"] svg { fill: #000; stroke: #000; }
    so the generic svg-only scale makes the outline drift off the fill */
 body[data-heart="h6"] .wish:hover svg { transform: none; }
 
+/* HEART 7 — same black outline as Heart 4, but hidden at rest: it fades
+   in only while the card is hovered (or once favourited, so a selected
+   heart never disappears). On touch devices (mobile) it's always shown. */
+body[data-heart="h7"] .wish svg { fill: none; }
+body[data-heart="h7"] .wish[data-on="true"] svg { fill: var(--c-ink); }
+body[data-heart="h7"] .wish {
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s var(--ease-out), transform .2s var(--ease-out);
+}
+body[data-heart="h7"] .card:hover .wish,
+body[data-heart="h7"] .wish[data-on="true"] { opacity: 1; pointer-events: auto; }
+@media (hover: none) {
+  body[data-heart="h7"] .wish { opacity: 1; pointer-events: auto; }
+}
+
+/* ============================================================
+   SALES BANNER — a "SALE" flag on the photo of cards that carry
+   sale data; the dashboard picks the treatment (Figma 1135-22770 /
+   1273-24563). Only rendered on sale cards, so it never shows here
+   unless a version is active.
+   ============================================================ */
+.sale-flag { display: none; }
+/* v1 — solid pink badge, bottom-left of the image (--surface/sales #C1003F) */
+body[data-salebanner="v1"] .sale-flag {
+  display: inline-flex; align-items: baseline; justify-content: center;
+  position: absolute; left: 12px; bottom: 12px; z-index: 4;
+  padding: 2px 8px 0;
+  background: #C1003F; color: #fff;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 400; white-space: nowrap;
+}
+/* v2 — large translucent white wordmark, regular weight, pushed hard into
+   the bottom-left corner so its baseline touches the rim (negative offsets
+   drop the descender space below the clipped edge) */
+body[data-salebanner="v2"] .sale-flag {
+  display: block;
+  position: absolute; left: -0.04em; bottom: -0.08em; z-index: 4;
+  color: rgba(255,255,255,.6);
+  font-size: 24cqw; line-height: 1; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 300; white-space: nowrap;
+  pointer-events: none;
+}
+
 /* ============================================================
    CARD INFO — title / price / colour label; the dashboard decides
    whether the colour label gets its own line or joins the price line
    ============================================================ */
-.card__info { position: relative; padding: 16px 12px 0; } /* 12px side insets on desktop (mobile keeps its own) */
-body:not([data-side="none"]) .card__info { padding-right: 0; }
+.card__info { position: relative; padding: 16px 12px 0; } /* 12px insets on both sides (mobile keeps its own) */
 .card__cat {
   font-size: 12px; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
@@ -435,15 +480,16 @@ body:not([data-side="none"]) .card__info { padding-right: 0; }
   margin-top: 4px; padding-top: 2px;
   font-size: 12px; line-height: 14px;
 }
-/* burgundy sale + member price (the old "Price" exploration) —
-   shown on the cards that carry sale data, but only in the
-   "second line" colour-label version */
+/* burgundy sale + member price (the old "Price" exploration) — its own
+   dashboard toggle now: "standard" = plain price, "sale" = struck price
+   + burgundy reduced price + member price on the cards with sale data */
 .card__sale { display: none; }
-body[data-colors="inline"] .card__pr.is-sale > .pr-now { text-decoration: line-through; color: var(--c-ink-soft); }
-body[data-colors="inline"] .card__sale {
-  display: block;
-  margin-top: 2px;
-  font-size: 12px; line-height: 14px;
+body[data-pricing="sale"] .card__pr.is-sale > .pr-now { text-decoration: line-through; color: var(--c-ink-soft); }
+/* discounted + member price sit on the price line, to the right of the
+   current price (not on their own line below the colour variations) */
+body[data-pricing="sale"] .card__sale {
+  display: inline;
+  font-size: inherit; line-height: 14px; /* matches the regular price at every breakpoint */
   color: var(--c-burgundy);
 }
 /* member price — dark burgundy, next to the reduced price */
@@ -495,7 +541,7 @@ body[data-colors="inline"] .cvar__label { flex-basis: auto; margin-top: 0; margi
 .ed--row2, .ed--last, .ed--tall { grid-column: span 2; align-self: start; }
 .ed--row2 img { object-position: 50% 55%; transform: scale(1.15); } /* peony bouquet — zoomed in slightly */
 .ed--last img { object-position: 50% 50%; } /* hydrangea face close-up */
-.ed--tall img { object-position: 50% 52%; } /* love letter on the velvet sofa */
+.ed--tall img { object-position: 50% 15%; } /* pink-memories mood — focus the top centre (the sign) */
 
 /* "Triumph live" images — a pure product grid: no editorial/mood tiles,
    whatever the view; the cards close ranks over the freed slots */
@@ -650,9 +696,9 @@ body.drawer-open .drawer {
 
   .breadcrumb { font-size: 10px; letter-spacing: .04em; padding: 8px 16px 12px; gap: 8px; }
 
-  /* hero — banner title at half size */
+  /* hero — larger banner title on mobile, left aligned */
   .hero { height: 300px; }
-  .hero h1 { font-size: 10px; }
+  .hero h1 { font-size: 15px; padding: 0 16px; }
 
   /* results bar — title left (wraps under itself), "Sort & Filter +" right,
      both aligned along the bottom edge */
@@ -676,13 +722,13 @@ body.drawer-open .drawer {
   body:not([data-side="none"]) .card__info { padding-left: 0; padding-right: 0; }
   .card__cat { font-size: 11px; line-height: 16px; }
   .card__pr { margin-top: 2px; font-size: 10px; }
-  .card__sale { font-size: 10px; }
+  /* .card__sale inherits the regular price size (10px here); keep the member gap tighter */
   .card__sale .mem { margin-left: 8px; }
   .cvar__label { margin-top: 0; font-size: 10px; }
   body[data-colors="inline"] .cvar__label { margin-left: 8px; }
 
   /* hearts sit closer to the corner on small cards */
-  .wish { top: 10px; right: 10px; width: 20px; height: 20px; }
+  .wish { top: 9px; right: 10px; width: 20px; height: 20px; }
   .wish svg { width: 20px; height: 20px; }
   body[data-heart="h1"] .wish { width: 28px; height: 28px; }
   body[data-heart="h1"] .wish svg { width: 20px; height: 20px; }
@@ -692,6 +738,9 @@ body.drawer-open .drawer {
   body[data-heart="h6"] .wish svg { width: 24px; height: 24px; }
   body[data-heart="h2"] .wish { width: 20px; height: 20px; margin: -2px 0 -2px auto; }
   body[data-heart="h2"] .wish svg { width: 20px; height: 20px; }
+
+  /* sales banner — smaller pink badge on the narrow cards */
+  body[data-salebanner="v1"] .sale-flag { font-size: 11px; line-height: 16px; padding: 2px 6px 0; left: 8px; bottom: 8px; }
 
   /* colour panel — fit the narrow cards */
   .panel { flex-wrap: wrap; gap: 4px; padding: 8px 4px; overflow: hidden; }
@@ -771,12 +820,10 @@ body.dash-open .dash { display: flex; }
   /* the dashboard becomes a bottom sheet */
   .dash { left: 12px; right: 12px; width: auto; bottom: 64px; max-height: 55vh; }
   .dash-toggle { left: 12px; bottom: 12px; }
-  /* desktop-only filter treatments — the control has no effect here */
-  .dash__group--filters { display: none; }
 }
 </style>
 </head>
-<body data-view="products" data-gap="none" data-side="none" data-filters="all" data-colors="newline" data-wording="count" data-images="new" data-heart="h1">
+<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-colors="newline" data-pricing="standard" data-salebanner="v1" data-images="new" data-heart="h4">
 
 <!-- HEADER -->
 <header>
@@ -828,7 +875,7 @@ body.dash-open .dash { display: flex; }
   <section class="hero">
     <img src="./Assets/plp/hero-burgundy.jpg" alt="Blush &amp; Burgundy" />
     <video src="./Assets/plp/hero.mp4" poster="./Assets/plp/hero.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
-    <h1>A Love Story in Blush &amp; Burgundy</h1>
+    <h1>ODE TO BURGUNDY AND BLUSH</h1>
   </section>
 
   <!-- RESULTS (sticky below the nav while scrolling the grid) -->
@@ -901,27 +948,20 @@ body.dash-open .dash { display: flex; }
   <div class="dash__group">
     <div class="dash__label">Padding between cards</div>
     <div class="dash__seg">
-      <button data-k="gap" data-val="none" data-on="true">None</button>
-      <button data-k="gap" data-val="med">Medium</button>
+      <button data-k="gap" data-val="med" data-on="true">Medium</button>
       <button data-k="gap" data-val="max">Max</button>
     </div>
   </div>
   <div class="dash__group">
     <div class="dash__label">Padding on the sides</div>
     <div class="dash__seg">
-      <button data-k="side" data-val="none" data-on="true">None</button>
-      <button data-k="side" data-val="med">Medium</button>
+      <button data-k="side" data-val="none">None</button>
+      <button data-k="side" data-val="med" data-on="true">Medium</button>
       <button data-k="side" data-val="max">Max</button>
     </div>
   </div>
-  <div class="dash__group dash__group--filters">
-    <div class="dash__label">Filters</div>
-    <div class="dash__seg">
-      <button data-k="filters" data-val="all" data-on="true">All</button>
-      <button data-k="filters" data-val="some">Some</button>
-      <button data-k="filters" data-val="none">None</button>
-    </div>
-  </div>
+  <!-- Filters control removed from the panel: only "some" is active and there's
+       nothing to toggle. The filter behaviour + deep-link (?filters=all|some|none) still work. -->
   <div class="dash__group">
     <div class="dash__label">Colour label position</div>
     <div class="dash__seg">
@@ -930,10 +970,17 @@ body.dash-open .dash { display: flex; }
     </div>
   </div>
   <div class="dash__group">
-    <div class="dash__label">Colour label wording</div>
+    <div class="dash__label">Pricing</div>
     <div class="dash__seg">
-      <button data-k="wording" data-val="count" data-on="true">+ 3 colors</button>
-      <button data-k="wording" data-val="other">+ more colors</button>
+      <button data-k="pricing" data-val="standard" data-on="true">Standard</button>
+      <button data-k="pricing" data-val="sale">Sale + member</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Sales banner</div>
+    <div class="dash__seg">
+      <button data-k="salebanner" data-val="v1" data-on="true">Sale banner V1</button>
+      <button data-k="salebanner" data-val="v2">Sale banner V2</button>
     </div>
   </div>
   <div class="dash__group">
@@ -946,12 +993,14 @@ body.dash-open .dash { display: flex; }
   <div class="dash__group">
     <div class="dash__label">Wishlist heart</div>
     <div class="dash__seg">
-      <button data-k="heart" data-val="h1" data-on="true">Heart 1</button>
-      <button data-k="heart" data-val="h2">Heart 2</button>
-      <button data-k="heart" data-val="h3">Heart 3</button>
-      <button data-k="heart" data-val="h4">Heart 4</button>
-      <button data-k="heart" data-val="h5">Heart 5</button>
-      <button data-k="heart" data-val="h6">Heart 6</button>
+      <button data-k="heart" data-val="h4" data-on="true">Heart 1</button>
+      <button data-k="heart" data-val="h7">Heart 2</button>
+      <button data-k="heart" data-val="h2">Heart 3</button>
+      <!-- earlier explorations hidden for now — kept in code, remove hidden to restore -->
+      <button data-k="heart" data-val="h1" hidden>Heart 1 (frosted disc)</button>
+      <button data-k="heart" data-val="h3" hidden>Heart 3 (white outline)</button>
+      <button data-k="heart" data-val="h5" hidden>Heart 5 (reveal on panel)</button>
+      <button data-k="heart" data-val="h6" hidden>Heart 6 (frosted glyph)</button>
     </div>
   </div>
 </aside>
@@ -961,10 +1010,13 @@ body.dash-open .dash { display: flex; }
    DATA — products from Figma 937-27178 (Blush & Burgundy),
    colour swatches from /Colour Swatches (black · red · mauve)
    ============================================================ */
+/* colour swatches — new pngs from /Colour Swatches (added today) */
 const SWATCHES = [
-  { name: 'Black Lace', sw: './Assets/plp/swatch-black.jpg', photo: './Assets/plp/card4.jpg' },
-  { name: 'Deep Red',   sw: './Assets/plp/swatch-red.jpg',   photo: './Assets/plp/card5.jpg' },
-  { name: 'Mauve',      sw: './Assets/plp/swatch-mauve.jpg', photo: './Assets/plp/card3.jpg' },
+  { name: 'Black',    sw: './Assets/plp/swatch-black.png',    photo: './Assets/plp/products/prod07.jpg' },
+  { name: 'Burgundy', sw: './Assets/plp/swatch-burgundy.png', photo: './Assets/plp/products/prod08.jpg' },
+  { name: 'Red',      sw: './Assets/plp/swatch-red.png',      photo: './Assets/plp/products/prod09.jpg' },
+  { name: 'Pink',     sw: './Assets/plp/swatch-pink.png',     photo: './Assets/plp/products/prod10.jpg' },
+  { name: 'Teal',     sw: './Assets/plp/swatch-teal.png',     photo: './Assets/plp/products/prod11.jpg' },
 ];
 
 const P = n => `./Assets/plp/card${n}.jpg`;
@@ -996,13 +1048,25 @@ const PRODUCTS = [
   { cat: 'SATIN TRIM BRA',            pr: '£41.00', colors: 3, ph: P(3) },
 ];
 
+/* new Blush & Burgundy product photos — from
+   /FOR NEVER DONE BLUSH AND BURGUNDY/Colors combined (copied in) */
+const PROD = n => `./Assets/plp/products/prod${String(n).padStart(2, '0')}.jpg`;
+const PROD_PHOTOS = Array.from({ length: 23 }, (_, i) => PROD(i + 1));
+/* photos hand-ordered: blush (B) and burgundy (Bu) alternate so a blush
+   product always sits beside a burgundy one, AND look-alike shots are
+   spread apart — the mauve-on-dark trio (5/6/7/20) and the redheads
+   (3/13 · 10/14) never land next to each other. prod22 (2nd plaid
+   redhead, a near-dupe of 10) is dropped for prod23 (burgundy dress). */
+const PHOTO_ORDER = [1, 2, 5, 8, 6, 10, 16, 9, 4, 11, 7, 14, 20, 15, 13, 17, 3, 18, 19, 21, 12, 23];
+PRODUCTS.forEach((p, i) => { p.ph = PROD(PHOTO_ORDER[i % PHOTO_ORDER.length]); });
+
 /* ============================================================
    RENDER CARDS
    ============================================================ */
 const grid = document.getElementById('grid');
 
 /* alternate product photos for the hover gallery (4 per card) */
-const GALLERY_POOL = [P(1), P(2), P(3), P(4), P(5), P(6)];
+const GALLERY_POOL = PROD_PHOTOS;
 
 PRODUCTS.forEach((p, i) => {
   /* 4 hover photos: the card's own + 3 rotating alternates */
@@ -1024,14 +1088,14 @@ PRODUCTS.forEach((p, i) => {
       <img class="ph ph--base" src="${p.ph}" alt="${p.cat}" />
       <img class="ph ph--variant" src="${p.ph}" alt="" aria-hidden="true" />
       <img class="ph ph--hover" src="${gallery[1]}" alt="" aria-hidden="true" />
+      ${p.sale ? '<span class="sale-flag">SALE</span>' : ''}
       <button class="gal-nav gal-nav--prev" aria-label="Previous photo"><svg viewBox="0 0 10 10"><path d="M6.5 1 2.5 5l4 4"/></svg></button>
       <button class="gal-nav gal-nav--next" aria-label="Next photo"><svg viewBox="0 0 10 10"><path d="M3.5 1l4 4-4 4"/></svg></button>
       <button class="wish" data-on="false" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path class="hs" d="M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z"/><path class="ho" d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z"/></svg></button>
     </div>
     <div class="card__info">
       <div class="card__cat">${p.cat}</div>
-      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span><button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
-      ${p.sale ? `<div class="card__sale">${p.sale}<span class="mem">Member price ${p.mem}</span></div>` : ''}
+      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}<span class="mem">Member price ${p.mem}</span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
       <div class="panel" role="group" aria-label="Colours">
         <button class="thumb thumb--current" data-photo="${p.ph}" data-idx="0" data-sel="true" aria-label="Selected colour" title="Selected colour">
           <img src="${p.ph}" alt="" loading="lazy" />
@@ -1053,7 +1117,7 @@ const mkTile = (cls, src) => {
   return t;
 };
 const edRow2 = mkTile('ed--row2', './Assets/plp/ed-peonies-wide.jpg');
-const edTall = mkTile('ed--tall', './Assets/plp/ed-loveletter.jpg');
+const edTall = mkTile('ed--tall', './Assets/plp/ed-mood-pinkmemories.jpg');
 const edLast = mkTile('ed--last', './Assets/plp/ed-hydrangea.jpg');
 
 /* CONTENT TYPES media — a muted looping video replaces the second mood
@@ -1091,13 +1155,6 @@ function applyView(v) {
   edLastImg.src = content ? './Assets/plp/mood-screenshot.png' : ED_LAST_SRC;
   if (content) moodVideo.play().catch(() => {});
   else moodVideo.pause();
-}
-
-/* colour label wording — "+ 3 colors" vs "Other colours" */
-function applyWording(w) {
-  document.querySelectorAll('.cvar__label').forEach(l => {
-    l.textContent = w === 'other' ? '+ more colors' : `+ ${l.dataset.count} colors`;
-  });
 }
 
 const cards = []; /* filled below, before the first placeTiles() */
@@ -1521,14 +1578,15 @@ const dash = document.querySelector('.dash');
 const dashToggle = document.querySelector('.dash-toggle');
 
 const CONTROLS = {
-  view:    ['products', 'content'],
-  gap:     ['none', 'med', 'max'],
-  side:    ['none', 'med', 'max'],
-  filters: ['all', 'some', 'none'],
-  colors:  ['newline', 'inline'],
-  wording: ['count', 'other'],
-  images:  ['new', 'live'],
-  heart:   ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  view:     ['products', 'content'],
+  gap:      ['med', 'max'],
+  side:     ['none', 'med', 'max'],
+  filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
+  colors:   ['newline', 'inline'],
+  pricing:  ['standard', 'sale'],
+  salebanner: ['v1', 'v2'],
+  images:   ['new', 'live'],
+  heart:    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7'], /* h1/h3/h5/h6 hidden but kept */
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
@@ -1558,7 +1616,6 @@ function setOption(key, val) {
   }
   if (key === 'view') applyView(val);
   if (key === 'heart') applyHeart(val);
-  if (key === 'wording') applyWording(val);
   if (key === 'filters') { setDrawer(false); closeDropdown(); }
   closeAll();
   dash.querySelectorAll(`button[data-k="${key}"]`).forEach(b => b.dataset.on = String(b.dataset.val === val));
@@ -1580,7 +1637,7 @@ if (window.innerWidth > 760) body.classList.add('dash-open');
 else dashToggle.setAttribute('aria-expanded', 'false');
 
 /* deep-link: plp.html?view=content&gap=max&side=med&filters=some
-   &colors=inline&wording=other&images=live&heart=h2&open=2
+   &colors=inline&images=live&heart=h2&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });

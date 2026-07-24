@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sale Badge Explorations – Triumph</title>
+<style>
+/* ============================================================
+   FONTS (local — Alliance No.1 Light + Regular, same as plp.html)
+   ============================================================ */
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Regular.otf") format("opentype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS — plp.html tokens + a switchable sale red
+   ============================================================ */
+:root {
+  --c-bg:        #FFFFFF;
+  --c-ink:       #000000;
+  --c-ink-soft:  rgba(0,0,0,.5);
+  --c-line:      #DADADA;
+  --c-offwhite:  #F8F3F3;
+  --c-burgundy:  #5E2039;
+
+  --red: #C8102E; /* the switcher rewrites this */
+
+  --font-sans:  "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Didot", "Bodoni 72", "Playfair Display", Georgia, serif;
+
+  --ease-out: cubic-bezier(.22,.61,.36,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; overflow-x: clip; }
+body {
+  background: var(--c-bg); color: var(--c-ink);
+  font-family: var(--font-sans); font-weight: 400;
+  font-size: 14px; line-height: 1.45; letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; background: none; border: 0; padding: 0; color: inherit; }
+h1, h2 { margin: 0; font-weight: 300; }
+
+/* ============================================================
+   PAGE HEADER — logo, title, red switcher
+   ============================================================ */
+.top {
+  max-width: 1680px; margin: 0 auto;
+  padding: 24px 24px 0;
+}
+.logo__img { width: 156px; height: 20px; display: block; }
+.intro { margin: 64px 0 24px; }
+.intro h1 {
+  font-size: clamp(28px, 4vw, 44px); line-height: 1.1;
+  letter-spacing: .02em; text-transform: uppercase;
+}
+.intro p {
+  margin: 12px 0 0; max-width: 560px;
+  font-size: 13px; font-weight: 300; color: var(--c-ink-soft);
+}
+/* red hue switcher — small swatch chips */
+.hues {
+  display: flex; align-items: center; gap: 16px;
+  margin: 28px 0 0; padding: 20px 0;
+  border-top: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+}
+.hues__label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 300; }
+.hue {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: .04em; font-weight: 300;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid transparent;
+  transition: border-color .2s var(--ease-out);
+}
+.hue[data-on="true"] { border-color: var(--c-ink); }
+.hue i { width: 16px; height: 16px; display: block; }
+
+/* ============================================================
+   CONCEPT GRID — one PLP card per idea, caption above
+   ============================================================ */
+.concepts {
+  max-width: 1680px; margin: 56px auto 0; padding: 0 24px 120px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 72px 32px;
+}
+@media (max-width: 1100px) { .concepts { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .concepts { grid-template-columns: 1fr; } }
+
+.cell__cap { margin-bottom: 14px; min-height: 74px; }
+.cell__num {
+  font-size: 11px; font-weight: 300; letter-spacing: .08em;
+  color: var(--c-ink-soft);
+}
+.cell__name {
+  font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+  margin-top: 2px;
+}
+.cell__note {
+  margin-top: 4px;
+  font-size: 12px; font-weight: 300; line-height: 1.5;
+  color: var(--c-ink-soft); max-width: 40ch;
+}
+
+/* ============================================================
+   PRODUCT CARD — mirrors plp.html
+   ============================================================ */
+.card { position: relative; cursor: pointer; }
+.card__img {
+  position: relative;
+  aspect-ratio: 688 / 905;
+  overflow: hidden;
+  background: var(--c-offwhite);
+  container-type: inline-size;
+}
+.card__img .ph {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .9s var(--ease-out);
+}
+.card:hover .card__img .ph { transform: scale(1.04); }
+
+.wish { position: absolute; top: 15px; right: 16px; z-index: 6; width: 24px; height: 24px; }
+.wish svg { width: 24px; height: 24px; fill: none; stroke: var(--c-ink); stroke-width: 1; transition: transform .2s var(--ease-out); }
+.wish:hover svg { transform: scale(1.1); }
+
+.card__info { position: relative; padding: 16px 12px 0; }
+.card__cat { font-size: 12px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase; }
+.card__pr {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+  margin-top: 4px; padding-top: 2px;
+  font-size: 12px; line-height: 14px;
+}
+.pr-was { text-decoration: line-through; color: var(--c-ink-soft); }
+.pr-sale { color: var(--red); }
+.cvar__label {
+  flex-basis: 100%; margin-top: 3px; text-align: left;
+  font-size: 12px; line-height: 14px; font-weight: 400;
+  transition: opacity .2s var(--ease-out);
+}
+.cvar__label:hover { opacity: .55; }
+
+/* ============================================================
+   01 — THE PLACARD
+   hairline red frame, no fill — a gallery label pinned to the photo
+   ============================================================ */
+.b01 .flag {
+  position: absolute; left: 12px; top: 12px; z-index: 4;
+  padding: 5px 10px 4px;
+  border: 1px solid var(--red); color: var(--red);
+  font-size: 10px; line-height: 1; letter-spacing: .22em;
+  text-transform: uppercase; font-weight: 400;
+}
+
+/* ============================================================
+   02 — THE UNDERLINE
+   just the word, set small with a hairline rule — type as the badge
+   ============================================================ */
+.b02 .flag {
+  position: absolute; left: 12px; top: 12px; z-index: 4;
+  color: var(--red);
+  font-size: 12px; line-height: 1; letter-spacing: .18em;
+  text-transform: uppercase; font-weight: 400;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--red);
+}
+
+/* ============================================================
+   03 — THE SEAL
+   circular type slowly rotating around a −30% core, like an
+   editorial sticker / wax seal placed on the photograph
+   ============================================================ */
+.b03 .flag {
+  position: absolute; right: 14px; bottom: 14px; z-index: 4;
+  width: 72px; height: 72px;
+}
+.b03 .flag svg { width: 100%; height: 100%; overflow: visible; animation: seal-spin 16s linear infinite; }
+.b03 .flag svg text { fill: var(--red); font-size: 9px; letter-spacing: .32em; text-transform: uppercase; font-family: var(--font-sans); font-weight: 400; }
+.b03 .flag .seal-core {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--red); font-size: 12px; font-weight: 300; letter-spacing: .04em;
+}
+@keyframes seal-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .b03 .flag svg { animation: none; } }
+
+/* ============================================================
+   04 — THE SPINE
+   the sale note runs vertically up the edge of the photo,
+   like a title on a magazine spine
+   ============================================================ */
+.b04 .flag {
+  position: absolute; left: 12px; bottom: 12px; z-index: 4;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  color: var(--red);
+  font-size: 10px; letter-spacing: .28em;
+  text-transform: uppercase; font-weight: 400;
+}
+
+/* ============================================================
+   05 — THE NUMERAL
+   no word at all — the reduction itself, set huge and light,
+   is the graphic element
+   ============================================================ */
+.b05 .flag {
+  position: absolute; left: 12px; bottom: 4px; z-index: 4;
+  color: var(--red);
+  font-size: 15cqw; line-height: 1; font-weight: 300;
+  letter-spacing: -.02em; white-space: nowrap;
+}
+
+/* ============================================================
+   06 — THE DOG-EAR
+   the corner of the photo folds over in red, like a page
+   marked in a catalogue
+   ============================================================ */
+.b06 .flag {
+  position: absolute; top: 0; left: 0; z-index: 4;
+  width: 72px; height: 72px;
+  background: var(--red);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.b06 .flag span {
+  position: absolute; top: 17px; left: -9px;
+  width: 72px; text-align: center;
+  transform: rotate(-45deg);
+  color: #fff; font-size: 9px; letter-spacing: .26em;
+  text-transform: uppercase; font-weight: 400;
+}
+/* move the heart out of the fold's way? no — fold is top-left, heart top-right */
+
+/* ============================================================
+   07 — THE TICKER
+   a hairline news-ticker running along the bottom rim of the
+   photo — quiet at a glance, alive when you look
+   ============================================================ */
+.b07 .flag {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  overflow: hidden;
+  background: rgba(255,255,255,.82);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-top: 1px solid var(--red);
+  padding: 5px 0 4px;
+}
+.b07 .flag .tick {
+  display: inline-block; white-space: nowrap;
+  color: var(--red); font-size: 10px; letter-spacing: .22em;
+  text-transform: uppercase; font-weight: 400;
+  animation: ticker 14s linear infinite;
+}
+@keyframes ticker { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .b07 .flag .tick { animation: none; } }
+
+/* ============================================================
+   08 — THE INK NOTE
+   "on sale" written in red italic serif, tilted — an editor's
+   annotation on the proof sheet
+   ============================================================ */
+.b08 .flag {
+  position: absolute; left: 14px; top: 14px; z-index: 4;
+  color: var(--red);
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 24px; line-height: 1; letter-spacing: .01em;
+  transform: rotate(-5deg);
+}
+
+/* ============================================================
+   09 — THE REDLINE
+   nothing on the photo at all — a hand-drawn red ellipse circles
+   the reduced price, the way you'd ring it in print
+   ============================================================ */
+.b09 .pr-wrap { position: relative; display: inline-block; padding: 3px 8px; }
+.b09 .pr-wrap svg {
+  position: absolute; inset: -4px -6px; width: calc(100% + 12px); height: calc(100% + 8px);
+  overflow: visible; pointer-events: none;
+}
+.b09 .pr-wrap svg path {
+  fill: none; stroke: var(--red); stroke-width: 1.1; stroke-linecap: round;
+}
+
+/* ============================================================
+   10 — THE FROSTED CHIP
+   the PLP's frosted-glass CTA language carrying the sale message
+   ============================================================ */
+.b10 .flag {
+  position: absolute; left: 12px; bottom: 12px; z-index: 4;
+  padding: 6px 12px 5px;
+  background: rgba(255,255,255,.25);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  color: var(--red);
+  font-size: 10px; line-height: 1; letter-spacing: .2em;
+  text-transform: uppercase; font-weight: 400;
+}
+
+/* ============================================================
+   11 — THE KICKER
+   photo stays untouched; a red editorial kicker line sits above
+   the product name, magazine-style
+   ============================================================ */
+.b11 .kicker {
+  display: block;
+  color: var(--red);
+  font-size: 10px; line-height: 1; letter-spacing: .18em;
+  text-transform: uppercase; font-weight: 400;
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   12 — THE ASTERISK
+   a single red asterisk after the name, resolved by a footnote —
+   the quietest possible signal
+   ============================================================ */
+.b12 .ast { color: var(--red); font-size: 14px; margin-left: 2px; }
+.b12 .foot {
+  flex-basis: 100%;
+  color: var(--red);
+  font-size: 11px; font-weight: 300; letter-spacing: .02em;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   13 — THE OUTLINE WORDMARK
+   sibling of the live v2 — the oversized corner wordmark, but
+   stroke-only in red, so the photo shows through the letters
+   ============================================================ */
+.b13 .flag {
+  position: absolute; left: -0.04em; bottom: -0.08em; z-index: 4;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--red);
+  font-size: 24cqw; line-height: 1; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 300; white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ============================================================
+   14 — THE SPLIT BAR
+   a typographic rule between photo and caption: SALE flush left,
+   the reduction flush right — pure layout, no ornament
+   ============================================================ */
+.b14 .bar {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 0 0 2px;
+  padding: 7px 12px 6px;
+  border-bottom: 1px solid var(--red);
+  color: var(--red);
+  font-size: 10px; line-height: 1; letter-spacing: .22em;
+  text-transform: uppercase; font-weight: 400;
+}
+
+/* ============================================================
+   15 — THE ARCHIVE STAMP
+   double-ruled, tilted, slightly translucent — a rubber stamp
+   pressed onto the photograph
+   ============================================================ */
+.b15 .flag {
+  position: absolute; left: 14px; top: 16px; z-index: 4;
+  padding: 7px 12px 6px;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 10px; line-height: 1; letter-spacing: .2em;
+  text-transform: uppercase; font-weight: 400;
+  transform: rotate(-6deg);
+  opacity: .92; mix-blend-mode: multiply;
+}
+.b15 .flag::after {
+  content: ""; position: absolute; inset: 2px;
+  border: 1px solid var(--red);
+}
+
+/* ============================================================
+   16 — THE SASH
+   a hairline diagonal ribbon across the corner — the classic
+   sale sash, rebuilt at couture weight
+   ============================================================ */
+.b16 .flag {
+  position: absolute; top: 0; left: 0; z-index: 4;
+  width: 130px; height: 130px;
+  overflow: hidden; pointer-events: none;
+}
+.b16 .flag span {
+  position: absolute; top: 30px; left: -44px;
+  width: 180px; text-align: center;
+  transform: rotate(-45deg);
+  padding: 5px 0 4px;
+  background: rgba(255,255,255,.85);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border-top: 1px solid var(--red); border-bottom: 1px solid var(--red);
+  color: var(--red); font-size: 9px; line-height: 1;
+  letter-spacing: .3em; text-transform: uppercase; font-weight: 400;
+}
+
+/* ============================================================
+   17 — THE HIGHLIGHTER
+   a translucent red marker swipe across the reduced price —
+   the badge lives in the typography, not on the photo
+   ============================================================ */
+.b17 .hl { position: relative; z-index: 0; display: inline-block; color: var(--c-ink); }
+.b17 .hl::before {
+  content: ""; position: absolute;
+  inset: -3px -6px -4px -5px;
+  background: color-mix(in srgb, var(--red) 26%, transparent);
+  transform: skew(-12deg) rotate(-1.2deg);
+  z-index: -1;
+}
+
+/* ============================================================
+   18 — THE CROP MARKS
+   printer's registration corners in red + a proof annotation —
+   the photograph as a marked-up print
+   ============================================================ */
+.b18 .flag { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.b18 .flag i { position: absolute; width: 14px; height: 14px; display: block; }
+.b18 .flag i:nth-child(1) { top: 10px; left: 10px;  border-top: 1px solid var(--red); border-left: 1px solid var(--red); }
+.b18 .flag i:nth-child(2) { top: 10px; right: 10px; border-top: 1px solid var(--red); border-right: 1px solid var(--red); }
+.b18 .flag i:nth-child(3) { bottom: 10px; left: 10px;  border-bottom: 1px solid var(--red); border-left: 1px solid var(--red); }
+.b18 .flag i:nth-child(4) { bottom: 10px; right: 10px; border-bottom: 1px solid var(--red); border-right: 1px solid var(--red); }
+.b18 .flag span {
+  position: absolute; left: 32px; bottom: 14px;
+  color: var(--red); font-size: 9px; letter-spacing: .24em;
+  text-transform: uppercase; font-weight: 400;
+}
+/* heart sits inside the top-right mark — nudge it clear */
+.b18 .wish { top: 30px; right: 30px; }
+
+/* ============================================================
+   19 — THE FRAME
+   the whole photo is framed by a hairline red border; a tiny
+   label interrupts the rule at the bottom, like a plate caption
+   ============================================================ */
+.b19 .flag {
+  position: absolute; inset: 10px; z-index: 4;
+  border: 1px solid var(--red);
+  pointer-events: none;
+}
+.b19 .flag span {
+  position: absolute; left: 50%; bottom: 0;
+  transform: translate(-50%, 50%);
+  padding: 2px 10px;
+  background: var(--c-bg);
+  color: var(--red); font-size: 9px; line-height: 1.4;
+  letter-spacing: .26em; text-transform: uppercase; font-weight: 400;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   20 — THE BOOKMARK
+   a red ribbon hangs from the top edge of the photo, notched
+   at the tail — the piece is marked
+   ============================================================ */
+.b20 .flag {
+  position: absolute; top: 0; left: 20px; z-index: 4;
+  width: 26px; height: 74px;
+  background: var(--red);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 9px), 0 100%);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 12px;
+}
+.b20 .flag span {
+  writing-mode: vertical-rl;
+  color: #fff; font-size: 9px; line-height: 1;
+  letter-spacing: .3em; text-transform: uppercase; font-weight: 400;
+}
+
+/* ============================================================
+   21 — THE PULSE
+   a small red dot breathing next to the product name — sale as
+   a live signal, not a shout
+   ============================================================ */
+.b21 .pulse-wrap {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-left: 10px;
+  color: var(--red); font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; font-weight: 400;
+}
+.b21 .pulse-wrap i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.72); } }
+@media (prefers-reduced-motion: reduce) { .b21 .pulse-wrap i { animation: none; } }
+
+/* ============================================================
+   22 — THE EXPONENT
+   the reduction set as a footnote exponent on the price —
+   scientific notation for markdowns
+   ============================================================ */
+.b22 .sup {
+  color: var(--red);
+  font-size: 8.5px; letter-spacing: .04em;
+  vertical-align: super; line-height: 1;
+  margin-left: 1px;
+}
+
+/* ============================================================
+   23 — THE VEIL
+   a red wash rises from the bottom of the photograph, the
+   wordmark sitting quietly inside it
+   ============================================================ */
+.b23 .flag {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  height: 42%;
+  background: linear-gradient(to top, color-mix(in srgb, var(--red) 62%, transparent), transparent);
+  pointer-events: none;
+}
+.b23 .flag span {
+  position: absolute; left: 50%; bottom: 14px;
+  transform: translateX(-50%);
+  color: #fff; font-size: 11px; line-height: 1;
+  letter-spacing: .42em; text-indent: .42em; /* re-centres the tracked type */
+  text-transform: uppercase; font-weight: 300; white-space: nowrap;
+}
+
+/* ============================================================
+   24 — THE PERCENT
+   a giant stroke-only % bleeding off the corner — the symbol
+   as a watermark, no words at all
+   ============================================================ */
+.b24 .flag {
+  position: absolute; right: -0.05em; bottom: -0.16em; z-index: 4;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--red);
+  font-size: 42cqw; line-height: 1; font-weight: 300;
+  pointer-events: none;
+}
+
+/* ============================================================
+   25 — THE DEADLINE
+   a single red italic serif line under the price — urgency
+   written as editorial copy, not a countdown widget
+   ============================================================ */
+.b25 .deadline {
+  flex-basis: 100%;
+  margin-top: 4px;
+  color: var(--red);
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 13px; line-height: 1.3; letter-spacing: .01em;
+}
+
+/* ============================================================
+   26 — THE REVEAL
+   nothing at rest; on hover the photo frosts over and a placard
+   fades up in the centre. Sale as a discovered secret.
+   (touch devices: the placard is simply pinned bottom-left)
+   ============================================================ */
+.b26 .flag {
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.34);
+  -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .4s var(--ease-out);
+}
+.b26 .card:hover .flag, .b26:hover .flag { opacity: 1; }
+.b26 .flag span {
+  padding: 9px 16px 8px;
+  border: 1px solid var(--red);
+  color: var(--red); font-size: 10px; line-height: 1;
+  letter-spacing: .26em; text-transform: uppercase; font-weight: 400;
+}
+@media (hover: none) {
+  .b26 .flag {
+    opacity: 1;
+    inset: auto auto 12px 12px;
+    background: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    align-items: flex-end; justify-content: flex-start;
+  }
+  .b26 .flag span { background: rgba(255,255,255,.85); }
+}
+
+/* ============================================================
+   27 — THE RED INK
+   no badge anywhere. The entire caption — name, price, colours —
+   is simply printed in red. The card itself is the signal.
+   ============================================================ */
+.b27 .card__cat, .b27 .card__pr, .b27 .cvar__label { color: var(--red); }
+.b27 .pr-was { color: color-mix(in srgb, var(--red) 45%, transparent); }
+
+/* footer */
+.foot-note {
+  max-width: 1680px; margin: 0 auto; padding: 0 24px 64px;
+  font-size: 11px; font-weight: 300; color: var(--c-ink-soft); letter-spacing: .02em;
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="logo" href="./plp.html" aria-label="Triumph">
+    <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
+  </a>
+
+  <div class="intro">
+    <h1>Sale badge<br/>explorations</h1>
+    <p>Twenty-seven editorial treatments for the PLP sale flag — researched against Farfetch, Selfridges, SSENSE &amp; co on Mobbin, then pushed somewhere more premium. Hover the cards; a few of them move, and one only exists on hover.</p>
+  </div>
+
+  <div class="hues">
+    <span class="hues__label">Red</span>
+    <button class="hue" data-hue="#C8102E" data-on="true"><i style="background:#C8102E"></i>Signal red</button>
+    <button class="hue" data-hue="#C1003F"><i style="background:#C1003F"></i>Sales pink (token)</button>
+    <button class="hue" data-hue="#8E0E2B"><i style="background:#8E0E2B"></i>Oxblood</button>
+  </div>
+</div>
+
+<main class="concepts" id="grid"></main>
+
+<p class="foot-note">Local exploration only — plp-badges.html · reference screens: Farfetch sale PLP, Selfridges markdowns, Cosmos price chips (Mobbin, Jul 2026)</p>
+
+<script>
+/* ============================================================
+   DATA — sale products borrowed from plp.html
+   ============================================================ */
+const P = n => `./Assets/plp/products/prod${String(n).padStart(2,'0')}.jpg`;
+const PRODUCTS = [
+  { cat: 'LACE BALCONETTE BRA',       was: '£59.95', now: '£41.95', off: '−30%', colors: 4, ph: P(6)  },
+  { cat: 'PLUNGE LACE BRA',           was: '£59.95', now: '£47.95', off: '−20%', colors: 4, ph: P(5)  },
+  { cat: 'DEMI CUP SATIN BRA',        was: '£55.00', now: '£38.50', off: '−30%', colors: 3, ph: P(3)  },
+  { cat: 'BRALETTE TRIANGLE',         was: '£24.95', now: '£17.95', off: '−28%', colors: 4, ph: P(9)  },
+  { cat: 'CONVERTIBLE MULTI-WAY BRA', was: '£47.00', now: '£32.95', off: '−30%', colors: 4, ph: P(2)  },
+  { cat: 'NURSING SUPPORT BRA',       was: '£36.00', now: '£25.00', off: '−30%', colors: 3, ph: P(1)  },
+  { cat: 'SOFT LACE BRALETTE',        was: '£27.95', now: '£19.95', off: '−28%', colors: 4, ph: P(12) },
+  { cat: 'WIRED PADDED BRA',          was: '£49.95', now: '£34.95', off: '−30%', colors: 4, ph: P(14) },
+  { cat: 'MINIMIZER COMFORT BRA',     was: '£44.00', now: '£30.95', off: '−30%', colors: 3, ph: P(16) },
+  { cat: 'HIGH APEX LACE BRA',        was: '£52.00', now: '£41.50', off: '−20%', colors: 4, ph: P(18) },
+  { cat: 'SEAMLESS T-SHIRT BRA',      was: '£39.95', now: '£27.95', off: '−30%', colors: 4, ph: P(20) },
+  { cat: 'SATIN TRIM BALCONETTE',     was: '£56.00', now: '£39.00', off: '−30%', colors: 3, ph: P(7)  },
+  { cat: 'EMBROIDERED PLUNGE BRA',    was: '£62.00', now: '£43.50', off: '−30%', colors: 4, ph: P(10) },
+  { cat: 'STRAPLESS SMOOTH BRA',      was: '£45.00', now: '£31.50', off: '−30%', colors: 3, ph: P(22) },
+  { cat: 'PADDED LACE BRA',           was: '£57.95', now: '£40.50', off: '−30%', colors: 4, ph: P(15) },
+  { cat: 'FLORAL LACE PLUNGE BRA',    was: '£54.00', now: '£37.80', off: '−30%', colors: 4, ph: P(4)  },
+  { cat: 'SOFT CUP WIRELESS BRA',     was: '£42.00', now: '£29.50', off: '−30%', colors: 3, ph: P(8)  },
+  { cat: 'SCALLOPED EDGE BRALETTE',   was: '£29.95', now: '£20.95', off: '−30%', colors: 4, ph: P(11) },
+  { cat: 'FULL COVERAGE LACE BRA',    was: '£58.00', now: '£46.50', off: '−20%', colors: 4, ph: P(13) },
+  { cat: 'MESH INSERT PLUNGE BRA',    was: '£61.00', now: '£42.50', off: '−30%', colors: 3, ph: P(17) },
+  { cat: 'RIBBED LOUNGE BRALETTE',    was: '£26.00', now: '£18.00', off: '−30%', colors: 4, ph: P(19) },
+  { cat: 'SIDE SUPPORT SMOOTH BRA',   was: '£48.00', now: '£33.50', off: '−30%', colors: 3, ph: P(21) },
+  { cat: 'SATIN PIPING BALCONETTE',   was: '£53.00', now: '£37.00', off: '−30%', colors: 4, ph: P(23) },
+  { cat: 'EVERYDAY T-SHIRT BRA',      was: '£38.00', now: '£26.50', off: '−30%', colors: 4, ph: P(2)  },
+  { cat: 'GEO LACE HIGH APEX BRA',    was: '£56.00', now: '£44.80', off: '−20%', colors: 3, ph: P(5)  },
+  { cat: 'MICROFIBRE PLUNGE BRA',     was: '£43.00', now: '£30.00', off: '−30%', colors: 4, ph: P(6)  },
+  { cat: 'CHANTILLY LACE BALCONETTE', was: '£64.00', now: '£44.80', off: '−30%', colors: 4, ph: P(3)  },
+];
+
+/* ============================================================
+   CONCEPTS — badge markup per idea; place: img | bar | none
+   ============================================================ */
+const CONCEPTS = [
+  { name: 'The Placard',       note: 'A hairline red frame, no fill — the SALE label pinned to the photo like a gallery placard.',
+    cls: 'b01', img: p => `<span class="flag">Sale</span>` },
+  { name: 'The Underline',     note: 'No box at all. The word, set small and letterspaced, carried by a single hairline rule.',
+    cls: 'b02', img: p => `<span class="flag">Sale</span>` },
+  { name: 'The Seal',          note: 'Circular type turning slowly around the reduction — an editorial sticker pressed on the image.',
+    cls: 'b03', img: p => `<span class="flag" aria-label="Sale ${p.off}">
+      <svg viewBox="0 0 72 72"><defs><path id="sealpath" d="M36,36 m-27,0 a27,27 0 1,1 54,0 a27,27 0 1,1 -54,0"/></defs>
+      <text><textPath href="#sealpath">Sale · Triumph · Sale ·</textPath></text></svg>
+      <span class="seal-core">${p.off}</span></span>` },
+  { name: 'The Spine',         note: 'The sale note runs vertically up the left rim of the photograph, like a title on a magazine spine.',
+    cls: 'b04', img: p => `<span class="flag">Sale — Final Reductions</span>` },
+  { name: 'The Numeral',       note: 'No word. The reduction itself, oversized and light, becomes the graphic — pure confidence.',
+    cls: 'b05', img: p => `<span class="flag">${p.off}</span>` },
+  { name: 'The Dog-Ear',       note: 'The corner of the photo folds over in red — a page marked in the season’s catalogue.',
+    cls: 'b06', img: p => `<span class="flag"><span>Sale</span></span>` },
+  { name: 'The Ticker',        note: 'A hairline news-ticker gliding along the bottom rim — quiet at a glance, alive when you look.',
+    cls: 'b07', img: p => { const s = `Sale — Final Reductions — ${p.off} — `.repeat(4);
+      return `<span class="flag"><span class="tick">${s}${s}</span></span>`; } },
+  { name: 'The Ink Note',      note: '“on sale” in red italic serif, tilted — an editor’s annotation on the proof sheet.',
+    cls: 'b08', img: p => `<span class="flag">on sale</span>` },
+  { name: 'The Redline',       note: 'Nothing on the photo. A hand-drawn red ellipse rings the reduced price, the way you’d mark it in print.',
+    cls: 'b09', img: null, redline: true },
+  { name: 'The Frosted Chip',  note: 'The PLP’s frosted-glass CTA language, borrowed to carry the sale message on the image.',
+    cls: 'b10', img: p => `<span class="flag">Sale ${p.off}</span>` },
+  { name: 'The Kicker',        note: 'The photo stays untouched. A red kicker line sits above the product name, magazine-style.',
+    cls: 'b11', img: null, kicker: 'Sale — Final Reductions' },
+  { name: 'The Asterisk',      note: 'A single red asterisk after the name, resolved by a footnote. The quietest possible signal.',
+    cls: 'b12', img: null, asterisk: true },
+  { name: 'The Outline Wordmark', note: 'Sibling of the live V2 — the oversized corner wordmark, stroke-only, the photo showing through the letters.',
+    cls: 'b13', img: p => `<span class="flag">Sale</span>` },
+  { name: 'The Split Bar',     note: 'A typographic rule between photo and caption: SALE flush left, the reduction flush right.',
+    cls: 'b14', img: null, bar: true },
+  { name: 'The Archive Stamp', note: 'Double-ruled, tilted, blending into the print — a rubber stamp pressed onto the photograph.',
+    cls: 'b15', img: p => `<span class="flag">Archive Sale</span>` },
+  { name: 'The Sash',          note: 'The classic corner sale sash, rebuilt at couture weight — a frosted hairline ribbon.',
+    cls: 'b16', img: p => `<span class="flag"><span>Sale</span></span>` },
+  { name: 'The Highlighter',   note: 'A translucent red marker swipe across the reduced price — the badge lives in the type.',
+    cls: 'b17', img: null, highlight: true },
+  { name: 'The Crop Marks',    note: 'Printer’s registration corners and a proof annotation — the photograph as a marked-up print.',
+    cls: 'b18', img: p => `<span class="flag"><i></i><i></i><i></i><i></i><span>Sale ${p.off}</span></span>` },
+  { name: 'The Frame',         note: 'A hairline red border frames the whole photo; a tiny plate caption interrupts the rule.',
+    cls: 'b19', img: p => `<span class="flag"><span>Sale ${p.off}</span></span>` },
+  { name: 'The Bookmark',      note: 'A red ribbon hangs from the top edge, notched at the tail — this piece is marked.',
+    cls: 'b20', img: p => `<span class="flag"><span>Sale</span></span>` },
+  { name: 'The Pulse',         note: 'A small red dot breathing beside the name — sale as a live signal, not a shout.',
+    cls: 'b21', img: null, pulse: true },
+  { name: 'The Exponent',      note: 'The reduction set as a footnote exponent on the price — scientific notation for markdowns.',
+    cls: 'b22', img: null, sup: true },
+  { name: 'The Veil',          note: 'A red wash rises from the bottom of the photograph, the wordmark sitting quietly inside it.',
+    cls: 'b23', img: p => `<span class="flag"><span>Sale</span></span>` },
+  { name: 'The Percent',       note: 'A giant stroke-only % bleeding off the corner — the symbol as a watermark, no words at all.',
+    cls: 'b24', img: p => `<span class="flag">%</span>` },
+  { name: 'The Deadline',      note: 'One red italic serif line under the price — urgency written as editorial copy, not a countdown.',
+    cls: 'b25', img: null, deadline: 'reductions end August 3rd' },
+  { name: 'The Reveal',        note: 'Nothing at rest. On hover the photo frosts over and a placard fades up — sale as a discovered secret.',
+    cls: 'b26', img: p => `<span class="flag"><span>Sale ${p.off}</span></span>` },
+  { name: 'The Red Ink',       note: 'No badge anywhere. The entire caption is simply printed in red — the card itself is the signal.',
+    cls: 'b27', img: null },
+];
+
+/* ============================================================
+   BUILD
+   ============================================================ */
+const HEART = `<button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24"><path d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z"/></svg></button>`;
+
+/* sketchy double-stroke ellipse for The Redline */
+const REDLINE_SVG = `<svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M8,15 C8,6 30,2 52,3 C78,4 95,8 94,15 C93,23 72,28 48,27 C24,26 7,23 8,16 C9,9 28,4 55,4" />
+</svg>`;
+
+const grid = document.getElementById('grid');
+
+CONCEPTS.forEach((c, i) => {
+  const p = PRODUCTS[i];
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+
+  let priceHtml;
+  if (c.redline)        priceHtml = `<span class="pr-was">${p.was}</span> <span class="pr-wrap"><span class="pr-sale">${p.now}</span>${REDLINE_SVG}</span>`;
+  else if (c.highlight) priceHtml = `<span class="pr-was">${p.was}</span> <span class="hl">${p.now}</span>`;
+  else if (c.sup)       priceHtml = `<span class="pr-was">${p.was}</span> <span class="pr-sale">${p.now}<span class="sup">${p.off}</span></span>`;
+  else                  priceHtml = `<span class="pr-was">${p.was}</span> <span class="pr-sale">${p.now}</span>`;
+
+  cell.innerHTML = `
+    <div class="cell__cap">
+      <div class="cell__num">${String(i + 1).padStart(2, '0')} / ${CONCEPTS.length}</div>
+      <div class="cell__name">${c.name}</div>
+      <div class="cell__note">${c.note}</div>
+    </div>
+    <article class="card ${c.cls}">
+      <div class="card__img">
+        <img class="ph" src="${p.ph}" alt="${p.cat}" loading="lazy" />
+        ${c.img ? c.img(p) : ''}
+        ${HEART}
+      </div>
+      ${c.bar ? `<div class="bar"><span>Sale</span><span>${p.off}</span></div>` : ''}
+      <div class="card__info">
+        <div class="card__cat">${c.kicker ? `<span class="kicker">${c.kicker}</span>` : ''}${p.cat}${c.asterisk ? '<span class="ast">*</span>' : ''}${c.pulse ? `<span class="pulse-wrap"><i></i>Sale ${p.off}</span>` : ''}</div>
+        <div class="card__pr">
+          ${priceHtml}
+          ${c.asterisk ? `<span class="foot">* final reductions — ${p.off}</span>` : ''}
+          ${c.deadline ? `<span class="deadline">${c.deadline}</span>` : ''}
+          <button class="cvar__label">+ ${p.colors} colors</button>
+        </div>
+      </div>
+    </article>`;
+
+  grid.appendChild(cell);
+});
+
+/* ============================================================
+   RED SWITCHER
+   ============================================================ */
+document.querySelectorAll('.hue').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hue').forEach(b => b.dataset.on = 'false');
+    btn.dataset.on = 'true';
+    document.documentElement.style.setProperty('--red', btn.dataset.hue);
+  });
+});
+</script>
+</body>
+</html>
