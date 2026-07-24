@@ -322,7 +322,7 @@ header {
 }
 .acc.is-open .acc__head svg { transform: rotate(180deg); }
 /* the reviews head carries a star row too — keep the chevron rules off it */
-.acc__head svg.stars { width: 73px; height: 13px; stroke: none; }
+.acc__head svg.stars { width: 73px; height: 13px; stroke: none; transition: none; }
 .acc.is-open .acc__head svg.stars { transform: none; }
 .acc__body {
   overflow: hidden;
@@ -999,15 +999,14 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
           <div class="acc__line"></div>
         </div>
         <div class="acc acc--reviews">
-          <!-- star glyph from the Figma export (Assets/pdp/reviews/stars-5.svg), one 13x13 cell -->
-          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-            <path id="rvw-star" d="M6.30965 0.590212C6.36926 0.405395 6.63074 0.405394 6.69035 0.590211L7.90702 4.3628C7.93372 4.44557 8.01084 4.5016 8.09781 4.50141L12.0617 4.49274C12.2559 4.49232 12.3367 4.74101 12.1794 4.8548L8.96739 7.17773C8.89693 7.22869 8.86747 7.31935 8.89452 7.40201L10.1277 11.1692C10.1881 11.3538 9.97655 11.5075 9.81969 11.393L6.61791 9.05606C6.54766 9.00479 6.45234 9.00479 6.38209 9.05606L3.18031 11.393C3.02345 11.5075 2.81191 11.3538 2.87232 11.1692L4.10548 7.40201C4.13253 7.31935 4.10307 7.22869 4.0326 7.17773L0.820637 4.8548C0.663285 4.74101 0.744087 4.49232 0.938277 4.49274L4.90219 4.50141C4.98916 4.5016 5.06628 4.44557 5.09298 4.3628L6.30965 0.590212Z"/>
-          </defs></svg>
           <button class="acc__head">
             <span class="rvw__headgrp">
               <span class="lbl">Reviews</span>
               <span class="rvw__headstars">
-                <svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true"><use href="#rvw-star" fill="#000"/><use href="#rvw-star" x="15" fill="#000"/><use href="#rvw-star" x="30" fill="#000"/><use href="#rvw-star" x="45" fill="#000"/><use href="#rvw-star" x="60" fill="#000"/></svg>
+                <!-- star paths are stamped by rvwStars() at load — real paths, not
+                     <use> refs: Chrome re-clones use-shadow trees on ancestor class
+                     changes, which made the stars flicker on every accordion click -->
+                <svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true" data-stars="5"></svg>
                 <span class="rvw__count">[ 61 ]</span>
               </span>
             </span>
@@ -1311,8 +1310,14 @@ const rvwSortWrap = document.getElementById('rvwSortWrap');
 let rvwShown = RVW_PAGE;
 let rvwSortKey = 'recent';
 
-const rvwStars = n => `<svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true">${
-  [0, 1, 2, 3, 4].map(i => `<use href="#rvw-star" x="${i * 15}" fill="${i < n ? '#000' : '#F1F1F1'}"></use>`).join('')}</svg>`;
+/* star glyph from the Figma export (Assets/pdp/reviews/stars-5.svg), one 13x13
+   cell — stamped as real paths (a shared <use> ref flickers on class changes) */
+const RVW_STAR_D = 'M6.30965 0.590212C6.36926 0.405395 6.63074 0.405394 6.69035 0.590211L7.90702 4.3628C7.93372 4.44557 8.01084 4.5016 8.09781 4.50141L12.0617 4.49274C12.2559 4.49232 12.3367 4.74101 12.1794 4.8548L8.96739 7.17773C8.89693 7.22869 8.86747 7.31935 8.89452 7.40201L10.1277 11.1692C10.1881 11.3538 9.97655 11.5075 9.81969 11.393L6.61791 9.05606C6.54766 9.00479 6.45234 9.00479 6.38209 9.05606L3.18031 11.393C3.02345 11.5075 2.81191 11.3538 2.87232 11.1692L4.10548 7.40201C4.13253 7.31935 4.10307 7.22869 4.0326 7.17773L0.820637 4.8548C0.663285 4.74101 0.744087 4.49232 0.938277 4.49274L4.90219 4.50141C4.98916 4.5016 5.06628 4.44557 5.09298 4.3628L6.30965 0.590212Z';
+const rvwStarPaths = n => [0, 1, 2, 3, 4].map(i =>
+  `<path transform="translate(${i * 15} 0)" d="${RVW_STAR_D}" fill="${i < n ? '#000' : '#F1F1F1'}"></path>`).join('');
+const rvwStars = n => `<svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true">${rvwStarPaths(n)}</svg>`;
+/* fill the static star rows in the markup (the accordion head) */
+document.querySelectorAll('svg.stars[data-stars]').forEach(s => { s.innerHTML = rvwStarPaths(+s.dataset.stars); });
 
 function rvwRender() {
   const sorted = RVW_REVIEWS.map((r, i) => ({ ...r, i })).sort(RVW_SORTS[rvwSortKey].fn);
