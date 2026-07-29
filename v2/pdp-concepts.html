@@ -1142,7 +1142,28 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
 .needs__proof { font-size: 11px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-soft); padding-top: 14px; border-top: 1px solid var(--c-line); }
 
 /* --- reframed fit finder ------------------------------------ */
-/* in-buybox version (all five directions share this) */
+/* Two treatments of the same message, swapped by body[data-fit]:
+   "card"  — the cream panel, deliberately hard to miss
+   "plain" — one quiet line where the old "Find the right size" link sat,
+             no box and no raised type, for when the buy box shouldn't
+             be interrupted. Default is plain.
+   The markup carries data-fit so neither one flashes before JS runs. */
+.fitline { display: none; }
+.fitline p {
+  /* no width cap — the buy-box column already caps at 440px, and a
+     narrower measure broke "Let us find you the right one" mid-phrase */
+  margin: 0;
+  font-size: 12px; font-weight: 300; line-height: 18px; letter-spacing: .04em;
+}
+.fitline a {
+  text-decoration: underline; text-underline-position: from-font;
+  transition: opacity .2s var(--ease-out);
+}
+.fitline a:hover { opacity: .55; }
+body[data-fit="plain"] .fitnote { display: none; }
+body[data-fit="plain"] .fitline { display: block; }
+
+/* in-buybox card version */
 .fitnote {
   display: flex; flex-direction: column; gap: 10px;
   padding: 20px; background: var(--c-cream);
@@ -1359,6 +1380,8 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
 }
 .vsw__btn:hover { background: #F1F1F1; }
 .vsw__btn[aria-pressed="true"] { background: var(--c-ink); color: #fff; font-weight: 400; }
+/* the fit-note treatment toggle, stacked directly above the concept pill */
+.vsw--fit { bottom: 60px; }
 /* the name of the active direction, shown beside the pills */
 .vsw__name {
   max-width: 190px; padding: 0 10px;
@@ -1476,10 +1499,15 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
   .shades__nav { display: none !important; } /* swipe instead */
   .shades__note { margin-top: 28px; text-align: left; }
 
-  /* keep the switcher clear of the mobile sticky add-to-cart */
+  /* keep the switchers clear of the mobile sticky add-to-cart */
   .vsw { left: 8px; right: 8px; bottom: 8px; justify-content: center; }
   .vsw__lbl, .vsw__name { display: none; }
   body.has-sticky .vsw { bottom: 84px; }
+  .vsw--fit { bottom: 50px; }
+  body.has-sticky .vsw--fit { bottom: 126px; }
+  /* the label is the only thing telling the two pills apart once the
+     concept pill's own label is hidden, so keep this one */
+  .vsw--fit .vsw__lbl { display: inline; }
 }
 
 /* very small screens — the reviews stats strip regrids: histogram left with
@@ -1500,7 +1528,7 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
 
 </style>
 </head>
-<body>
+<body data-fit="plain">
 
 <!-- HEADER -->
 <header>
@@ -1631,6 +1659,10 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
           <div class="fitnote__h">95% of women wear the wrong size.<br />Let us find you the right one.</div>
           <p class="fitnote__p">Two questions about how your current bra feels — no tape measure needed.</p>
           <a class="fitnote__cta" href="#">Find my size</a>
+        </div>
+        <!-- quiet variant: the same claim as one line, the offer as the link -->
+        <div class="fitline">
+          <p>95% of women wear the wrong size. <a href="#">Let us find you the right one</a></p>
         </div>
 
         <div class="cta-block" id="ctaBlock">
@@ -2956,6 +2988,13 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
   <button class="cta" data-add>Add to Cart</button>
 </div>
 
+<!-- SIZE-COMMUNICATION TREATMENT (quiet line vs. cream card) -->
+<div class="vsw vsw--fit" role="group" aria-label="Size communication treatment">
+  <span class="vsw__lbl">Fit note</span>
+  <button class="vsw__btn" data-fitbtn="plain" aria-pressed="true">Plain</button>
+  <button class="vsw__btn" data-fitbtn="card" aria-pressed="false">Card</button>
+</div>
+
 <!-- CONCEPT VERSION SWITCHER (same corner as the old Variante toggle) -->
 <div class="vsw" id="vsw" role="group" aria-label="PDP concept version">
   <span class="vsw__lbl">Concept</span>
@@ -3679,6 +3718,22 @@ const stored = sessionStorage.getItem('pdpConcept');
 activate(Number(fromUrl) || Number(stored) || 1);
 vBtns.forEach(b => b.addEventListener('click',
   () => sessionStorage.setItem('pdpConcept', b.dataset.vbtn)));
+
+/* ---------- size-communication treatment -------------------- */
+const fitBtns = $$('[data-fitbtn]');
+function setFit(mode) {
+  document.body.dataset.fit = mode;
+  fitBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fitbtn === mode)));
+  sessionStorage.setItem('pdpFit', mode);
+  /* the two treatments differ in height, so the sticky buy-box scroll
+     needs re-measuring after a swap */
+  window.dispatchEvent(new Event('resize'));
+}
+fitBtns.forEach(b => b.addEventListener('click', () => setFit(b.dataset.fitbtn)));
+/* ?fit=card deep-links the treatment, the same way ?v=N does the direction */
+const fitParam = new URLSearchParams(location.search).get('fit');
+setFit(['plain', 'card'].includes(fitParam) ? fitParam
+  : (sessionStorage.getItem('pdpFit') || document.body.dataset.fit || 'plain'));
 
 /* keyboard: 1–6 jumps between directions (handy in review sessions) */
 document.addEventListener('keydown', e => {
