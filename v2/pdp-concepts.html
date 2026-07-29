@@ -938,16 +938,34 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
   position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: 3; overflow: visible; pointer-events: none;
 }
-.diagram__svg line { stroke: rgba(255,255,255,.65); stroke-width: 1; }
+.diagram__svg path { fill: none; stroke: rgba(255,255,255,.65); stroke-width: 1; }
+/* the widths and offsets here must agree with DG_EDGE in the script —
+   that is where each leader line is told to start */
 .diagram__call {
   position: absolute; z-index: 4;
-  width: 30%;
+  width: 20%;
   display: flex; flex-direction: column; gap: 5px;
   transform: translateY(-50%);
   color: #fff;
   text-shadow: 0 1px 14px rgba(0,0,0,.45);
 }
-.diagram__call--l { text-align: right; align-items: flex-end; }
+.diagram__call--l { text-align: right; align-items: flex-end; left: 17%; }
+.diagram__call--r { right: 17%; }
+
+/* ---- beside variant (V6): copy in the gutters, shorter square photo,
+        curved arrows, and no scrim since nothing sits on the image ---- */
+.diagram--beside .diagram__stage { width: 48%; aspect-ratio: 1 / 1; }
+.diagram--beside .diagram__call {
+  width: 24%;
+  color: var(--c-ink);
+  text-shadow: none;
+}
+.diagram--beside .diagram__call--l { left: 0; }
+.diagram--beside .diagram__call--r { right: 0; }
+.diagram--beside .diagram__n,
+.diagram--beside .diagram__d { color: var(--c-ink-soft); }
+.diagram--beside .diagram__svg path { stroke: rgba(0,0,0,.34); }
+.diagram--beside .diagram__svg marker path { fill: rgba(0,0,0,.34); stroke: none; }
 .diagram__n { font-size: 10px; font-weight: 300; letter-spacing: .1em; color: rgba(255,255,255,.7); }
 .diagram__t { font-size: 12px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
 .diagram__d { margin: 0; font-size: 11px; font-weight: 300; line-height: 17px; letter-spacing: .02em; color: rgba(255,255,255,.9); }
@@ -1070,8 +1088,10 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
 }
 .worn__strip::-webkit-scrollbar { display: none; }
 .worn__item {
-  flex: none; width: 260px; scroll-snap-align: start;
-  display: flex; flex-direction: column; gap: 12px;
+  /* fluid so the row scales with the viewport instead of pinning to one
+     size, with a floor that keeps four-ish in view on a 1440 screen */
+  flex: none; width: clamp(300px, 24vw, 420px); scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 14px;
 }
 /* square, like the grid these photos come from */
 .worn__pic { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: var(--c-cream); }
@@ -1266,11 +1286,13 @@ body[data-fit="plain"] .fitline { display: block; }
 .quilt__pair:nth-child(even) { flex-direction: row-reverse; }
 .quilt__pair > * { flex: 1 1 50%; min-width: 0; aspect-ratio: 1 / 1; }
 .quilt__img { position: relative; overflow: hidden; background: var(--c-cream); }
-.quilt__img img {
+.quilt__img img, .quilt__img video {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   transition: transform 1.4s var(--ease-out);
 }
 .quilt__pair:hover .quilt__img img { transform: scale(1.03); }
+/* the clip is shot on white, so it needs no scale-on-hover to feel alive */
+.quilt__img--video { background: #fff; }
 .quilt__txt {
   display: flex; flex-direction: column; justify-content: center; gap: 16px;
   padding: 40px clamp(28px, 5.5vw, 96px);
@@ -1432,8 +1454,10 @@ body[data-fit="plain"] .fitline { display: block; }
 
   /* the leader-line diagram needs side gutters it doesn't have here —
      show the photo full width and the callouts as a numbered list */
-  /* no overlay here, so the photo needs no scrim to sit under white type */
-  .diagram__stage { width: 100%; }
+  /* no overlay here, so the photo needs no scrim to sit under white type.
+     the --beside selector is more specific, so it needs restating */
+  .diagram__stage,
+  .diagram--beside .diagram__stage { width: 100%; }
   .diagram__call, .diagram__svg, .diagram__dot, .diagram__scrim { display: none; }
   .diagram__list {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1459,7 +1483,7 @@ body[data-fit="plain"] .fitline { display: block; }
   .shopscene__card { width: 190px; }
 
   .worn__strip { margin-top: 24px; gap: 12px; }
-  .worn__item { width: 210px; }
+  .worn__item { width: 74vw; }
 
   .tone { flex-direction: column; gap: 24px; }
   .tone__panel { flex: none; width: 100%; }
@@ -2816,11 +2840,15 @@ body[data-fit="plain"] .fitline { display: block; }
           </div>
         </div>
         <div class="quilt__pair">
-          <div class="quilt__img"><img src="./Assets/unsplash/q-invisible.jpg" alt="Under a plain white t-shirt" loading="lazy" /></div>
+          <div class="quilt__img quilt__img--video">
+            <video src="./Assets/unsplash/q-invisible-tee.mp4" poster="./Assets/unsplash/q-invisible.jpg"
+                   muted loop playsinline autoplay preload="metadata"
+                   aria-label="A woman moving in a plain fitted t-shirt"></video>
+          </div>
           <div class="quilt__txt">
             <span class="quilt__n">02</span>
-            <h3 class="quilt__h">Invisible Under White</h3>
-            <p class="quilt__p">The lace is bonded and laser-cut, so there is no seam to print and no edge to ridge. A plain white t-shirt is the hardest test there is — this is the bra we shoot under it.</p>
+            <h3 class="quilt__h">Invisible Under A Tee</h3>
+            <p class="quilt__p">The edges are bonded and laser-cut, so there is no seam to print and no ridge to show. A plain fitted t-shirt is the hardest test there is — so watch one move.</p>
             <div class="quilt__proof">Bonded edges · no visible seam</div>
           </div>
         </div>
@@ -2841,30 +2869,6 @@ body[data-fit="plain"] .fitline { display: block; }
             <p class="quilt__p">About 80% of the support comes from the underband, not the straps. It's cut wide and bonded flat so it can pull firm without digging — which is why it doesn't ride up when you lift your arms.</p>
             <div class="quilt__proof">Wide bonded underband, no plastic bone</div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="cx rv">
-      <div class="mdstat">
-        <div class="mdstat__fig">
-          <span class="mdstat__num">12</span>
-          <span class="mdstat__unit">hrs</span>
-        </div>
-        <div class="mdstat__h">Without One Readjustment</div>
-        <p class="mdstat__p">Worn a full working day by 40 women — commute, desk, dinner — without a single adjustment. Nine in ten said they stopped noticing it before lunch.</p>
-      </div>
-    </section>
-
-    <section class="cx cx--flush rv">
-      <div class="mdband mdband--short">
-        <div class="mdband__media">
-          <img src="./Assets/unsplash/band-warm.jpg" alt="" loading="lazy" />
-          <div class="mdband__scrim"></div>
-        </div>
-        <div class="mdband__txt">
-          <h2 class="mdband__h">Too Beautiful To Hide</h2>
-          <p class="mdband__p">Matte jacquard straps at the width of a fine dress strap, and a scallop cut to sit above a low waistband. Designed for the moments it shows.</p>
         </div>
       </div>
     </section>
@@ -2898,7 +2902,7 @@ body[data-fit="plain"] .fitline { display: block; }
         <h2 class="cx__h cx__h--wide" style="max-width:24ch;">What Each Part Is For</h2>
         <p class="cx__lede" style="max-width:56ch;">Six pieces of construction, and the thing each one buys you by the end of the day.</p>
       </div>
-      <div class="diagram rv" data-diagram="benefits" style="margin-top:64px;">
+      <div class="diagram diagram--beside rv" data-diagram="benefits" style="margin-top:64px;">
         <div class="diagram__stage">
           <img src="./Assets/pdp/gallery-1.jpg" alt="Aura Spotlight bra with each benefit labelled" />
         </div>
@@ -3335,28 +3339,32 @@ const WORN = [
    photo is swapped. `side` picks the gutter the label sits in; the label is
    centred on its own y so a single straight rule can join the two. Keep the
    y values on each side well apart or the labels collide. */
-/* x/y = the anchor on the garment (% of the photo box, measured against
-   gallery-1.jpg). ly = where the label sits in the gutter, spread far
-   enough apart that the copy can't collide. Keyed by set so a version can
-   point at the same construction with a different argument:
+/* Anchors are stored in SOURCE-PHOTO coordinates — x and ys are % of
+   gallery-1.jpg itself, not of the box it's cropped into. The box crop is
+   worked out at layout time, so the two variants can use different aspect
+   ratios (V2 is 4:5, V6 is 1:1) without the dots drifting off the garment,
+   which is what happened twice when these were box-relative.
+   ly = the label's own height in the box, spread so copy can't collide.
+   Keyed by set so a version can point at the same construction with a
+   different argument:
      anatomy  (V2) — names the part, then explains it
      benefits (V6) — leads with the payoff, names the part underneath */
 const DIAGRAM_SETS = {
   anatomy: [
-    { x: 67, y: 46, ly: 16, side: 'r', t: 'V-slide strap',   d: 'Soft jacquard elastic that holds its setting all day.' },
-    { x: 38, y: 54, ly: 22, side: 'l', t: 'Bonded top edge', d: 'Laser-cut, not stitched — nothing to print through.' },
-    { x: 62, y: 58, ly: 46, side: 'r', t: 'Floral jacquard', d: 'Double-layered lace with LYCRA®: stretches, then recovers.' },
-    { x: 40, y: 62, ly: 50, side: 'l', t: 'Moulded cup',     d: 'Seam-free and 1.8 mm thin — shape without bulk.' },
-    { x: 70, y: 63, ly: 76, side: 'r', t: 'Flexible wire',   d: 'Follows the breast root, clear of the arm crease.' },
-    { x: 44, y: 70, ly: 80, side: 'l', t: 'Wide underband',  d: 'Carries about 80% of the support. Bonded flat, no digging.' },
+    { x: 67, ys: 46.25, ly: 16, side: 'r', t: 'V-slide strap',   d: 'Soft jacquard elastic that holds its setting all day.' },
+    { x: 38, ys: 53.75, ly: 22, side: 'l', t: 'Bonded top edge', d: 'Laser-cut, not stitched — nothing to print through.' },
+    { x: 62, ys: 57.50, ly: 46, side: 'r', t: 'Floral jacquard', d: 'Double-layered lace with LYCRA®: stretches, then recovers.' },
+    { x: 40, ys: 61.25, ly: 52, side: 'l', t: 'Moulded cup',     d: 'Seam-free and 1.8 mm thin — shape without bulk.' },
+    { x: 70, ys: 62.20, ly: 78, side: 'r', t: 'Flexible wire',   d: 'Follows the breast root, clear of the arm crease.' },
+    { x: 44, ys: 68.75, ly: 84, side: 'l', t: 'Wide underband',  d: 'Carries about 80% of the support. Bonded flat, no digging.' },
   ],
   benefits: [
-    { x: 67, y: 46, ly: 16, side: 'r', t: 'Straps Stay Set',        d: 'V-slides hold the length you set, so nothing creeps down.' },
-    { x: 38, y: 54, ly: 22, side: 'l', t: 'Nothing Prints Through', d: 'Bonded and laser-cut — no seam to show under a white tee.' },
-    { x: 62, y: 58, ly: 46, side: 'r', t: 'Moves And Recovers',     d: 'LYCRA® in the lace itself: it stretches, then springs back.' },
-    { x: 40, y: 62, ly: 50, side: 'l', t: 'Shape Without Bulk',     d: 'A 1.8 mm moulded cup lifts on its own. No added padding.' },
-    { x: 70, y: 63, ly: 76, side: 'r', t: 'No Digging At The Arm',  d: 'Stops short of the arm crease — an outline, not a pinch.' },
-    { x: 44, y: 70, ly: 80, side: 'l', t: 'Never Rides Up',         d: 'The wide band carries the weight, so it holds without pressing.' },
+    { x: 67, ys: 46.25, ly: 16, side: 'r', t: 'Straps Stay Set',        d: 'V-slides hold the length you set, so nothing creeps down.' },
+    { x: 38, ys: 53.75, ly: 22, side: 'l', t: 'Nothing Prints Through', d: 'Bonded and laser-cut — no seam to show under a fitted tee.' },
+    { x: 62, ys: 57.50, ly: 46, side: 'r', t: 'Moves And Recovers',     d: 'LYCRA® in the lace itself: it stretches, then springs back.' },
+    { x: 40, ys: 61.25, ly: 52, side: 'l', t: 'Shape Without Bulk',     d: 'A 1.8 mm moulded cup lifts on its own. No added padding.' },
+    { x: 70, ys: 62.20, ly: 78, side: 'r', t: 'No Digging At The Arm',  d: 'Stops short of the arm crease — an outline, not a pinch.' },
+    { x: 44, ys: 68.75, ly: 84, side: 'l', t: 'Never Rides Up',         d: 'The wide band carries the weight, so it holds without pressing.' },
   ],
 };
 
@@ -3508,57 +3516,108 @@ $$('[data-worn]').forEach(strip => {
    inside the photo, so x/y need no translation and no measuring pass. */
 /* 26% wide, inset 2% — the columns must clear the outermost anchor (x=70)
    or a dot lands inside its own label */
-const DG_LBL_W = 26, DG_INSET = 2, DG_GAP = 1.5;
+/* gallery-1.jpg's own aspect — needed to undo the cover-crop and turn a
+   source coordinate into a position inside whatever box holds it */
+const DG_SRC_ASPECT = 900 / 1200;
+/* a label's inner edge, as a fraction of the block width.
+   onImage: just inside the photo (which spans 15-85% of the block)
+   beside:  flush to the photo's gutter (photo spans 26-74%) */
+const DG_EDGE = { onImage: { l: .37, r: .63 }, beside: { l: .24, r: .76 } };
 const SVGNS = 'http://www.w3.org/2000/svg';
-$$('[data-diagram]').forEach(block => {
+
+$$('[data-diagram]').forEach((block, bi) => {
   const points = DIAGRAM_SETS[block.dataset.diagram] || DIAGRAM_SETS.anatomy;
+  const beside = block.classList.contains('diagram--beside');
   const stage = block.querySelector('.diagram__stage');
   const list = block.querySelector('.diagram__list');
 
-  const scrim = document.createElement('span');
-  scrim.className = 'diagram__scrim';
-  stage.appendChild(scrim);
+  /* the on-image variant needs the photo knocked back so white type holds;
+     with the copy outside there is nothing to darken it for */
+  if (!beside) {
+    const scrim = document.createElement('span');
+    scrim.className = 'diagram__scrim';
+    stage.appendChild(scrim);
+  }
 
-  /* percentage viewBox + non-scaling strokes: the lines follow the photo as
-     it resizes without the hairline stretching with it */
+  /* a pixel viewBox, not a 0-100 one: preserveAspectRatio="none" on a
+     non-square block would skew both the curves and the arrowheads */
   const svg = document.createElementNS(SVGNS, 'svg');
   svg.setAttribute('class', 'diagram__svg');
-  svg.setAttribute('viewBox', '0 0 100 100');
-  svg.setAttribute('preserveAspectRatio', 'none');
-  stage.appendChild(svg);
+  const arrowId = 'dgArrow' + bi;
+  if (beside) {
+    svg.innerHTML = `<defs><marker id="${arrowId}" viewBox="0 0 8 8" refX="6.5" refY="4"
+      markerWidth="7" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 .9 L6.5 4 L0 7.1 Z" /></marker></defs>`;
+  }
+  block.appendChild(svg);
 
+  const paths = [], calls = [], dots = [];
   points.forEach((h, i) => {
     const n = String(i + 1).padStart(2, '0');
-    const left = h.side === 'l';
-    /* the label's inner edge — where its leader line begins */
-    const inner = left ? DG_INSET + DG_LBL_W : 100 - DG_INSET - DG_LBL_W;
+    const body = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
 
-    const line = document.createElementNS(SVGNS, 'line');
-    line.setAttribute('x1', left ? inner + DG_GAP : inner - DG_GAP);
-    line.setAttribute('y1', h.ly);
-    line.setAttribute('x2', h.x);
-    line.setAttribute('y2', h.y);
-    line.setAttribute('vector-effect', 'non-scaling-stroke');
-    svg.appendChild(line);
+    const path = document.createElementNS(SVGNS, 'path');
+    if (beside) path.setAttribute('marker-end', `url(#${arrowId})`);
+    svg.appendChild(path);
+    paths.push(path);
 
     const call = document.createElement('div');
     call.className = 'diagram__call diagram__call--' + h.side;
-    call.style.top = h.ly + '%';
-    call.style[left ? 'left' : 'right'] = DG_INSET + '%';
-    call.innerHTML = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
+    call.innerHTML = body;
+    block.appendChild(call);
+    calls.push(call);
 
-    const dot = document.createElement('span');
-    dot.className = 'diagram__dot';
-    dot.style.left = h.x + '%';
-    dot.style.top = h.y + '%';
-
-    stage.append(call, dot);
+    /* the arrowhead marks the spot in the beside variant — a dot as well
+       would just double up on it */
+    if (beside) { dots.push(null); }
+    else {
+      const dot = document.createElement('span');
+      dot.className = 'diagram__dot';
+      block.appendChild(dot);
+      dots.push(dot);
+    }
 
     const li = document.createElement('div');
     li.className = 'diagram__li';
-    li.innerHTML = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
+    li.innerHTML = body;
     list.appendChild(li);
   });
+
+  function layout() {
+    const bw = block.clientWidth, bh = block.clientHeight;
+    const sw = stage.offsetWidth, sh = stage.offsetHeight;
+    if (!bw || !sh) return;
+    const sx = stage.offsetLeft, sy = stage.offsetTop;
+    svg.setAttribute('viewBox', `0 0 ${bw} ${bh}`);
+
+    /* cover on a portrait source in a wider box fills the width and crops
+       top and bottom, so only this slice of the source is on screen */
+    const visible = Math.min(1, DG_SRC_ASPECT / (sw / sh));
+    const edge = beside ? DG_EDGE.beside : DG_EDGE.onImage;
+
+    points.forEach((h, i) => {
+      const ax = sx + (h.x / 100) * sw;
+      const ay = sy + ((h.ys / 100 - (1 - visible) / 2) / visible) * sh;
+      const ly = sy + (h.ly / 100) * sh;
+      const left = h.side === 'l';
+      const startX = (left ? edge.l : edge.r) * bw + (left ? 8 : -8);
+
+      calls[i].style.top = ly + 'px';
+      if (dots[i]) { dots[i].style.left = ax + 'px'; dots[i].style.top = ay + 'px'; }
+
+      if (beside) {
+        /* symmetric horizontal control points, so the line leaves the label
+           level and arrives at the anchor level again */
+        const k = (ax - startX) * 0.5;
+        paths[i].setAttribute('d', `M ${startX} ${ly} C ${startX + k} ${ly}, ${ax - k} ${ay}, ${ax} ${ay}`);
+      } else {
+        paths[i].setAttribute('d', `M ${startX} ${ly} L ${ax} ${ay}`);
+      }
+    });
+  }
+  new ResizeObserver(layout).observe(stage);
+  window.addEventListener('resize', layout);
+  layout();
 });
 
 /* ---------- V2 cutaway layers ------------------------------- */
