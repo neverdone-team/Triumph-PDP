@@ -340,16 +340,25 @@ body[data-side="max"] .grid { padding: 0 48px; }
 .card__img:hover .gal-nav { opacity: 1; pointer-events: auto; }
 @media (hover: none) { .gal-nav { display: none; } }
 
-/* wishlist heart — top right of every product photo */
+/* wishlist heart — black outline, top right of every product photo, hidden
+   at rest: it fades in only while the card is hovered (or once favourited,
+   so a selected heart never disappears). On touch devices it's always shown. */
 .wish {
   /* top is 1px less than right: the heart glyph sits ~1px lower inside its
      box than it does from the right, so equal offsets read as more top gap */
   position: absolute; top: 15px; right: 16px; z-index: 6;
   width: 24px; height: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s var(--ease-out), transform .2s var(--ease-out);
+}
+.card:hover .wish,
+.wish[data-on="true"] { opacity: 1; pointer-events: auto; }
+@media (hover: none) {
+  .wish { opacity: 1; pointer-events: auto; }
 }
 .wish svg {
   width: 24px; height: 24px;
-  fill: #fff; stroke: var(--c-ink); stroke-width: 1;
+  fill: none; stroke: var(--c-ink); stroke-width: 1;
   transition: fill .2s var(--ease-out), transform .2s var(--ease-out);
 }
 .wish:hover svg { transform: scale(1.1); }
@@ -359,88 +368,6 @@ body[data-side="max"] .grid { padding: 0 48px; }
    reads much crisper than tinting the 1px outline */
 .wish svg .hs { display: none; stroke: none; }
 .wish[data-on="true"] svg .hs { display: block; }
-
-/* HEART 1 — no white fill, white stroke, blurred dark disc behind */
-body[data-heart="h1"] .wish {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  background: rgba(0,0,0,.3);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-}
-/* native 24px — scaling the svg puts the 1px stroke between pixels and blurs it;
-   1px nudge down: the heart's optical centre sits above its geometric one,
-   so dead-centre reads too high in the disc */
-body[data-heart="h1"] .wish svg { width: 24px; height: 24px; fill: none; stroke: #fff; position: relative; top: 1px; }
-body[data-heart="h1"] .wish[data-on="true"] svg { fill: #fff; }
-
-/* HEART 3 — white outline heart in the photo, no disc behind it */
-body[data-heart="h3"] .wish svg { fill: none; stroke: #fff; }
-body[data-heart="h3"] .wish[data-on="true"] svg { fill: #fff; }
-
-/* HEART 4 — black outline heart in the photo, no fill, no disc */
-body[data-heart="h4"] .wish svg { fill: none; }
-body[data-heart="h4"] .wish[data-on="true"] svg { fill: var(--c-ink); }
-
-/* HEART 2 — the classic heart (white fill, black stroke) moves out of
-   the photo onto the title line, flush right (JS re-slots the node);
-   rendered at its native 24px so the 1px stroke stays sharp, negative
-   margins keep the 20px title line-height intact */
-body[data-heart="h2"] .card__cat { display: flex; align-items: center; gap: 12px; }
-body[data-heart="h2"] .wish {
-  position: static;
-  margin: -2px 0 -2px auto;
-  width: 24px; height: 24px; flex: none;
-}
-body[data-heart="h2"] .wish svg { width: 24px; height: 24px; }
-
-/* HEART 5 — no heart at rest, in the photo or below it; hovering
-   "+ N colors" (tap on mobile) opens the colour panel and only then
-   the heart fades in top right, level with the product title, above
-   the panel (the node lives in .card__info for this option) */
-body[data-heart="h5"] .wish {
-  top: 50%; right: 12px; /* centred on the open swatch row */
-  z-index: 6;
-  opacity: 0; pointer-events: none;
-  transform: translateY(calc(-50% + 6px));
-  transition: opacity .32s var(--ease-out), transform .32s var(--ease-out);
-}
-body[data-heart="h5"] .card.is-open .wish { opacity: 1; pointer-events: auto; transform: translateY(-50%); }
-
-/* HEART 6 — frosted heart: the blurred dark glass is the glyph itself
-   rather than a disc behind it — the backdrop blur is clipped to the
-   solid heart path (.hs, native 24px coords) under a dark grey outline */
-body[data-heart="h6"] .wish::before {
-  content: "";
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,.25);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  clip-path: path('M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z');
-}
-/* position:relative lifts the svg above the ::before — the absolutely
-   positioned frost otherwise paints on top of the glyph and tints it */
-body[data-heart="h6"] .wish svg { position: relative; fill: none; stroke: #3d3d3d; }
-/* stroke goes black too — the grey outline sits on top of the fill and
-   would otherwise leave a grey rim around the selected heart */
-body[data-heart="h6"] .wish[data-on="true"] svg { fill: #000; stroke: #000; }
-/* no hover scale — the frosted ::before can't animate with the svg,
-   so the generic svg-only scale makes the outline drift off the fill */
-body[data-heart="h6"] .wish:hover svg { transform: none; }
-
-/* HEART 7 — same black outline as Heart 4, but hidden at rest: it fades
-   in only while the card is hovered (or once favourited, so a selected
-   heart never disappears). On touch devices (mobile) it's always shown. */
-body[data-heart="h7"] .wish svg { fill: none; }
-body[data-heart="h7"] .wish[data-on="true"] svg { fill: var(--c-ink); }
-body[data-heart="h7"] .wish {
-  opacity: 0; pointer-events: none;
-  transition: opacity .28s var(--ease-out), transform .2s var(--ease-out);
-}
-body[data-heart="h7"] .card:hover .wish,
-body[data-heart="h7"] .wish[data-on="true"] { opacity: 1; pointer-events: auto; }
-@media (hover: none) {
-  body[data-heart="h7"] .wish { opacity: 1; pointer-events: auto; }
-}
 
 /* ============================================================
    SALES BANNER — a "SALE" flag on the photo of cards that carry
@@ -458,21 +385,27 @@ body[data-salebanner="v1"] .sale-flag {
   font-size: 14px; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400; white-space: nowrap;
 }
-/* v2 — large translucent white wordmark, regular weight, pushed hard into
-   the bottom-left corner so its baseline touches the rim (negative offsets
-   drop the descender space below the clipped edge) */
-body[data-salebanner="v2"] .sale-flag {
+/* v2–v5 — one large wordmark, light weight, pushed hard into the bottom-left
+   corner so its baseline touches the rim (negative offsets drop the descender
+   space below the clipped edge). The four versions differ only in the ink. */
+body[data-salebanner="v2"] .sale-flag,
+body[data-salebanner="v3"] .sale-flag,
+body[data-salebanner="v4"] .sale-flag,
+body[data-salebanner="v5"] .sale-flag {
   display: block;
   position: absolute; left: -0.04em; bottom: -0.08em; z-index: 4;
-  color: rgba(255,255,255,.6);
   font-size: 24cqw; line-height: 1; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 300; white-space: nowrap;
   pointer-events: none;
 }
+body[data-salebanner="v2"] .sale-flag { color: rgba(255,255,255,.6); } /* translucent white */
+body[data-salebanner="v3"] .sale-flag { color: #fff; }                 /* full white */
+body[data-salebanner="v4"] .sale-flag { color: #747474; }              /* grey/medium */
+body[data-salebanner="v5"] .sale-flag { color: var(--c-ink); }         /* black */
 
 /* ============================================================
-   CARD INFO — title / price / colour label; the dashboard decides
-   whether the colour label gets its own line or joins the price line
+   CARD INFO — title / price / colour label; the colour label always
+   wraps onto its own line below the price
    ============================================================ */
 .card__info { position: relative; padding: 16px 12px 0; } /* 12px insets on both sides (mobile keeps its own) */
 .card__cat {
@@ -505,8 +438,6 @@ body[data-pricing="sale"] .card__sale {
   font-size: 12px; line-height: 14px; font-weight: 400;
   transition: opacity .2s var(--ease-out);
 }
-/* "second line" — the colour label joins the price line (two-line card) */
-body[data-colors="inline"] .cvar__label { flex-basis: auto; margin-top: 0; margin-left: 12px; }
 .cvar__label:hover { opacity: .55; }
 
 /* ============================================================
@@ -729,19 +660,10 @@ body.drawer-open .drawer {
   /* .card__sale inherits the regular price size (10px here); keep the member gap tighter */
   .card__sale .mem { margin-left: 8px; }
   .cvar__label { margin-top: 0; font-size: 10px; }
-  body[data-colors="inline"] .cvar__label { margin-left: 8px; }
 
-  /* hearts sit closer to the corner on small cards */
+  /* the heart sits closer to the corner on small cards */
   .wish { top: 9px; right: 10px; width: 20px; height: 20px; }
   .wish svg { width: 20px; height: 20px; }
-  body[data-heart="h1"] .wish { width: 28px; height: 28px; }
-  body[data-heart="h1"] .wish svg { width: 20px; height: 20px; }
-  body[data-heart="h5"] .wish { right: 4px; }
-  /* keep h6 at 24px — the clip-path coords are fixed in the 24px viewBox */
-  body[data-heart="h6"] .wish { width: 24px; height: 24px; }
-  body[data-heart="h6"] .wish svg { width: 24px; height: 24px; }
-  body[data-heart="h2"] .wish { width: 20px; height: 20px; margin: -2px 0 -2px auto; }
-  body[data-heart="h2"] .wish svg { width: 20px; height: 20px; }
 
   /* sales banner — smaller pink badge on the narrow cards */
   body[data-salebanner="v1"] .sale-flag { font-size: 11px; line-height: 16px; padding: 2px 6px 0; left: 8px; bottom: 8px; }
@@ -827,7 +749,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-colors="newline" data-pricing="standard" data-salebanner="v1" data-images="new" data-heart="h4">
+<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-pricing="standard" data-salebanner="v1" data-images="new">
 
 <!-- HEADER -->
 <header>
@@ -966,13 +888,8 @@ body.dash-open .dash { display: flex; }
   </div>
   <!-- Filters control removed from the panel: only "some" is active and there's
        nothing to toggle. The filter behaviour + deep-link (?filters=all|some|none) still work. -->
-  <div class="dash__group">
-    <div class="dash__label">Colour label position</div>
-    <div class="dash__seg">
-      <button data-k="colors" data-val="newline" data-on="true">New line</button>
-      <button data-k="colors" data-val="inline">Second line</button>
-    </div>
-  </div>
+  <!-- Colour label position removed from the panel: the label always takes a
+       new line below the price, so there was nothing left to toggle. -->
   <div class="dash__group">
     <div class="dash__label">Pricing</div>
     <div class="dash__seg">
@@ -983,8 +900,11 @@ body.dash-open .dash { display: flex; }
   <div class="dash__group">
     <div class="dash__label">Sales banner</div>
     <div class="dash__seg">
-      <button data-k="salebanner" data-val="v1" data-on="true">Sale banner V1</button>
-      <button data-k="salebanner" data-val="v2">Sale banner V2</button>
+      <button data-k="salebanner" data-val="v1" data-on="true" title="Pink badge">V1</button>
+      <button data-k="salebanner" data-val="v2" title="Wordmark — translucent white">V2</button>
+      <button data-k="salebanner" data-val="v3" title="Wordmark — white">V3</button>
+      <button data-k="salebanner" data-val="v4" title="Wordmark — grey">V4</button>
+      <button data-k="salebanner" data-val="v5" title="Wordmark — black">V5</button>
     </div>
   </div>
   <div class="dash__group">
@@ -994,19 +914,8 @@ body.dash-open .dash { display: flex; }
       <button data-k="images" data-val="live">Triumph live</button>
     </div>
   </div>
-  <div class="dash__group">
-    <div class="dash__label">Wishlist heart</div>
-    <div class="dash__seg">
-      <button data-k="heart" data-val="h4" data-on="true">Heart 1</button>
-      <button data-k="heart" data-val="h7">Heart 2</button>
-      <button data-k="heart" data-val="h2">Heart 3</button>
-      <!-- earlier explorations hidden for now — kept in code, remove hidden to restore -->
-      <button data-k="heart" data-val="h1" hidden>Heart 1 (frosted disc)</button>
-      <button data-k="heart" data-val="h3" hidden>Heart 3 (white outline)</button>
-      <button data-k="heart" data-val="h5" hidden>Heart 5 (reveal on panel)</button>
-      <button data-k="heart" data-val="h6" hidden>Heart 6 (frosted glyph)</button>
-    </div>
-  </div>
+  <!-- Wishlist heart removed from the panel: the reveal-on-hover heart
+       (the old Heart 2) is now the only version. -->
 </aside>
 
 <script>
@@ -1141,16 +1050,6 @@ moodCta.className = 'mood-cta';
 moodCta.textContent = 'Discover this product';
 moodCta.addEventListener('click', () => { window.location.href = './pdp.html'; });
 edLast.appendChild(moodCta);
-
-/* HEART 2 — the wishlist heart lives in the photo for Heart 1/3 and
-   moves onto the title line for Heart 2 (state travels with the node) */
-function applyHeart(v) {
-  cards.forEach(card => {
-    const wish = card.querySelector('.wish');
-    const slot = v === 'h2' ? '.card__cat' : v === 'h5' ? '.card__info' : '.card__img';
-    card.querySelector(slot).appendChild(wish);
-  });
-}
 
 const ED_LAST_SRC = './Assets/plp/ed-hydrangea.jpg';
 const edLastImg = edLast.querySelector('img');
@@ -1586,11 +1485,9 @@ const CONTROLS = {
   gap:      ['med', 'max'],
   side:     ['none', 'med', 'max'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
-  colors:   ['newline', 'inline'],
   pricing:  ['standard', 'sale'],
-  salebanner: ['v1', 'v2'],
+  salebanner: ['v1', 'v2', 'v3', 'v4', 'v5'],
   images:   ['new', 'live'],
-  heart:    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7'], /* h1/h3/h5/h6 hidden but kept */
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
@@ -1619,7 +1516,6 @@ function setOption(key, val) {
     });
   }
   if (key === 'view') applyView(val);
-  if (key === 'heart') applyHeart(val);
   if (key === 'filters') { setDrawer(false); closeDropdown(); }
   closeAll();
   dash.querySelectorAll(`button[data-k="${key}"]`).forEach(b => b.dataset.on = String(b.dataset.val === val));
@@ -1641,7 +1537,7 @@ if (window.innerWidth > 760) body.classList.add('dash-open');
 else dashToggle.setAttribute('aria-expanded', 'false');
 
 /* deep-link: plp.html?view=content&gap=max&side=med&filters=some
-   &colors=inline&images=live&heart=h2&open=2
+   &pricing=sale&salebanner=v3&images=live&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
