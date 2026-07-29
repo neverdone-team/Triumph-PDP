@@ -909,16 +909,26 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
    JS (see DIAGRAM) because the line length depends on both ends.
    ------------------------------------------------------------ */
 .diagram { position: relative; }
+/* the labels sit ON the photo, so the stage carries everything and all
+   coordinates are plain percentages of this box */
 .diagram__stage {
   position: relative; z-index: 1;
-  width: 40%; margin: 0 auto;
+  width: 70%; margin: 0 auto;
   aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-cream);
 }
 .diagram__stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* one scrim so white annotation holds over both the light wall and the
+   pale bra — the same device as the .stmt / .mdband statement bands */
+.diagram__scrim {
+  position: absolute; inset: 0; z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.58) 0%, rgba(0,0,0,.46) 26%, rgba(0,0,0,.2) 42%, rgba(0,0,0,.2) 58%, rgba(0,0,0,.46) 74%, rgba(0,0,0,.58) 100%),
+    rgba(0,0,0,.16);
+}
 .diagram__dot {
-  position: absolute; z-index: 3;
+  position: absolute; z-index: 4;
   width: 7px; height: 7px; border-radius: 50%;
-  background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+  background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.25);
   transform: translate(-50%, -50%);
 }
 /* leader lines are drawn as SVG so a label can sit wherever it fits while
@@ -926,19 +936,21 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
    horizontals, which forced every label to share its anchor's height */
 .diagram__svg {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  z-index: 2; overflow: visible; pointer-events: none;
+  z-index: 3; overflow: visible; pointer-events: none;
 }
-.diagram__svg line { stroke: var(--c-line); stroke-width: 1; }
+.diagram__svg line { stroke: rgba(255,255,255,.65); stroke-width: 1; }
 .diagram__call {
-  position: absolute; z-index: 3;
-  width: 25%;
-  display: flex; flex-direction: column; gap: 6px;
+  position: absolute; z-index: 4;
+  width: 30%;
+  display: flex; flex-direction: column; gap: 5px;
   transform: translateY(-50%);
+  color: #fff;
+  text-shadow: 0 1px 14px rgba(0,0,0,.45);
 }
 .diagram__call--l { text-align: right; align-items: flex-end; }
-.diagram__n { font-size: 10px; font-weight: 300; letter-spacing: .1em; color: var(--c-ink-soft); }
+.diagram__n { font-size: 10px; font-weight: 300; letter-spacing: .1em; color: rgba(255,255,255,.7); }
 .diagram__t { font-size: 12px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
-.diagram__d { margin: 0; font-size: 11px; font-weight: 300; line-height: 17px; letter-spacing: .02em; color: var(--c-ink-soft); }
+.diagram__d { margin: 0; font-size: 11px; font-weight: 300; line-height: 17px; letter-spacing: .02em; color: rgba(255,255,255,.9); }
 /* the stacked fallback used below 1200px, where gutters are too narrow */
 .diagram__list { display: none; }
 
@@ -1397,8 +1409,9 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
 
   /* the leader-line diagram needs side gutters it doesn't have here —
      show the photo full width and the callouts as a numbered list */
+  /* no overlay here, so the photo needs no scrim to sit under white type */
   .diagram__stage { width: 100%; }
-  .diagram__call, .diagram__svg, .diagram__dot { display: none; }
+  .diagram__call, .diagram__svg, .diagram__dot, .diagram__scrim { display: none; }
   .diagram__list {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px 32px; margin-top: 32px;
@@ -2898,7 +2911,7 @@ body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
         <button class="shades__nav" data-shades-next aria-label="Next shades">
           <svg viewBox="0 0 9 14"><path d="M1 1l6.5 6-6.5 6"/></svg>
         </button>
-        <p class="cx__lede shades__note">Every nude is the same lace and the same cut — only matched to a different skin. Not sure which is yours? <a class="cx__link" href="#" style="align-self:auto;">Find your nude</a></p>
+        <p class="cx__lede shades__note">Every nude is the same lace and the same cut — only matched to a different skin.</p>
       </div>
     </section>
 
@@ -3291,20 +3304,20 @@ const WORN = [
      benefits (V6) — leads with the payoff, names the part underneath */
 const DIAGRAM_SETS = {
   anatomy: [
-    { x: 65, y: 35, ly: 26, side: 'r', t: 'V-slide strap',   d: 'Soft jacquard elastic that holds its setting instead of creeping down over the day.' },
-    { x: 53, y: 52, ly: 28, side: 'l', t: 'Bonded top edge', d: 'Laser-cut, not stitched — so there is no seam to print under a t-shirt.' },
-    { x: 60, y: 56, ly: 53, side: 'r', t: 'Floral jacquard', d: 'Double-layered lace with LYCRA® through the ground: it stretches and springs back.' },
-    { x: 47, y: 62, ly: 55, side: 'l', t: 'Moulded cup',     d: 'Seam-free and 1.8 mm thin — shape without the bulk of added padding.' },
-    { x: 68, y: 72, ly: 80, side: 'r', t: 'Flexible wire',   d: 'Follows the breast root and stops short of the arm crease. An outline, not a pinch.' },
-    { x: 52, y: 82, ly: 82, side: 'l', t: 'Wide underband',  d: 'Carries about 80% of the support. Bonded flat so it holds firm without digging in.' },
+    { x: 67, y: 46, ly: 16, side: 'r', t: 'V-slide strap',   d: 'Soft jacquard elastic that holds its setting all day.' },
+    { x: 38, y: 54, ly: 22, side: 'l', t: 'Bonded top edge', d: 'Laser-cut, not stitched — nothing to print through.' },
+    { x: 62, y: 58, ly: 46, side: 'r', t: 'Floral jacquard', d: 'Double-layered lace with LYCRA®: stretches, then recovers.' },
+    { x: 40, y: 62, ly: 50, side: 'l', t: 'Moulded cup',     d: 'Seam-free and 1.8 mm thin — shape without bulk.' },
+    { x: 70, y: 63, ly: 76, side: 'r', t: 'Flexible wire',   d: 'Follows the breast root, clear of the arm crease.' },
+    { x: 44, y: 70, ly: 80, side: 'l', t: 'Wide underband',  d: 'Carries about 80% of the support. Bonded flat, no digging.' },
   ],
   benefits: [
-    { x: 65, y: 35, ly: 26, side: 'r', t: 'Straps Stay Set',        d: 'V-slides at the back hold the length you chose, so nothing creeps down by the afternoon.' },
-    { x: 53, y: 52, ly: 28, side: 'l', t: 'Nothing Prints Through', d: 'The top edge is bonded and laser-cut, so there is no seam to show under a white t-shirt.' },
-    { x: 60, y: 56, ly: 53, side: 'r', t: 'Moves And Recovers',     d: 'LYCRA® runs through the lace itself — it stretches with you and springs back rather than going slack.' },
-    { x: 47, y: 62, ly: 55, side: 'l', t: 'Shape Without Bulk',     d: 'A 1.8 mm moulded cup rounds and lifts on its own. No extra padding, so you keep your own shape.' },
-    { x: 68, y: 72, ly: 80, side: 'r', t: 'No Digging At The Arm',  d: 'The wire follows the breast root and stops short of the arm crease. You feel an outline, not a pinch.' },
-    { x: 52, y: 82, ly: 82, side: 'l', t: 'Never Rides Up',         d: 'The wide underband carries about 80% of the weight, so it can hold firm without pressing in.' },
+    { x: 67, y: 46, ly: 16, side: 'r', t: 'Straps Stay Set',        d: 'V-slides hold the length you set, so nothing creeps down.' },
+    { x: 38, y: 54, ly: 22, side: 'l', t: 'Nothing Prints Through', d: 'Bonded and laser-cut — no seam to show under a white tee.' },
+    { x: 62, y: 58, ly: 46, side: 'r', t: 'Moves And Recovers',     d: 'LYCRA® in the lace itself: it stretches, then springs back.' },
+    { x: 40, y: 62, ly: 50, side: 'l', t: 'Shape Without Bulk',     d: 'A 1.8 mm moulded cup lifts on its own. No added padding.' },
+    { x: 70, y: 63, ly: 76, side: 'r', t: 'No Digging At The Arm',  d: 'Stops short of the arm crease — an outline, not a pinch.' },
+    { x: 44, y: 70, ly: 80, side: 'l', t: 'Never Rides Up',         d: 'The wide band carries the weight, so it holds without pressing.' },
   ],
 };
 
@@ -3451,31 +3464,40 @@ $$('[data-worn]').forEach(strip => {
    edge sits at 28% of the block and each anchor's x in block coordinates
    is 28 + x*0.44. Labels occupy the gutters and the leader line spans the
    gap between the label's inner edge and the anchor. */
-const DG_IMG_W = 40, DG_IMG_L = (100 - DG_IMG_W) / 2, DG_GAP = 1.5;
+/* label geometry, all % of the photo box: a 30%-wide column inset 3% from
+   each edge, so a leader line starts just inside it. Everything now lives
+   inside the photo, so x/y need no translation and no measuring pass. */
+/* 26% wide, inset 2% — the columns must clear the outermost anchor (x=70)
+   or a dot lands inside its own label */
+const DG_LBL_W = 26, DG_INSET = 2, DG_GAP = 1.5;
 const SVGNS = 'http://www.w3.org/2000/svg';
 $$('[data-diagram]').forEach(block => {
   const points = DIAGRAM_SETS[block.dataset.diagram] || DIAGRAM_SETS.anatomy;
   const stage = block.querySelector('.diagram__stage');
   const list = block.querySelector('.diagram__list');
 
-  /* percentage viewBox + non-scaling strokes: the lines follow the block as
+  const scrim = document.createElement('span');
+  scrim.className = 'diagram__scrim';
+  stage.appendChild(scrim);
+
+  /* percentage viewBox + non-scaling strokes: the lines follow the photo as
      it resizes without the hairline stretching with it */
   const svg = document.createElementNS(SVGNS, 'svg');
   svg.setAttribute('class', 'diagram__svg');
   svg.setAttribute('viewBox', '0 0 100 100');
   svg.setAttribute('preserveAspectRatio', 'none');
-  block.appendChild(svg);
+  stage.appendChild(svg);
 
   points.forEach((h, i) => {
     const n = String(i + 1).padStart(2, '0');
-    const ax = DG_IMG_L + h.x * (DG_IMG_W / 100);   // anchor x in block %
     const left = h.side === 'l';
-    const labelInner = left ? 25 : 75;              // label's inner edge
+    /* the label's inner edge — where its leader line begins */
+    const inner = left ? DG_INSET + DG_LBL_W : 100 - DG_INSET - DG_LBL_W;
 
     const line = document.createElementNS(SVGNS, 'line');
-    line.setAttribute('x1', left ? labelInner + DG_GAP : labelInner - DG_GAP);
+    line.setAttribute('x1', left ? inner + DG_GAP : inner - DG_GAP);
     line.setAttribute('y1', h.ly);
-    line.setAttribute('x2', ax);
+    line.setAttribute('x2', h.x);
     line.setAttribute('y2', h.y);
     line.setAttribute('vector-effect', 'non-scaling-stroke');
     svg.appendChild(line);
@@ -3483,32 +3505,21 @@ $$('[data-diagram]').forEach(block => {
     const call = document.createElement('div');
     call.className = 'diagram__call diagram__call--' + h.side;
     call.style.top = h.ly + '%';
-    call.style[left ? 'left' : 'right'] = '0';
+    call.style[left ? 'left' : 'right'] = DG_INSET + '%';
     call.innerHTML = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
 
     const dot = document.createElement('span');
     dot.className = 'diagram__dot';
-    dot.style.left = ax + '%';
+    dot.style.left = h.x + '%';
     dot.style.top = h.y + '%';
 
-    block.append(call, dot);
+    stage.append(call, dot);
 
     const li = document.createElement('div');
     li.className = 'diagram__li';
     li.innerHTML = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
     list.appendChild(li);
   });
-
-  /* the block is as tall as the photo, so y% maps straight across — but pin
-     the dots and labels to the photo's measured box so a stacked mobile
-     layout or a late image load can't drift them */
-  const place = () => {
-    const top = stage.offsetTop, h = stage.offsetHeight;
-    $$('.diagram__dot', block).forEach((d, i) => { d.style.top = (top + h * points[i].y / 100) + 'px'; });
-    $$('.diagram__call', block).forEach((c, i) => { c.style.top = (top + h * points[i].ly / 100) + 'px'; });
-  };
-  new ResizeObserver(place).observe(stage);
-  place();
 });
 
 /* ---------- V2 cutaway layers ------------------------------- */
