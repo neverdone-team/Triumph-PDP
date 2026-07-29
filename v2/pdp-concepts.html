@@ -901,40 +901,46 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
   margin-bottom: 4px;
 }
 
-/* --- annotated hotspots (HODINKEE) -------------------------- */
-.hot { display: flex; gap: 60px; align-items: flex-start; }
-.hot__txt { flex: 0 1 340px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 120px; }
-.hot__stage { flex: 1 1 0; min-width: 0; position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-cream); }
-.hot__stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.hot__dot {
+/* --- anatomy infographic -----------------------------------
+   Every label is visible at once with a thin leader line to the part
+   it names — no clicking. The photo sits in a centre column and the
+   labels live in the gutters, each vertically aligned with its own
+   anchor so one straight rule can connect them. Positions come from
+   JS (see DIAGRAM) because the line length depends on both ends.
+   ------------------------------------------------------------ */
+.diagram { position: relative; }
+.diagram__stage {
+  position: relative; z-index: 1;
+  width: 40%; margin: 0 auto;
+  aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-cream);
+}
+.diagram__stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.diagram__dot {
   position: absolute; z-index: 3;
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.25);
   transform: translate(-50%, -50%);
-  background: rgba(255,255,255,.55);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 400; letter-spacing: 0;
-  transition: background .3s var(--ease-out), transform .3s var(--ease-out);
 }
-.hot__dot::after {
-  content: ""; position: absolute; inset: -7px;
-  border: 1px solid rgba(255,255,255,.5); border-radius: 50%;
-  opacity: 0; transition: opacity .3s var(--ease-out);
+/* leader lines are drawn as SVG so a label can sit wherever it fits while
+   its line still runs to the exact anchor — a CSS box can only do
+   horizontals, which forced every label to share its anchor's height */
+.diagram__svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 2; overflow: visible; pointer-events: none;
 }
-.hot__dot:hover, .hot__dot[aria-expanded="true"] { background: #fff; transform: translate(-50%, -50%) scale(1.12); }
-.hot__dot[aria-expanded="true"]::after { opacity: 1; }
-.hot__pop {
-  position: absolute; z-index: 4;
-  width: 232px; padding: 16px;
-  background: #fff;
-  display: flex; flex-direction: column; gap: 8px;
-  opacity: 0; pointer-events: none; transform: translateY(4px);
-  transition: opacity .3s var(--ease-out), transform .3s var(--ease-out);
+.diagram__svg line { stroke: var(--c-line); stroke-width: 1; }
+.diagram__call {
+  position: absolute; z-index: 3;
+  width: 25%;
+  display: flex; flex-direction: column; gap: 6px;
+  transform: translateY(-50%);
 }
-.hot__pop[data-on="true"] { opacity: 1; pointer-events: auto; transform: none; }
-.hot__pop b { font-size: 12px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
-.hot__pop p { margin: 0; font-size: 12px; font-weight: 300; line-height: 18px; letter-spacing: .04em; }
-.hot__hint { font-size: 11px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-soft); }
+.diagram__call--l { text-align: right; align-items: flex-end; }
+.diagram__n { font-size: 10px; font-weight: 300; letter-spacing: .1em; color: var(--c-ink-soft); }
+.diagram__t { font-size: 12px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.diagram__d { margin: 0; font-size: 11px; font-weight: 300; line-height: 17px; letter-spacing: .02em; color: var(--c-ink-soft); }
+/* the stacked fallback used below 1200px, where gutters are too narrow */
+.diagram__list { display: none; }
 
 /* --- numbered steps (Spotify "how it works") ---------------- */
 .steps { display: flex; flex-direction: column; }
@@ -1059,14 +1065,6 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
 .worn__pic { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: var(--c-cream); }
 .worn__pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease-out); }
 .worn__item:hover .worn__pic img { transform: scale(1.05); }
-/* the little shop tag Nike puts in the corner of each UGC tile */
-.worn__bag {
-  position: absolute; left: 10px; top: 10px;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(255,255,255,.9);
-  display: flex; align-items: center; justify-content: center;
-}
-.worn__bag svg { width: 13px; height: 13px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
 .worn__meta { display: flex; flex-direction: column; gap: 5px; }
 .worn__handle { font-size: 11px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
 .worn__note { font-size: 12px; font-weight: 300; line-height: 18px; letter-spacing: .04em; color: var(--c-ink-soft); }
@@ -1075,6 +1073,9 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
 /* --- skin-tone selector (Kess Berlin) ----------------------- */
 .tone { display: flex; gap: 60px; align-items: flex-start; }
 .tone__stage { flex: 1 1 0; min-width: 0; position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-cream); }
+/* V2 shows the tone shot half as tall — a wide crop reads as a swatch
+   on skin rather than a portrait, which suits the analytical direction */
+body[data-v="2"] .tone__stage { aspect-ratio: 8 / 5; }
 .tone__stage img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   opacity: 0; transition: opacity .6s var(--ease-out);
@@ -1394,10 +1395,15 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
   .motion { grid-template-columns: 1fr; gap: 20px; }
   .motion__vid { aspect-ratio: 4 / 5; }
 
-  .hot { flex-direction: column; gap: 24px; }
-  .hot__txt { position: static; flex: none; width: 100%; }
-  .hot__stage { width: 100%; }
-  .hot__pop { width: 200px; }
+  /* the leader-line diagram needs side gutters it doesn't have here —
+     show the photo full width and the callouts as a numbered list */
+  .diagram__stage { width: 100%; }
+  .diagram__call, .diagram__svg, .diagram__dot { display: none; }
+  .diagram__list {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 32px; margin-top: 32px;
+  }
+  .diagram__li { display: flex; flex-direction: column; gap: 5px; padding-top: 14px; border-top: 1px solid var(--c-line); }
 
   .steps__row { flex-wrap: wrap; gap: 20px; padding: 24px 0; }
   .steps__thumb { width: 92px; order: 3; }
@@ -2058,16 +2064,16 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
     </div>
 
     <section class="cx">
-      <div class="hot rv" data-hot>
-        <div class="hot__txt">
-          <span class="cx__eyeb">Anatomy</span>
-          <h2 class="cx__h">Every part of it is doing something</h2>
-          <p class="cx__lede">Six details that decide how a bra feels by 6pm. Tap a point to see what it does.</p>
-          <span class="hot__hint">Tap the points on the photo</span>
+      <div class="cx__head rv" style="align-items:center; text-align:center;">
+        <span class="cx__eyeb">Anatomy</span>
+        <h2 class="cx__h cx__h--wide" style="max-width:26ch;">Every part of it is doing something</h2>
+        <p class="cx__lede" style="max-width:52ch;">Six details that decide how a bra feels by 6pm.</p>
+      </div>
+      <div class="diagram rv" data-diagram style="margin-top:64px;">
+        <div class="diagram__stage">
+          <img src="./Assets/pdp/gallery-1.jpg" alt="Aura Spotlight bra with its construction labelled" />
         </div>
-        <div class="hot__stage" data-hot-stage>
-          <img src="./Assets/pdp/gallery-1.jpg" alt="Aura Spotlight bra with annotated details" />
-        </div>
+        <div class="diagram__list"></div>
       </div>
     </section>
 
@@ -2841,6 +2847,34 @@ body[data-v="6"] .cz[data-v="6"] { display: block; }
       </div>
     </section>
 
+    <section class="cx">
+      <div class="cx__head rv">
+        <span class="cx__eyeb">Where it sits</span>
+        <h2 class="cx__h cx__h--wide">Instead of "medium coverage"</h2>
+        <p class="cx__lede">Three scales that place this bra against every other one we make — measured, not described.</p>
+      </div>
+      <div class="meters rv" data-meters style="margin-top:48px;">
+        <div class="meter">
+          <div class="meter__top"><span class="meter__name">Coverage</span><span class="meter__val">Just below the collarbone</span></div>
+          <div class="meter__track"><span class="meter__fill" data-fill="58"></span><span class="meter__dot" style="--v:58%"></span></div>
+          <div class="meter__ends"><span>Bare minimum</span><span>Full cup</span></div>
+          <p class="meter__note">Covers the whole breast with a soft top edge — safe under a scoop neck, invisible under a crew.</p>
+        </div>
+        <div class="meter">
+          <div class="meter__top"><span class="meter__name">Support</span><span class="meter__val">Everyday to long day</span></div>
+          <div class="meter__track"><span class="meter__fill" data-fill="72"></span><span class="meter__dot" style="--v:72%"></span></div>
+          <div class="meter__ends"><span>Barely there</span><span>Firm hold</span></div>
+          <p class="meter__note">Enough for a 12-hour day and a commute. Not a sports bra — see Triumph Motion for that.</p>
+        </div>
+        <div class="meter">
+          <div class="meter__top"><span class="meter__name">Lift</span><span class="meter__val">Natural shape, lifted</span></div>
+          <div class="meter__track"><span class="meter__fill" data-fill="44"></span><span class="meter__dot" style="--v:44%"></span></div>
+          <div class="meter__ends"><span>As you are</span><span>Push-up</span></div>
+          <p class="meter__note">Rounds and raises without pushing together. No added padding on top of the moulded cup.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="cx rv">
       <div class="shades" data-shades>
         <h2 class="shades__h">Nudes Compared</h2>
@@ -3229,17 +3263,21 @@ const WORN = [
   { h: '@charlotte.pl', img: 'ig-8-cardigan',    note: 'Weekend, nothing over it but a cardigan.',       size: 'Wears 85B' },
 ];
 
-/* V2 — annotated anatomy (HODINKEE hotspots).
-   Coordinates are % of the .hot__stage box (4:5, object-fit cover) and were
-   measured against gallery-1.jpg so each dot lands on the part it names.
-   Re-measure these if the photo behind them is ever swapped. */
-const HOTSPOTS = [
-  { x: 53, y: 52, t: 'Bonded top edge',   d: 'Laser-cut and bonded instead of stitched, so there is no seam to print under a t-shirt.' },
-  { x: 47, y: 58, t: 'Moulded cup',       d: 'Seam-free and 1.8 mm thin — shape without the bulk of added padding.' },
-  { x: 60, y: 56, t: 'Floral jacquard',   d: 'Double-layered lace with LYCRA® through the ground: it stretches and springs back.' },
-  { x: 68, y: 64, t: 'Flexible wire',     d: 'Follows the breast root and stops short of the arm crease. You feel an outline, not a pinch.' },
-  { x: 52, y: 67, t: 'Wide underband',    d: 'Carries about 80% of the support. Bonded flat so it holds firm without digging in.' },
-  { x: 65, y: 35, t: 'V-slide strap',     d: 'Soft jacquard elastic that holds its setting instead of creeping down over the day.' },
+/* V2 — anatomy infographic.
+   x/y are % of the photo box (4:5, object-fit cover), measured against
+   gallery-1.jpg so each dot lands on the part it names — re-measure if the
+   photo is swapped. `side` picks the gutter the label sits in; the label is
+   centred on its own y so a single straight rule can join the two. Keep the
+   y values on each side well apart or the labels collide. */
+/* x/y = the anchor on the garment. ly = where the label sits in the gutter,
+   spread far enough apart that the copy can't collide. */
+const DIAGRAM = [
+  { x: 65, y: 35, ly: 26, side: 'r', t: 'V-slide strap',   d: 'Soft jacquard elastic that holds its setting instead of creeping down over the day.' },
+  { x: 53, y: 52, ly: 28, side: 'l', t: 'Bonded top edge', d: 'Laser-cut, not stitched — so there is no seam to print under a t-shirt.' },
+  { x: 60, y: 56, ly: 53, side: 'r', t: 'Floral jacquard', d: 'Double-layered lace with LYCRA® through the ground: it stretches and springs back.' },
+  { x: 47, y: 62, ly: 55, side: 'l', t: 'Moulded cup',     d: 'Seam-free and 1.8 mm thin — shape without the bulk of added padding.' },
+  { x: 68, y: 72, ly: 80, side: 'r', t: 'Flexible wire',   d: 'Follows the breast root and stops short of the arm crease. An outline, not a pinch.' },
+  { x: 52, y: 82, ly: 82, side: 'l', t: 'Wide underband',  d: 'Carries about 80% of the support. Bonded flat so it holds firm without digging in.' },
 ];
 
 /* V2 — cutaway layers (Leesa layer diagram) */
@@ -3367,12 +3405,11 @@ $$('[data-shades]').forEach(block => {
 });
 
 /* ---------- "as worn by" rows -------------------------------- */
-const wornBag = `<span class="worn__bag"><svg viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg></span>`;
 $$('[data-worn]').forEach(strip => {
   const items = strip.hasAttribute('data-worn-long') ? WORN : WORN.slice(0, 6);
   strip.innerHTML = items.map(w => `
     <a class="worn__item" href="#">
-      <div class="worn__pic"><img src="./Assets/unsplash/${w.img}.jpg" alt="${w.h} wearing the Aura Spotlight" loading="lazy" />${wornBag}</div>
+      <div class="worn__pic"><img src="./Assets/unsplash/${w.img}.jpg" alt="${w.h} wearing the Aura Spotlight" loading="lazy" /></div>
       <div class="worn__meta">
         <span class="worn__handle">${w.h}</span>
         <span class="worn__note">${w.note}</span>
@@ -3381,43 +3418,68 @@ $$('[data-worn]').forEach(strip => {
     </a>`).join('');
 });
 
-/* ---------- V2 annotated hotspots ---------------------------- */
-$$('[data-hot]').forEach(block => {
-  const stage = block.querySelector('[data-hot-stage]');
-  HOTSPOTS.forEach((h, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'hot__dot';
-    dot.style.left = h.x + '%';
+/* ---------- V2 anatomy infographic --------------------------- */
+/* The photo is a centred column (.diagram__stage, 44% wide), so its left
+   edge sits at 28% of the block and each anchor's x in block coordinates
+   is 28 + x*0.44. Labels occupy the gutters and the leader line spans the
+   gap between the label's inner edge and the anchor. */
+const DG_IMG_W = 40, DG_IMG_L = (100 - DG_IMG_W) / 2, DG_GAP = 1.5;
+const SVGNS = 'http://www.w3.org/2000/svg';
+$$('[data-diagram]').forEach(block => {
+  const stage = block.querySelector('.diagram__stage');
+  const list = block.querySelector('.diagram__list');
+
+  /* percentage viewBox + non-scaling strokes: the lines follow the block as
+     it resizes without the hairline stretching with it */
+  const svg = document.createElementNS(SVGNS, 'svg');
+  svg.setAttribute('class', 'diagram__svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  block.appendChild(svg);
+
+  DIAGRAM.forEach((h, i) => {
+    const n = String(i + 1).padStart(2, '0');
+    const ax = DG_IMG_L + h.x * (DG_IMG_W / 100);   // anchor x in block %
+    const left = h.side === 'l';
+    const labelInner = left ? 25 : 75;              // label's inner edge
+
+    const line = document.createElementNS(SVGNS, 'line');
+    line.setAttribute('x1', left ? labelInner + DG_GAP : labelInner - DG_GAP);
+    line.setAttribute('y1', h.ly);
+    line.setAttribute('x2', ax);
+    line.setAttribute('y2', h.y);
+    line.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(line);
+
+    const call = document.createElement('div');
+    call.className = 'diagram__call diagram__call--' + h.side;
+    call.style.top = h.ly + '%';
+    call.style[left ? 'left' : 'right'] = '0';
+    call.innerHTML = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
+
+    const dot = document.createElement('span');
+    dot.className = 'diagram__dot';
+    dot.style.left = ax + '%';
     dot.style.top = h.y + '%';
-    dot.textContent = String(i + 1);
-    dot.setAttribute('aria-expanded', 'false');
-    dot.setAttribute('aria-label', h.t);
 
-    const pop = document.createElement('div');
-    pop.className = 'hot__pop';
-    pop.dataset.on = 'false';
-    pop.innerHTML = `<b>${h.t}</b><p>${h.d}</p>`;
-    /* flip the card to the other side of the dot near the right edge
-       so it never runs outside the photo */
-    const flip = h.x > 58;
-    pop.style.left = flip ? 'auto' : `calc(${h.x}% + 22px)`;
-    pop.style.right = flip ? `calc(${100 - h.x}% + 22px)` : 'auto';
-    pop.style.top = `min(${h.y}%, calc(100% - 132px))`;
+    block.append(call, dot);
 
-    dot.addEventListener('click', e => {
-      e.stopPropagation();
-      const open = pop.dataset.on === 'true';
-      $$('.hot__pop', stage).forEach(p => p.dataset.on = 'false');
-      $$('.hot__dot', stage).forEach(d => d.setAttribute('aria-expanded', 'false'));
-      pop.dataset.on = String(!open);
-      dot.setAttribute('aria-expanded', String(!open));
-    });
-    stage.append(dot, pop);
+    const li = document.createElement('div');
+    li.className = 'diagram__li';
+    li.innerHTML = `<span class="diagram__n">${n}</span><span class="diagram__t">${h.t}</span><p class="diagram__d">${h.d}</p>`;
+    list.appendChild(li);
   });
-  stage.addEventListener('click', () => {
-    $$('.hot__pop', stage).forEach(p => p.dataset.on = 'false');
-    $$('.hot__dot', stage).forEach(d => d.setAttribute('aria-expanded', 'false'));
-  });
+
+  /* the block is as tall as the photo, so y% maps straight across — but pin
+     the dots and labels to the photo's measured box so a stacked mobile
+     layout or a late image load can't drift them */
+  const place = () => {
+    const top = stage.offsetTop, h = stage.offsetHeight;
+    $$('.diagram__dot', block).forEach((d, i) => { d.style.top = (top + h * DIAGRAM[i].y / 100) + 'px'; });
+    $$('.diagram__call', block).forEach((c, i) => { c.style.top = (top + h * DIAGRAM[i].ly / 100) + 'px'; });
+  };
+  new ResizeObserver(place).observe(stage);
+  place();
 });
 
 /* ---------- V2 cutaway layers ------------------------------- */
