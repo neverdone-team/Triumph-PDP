@@ -274,15 +274,11 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   grid-auto-flow: dense;
   row-gap: var(--row-gap);
   margin-bottom: 120px;
+  /* settled 2026-07-30: 24px between the cards, 48px down each side.
+     Mobile drops the side padding to zero — see the ≤760px block. */
+  column-gap: 24px;
+  padding: 0 48px;
 }
-/* gap between the cards (desktop values, mobile below) — "none" butts the
-   photos edge to edge; the row gap stays, only the columns close up */
-body[data-gap="none"] .grid { column-gap: 0; }
-body[data-gap="med"] .grid { column-gap: 24px; }
-body[data-gap="max"] .grid { column-gap: 40px; }
-/* padding left + right of the grid */
-body[data-side="med"] .grid { padding: 0 24px; }
-body[data-side="max"] .grid { padding: 0 48px; }
 .card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
 .card, .ed {
   position: relative;
@@ -304,7 +300,6 @@ body[data-side="max"] .grid { padding: 0 48px; }
   aspect-ratio: 688 / 905; /* Figma card image */
   overflow: hidden;
   background: var(--c-offwhite);
-  container-type: inline-size; /* so the v2 SALE wordmark scales with card width */
 }
 .card__img .ph {
   position: absolute; inset: 0;
@@ -372,14 +367,12 @@ body[data-side="max"] .grid { padding: 0 48px; }
 .wish[data-on="true"] svg .hs { display: block; }
 
 /* ============================================================
-   SALES BANNER — a "SALE" flag on the photo of cards that carry
-   sale data; the dashboard picks the treatment (Figma 1135-22770 /
-   1273-24563). Only rendered on sale cards, so it never shows here
-   unless a version is active.
+   SALES BANNER — the solid pink "SALE" badge, bottom-left of the photo
+   (--surface/sales #C1003F; Figma 1135-22770 / 1273-24563). The four
+   translucent-wordmark alternatives were dropped 2026-07-30; this is now
+   the only treatment. Rendered only on cards that carry sale data.
    ============================================================ */
-.sale-flag { display: none; }
-/* v1 — solid pink badge, bottom-left of the image (--surface/sales #C1003F) */
-body[data-salebanner="v1"] .sale-flag {
+.sale-flag {
   display: inline-flex; align-items: baseline; justify-content: center;
   position: absolute; left: 12px; bottom: 12px; z-index: 4;
   padding: 2px 8px 0;
@@ -387,23 +380,6 @@ body[data-salebanner="v1"] .sale-flag {
   font-size: 14px; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400; white-space: nowrap;
 }
-/* v2–v5 — one large wordmark, light weight, pushed hard into the bottom-left
-   corner so its baseline touches the rim (negative offsets drop the descender
-   space below the clipped edge). The four versions differ only in the ink. */
-body[data-salebanner="v2"] .sale-flag,
-body[data-salebanner="v3"] .sale-flag,
-body[data-salebanner="v4"] .sale-flag,
-body[data-salebanner="v5"] .sale-flag {
-  display: block;
-  position: absolute; left: -0.04em; bottom: -0.08em; z-index: 4;
-  font-size: 24cqw; line-height: 1; letter-spacing: .04em;
-  text-transform: uppercase; font-weight: 300; white-space: nowrap;
-  pointer-events: none;
-}
-body[data-salebanner="v2"] .sale-flag { color: rgba(255,255,255,.6); } /* translucent white */
-body[data-salebanner="v3"] .sale-flag { color: #fff; }                 /* full white */
-body[data-salebanner="v4"] .sale-flag { color: rgba(0,0,0,.5); }       /* black, 50% */
-body[data-salebanner="v5"] .sale-flag { color: var(--c-ink); }         /* black */
 
 /* ============================================================
    CARD INFO — title / price / colour label; the colour label always
@@ -646,18 +622,18 @@ body.drawer-open .drawer {
   .filters, .filters-single { display: none !important; }
   .filters-mobile { display: inline-flex; }
 
-  /* grid — 2 columns */
-  .grid { grid-template-columns: repeat(2, 1fr) !important; margin-bottom: 80px; }
-  /* the desktop gaps are too wide for 2 columns — step them down
-     ("none" needs no override: 0 is 0 at every width) */
-  body[data-gap="med"] .grid { column-gap: 12px; }
-  body[data-gap="max"] .grid { column-gap: 16px; }
-  body[data-side="med"] .grid { padding: 0 16px; }
-  body[data-side="max"] .grid { padding: 0 24px; }
+  /* grid — 2 columns, edge to edge: no side padding, and 12px between the
+     cards (the desktop 24px is too wide once there are only two columns) */
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    margin-bottom: 80px;
+    column-gap: 12px;
+    padding: 0;
+  }
 
-  /* card info */
+  /* card info — the 4px insets stay: with the grid flush to the viewport
+     there is no page padding left to hold the text off the edge */
   .card__info { padding: 10px 4px 0; }
-  body:not([data-side="none"]) .card__info { padding-left: 0; padding-right: 0; }
   .card__cat { font-size: 11px; line-height: 16px; }
   .card__pr { margin-top: 2px; font-size: 10px; }
   /* .card__sale inherits the regular price size (10px here); keep the member gap tighter */
@@ -669,11 +645,11 @@ body.drawer-open .drawer {
   .wish svg { width: 20px; height: 20px; }
 
   /* sales banner — smaller pink badge on the narrow cards */
-  body[data-salebanner="v1"] .sale-flag { font-size: 11px; line-height: 16px; padding: 2px 6px 0; left: 8px; bottom: 8px; }
+  .sale-flag { font-size: 11px; line-height: 16px; padding: 2px 6px 0; left: 8px; bottom: 8px; }
 
-  /* colour panel — fit the narrow cards */
+  /* colour panel — fit the narrow cards; the 4px left inset lines the
+     swatches up with the card text now that the grid is flush */
   .panel { flex-wrap: wrap; gap: 4px; padding: 8px 4px; overflow: hidden; }
-  body:not([data-side="none"]) .panel { padding-left: 0; }
   .thumb img { width: 32px; height: 32px; }
 
   /* gallery — swipe only, no chevrons */
@@ -752,7 +728,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-gap="med" data-side="med" data-filters="some" data-pricing="standard" data-salebanner="v1" data-images="new">
+<body data-view="products" data-filters="some" data-pricing="standard" data-images="new">
 
 <!-- HEADER -->
 <header>
@@ -874,22 +850,9 @@ body.dash-open .dash { display: flex; }
       <button data-k="view" data-val="content">All formats</button>
     </div>
   </div>
-  <div class="dash__group">
-    <div class="dash__label">Padding between cards</div>
-    <div class="dash__seg">
-      <button data-k="gap" data-val="none">None</button>
-      <button data-k="gap" data-val="med" data-on="true">Medium</button>
-      <button data-k="gap" data-val="max">Max</button>
-    </div>
-  </div>
-  <div class="dash__group">
-    <div class="dash__label">Padding on the sides</div>
-    <div class="dash__seg">
-      <button data-k="side" data-val="none">None</button>
-      <button data-k="side" data-val="med" data-on="true">Medium</button>
-      <button data-k="side" data-val="max">Max</button>
-    </div>
-  </div>
+  <!-- Padding settled 2026-07-30 and both toggles removed: desktop is 48px
+       down the sides + 24px between the cards, mobile is flush to the edge
+       + 12px between. The values live on .grid, not on data attributes. -->
   <!-- Filters control removed from the panel: only "some" is active and there's
        nothing to toggle. The filter behaviour + deep-link (?filters=all|some|none) still work. -->
   <!-- Colour label position removed from the panel: the label always takes a
@@ -901,16 +864,8 @@ body.dash-open .dash { display: flex; }
       <button data-k="pricing" data-val="sale">Sale + member</button>
     </div>
   </div>
-  <div class="dash__group">
-    <div class="dash__label">Sales banner</div>
-    <div class="dash__seg">
-      <button data-k="salebanner" data-val="v1" data-on="true" title="Pink badge">V1</button>
-      <button data-k="salebanner" data-val="v2" title="Wordmark — translucent white">V2</button>
-      <button data-k="salebanner" data-val="v3" title="Wordmark — white">V3</button>
-      <button data-k="salebanner" data-val="v4" title="Wordmark — black 50%">V4</button>
-      <button data-k="salebanner" data-val="v5" title="Wordmark — black">V5</button>
-    </div>
-  </div>
+  <!-- Sales banner settled 2026-07-30 on the pink badge (the old V1) and the
+       toggle removed with it; the badge now shows on every sale card. -->
   <div class="dash__group">
     <div class="dash__label">Images</div>
     <div class="dash__seg">
@@ -1486,11 +1441,8 @@ const dashToggle = document.querySelector('.dash-toggle');
 
 const CONTROLS = {
   view:     ['products', 'content'],
-  gap:      ['none', 'med', 'max'],
-  side:     ['none', 'med', 'max'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
   pricing:  ['standard', 'sale'],
-  salebanner: ['v1', 'v2', 'v3', 'v4', 'v5'],
   images:   ['new', 'live'],
 };
 
@@ -1540,8 +1492,7 @@ dashToggle.addEventListener('click', () => {
 if (window.innerWidth > 760) body.classList.add('dash-open');
 else dashToggle.setAttribute('aria-expanded', 'false');
 
-/* deep-link: plp.html?view=content&gap=max&side=med&filters=some
-   &pricing=sale&salebanner=v3&images=live&open=2
+/* deep-link: plp.html?view=content&filters=some&pricing=sale&images=live&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
