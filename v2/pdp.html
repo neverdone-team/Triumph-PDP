@@ -344,10 +344,10 @@ header {
 .acc__line { border-bottom: 1px solid var(--c-line); }
 
 /* ============================================================
-   REVIEWS ACCORDION — Airbnb-style content from Figma 1820:5579
-   (frames 1821-8027 collapsed / 1821-8028 expanded). Head carries
-   stars + count; body holds rating hero, stats strip, sort row,
-   the review list and the load-more/write actions. The opened
+   REVIEWS ACCORDION — Figma 2258:25235 (desktop) / 2258:25918 (mobile),
+   which supersede the first pass from 1820:5579. Head carries stars +
+   count; body holds the rating hero, stats strip, sort row, the review
+   list (some reviews carry a Triumph reply) and load more. The opened
    height is measured by the shared accordion JS; rvwRender()
    re-measures after LOAD MORE / sorting changes the content.
    ============================================================ */
@@ -360,17 +360,18 @@ header {
 .rvw { display: flex; flex-direction: column; gap: 32px; padding: 12px 15px 16px 0; }
 .rvw p { margin: 0; max-width: none; }
 
-/* rating hero — big score, recommend line, summary, Bazaarvoice badge */
+/* rating hero — the recommend line over the Bazaarvoice badge, centred.
+   The 4.9 score and the summary sentence are gone as of 2258:25441. */
 .rvw__hero { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; text-align: center; }
-.rvw__score { font-size: 40px; line-height: 44px; font-weight: 300; letter-spacing: 0; }
-.rvw__herotxt { display: flex; flex-direction: column; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: .04em; }
 /* p selector keeps it ahead of the .acc__body p weight-300 rule */
-p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
-.rvw__sum { font-size: 12px; line-height: 16px; font-weight: 300; max-width: 425px; }
-.rvw__badge { width: 96px; height: 14px; }
+p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transform: uppercase; letter-spacing: .04em; }
+.rvw__badge { width: 82px; height: 12px; }
 
-/* stats strip — 5..1 distribution left, Comfort/Quality/Fit columns */
+/* stats strip — 5..1 distribution left, Comfort/Quality/Fit columns.
+   .rvw__statcol is inert here (display:contents) and only becomes a real
+   box on mobile, where the three scores stack behind one shared divider */
 .rvw__stats { display: flex; align-items: stretch; min-height: 76px; }
+.rvw__statcol { display: contents; }
 .rvw__hist { width: 150px; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-right: 18px; }
 .rvw__row { display: flex; align-items: center; gap: 8px; }
 .rvw__row i { font-style: normal; font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; width: 6px; flex: none; }
@@ -425,8 +426,20 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
 .rvw__report { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-50); margin-top: 6px; text-align: left; }
 .rvw__report:hover, .rvw__sortbtn:hover, .rvw__actions button:hover { opacity: .55; }
 
-/* footer actions */
-.rvw__actions { display: flex; align-items: center; justify-content: space-between; }
+/* reply from Triumph (2263:27187) — sits under the review it answers,
+   indented behind a hairline; head line carries the timestamp right */
+.rvw__reply {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 6px; /* + the item's 10px gap = the 16px in the design */
+  border-left: .5px solid var(--c-ink);
+  padding: 12px 0 12px 12px;
+  font-size: 12px; line-height: 20px; font-weight: 300; letter-spacing: .04em;
+}
+.rvw__replyhead { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.rvw__reply p { margin: 0; }
+
+/* footer actions — LOAD MORE only; the design has no "write a review" */
+.rvw__actions { display: flex; align-items: center; }
 .rvw__actions button {
   font-size: 12px; line-height: 16px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
   text-decoration: underline; text-underline-offset: 2px;
@@ -714,20 +727,33 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
   .gallery__hero, .gallery__slide { width: 67.8%; }
 }
 
-/* very small screens — the reviews stats strip regrids: histogram left with
-   shortened bars, Comfort/Quality/Fit stacked to the right of one shared divider */
-@media (max-width: 480px) {
-  .rvw__stats {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    min-height: 0;
+/* MOBILE REVIEWS (Figma 2258:25918) — at Triumph's sm boundary the reviews
+   restack: the recommend line drops to label size, and the stats strip puts
+   the histogram left of ONE divider with Comfort/Quality/Fit stacked to its
+   right as label + value on a single line. The vertical rhythm tightens from
+   32px to 16px throughout. */
+@media (max-width: 575.98px) {
+  .rvw { gap: 16px; }
+  .rvw__hero { gap: 16px; }
+  p.rvw__rec { font-size: 10px; line-height: 12px; }
+  .rvw__stats { margin-top: 4px; } /* + the 16px gap = the design's 20px */
+
+  .rvw__hist { flex: 1; width: auto; padding-right: 16px; }
+  .rvw__statcol {
+    display: flex; flex: 1; min-width: 0; flex-direction: column;
+    border-left: 1px solid var(--c-line);
+    padding-left: 16px;
   }
-  .rvw__hist { grid-row: 1 / 4; width: auto; padding-right: 20px; align-self: center; }
   .rvw__col {
-    flex-direction: row; justify-content: flex-start; align-items: baseline; gap: 8px;
-    padding: 7px 0 7px 20px;
+    flex: 1;
+    flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;
+    border-left: 0;
   }
-  .rvw__col span { font-size: 14px; line-height: 18px; }
+  .rvw__col span { font-size: 12px; line-height: 16px; }
+
+  /* review list — 16px gap + 16px above the rule (32px between reviews) */
+  .rvw__list { gap: 16px; }
+  .rvw__item + .rvw__item { padding-top: 16px; }
 }
 
 </style>
@@ -1015,12 +1041,8 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
           <div class="acc__body">
             <div class="rvw">
               <div class="rvw__hero">
-                <div class="rvw__score">4.9</div>
-                <div class="rvw__herotxt">
-                  <p class="rvw__rec">84% would recommend this product.</p>
-                  <p class="rvw__sum">Majority of customers value the comfortable lace and how it looks under a T-shirt. A few address issues with the fit.</p>
-                </div>
-                <img class="rvw__badge" src="./Assets/pdp/reviews/authentic-reviews-mono.png" alt="Authentic Reviews by Bazaarvoice" width="96" height="14" />
+                <p class="rvw__rec">84% would recommend this product.</p>
+                <img class="rvw__badge" src="./Assets/pdp/reviews/authentic-reviews-mono.png" alt="Authentic Reviews by Bazaarvoice" width="82" height="12" />
               </div>
               <div class="rvw__stats">
                 <div class="rvw__hist">
@@ -1030,16 +1052,20 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
                   <div class="rvw__row"><i>2</i><span class="rvw__track"></span></div>
                   <div class="rvw__row"><i>1</i><span class="rvw__track"><span class="rvw__bar" style="width:28%"></span></span></div>
                 </div>
-                <div class="rvw__col"><b>Comfort</b><span>4.4</span></div>
-                <div class="rvw__col"><b>Quality</b><span>4.7</span></div>
-                <div class="rvw__col"><b>Fit</b><span>4.1</span></div>
+                <!-- display:contents on desktop, so the three columns sit beside the
+                     histogram; on mobile it becomes the single stacked column -->
+                <div class="rvw__statcol">
+                  <div class="rvw__col"><b>Comfort</b><span>4.4</span></div>
+                  <div class="rvw__col"><b>Quality</b><span>4.7</span></div>
+                  <div class="rvw__col"><b>Fit</b><span>4.1</span></div>
+                </div>
               </div>
               <div class="rvw__rule"></div>
               <div class="rvw__toolbar">
                 <span class="rvw__label10">Reviews&nbsp;&nbsp;[ 61 ]</span>
                 <div class="rvw__sortwrap" id="rvwSortWrap">
                   <button class="rvw__sortbtn" id="rvwSort" aria-haspopup="listbox">
-                    <span class="rvw__label10">Sort by: <span id="rvwSortLbl">Most recent</span></span>
+                    <span class="rvw__label10">Sort by: <span id="rvwSortLbl">Newest</span></span>
                     <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
                   </button>
                   <div class="rvw__sortmenu" role="listbox">
@@ -1052,7 +1078,6 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
               <div class="rvw__list" id="rvwList"></div>
               <div class="rvw__actions">
                 <button id="rvwMore">Load More Reviews</button>
-                <button>Write a Review</button>
               </div>
             </div>
           </div>
@@ -1283,7 +1308,9 @@ const RVW_REVIEWS = [
     by: 'Sophie', from: 'Austria', size: '80B' },
   { s: 3, date: '1 month ago', title: 'Runs a little small', c: 3, q: 4, f: 2,
     text: ['Lovely fabric and finish, but I had to go up a cup size. Order one size larger than usual.'],
-    by: 'Anonymous', from: 'United Kingdom', size: '70D' },
+    by: 'Anonymous', from: 'United Kingdom', size: '70D',
+    reply: { date: '1 month ago',
+      text: ['We regret to hear this bra did not work out for you after trying it on. We are confident that you will find a perfect fit among our wide assortment.', 'Best, Triumph'] } },
   { s: 5, date: '2 months ago', title: 'Beautiful lace', c: 5, q: 5, f: 5,
     text: ['The prettiest bra I own that I can actually wear all day. The lace detail is even nicer in person.', 'Customer recommends this product.'],
     by: 'Elena', from: 'Italy', size: '75B' },
@@ -1300,7 +1327,7 @@ const RVW_REVIEWS = [
 const RVW_PAGE = 4;
 const RVW_SORTS = {
   top:    { label: 'Top rated',   fn: (a, b) => b.s - a.s || a.i - b.i },
-  recent: { label: 'Most recent', fn: (a, b) => a.i - b.i },
+  recent: { label: 'Newest',      fn: (a, b) => a.i - b.i },
   least:  { label: 'Least stars', fn: (a, b) => a.s - b.s || a.i - b.i },
 };
 const rvwList = document.getElementById('rvwList');
@@ -1329,6 +1356,11 @@ function rvwRender() {
       <div class="rvw__itext">${r.text.map(t => `<p>${t}</p>`).join('')}</div>
       <div class="rvw__dots"><span>By ${r.by}</span><i></i><span>From ${r.from}</span><i></i><span>Size ${r.size}</span></div>
       <button class="rvw__report">Report</button>
+      ${r.reply ? `
+      <div class="rvw__reply">
+        <div class="rvw__replyhead"><span>Reply from Triumph</span><span class="rvw__date">${r.reply.date}</span></div>
+        <div>${r.reply.text.map(t => `<p>${t}</p>`).join('')}</div>
+      </div>` : ''}
     </div>`).join('');
   rvwMore.textContent = rvwShown >= RVW_REVIEWS.length ? 'Show Less Reviews' : 'Load More Reviews';
   /* the accordion opened to a measured height — refresh it for the new content */
