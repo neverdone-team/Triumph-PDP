@@ -275,7 +275,9 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   row-gap: var(--row-gap);
   margin-bottom: 120px;
 }
-/* gap between the cards (desktop values, mobile below) */
+/* gap between the cards (desktop values, mobile below) — "none" butts the
+   photos edge to edge; the row gap stays, only the columns close up */
+body[data-gap="none"] .grid { column-gap: 0; }
 body[data-gap="med"] .grid { column-gap: 24px; }
 body[data-gap="max"] .grid { column-gap: 40px; }
 /* padding left + right of the grid */
@@ -400,7 +402,7 @@ body[data-salebanner="v5"] .sale-flag {
 }
 body[data-salebanner="v2"] .sale-flag { color: rgba(255,255,255,.6); } /* translucent white */
 body[data-salebanner="v3"] .sale-flag { color: #fff; }                 /* full white */
-body[data-salebanner="v4"] .sale-flag { color: #747474; }              /* grey/medium */
+body[data-salebanner="v4"] .sale-flag { color: rgba(0,0,0,.5); }       /* black, 50% */
 body[data-salebanner="v5"] .sale-flag { color: var(--c-ink); }         /* black */
 
 /* ============================================================
@@ -646,7 +648,8 @@ body.drawer-open .drawer {
 
   /* grid — 2 columns */
   .grid { grid-template-columns: repeat(2, 1fr) !important; margin-bottom: 80px; }
-  /* the desktop gaps are too wide for 2 columns — step them down */
+  /* the desktop gaps are too wide for 2 columns — step them down
+     ("none" needs no override: 0 is 0 at every width) */
   body[data-gap="med"] .grid { column-gap: 12px; }
   body[data-gap="max"] .grid { column-gap: 16px; }
   body[data-side="med"] .grid { padding: 0 16px; }
@@ -874,6 +877,7 @@ body.dash-open .dash { display: flex; }
   <div class="dash__group">
     <div class="dash__label">Padding between cards</div>
     <div class="dash__seg">
+      <button data-k="gap" data-val="none">None</button>
       <button data-k="gap" data-val="med" data-on="true">Medium</button>
       <button data-k="gap" data-val="max">Max</button>
     </div>
@@ -903,7 +907,7 @@ body.dash-open .dash { display: flex; }
       <button data-k="salebanner" data-val="v1" data-on="true" title="Pink badge">V1</button>
       <button data-k="salebanner" data-val="v2" title="Wordmark — translucent white">V2</button>
       <button data-k="salebanner" data-val="v3" title="Wordmark — white">V3</button>
-      <button data-k="salebanner" data-val="v4" title="Wordmark — grey">V4</button>
+      <button data-k="salebanner" data-val="v4" title="Wordmark — black 50%">V4</button>
       <button data-k="salebanner" data-val="v5" title="Wordmark — black">V5</button>
     </div>
   </div>
@@ -1482,7 +1486,7 @@ const dashToggle = document.querySelector('.dash-toggle');
 
 const CONTROLS = {
   view:     ['products', 'content'],
-  gap:      ['med', 'max'],
+  gap:      ['none', 'med', 'max'],
   side:     ['none', 'med', 'max'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
   pricing:  ['standard', 'sale'],
