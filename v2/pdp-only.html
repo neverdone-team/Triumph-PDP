@@ -780,14 +780,15 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
     <a class="logo" href="./plp-only.html" aria-label="Triumph">
       <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
     </a>
+    <!-- every nav item returns to the PLP so the prototype is never a dead end -->
     <ul class="nav__links">
-      <li><a href="#">Special Deals</a></li>
+      <li><a href="./plp-only.html">Special Deals</a></li>
       <li><a href="./plp-only.html">Bras</a></li>
-      <li><a href="#">Knickers</a></li>
-      <li><a href="#">Shapewear</a></li>
-      <li><a href="#">Activewear</a></li>
-      <li><a href="#">Sleep &amp; Lounge</a></li>
-      <li><a href="#">Swimwear</a></li>
+      <li><a href="./plp-only.html">Knickers</a></li>
+      <li><a href="./plp-only.html">Shapewear</a></li>
+      <li><a href="./plp-only.html">Activewear</a></li>
+      <li><a href="./plp-only.html">Sleep &amp; Lounge</a></li>
+      <li><a href="./plp-only.html">Swimwear</a></li>
     </ul>
     <div class="nav__right">
       <label class="search" aria-label="Search">
@@ -805,7 +806,8 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
           <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
           <span class="cart-count" id="cartCount">0</span>
         </button>
-        <button class="burger" aria-label="Menu">
+        <!-- mobile: the nav links are hidden, so the burger is the way back -->
+        <button class="burger" aria-label="Menu" data-plp>
           <svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg>
         </button>
       </div>
@@ -1287,6 +1289,10 @@ function syncCta() {
     b.textContent = soldOut ? 'Notify Me' : 'Add to Cart';
   });
 }
+
+/* mobile burger — the nav links are hidden there, so it heads back to the PLP */
+document.querySelectorAll('[data-plp]').forEach(btn =>
+  btn.addEventListener('click', () => { window.location.href = './plp-only.html'; }));
 
 /* wishlist heart */
 document.getElementById('fav').addEventListener('click', e =>
