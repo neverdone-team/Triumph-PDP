@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Aura Spotlight – Padded Underwire Bra | Triumph</title>
+<style>
+/* ============================================================
+   FONTS (local — Alliance No.1 Light + Regular)
+   ============================================================ */
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Alliance No1";
+  src: url("./fonts/AllianceNo1-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   DESIGN TOKENS (Figma 727-1830 desktop / 727-2264 mobile)
+   ============================================================ */
+:root {
+  --c-bg:        #FFFFFF;
+  --c-ink:       #000000;
+  --c-ink-50:    rgba(0,0,0,.5);
+  --c-ink-soft:  #747474;
+  --c-line:      #DADADA;
+  --c-chip:      #DDDDDD;
+  --c-swatch:    rgba(0,0,0,.05);
+  --c-sale:      #C1003F;
+
+  --font-sans: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --pad-x: 80px;   /* desktop section padding (You-might-like) */
+  --ratio: 720 / 947; /* every product photo in the layout */
+
+  --ease-out: cubic-bezier(.22,.61,.36,1);
+  --ease-reveal: cubic-bezier(.22,1,.36,1); /* fast start, long glide-out */
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; background: none; border: 0; padding: 0; color: inherit; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+h1, h2, h3 { margin: 0; font-weight: 400; }
+
+/* ============================================================
+   HEADER (same as PLP prototype)
+   ============================================================ */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--c-bg);
+}
+.nav {
+  max-width: 2200px; margin: 0 auto;
+  padding: 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.logo { display: inline-flex; align-items: center; flex: none; }
+.logo__img { width: 156px; height: 20px; display: block; }
+.nav__links { display: flex; gap: 24px; }
+.nav__links a {
+  font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 300;
+  padding-bottom: 2px;
+  transition: color .25s var(--ease-out);
+}
+.nav__links a:hover { color: var(--c-ink-soft); } /* grey/medium — Figma 637-2373 hover state */
+.nav__right { display: flex; align-items: center; gap: 20px; }
+.search {
+  display: flex; align-items: center; gap: 4px;
+  height: 32px; padding: 0 16px 0 8px;
+  background: #F1F1F1;
+}
+.search svg { width: 16px; height: 16px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
+.search input {
+  border: 0; outline: 0; background: transparent;
+  font-family: inherit; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  font-weight: 300;
+  width: 64px; color: var(--c-ink);
+}
+.search input::placeholder { color: var(--c-ink); opacity: 1; }
+.nav__icons { display: flex; align-items: center; gap: 20px; }
+.nav__icons .icon { width: 18px; height: 18px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
+.nav__icons button[aria-label="Cart"] { display: inline-flex; align-items: flex-start; gap: 2px; }
+.cart-count { font-size: 12px; font-weight: 300; letter-spacing: .04em; line-height: 1; }
+.burger { display: none; }
+.burger svg { width: 20px; height: 8px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; display: block; }
+
+/* ============================================================
+   SCROLL REVEAL — same blurred rise as the PLP
+   ============================================================ */
+.rv {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(3px);
+  transition: opacity 1.4s var(--ease-reveal),
+              transform 1.4s var(--ease-reveal),
+              filter 1.4s var(--ease-reveal);
+}
+.rv.is-visible { opacity: 1; transform: none; filter: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rv { opacity: 1; transform: none; filter: none; transition: none; }
+}
+
+/* ============================================================
+   MAIN — Triumph breakpoints (responsive spec, Figma 1440-16050):
+   two columns from 1200px up. The gallery is fluid and caps at
+   1400px; the buy-box column is 50% capped at 800px with the
+   120/80 Figma paddings, and the content inside it caps at 440px
+   (its 380px minimum is guaranteed because the column is never
+   narrower than 600px once the 1200px layout kicks in). Beyond
+   2200px the whole page centers and white space grows both sides.
+   ============================================================ */
+.main {
+  max-width: 2200px; margin: 0 auto;
+  display: flex;
+}
+.gallery { flex: 1 1 auto; min-width: 0; max-width: 1400px; }
+.info    { width: 50%; max-width: 800px; flex: none; padding: 100px 80px 0 120px; }
+.info > * { max-width: 440px; }
+
+/* desktop — Samsøe-style two-phase scroll:
+   phase 1: the buy box pins at the top while the gallery scrolls all the
+   way through; phase 2: the gallery pins bottom-aligned and the remaining
+   buy-box content scrolls to its own end. The gallery's negative top and
+   the .main min-height (gallery + buy-box overflow) are measured by the
+   syncScrollStage() script so the hand-over lands exactly. */
+@media (min-width: 1200px) {
+  .gallery { position: sticky; top: 0; align-self: flex-start; } /* top set by JS */
+  .info    { position: sticky; top: 0; align-self: flex-start; }
+}
+
+/* --- gallery ------------------------------------------------ */
+.gallery__hero {
+  aspect-ratio: var(--ratio);
+  overflow: hidden;
+  position: relative;
+}
+.gallery__hero img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  animation: heroIn 1.6s var(--ease-out) both; /* PLP hero entrance */
+}
+@keyframes heroIn {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1); }
+}
+.gallery__row { display: flex; }
+.gallery__tile {
+  width: 50%; flex: none;
+  aspect-ratio: var(--ratio);
+  overflow: hidden;
+  position: relative;
+}
+.gallery__tile img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .9s var(--ease-out);
+}
+.gallery__tile:hover img { transform: scale(1.04); }
+/* white copy tile */
+.gallery__note { background: var(--c-bg); }
+.gallery__note p {
+  /* keep the copy centered however wide the tile grows (16.6% + 240px
+     was only centered at the 720px design width) */
+  position: absolute; left: 50%; top: 41.5%;
+  transform: translateX(-50%);
+  width: 240px; margin: 0;
+  font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+}
+/* mobile carousel chrome — hidden on desktop */
+.gallery__bars { display: none; }
+.gallery__slide { display: none; } /* extra swipe slides are mobile-only */
+
+/* --- info column -------------------------------------------- */
+.info > * + * { margin-top: 60px; }
+
+.p-head { display: flex; gap: 16px; align-items: flex-start; }
+.p-head__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.p-name  { font-size: 14px; font-weight: 300; line-height: 20px; letter-spacing: .04em; }
+.p-title { font-size: 16px; font-weight: 400; line-height: 24px; letter-spacing: .04em; text-transform: uppercase; }
+.p-price { display: flex; gap: 4px; align-items: baseline; letter-spacing: 0; }
+.p-price b { font-size: 14px; font-weight: 400; line-height: 16px; }
+.p-price span { font-size: 12px; font-weight: 300; line-height: 14px; color: var(--c-ink-50); }
+.price-note::before { content: "RRP"; } /* mobile shows "incl. VAT" instead */
+.fav { width: 24px; height: 24px; flex: none; }
+.fav svg { width: 100%; height: 100%; fill: none; stroke: var(--c-ink); stroke-width: 1.2; transition: fill .25s var(--ease-out); }
+.fav.is-on svg { fill: var(--c-ink); }
+/* outline at rest, the solid glyph joins it when selected (favorite*.svg) */
+.fav svg .hs { display: none; stroke: none; }
+.fav.is-on svg .hs { display: block; }
+
+/* labels — Label/Default/M */
+.lbl {
+  font-size: 12px; font-weight: 300; line-height: 16px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+
+/* colours */
+.colors { display: flex; flex-direction: column; gap: 12px; }
+.colors__opts { display: flex; gap: 8px; }
+.swatch {
+  width: 54px; height: 64px; flex: none;
+  background: var(--c-swatch);
+  border-bottom: 2px solid transparent;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 10px;
+  transition: border-color .25s var(--ease-out);
+}
+.swatch img { width: 44px; height: 44px; object-fit: cover; }
+.swatch[data-sel="true"] { border-bottom-color: var(--c-ink); }
+
+/* size grids */
+.sizes { display: flex; flex-direction: column; gap: 24px; }
+.size-block { display: flex; flex-direction: column; gap: 12px; }
+.size-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+.chip {
+  height: 30px;
+  border: .5px solid var(--c-chip);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  position: relative;
+  transition: border-color .25s var(--ease-out), background .25s var(--ease-out);
+}
+.chip:hover { border-color: var(--c-ink); }
+.chip[data-sel="true"] { border-color: var(--c-ink); background: var(--c-ink); color: #fff; }
+.chip--out {
+  border-color: rgba(0,0,0,.05);
+  color: var(--c-ink-50);
+  cursor: default;
+}
+.chip--out:hover { border-color: rgba(0,0,0,.05); }
+.chip--out::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 30px; height: 1px;
+  transform: translate(-50%,-50%);
+  background: var(--c-ink-50);
+}
+.size-link {
+  align-self: flex-start;
+  font-size: 14px; font-weight: 300; line-height: 14px; letter-spacing: .04em;
+  text-decoration: underline; text-underline-position: from-font;
+}
+.size-link:hover { opacity: .5; }
+
+/* CTA */
+.cta-block { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+.cta {
+  height: 44px; width: 100%;
+  background: var(--c-ink);
+  border: 1px solid var(--c-ink-soft);
+  color: #fff;
+  font-size: 14px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .25s var(--ease-out);
+}
+.cta:hover { opacity: .85; }
+.usp {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 300; line-height: 12px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.usp i { width: 3px; height: 3px; background: var(--c-ink); flex: none; }
+.usp u { text-underline-position: from-font; }
+
+/* complete your set */
+.set { display: flex; flex-direction: column; gap: 24px; margin-top: 80px; }
+.set__list { display: flex; flex-direction: column; gap: 24px; }
+.set-item { display: flex; gap: 12px; align-items: center; }
+.set-item__img { width: 140px; height: 184px; flex: none; overflow: hidden; }
+.set-item__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-out); }
+.set-item:hover .set-item__img img { transform: scale(1.04); }
+.set-item__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.set-item__ttl { display: flex; flex-direction: column; gap: 8px; letter-spacing: .04em; line-height: 20px; }
+.set-item__ttl em  { font-style: normal; font-weight: 300; font-size: 14px; }
+.set-item__ttl strong { font-weight: 400; font-size: 14px; text-transform: uppercase; }
+.addbag { width: 40px; height: 40px; flex: none; }
+.addbag svg { display: block; width: 100%; height: 100%; }
+.addbag:hover rect { stroke: var(--c-ink); }
+
+/* accordions */
+.accs { margin-top: 80px; display: flex; flex-direction: column; gap: 12px; }
+.acc { display: flex; flex-direction: column; }
+.acc__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 15px 12px 0;
+  width: 100%; text-align: left;
+}
+.acc__head svg {
+  width: 10.6px; height: 7px; flex: none;
+  fill: none; stroke: var(--c-ink); stroke-width: .8;
+  transition: transform .45s var(--ease-out);
+}
+.acc.is-open .acc__head svg { transform: rotate(180deg); }
+/* the reviews head carries a star row too — keep the chevron rules off it */
+.acc__head svg.stars { width: 73px; height: 13px; stroke: none; transition: none; }
+.acc.is-open .acc__head svg.stars { transform: none; }
+.acc__body {
+  overflow: hidden;
+  max-height: 0; /* opened height is measured by JS (panels vary a lot) */
+  opacity: 0;
+  transition: max-height .55s var(--ease-reveal), opacity .45s var(--ease-out);
+}
+.acc.is-open .acc__body { opacity: 1; }
+.acc__body p {
+  margin: 0 0 16px;
+  font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+  color: var(--c-ink);
+  max-width: 400px;
+}
+.acc__body > :last-child { margin-bottom: 0; }
+/* bottom spacing lives inside the content so max-height:0 fully hides it
+   (padding would keep the closed body 24px tall and skew the tab rhythm) */
+.acc__body::after { content: ""; display: block; height: 24px; }
+.acc__line { border-bottom: 1px solid var(--c-line); }
+
+/* ============================================================
+   REVIEWS ACCORDION — Figma 2258:25235 (desktop) / 2258:25918 (mobile),
+   which supersede the first pass from 1820:5579. Head carries stars +
+   count; body holds the rating hero, stats strip, sort row, the review
+   list (some reviews carry a Triumph reply) and load more. The opened
+   height is measured by the shared accordion JS; rvwRender()
+   re-measures after LOAD MORE / sorting changes the content.
+   ============================================================ */
+.rvw__headgrp { display: flex; align-items: center; gap: 8px; }
+.rvw__headstars { display: flex; align-items: center; gap: 4px; }
+/* 1px lift — the bracket glyphs hang below the digits, which reads as
+   sitting low next to the stars even when the boxes are centred */
+.rvw__count { font-size: 10px; font-weight: 300; line-height: 12px; letter-spacing: .04em; position: relative; top: -1px; }
+.stars { display: block; flex: none; }
+.rvw { display: flex; flex-direction: column; gap: 32px; padding: 12px 15px 16px 0; }
+.rvw p { margin: 0; max-width: none; }
+
+/* rating hero — the recommend line over the Bazaarvoice badge, centred.
+   The 4.9 score and the summary sentence are gone as of 2258:25441. */
+.rvw__hero { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; text-align: center; }
+/* p selector keeps it ahead of the .acc__body p weight-300 rule */
+p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transform: uppercase; letter-spacing: .04em; }
+.rvw__badge { width: 82px; height: 12px; }
+
+/* stats strip — 5..1 distribution left, Comfort/Quality/Fit columns.
+   .rvw__statcol is inert here (display:contents) and only becomes a real
+   box on mobile, where the three scores stack behind one shared divider */
+.rvw__stats { display: flex; align-items: stretch; min-height: 76px; }
+.rvw__statcol { display: contents; }
+.rvw__hist { width: 150px; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-right: 18px; }
+.rvw__row { display: flex; align-items: center; gap: 8px; }
+.rvw__row i { font-style: normal; font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; width: 6px; flex: none; }
+.rvw__track { display: block; height: 2px; flex: 1; background: #F1F1F1; }
+.rvw__bar { display: block; height: 2px; background: var(--c-ink); }
+.rvw__col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  border-left: 1px solid var(--c-line);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.rvw__col b { font-weight: 400; font-size: 11px; line-height: 14px; }
+.rvw__col span { font-weight: 400; font-size: 16px; line-height: 24px; }
+.rvw__rule { border-bottom: 1px solid var(--c-line); }
+
+/* count + sort row */
+.rvw__toolbar { display: flex; align-items: center; justify-content: space-between; }
+.rvw__label10 { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; }
+.rvw__sortwrap { position: relative; }
+.rvw__sortbtn { display: flex; align-items: center; gap: 8px; }
+.rvw__sortbtn svg { width: 10.6px; height: 7px; flex: none; fill: none; stroke: var(--c-ink); stroke-width: .8; transition: transform .3s var(--ease-out); }
+.rvw__sortwrap.is-open .rvw__sortbtn svg { transform: rotate(180deg); }
+.rvw__sortmenu {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 8;
+  min-width: 140px;
+  display: flex; flex-direction: column;
+  background: #fff; border: 1px solid var(--c-line);
+  opacity: 0; pointer-events: none; transform: translateY(-4px);
+  transition: opacity .25s var(--ease-out), transform .25s var(--ease-out);
+}
+.rvw__sortwrap.is-open .rvw__sortmenu { opacity: 1; pointer-events: auto; transform: none; }
+.rvw__sortmenu button {
+  padding: 10px 12px; text-align: left;
+  font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  transition: background .2s var(--ease-out);
+}
+.rvw__sortmenu button:hover { background: #F8F3F3; }
+.rvw__sortmenu button[data-on="true"] { font-weight: 400; }
+/* the reviews accordion ends open without a closing rule — the design has
+   no line below LOAD MORE / WRITE A REVIEW (collapsed keeps its line) */
+.acc--reviews.is-open .acc__line { display: none; }
+
+/* review list */
+.rvw__list { display: flex; flex-direction: column; gap: 24px; }
+.rvw__item { display: flex; flex-direction: column; gap: 10px; }
+.rvw__item + .rvw__item { border-top: 1px solid var(--c-line); padding-top: 24px; }
+.rvw__ihead { display: flex; align-items: center; justify-content: space-between; }
+.rvw__date { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-50); }
+.rvw__ititle { font-size: 12px; line-height: 16px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.rvw__dots { display: flex; align-items: center; gap: 8px; font-size: 10px; line-height: 14px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; }
+.rvw__dots i { width: 3px; height: 3px; background: var(--c-ink); flex: none; }
+.rvw__itext { font-size: 12px; line-height: 20px; font-weight: 300; letter-spacing: .04em; }
+.rvw__report { font-size: 10px; line-height: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; color: var(--c-ink-50); margin-top: 6px; text-align: left; }
+.rvw__report:hover, .rvw__sortbtn:hover, .rvw__actions button:hover { opacity: .55; }
+
+/* reply from Triumph (2263:27187) — sits under the review it answers,
+   indented behind a hairline; head line carries the timestamp right */
+.rvw__reply {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 6px; /* + the item's 10px gap = the 16px in the design */
+  border-left: .5px solid var(--c-ink);
+  padding: 12px 0 12px 12px;
+  font-size: 12px; line-height: 20px; font-weight: 300; letter-spacing: .04em;
+}
+.rvw__replyhead { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.rvw__reply p { margin: 0; }
+
+/* footer actions — LOAD MORE only; the design has no "write a review" */
+.rvw__actions { display: flex; align-items: center; }
+.rvw__actions button {
+  font-size: 12px; line-height: 16px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: underline; text-underline-offset: 2px;
+  transition: opacity .2s var(--ease-out);
+}
+
+/* --- accordion content (Figma 1301-16515) ------------------- */
+/* availability row is a link out, not a fold-out */
+.acc__head--link:hover .lbl { text-decoration: underline; text-underline-position: from-font; }
+.acc__arrow { width: 11px; height: 11px; display: block; flex: none; }
+/* lead line — Alliance Regular, uppercase (e.g. material composition) */
+.acc__strong {
+  font-weight: 400; text-transform: uppercase;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  margin: 0 0 16px;
+}
+.acc__list {
+  list-style: disc; padding-left: 18px; margin: 0 0 16px;
+  font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+  max-width: 400px;
+}
+.acc__link { text-decoration: underline; text-underline-position: from-font; }
+.acc__link:hover { opacity: .5; }
+.acc__logo { margin-top: 4px; }
+.acc__logos { display: flex; gap: 20px; align-items: flex-start; margin-top: 4px; }
+.acc__logos img { display: block; }
+/* shipping — labelled groups with right-aligned prices */
+.acc__sec { margin-bottom: 12px; }
+.grp { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
+.grp p { margin: 0; }
+.prow {
+  display: flex; gap: 20px; align-items: flex-end;
+  font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
+}
+.prow span { flex: 1; min-width: 0; }
+.prow b { font-weight: 300; white-space: nowrap; }
+
+/* discover more */
+.discover { margin-top: 80px; display: flex; flex-direction: column; gap: 24px; }
+.discover__links { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+.discover__links a {
+  font-size: 14px; font-weight: 300; line-height: 14px; letter-spacing: .04em;
+  text-decoration: underline; text-underline-position: from-font;
+}
+.discover__links a:hover { opacity: .5; }
+
+/* ============================================================
+   YOU MIGHT LIKE THIS
+   ============================================================ */
+.recs { max-width: 2200px; margin: 120px auto 0; } /* match .main so wide screens fill out */
+.recs h2 {
+  font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  padding: 0 var(--pad-x);
+}
+.recs__grid {
+  margin-top: 40px;
+  padding: 0 var(--pad-x);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 60px;
+  row-gap: 80px;
+}
+/* xxl (Triumph's 1400 breakpoint) — five per row, mirroring the
+   site's own +1-tile bump at 1400px */
+@media (min-width: 1400px) {
+  .recs__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+.rec { position: relative; }
+.rec__img {
+  position: relative;
+  aspect-ratio: 275 / 362;
+  overflow: hidden;
+  background: var(--c-swatch);
+}
+.rec__img img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .9s var(--ease-out), opacity .38s var(--ease-out);
+}
+/* alternate photo crossfades in on hover (stacked in Figma) */
+.rec__img .alt { opacity: 1; }
+.rec:hover .rec__img .alt { opacity: 0; }
+.rec:hover .rec__img img { transform: scale(1.04); }
+.rec__sale {
+  position: absolute; left: 16px; bottom: 16px;
+  background: var(--c-sale);
+  color: #fff;
+  padding: 2px 8px 0;
+  font-size: 14px; font-weight: 400; line-height: 20px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.rec__info {
+  padding-top: 16px;
+  /* centring (not flex-end) keeps the price on the title's visual axis
+     despite their different line-heights (20px vs 14px) */
+  display: flex; gap: 12px; align-items: center;
+}
+.rec__nm {
+  flex: 1; min-width: 0;
+  /* same title style as the PLP cards */
+  font-size: 12px; font-weight: 400; line-height: 20px; letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rec__pr { font-size: 12px; font-weight: 400; line-height: 14px; flex: none; }
+
+/* ============================================================
+   BOTTOM EDITORIAL COLLAGE
+   ============================================================ */
+/* headline — same treatment as the "You Might Like This" heading */
+.collage-head {
+  max-width: 2200px; margin: 120px auto 0;
+  font-size: 12px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase;
+  padding: 0 var(--pad-x);
+}
+.collage {
+  max-width: 2200px; margin: 40px auto 0;
+  display: flex;
+}
+.collage__tile {
+  width: 33.333%; flex: none;
+  aspect-ratio: 484 / 645;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+  padding: 16px;
+}
+.collage__tile img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 1.2s var(--ease-out);
+}
+.collage__tile:hover img { transform: scale(1.04); }
+.badge {
+  position: relative;
+  height: 28px; line-height: 28px;   /* hug the label width, no min-width */
+  padding: 0 10px;
+  text-align: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255,255,255,.2);
+  font-size: 14px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase;
+}
+.badge:hover { text-decoration: underline; }
+.badge--light { color: #fff; }
+
+/* ============================================================
+   MOBILE STICKY CTA (slides in once the inline CTA scrolls out)
+   ============================================================ */
+.sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--c-line);
+  transform: translateY(110%);
+  transition: transform .45s var(--ease-out);
+  display: none; /* mobile only */
+}
+.sticky-cta.is-on { transform: translateY(0); }
+
+/* ============================================================
+   RESPONSIVE — stacked design (Figma 727-2264), applied below
+   Triumph's xl breakpoint per the responsive spec (1440-16050):
+   everything under 1200px stacks like the @375/@600/@900 frames
+   ============================================================ */
+@media (max-width: 1199.98px) {
+  /* header — same 50px bar as the PLP */
+  .nav { padding: 12px 16px; gap: 16px; }
+  .logo__img { width: 100px; height: 13px; }
+  .nav__links { display: none; }
+  .nav__right { gap: 16px; }
+  .nav__icons { gap: 16px; }
+  .nav__icons .icon { width: 16px; height: 16px; }
+  .nav__icons button[aria-label="Wishlist"] { display: none; }
+  .burger { display: inline-flex; }
+  .search { height: 26px; padding: 0 12px 0 8px; }
+  .search svg { width: 14px; height: 14px; }
+  .search input { width: 60px; }
+
+  /* main stacks; gallery becomes a swipe carousel */
+  .main { display: block; }
+  .gallery { width: 100%; position: relative; }
+  .gallery__strip {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .gallery__strip::-webkit-scrollbar { display: none; }
+  .gallery__slide { display: block; }
+  .gallery__hero, .gallery__slide {
+    width: 100%; flex: none;
+    scroll-snap-align: start;
+    aspect-ratio: var(--ratio);
+    position: relative; overflow: hidden;
+  }
+  .gallery__slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .gallery__row { display: none; } /* desktop-only tiles */
+  .gallery__bars {
+    display: flex; gap: 8px;
+    position: absolute; left: 50%; bottom: 16px;
+    transform: translateX(-50%);
+  }
+  .gallery__bars i {
+    width: 40px; height: 3px;
+    background: rgba(255,255,255,.55);
+    transition: background .3s var(--ease-out);
+  }
+  .gallery__bars i.is-on { background: var(--c-ink); }
+
+  .info { width: 100%; max-width: none; padding: 40px 16px 0; }
+  .info > * { max-width: none; } /* the 440px cap is a two-column rule */
+  .info > * + * { margin-top: 60px; }
+
+  /* title block — name+style together, price after larger gap, incl. VAT note */
+  .p-head__txt { gap: 8px; }
+  .p-name, .p-title { font-size: 14px; line-height: 20px; }
+  .p-price { margin-top: 32px; }
+
+  .price-note::before { content: "incl. VAT"; }
+
+  /* colours — swatches above the label */
+  .colors { gap: 14px; }
+  .colors__opts { order: -1; }
+
+  /* complete-your-set tiles shrink (120 x 158) */
+  .set-item__img { width: 120px; height: 158px; }
+  .set-item__ttl { gap: 2px; }
+  .set-item__ttl em, .set-item__ttl strong { font-size: 12px; font-weight: 300; letter-spacing: .04em; }
+
+  /* accordions breathe a little more on mobile */
+  .accs { gap: 20px; }
+  .acc__head { padding-bottom: 20px; }
+
+  /* reviews — tighter histogram so the three stat columns keep air */
+  .rvw__hist { width: 124px; padding-right: 12px; }
+
+  /* discover more — links flow in a row */
+  .discover__links { flex-direction: row; flex-wrap: wrap; gap: 16px; }
+
+  /* you might like — 2-up grid */
+  .recs { margin-top: 80px; }
+  .recs h2 { padding: 0 16px; }
+  .recs__grid {
+    margin-top: 32px;
+    padding: 0 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
+    row-gap: 32px;
+  }
+  .rec__img { aspect-ratio: 155.5 / 204.6; }
+  .rec__info { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .rec__nm { width: 100%; font-size: 11px; line-height: 16px; } /* matches the PLP mobile card titles */
+  .rec__pr { font-size: 10px; }
+  .rec__sale { left: 8px; bottom: 8px; font-size: 12px; line-height: 18px; }
+
+  /* bottom collage — swipeable row of 240x320 tiles */
+  .collage-head { margin-top: 80px; padding: 0 16px; }
+  .collage {
+    margin-top: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .collage::-webkit-scrollbar { display: none; }
+  .collage__tile {
+    width: 240px;
+    aspect-ratio: 240 / 320;
+    scroll-snap-align: start;
+  }
+  .badge { height: 26px; line-height: 26px; font-size: 12px; }
+
+  .sticky-cta { display: block; }
+  body.has-sticky { padding-bottom: 80px; }
+}
+
+/* tablets (Triumph md/lg, 768–1199) — the swipe gallery shows the
+   next image alongside instead of going full width: slides shrink
+   to 610/900 of the viewport like the @900 frame (Figma 1435-8138) */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .gallery__hero, .gallery__slide { width: 67.8%; }
+}
+
+/* MOBILE REVIEWS (Figma 2258:25918) — at Triumph's sm boundary the reviews
+   restack: the recommend line drops to label size, and the stats strip puts
+   the histogram left of ONE divider with Comfort/Quality/Fit stacked to its
+   right as label + value on a single line. The vertical rhythm tightens from
+   32px to 16px throughout. */
+@media (max-width: 575.98px) {
+  .rvw { gap: 16px; }
+  .rvw__hero { gap: 16px; }
+  p.rvw__rec { font-size: 12px; line-height: 14px; }
+  .rvw__stats { margin-top: 4px; } /* + the 16px gap = the design's 20px */
+
+  .rvw__hist { flex: 1; width: auto; padding-right: 16px; }
+  .rvw__statcol {
+    display: flex; flex: 1; min-width: 0; flex-direction: column;
+    border-left: 1px solid var(--c-line);
+    padding-left: 16px;
+  }
+  .rvw__col {
+    flex: 1;
+    flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;
+    border-left: 0;
+  }
+  .rvw__col span { font-size: 12px; line-height: 16px; }
+
+  /* review list — 16px gap + 16px above the rule (32px between reviews) */
+  .rvw__list { gap: 16px; }
+  .rvw__item + .rvw__item { padding-top: 16px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav class="nav">
+    <a class="logo" href="./pdp-only.html" aria-label="Triumph">
+      <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
+    </a>
+    <ul class="nav__links">
+      <li><a href="#">Special Deals</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Knickers</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Activewear</a></li>
+      <li><a href="#">Sleep &amp; Lounge</a></li>
+      <li><a href="#">Swimwear</a></li>
+    </ul>
+    <div class="nav__right">
+      <label class="search" aria-label="Search">
+        <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Suche" />
+      </label>
+      <div class="nav__icons">
+        <button aria-label="Account">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </button>
+        <button aria-label="Wishlist">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z" stroke-linejoin="round"/></svg>
+        </button>
+        <button aria-label="Cart">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="burger" aria-label="Menu">
+          <svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="main">
+
+    <!-- GALLERY -->
+    <section class="gallery">
+      <!-- on mobile this wrapper becomes a swipe carousel -->
+      <div class="gallery__strip" id="galleryStrip">
+        <div class="gallery__hero">
+          <img src="./Assets/pdp/gallery-1.jpg" alt="Aura Spotlight padded underwire bra" id="heroImg" />
+        </div>
+        <div class="gallery__slide"><img src="./Assets/pdp/gallery-3.jpg" alt="" loading="lazy" /></div>
+        <div class="gallery__slide"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
+      </div>
+      <div class="gallery__bars" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
+
+      <!-- desktop-only editorial rows — fade in together as one block -->
+      <div class="gallery__rows rv">
+        <div class="gallery__row">
+          <div class="gallery__tile gallery__note">
+            <p>A whisper-soft floral lace bra, blending modern romance with a desire for comfort. Invisible under T-Shirts, combining beauty with comfort.</p>
+          </div>
+          <div class="gallery__tile"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
+        </div>
+        <div class="gallery__row">
+          <div class="gallery__tile"><img src="./Assets/pdp/gallery-3.jpg" alt="" loading="lazy" /></div>
+          <div class="gallery__tile"><img src="./Assets/pdp/gallery-2.jpg" alt="" loading="lazy" /></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO -->
+    <section class="info">
+
+      <div class="p-head rv">
+        <div class="p-head__txt">
+          <div class="p-name">Aura Spotlight</div>
+          <h1 class="p-title">Padded Underwire Bra</h1>
+          <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+        </div>
+        <button class="fav" id="fav" aria-label="Add to wishlist">
+          <svg viewBox="0 0 24 24"><path class="hs" d="M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z"/><path class="ho" d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z"/></svg>
+        </button>
+      </div>
+
+      <div class="colors rv">
+        <div class="lbl" id="colorLabel">Creamy Dream</div>
+        <div class="colors__opts" role="group" aria-label="Colours">
+          <button class="swatch" data-sel="true" data-color="Creamy Dream" aria-label="Creamy Dream">
+            <img src="./Assets/pdp/swatch-creamy.png" alt="" />
+          </button>
+          <button class="swatch" data-sel="false" data-color="Powder Blue" aria-label="Powder Blue">
+            <img src="./Assets/pdp/swatch-alt.png" alt="" />
+          </button>
+        </div>
+      </div>
+
+      <div class="sizes rv">
+        <div class="size-block">
+          <div class="lbl">Underbust Size</div>
+          <div class="size-grid" role="group" aria-label="Underbust size">
+            <button class="chip">70</button>
+            <button class="chip">75</button>
+            <button class="chip">80</button>
+            <button class="chip">85</button>
+            <button class="chip chip--out" aria-disabled="true">90</button>
+            <button class="chip">100</button>
+            <button class="chip">105</button>
+            <button class="chip">110</button>
+          </div>
+        </div>
+        <div class="size-block">
+          <div class="lbl">Cup Size</div>
+          <div class="size-grid" role="group" aria-label="Cup size">
+            <button class="chip">A</button>
+            <button class="chip">B</button>
+            <button class="chip">C</button>
+            <button class="chip">D</button>
+            <button class="chip chip--out" aria-disabled="true">E</button>
+            <button class="chip">F</button>
+            <button class="chip">G</button>
+            <button class="chip">H</button>
+          </div>
+        </div>
+        <a class="size-link" href="#">Find the right size</a>
+
+        <div class="cta-block" id="ctaBlock">
+          <button class="cta" data-add>Add to Cart</button>
+          <div class="usp">
+            <span>Free Delivery with <u>MYTriumph</u></span><i></i>
+            <span>Easy Returns</span><i></i>
+            <span>Pay with Klarna</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="set rv">
+        <div class="lbl">Complete Your Set</div>
+        <div class="set__list">
+          <div class="set-item">
+            <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Panty" loading="lazy" /></div>
+            <div class="set-item__txt">
+              <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Panty</strong></div>
+              <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+            </div>
+            <button class="addbag" aria-label="Add to bag" data-add>
+              <svg viewBox="0 0 40 40"><rect x="0.25" y="0.25" width="39.5" height="39.5" fill="none" stroke="#BDBDBD" stroke-width="0.5"/><path d="M20 15V25M25 20H15" stroke="black" stroke-width="0.8"/></svg>
+            </button>
+          </div>
+          <div class="set-item">
+            <div class="set-item__img"><img src="./Assets/pdp/gallery-2.jpg" alt="Aura Spotlight Top" loading="lazy" /></div>
+            <div class="set-item__txt">
+              <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Top</strong></div>
+              <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+            </div>
+            <button class="addbag" aria-label="Add to bag" data-add>
+              <svg viewBox="0 0 40 40"><rect x="0.25" y="0.25" width="39.5" height="39.5" fill="none" stroke="#BDBDBD" stroke-width="0.5"/><path d="M20 15V25M25 20H15" stroke="black" stroke-width="0.8"/></svg>
+            </button>
+          </div>
+          <div class="set-item">
+            <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Top" loading="lazy" /></div>
+            <div class="set-item__txt">
+              <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Top</strong></div>
+              <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+            </div>
+            <button class="addbag" aria-label="Add to bag" data-add>
+              <svg viewBox="0 0 40 40"><rect x="0.25" y="0.25" width="39.5" height="39.5" fill="none" stroke="#BDBDBD" stroke-width="0.5"/><path d="M20 15V25M25 20H15" stroke="black" stroke-width="0.8"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="accs rv" id="accs">
+        <!-- availability is a link out to the store finder, not a fold-out -->
+        <div class="acc">
+          <a class="acc__head acc__head--link" href="#"><span class="lbl">Availability In-Store</span>
+            <img class="acc__arrow" src="./Assets/pdp/acc-arrow-right.svg" alt="" />
+          </a>
+          <div class="acc__line"></div>
+        </div>
+        <div class="acc">
+          <button class="acc__head"><span class="lbl">Features</span>
+            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+          </button>
+          <div class="acc__body">
+            <p class="acc__strong">75% Polyamide, 25% Elastane</p>
+            <p>This minimizer bra works its magic by creating a beautifully smooth silhouette that keeps everything perfectly in place. The wireless design thoughtfully reduces your bust by one cup size while maintaining natural comfort throughout the day. Experience seamless style that moves with you, offering the confidence that comes from a flawless fit.</p>
+            <ul class="acc__list">
+              <li>With LYCRA® fibre for unparalleled comfort and ultimate fit</li>
+              <li>Wireless minimizer bra design reduces bust by one cup size</li>
+              <li>Soft elastic shoulder straps with new jacquard design</li>
+              <li>Bonded and laminated construction for virtually seamless wear</li>
+              <li>Hook-and-eye fastener for optimum support and an adjustable fit</li>
+              <li>V-slides provide additional comfort and optimal support</li>
+            </ul>
+            <p>Item Nr.: 10210668 (7613108912163)</p>
+            <img class="acc__logo" src="./Assets/pdp/acc-lycra.png" alt="LYCRA" width="46" height="29" />
+          </div>
+          <div class="acc__line"></div>
+        </div>
+        <div class="acc">
+          <button class="acc__head"><span class="lbl">Shipping &amp; Returns</span>
+            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+          </button>
+          <div class="acc__body">
+            <div class="lbl acc__sec">Shipping</div>
+            <div class="grp">
+              <div class="lbl">Free for MyTriumph members</div>
+              <div class="prow"><span>Standard delivery in 2-3 working days<br />Join now</span><b>£0.00</b></div>
+            </div>
+            <div class="grp">
+              <div class="lbl">Home delivery</div>
+              <div class="prow"><span>Standard delivery in 2-3 working days</span><b>£4.99</b></div>
+              <div class="prow"><span>Express delivery in 1-2 working days</span><b>£7.99</b></div>
+            </div>
+            <div class="grp">
+              <div class="lbl">Click &amp; Collect at your Triumph store</div>
+              <div class="prow"><span>Free delivery in 2-3 working days</span><b>£0.00</b></div>
+            </div>
+            <div class="grp">
+              <div class="lbl">Returns in Triumph stores</div>
+              <div class="prow"><span>Free of charge</span><b>£0.00</b></div>
+            </div>
+            <div class="lbl acc__sec">Returns</div>
+            <div class="grp">
+              <div class="lbl">Returns by post:</div>
+              <p>Refund to an online gift card: free of charge. Refund to the original payment method: £2.95 is deducted from the refund amount.</p>
+            </div>
+            <div class="grp">
+              <div class="lbl">Sustainable returns:</div>
+              <p>Your parcel doesn't contain a return label, a printed invoice or a returns form to fill in. You can find more information about our new returns process on our returns page.</p>
+            </div>
+          </div>
+          <div class="acc__line"></div>
+        </div>
+        <div class="acc">
+          <button class="acc__head"><span class="lbl">Care</span>
+            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+          </button>
+          <div class="acc__body">
+            <ul class="acc__list">
+              <li>Delicate wash cycle up to 30°C</li>
+              <li>Do not bleach</li>
+              <li>Do not tumble dry</li>
+              <li>Do not iron or press</li>
+              <li>Do not dryclean</li>
+            </ul>
+          </div>
+          <div class="acc__line"></div>
+        </div>
+        <div class="acc">
+          <button class="acc__head"><span class="lbl">Standards &amp; Traceability</span>
+            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+          </button>
+          <div class="acc__body">
+            <p class="acc__strong">Certified materials: 60% recycled pre-consumer Polyamide</p>
+            <p>Explore the journey of the product here: <a class="acc__link" href="https://uk.triumph.com/amourette/10210668.html?color=0004_Black#passportLinkModal" target="_blank" rel="noopener">Product Passport</a></p>
+            <p>Manufacturer: Triumph International GmbH<br />Hauptstr. 80<br />DE 73540 Heubach</p>
+            <p>The product contains minimum 60% GRS certified recycled polyamide.<br />Certified by Ecocert Greenlife<br />Licence no. 262425<br />Triumph Intertrade AG<br /><br />According to the GRS standard visible on<br /><a class="acc__link" href="https://textileexchange.org" target="_blank" rel="noopener">https://textileexchange.org</a></p>
+            <div class="acc__logos">
+              <img src="./Assets/pdp/acc-cert-1.png" alt="GRS — Global Recycled Standard" width="80" height="72" />
+              <img src="./Assets/pdp/acc-cert-2.png" alt="Ecocert Greenlife" width="80" height="87" />
+            </div>
+          </div>
+          <div class="acc__line"></div>
+        </div>
+        <div class="acc acc--reviews">
+          <button class="acc__head">
+            <span class="rvw__headgrp">
+              <span class="lbl">Reviews</span>
+              <span class="rvw__headstars">
+                <!-- star paths are stamped by rvwStars() at load — real paths, not
+                     <use> refs: Chrome re-clones use-shadow trees on ancestor class
+                     changes, which made the stars flicker on every accordion click -->
+                <svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true" data-stars="5"></svg>
+                <span class="rvw__count">[ 61 ]</span>
+              </span>
+            </span>
+            <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+          </button>
+          <div class="acc__body">
+            <div class="rvw">
+              <div class="rvw__hero">
+                <p class="rvw__rec">84% would recommend this product.</p>
+                <img class="rvw__badge" src="./Assets/pdp/reviews/authentic-reviews-mono.png" alt="Authentic Reviews by Bazaarvoice" width="82" height="12" />
+              </div>
+              <div class="rvw__stats">
+                <div class="rvw__hist">
+                  <div class="rvw__row"><i>5</i><span class="rvw__track"><span class="rvw__bar" style="width:100%"></span></span></div>
+                  <div class="rvw__row"><i>4</i><span class="rvw__track"><span class="rvw__bar" style="width:14%"></span></span></div>
+                  <div class="rvw__row"><i>3</i><span class="rvw__track"><span class="rvw__bar" style="width:4.6%"></span></span></div>
+                  <div class="rvw__row"><i>2</i><span class="rvw__track"></span></div>
+                  <div class="rvw__row"><i>1</i><span class="rvw__track"><span class="rvw__bar" style="width:28%"></span></span></div>
+                </div>
+                <!-- display:contents on desktop, so the three columns sit beside the
+                     histogram; on mobile it becomes the single stacked column -->
+                <div class="rvw__statcol">
+                  <div class="rvw__col"><b>Comfort</b><span>4.4</span></div>
+                  <div class="rvw__col"><b>Quality</b><span>4.7</span></div>
+                  <div class="rvw__col"><b>Fit</b><span>4.1</span></div>
+                </div>
+              </div>
+              <div class="rvw__rule"></div>
+              <div class="rvw__toolbar">
+                <span class="rvw__label10">Reviews&nbsp;&nbsp;[ 61 ]</span>
+                <div class="rvw__sortwrap" id="rvwSortWrap">
+                  <button class="rvw__sortbtn" id="rvwSort" aria-haspopup="listbox">
+                    <span class="rvw__label10">Sort by: <span id="rvwSortLbl">Newest</span></span>
+                    <svg viewBox="0 0 10.6 7"><path d="M10.3 0.26 5.3 6.26 0.3 0.26"/></svg>
+                  </button>
+                  <div class="rvw__sortmenu" role="listbox">
+                    <button data-sort="top">Top rated</button>
+                    <button data-sort="recent" data-on="true">Most recent</button>
+                    <button data-sort="least">Least stars</button>
+                  </div>
+                </div>
+              </div>
+              <div class="rvw__list" id="rvwList"></div>
+              <div class="rvw__actions">
+                <button id="rvwMore">Load More Reviews</button>
+              </div>
+            </div>
+          </div>
+          <div class="acc__line"></div>
+        </div>
+      </div>
+
+      <div class="discover rv">
+        <div class="lbl">Discover More In</div>
+        <div class="discover__links">
+          <a href="#">Padded Bras</a>
+          <a href="#">Underwire Bras</a>
+          <a href="#">Moulded Bras</a>
+          <a href="#">Non-moulded Bras</a>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- YOU MIGHT LIKE THIS -->
+  <section class="recs">
+    <h2 class="rv">You Might Like This</h2>
+    <div class="recs__grid" id="recsGrid"></div>
+  </section>
+
+  <!-- BOTTOM CATEGORY COLLAGE -->
+  <h2 class="collage-head rv">Swimwear, Loungewear, Briefs</h2>
+  <section class="collage">
+    <a class="collage__tile rv" href="#">
+      <img src="./Assets/pdp/bottom-2.jpg" alt="Swimwear" loading="lazy" />
+      <span class="badge">Swimwear</span>
+    </a>
+    <a class="collage__tile rv" href="#">
+      <img src="./Assets/pdp/bottom-3.jpg" alt="Loungewear" loading="lazy" />
+      <span class="badge">Loungewear</span>
+    </a>
+    <a class="collage__tile rv" href="#">
+      <img src="./Assets/pdp/bottom-1.jpg" alt="Briefs" loading="lazy" />
+      <span class="badge">Briefs</span>
+    </a>
+  </section>
+</main>
+
+<!-- MOBILE STICKY CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <button class="cta" data-add>Add to Cart</button>
+</div>
+
+<script>
+/* ============================================================
+   DATA — You might like this (Figma rows 727:2022 / 2099 / 2176)
+   ============================================================ */
+const RECS = [
+  { nm: 'Jersey',    pr: '£59.95', img: 'rec-1.jpg' },
+  { nm: 'Top',       pr: '£59.95', img: 'rec-2.jpg' },
+  { nm: 'Lacey bra', pr: '£59.95', img: 'rec-3.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-4.jpg' },
+  { nm: 'Jersey',    pr: '£59.95', img: 'rec-5.jpg' },
+  { nm: 'Top',       pr: '£59.95', img: 'rec-6.jpg' },
+  { nm: 'Lacey bra', pr: '£59.95', img: 'rec-7.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-8.jpg' },
+  { nm: 'Jersey',    pr: '£59.95', img: 'rec-9.jpg',   sale: true },
+  { nm: 'Top',       pr: '£59.95', img: 'rec-base.jpg', sale: true, noAlt: true },
+  { nm: 'Lacey bra', pr: '£59.95', img: 'rec-8.jpg',   sale: true },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-9.jpg', sale: true },
+  { nm: 'Balconette bra', pr: '£54.95', img: 'rec-3.jpg' },
+  { nm: 'Jersey',         pr: '£49.95', img: 'rec-6.jpg' },
+  { nm: 'Top',            pr: '£39.95', img: 'rec-1.jpg' },
+  { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-4.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '£44.95', img: 'rec-7.jpg' },
+  { nm: 'Top',            pr: '£34.95', img: 'rec-2.jpg' },
+  { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-5.jpg', sale: true },
+  { nm: 'Jersey',         pr: '£29.95', img: 'rec-8.jpg' },
+];
+/* 20 items — fills the grid evenly at every count: 10x2 / 5x4 / 4x5 */
+
+const recsGrid = document.getElementById('recsGrid');
+RECS.forEach(r => {
+  const card = document.createElement('a');
+  card.className = 'rec rv';
+  card.href = './pdp-only.html';
+  card.innerHTML = `
+    <div class="rec__img">
+      ${r.noAlt ? '' : `<img src="./Assets/pdp/rec-base.jpg" alt="" loading="lazy" />`}
+      <img class="alt" src="./Assets/pdp/${r.img}" alt="${r.nm}" loading="lazy" />
+      ${r.sale ? '<span class="rec__sale">Sale</span>' : ''}
+    </div>
+    <div class="rec__info">
+      <span class="rec__nm">${r.nm}</span>
+      <span class="rec__pr">${r.pr}</span>
+    </div>`;
+  recsGrid.appendChild(card);
+});
+
+/* ============================================================
+   SCROLL REVEAL — one-shot blurred rise; everything entering the
+   viewport animates together (no stagger, same as the PLP)
+   ============================================================ */
+const rvEls = [...document.querySelectorAll('.rv')];
+/* the buy box reveals as ONE unit — its below-fold content (Complete Your
+   Set, accordions, discover) sits pinned during scroll phase 1 and would
+   otherwise fade in noticeably later than the content around it */
+const infoRv = [...document.querySelectorAll('.info .rv')];
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  rvEls.forEach(el => el.classList.add('is-visible'));
+} else {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-visible');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
+  rvEls.filter(el => !infoRv.includes(el)).forEach(el => io.observe(el));
+  new IntersectionObserver(([en], obs) => {
+    if (!en.isIntersecting) return;
+    infoRv.forEach(el => el.classList.add('is-visible'));
+    obs.disconnect();
+  }, { threshold: 0 }).observe(document.querySelector('.info'));
+}
+
+/* ============================================================
+   TWO-PHASE SCROLL (desktop) — Samsøe-style hand-over
+   The page is exactly as tall as gallery + the buy box's overflow
+   beyond one viewport. The gallery gets a negative sticky top so it
+   pins the moment its last image reaches the viewport bottom — which
+   is the same scroll position where the container starts pushing the
+   top-pinned buy box, so phase 2 (buy box scrolling out its rest)
+   begins only once the gallery is fully through.
+   ============================================================ */
+const mainEl    = document.querySelector('.main');
+const galleryEl = document.querySelector('.gallery');
+const infoEl    = document.querySelector('.info');
+const desktopMq = window.matchMedia('(min-width: 1200px)');
+
+function syncScrollStage() {
+  if (!desktopMq.matches) {           // mobile stacks — no sticky play
+    mainEl.style.minHeight = '';
+    galleryEl.style.top = '';
+    return;
+  }
+  const vh = window.innerHeight;
+  const g  = galleryEl.offsetHeight;
+  const i  = infoEl.offsetHeight;
+  mainEl.style.minHeight = g + Math.max(0, i - vh) + 'px';
+  galleryEl.style.top = Math.min(0, vh - g) + 'px';
+}
+/* re-measure on resize and whenever a column changes height
+   (accordion open/close, images loading in) */
+const stageRo = new ResizeObserver(syncScrollStage);
+stageRo.observe(galleryEl);
+stageRo.observe(infoEl);
+window.addEventListener('resize', syncScrollStage);
+desktopMq.addEventListener('change', syncScrollStage);
+syncScrollStage();
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+/* colour swatches */
+const colorLabel = document.getElementById('colorLabel');
+document.querySelectorAll('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.swatch').forEach(s => s.dataset.sel = 'false');
+    sw.dataset.sel = 'true';
+    colorLabel.textContent = sw.dataset.color;
+  });
+});
+
+/* size chips — one selection per grid, sold-out not selectable */
+document.querySelectorAll('.size-grid').forEach(grid => {
+  grid.querySelectorAll('.chip:not(.chip--out)').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const on = chip.dataset.sel === 'true';
+      grid.querySelectorAll('.chip').forEach(c => c.dataset.sel = 'false');
+      chip.dataset.sel = on ? 'false' : 'true';
+    });
+  });
+});
+
+/* wishlist heart */
+document.getElementById('fav').addEventListener('click', e =>
+  e.currentTarget.classList.toggle('is-on'));
+
+/* add to cart — bump the header count */
+const cartCount = document.getElementById('cartCount');
+document.querySelectorAll('[data-add]').forEach(btn =>
+  btn.addEventListener('click', () => {
+    cartCount.textContent = +cartCount.textContent + 1;
+  }));
+
+/* accordions — animated open/close, one at a time; the opened height
+   is measured so long panels (shipping) unfold fully */
+document.querySelectorAll('.acc').forEach(acc => {
+  const head = acc.querySelector('button.acc__head');
+  const body = acc.querySelector('.acc__body');
+  if (!head || !body) return; // the availability row is a plain link out
+  head.addEventListener('click', () => {
+    const open = acc.classList.contains('is-open');
+    document.querySelectorAll('.acc').forEach(a => {
+      a.classList.remove('is-open');
+      const b = a.querySelector('.acc__body');
+      if (b) b.style.maxHeight = '';
+    });
+    if (!open) {
+      acc.classList.add('is-open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  });
+});
+
+/* ============================================================
+   REVIEWS — data-driven list (newest first); LOAD MORE toggles to
+   SHOW LESS, the sort dropdown re-sorts. After every render the
+   accordion's measured max-height is refreshed so the fold always
+   fits the current content.
+   ============================================================ */
+const RVW_REVIEWS = [
+  { s: 4, date: '2 hours ago', title: 'Good support', c: 4, q: 4, f: 4,
+    text: ['A beautiful wireless bra — good material and great support.', 'Customer recommends this product.'],
+    by: 'Anonymous', from: 'Switzerland', size: '85F' },
+  { s: 5, date: '2 days ago', title: 'Invisible under everything', c: 5, q: 5, f: 5,
+    text: ['Completely smooth under a tight T-shirt and the lace still feels special. My third one in this style.', 'Customer recommends this product.'],
+    by: 'Marie L.', from: 'Germany', size: '75C' },
+  { s: 5, date: '1 week ago', title: 'Perfect everyday bra', c: 5, q: 5, f: 4,
+    text: ['The straps stay put and the underwire never digs in. Washed it several times already — still looks like new.', 'Customer recommends this product.'],
+    by: 'Sophie', from: 'Austria', size: '80B' },
+  { s: 3, date: '1 month ago', title: 'Runs a little small', c: 3, q: 4, f: 2,
+    text: ['Lovely fabric and finish, but I had to go up a cup size. Order one size larger than usual.'],
+    by: 'Anonymous', from: 'United Kingdom', size: '70D',
+    reply: { date: '1 month ago',
+      text: ['We regret to hear this bra did not work out for you after trying it on. We are confident that you will find a perfect fit among our wide assortment.', 'Best, Triumph'] } },
+  { s: 5, date: '2 months ago', title: 'Beautiful lace', c: 5, q: 5, f: 5,
+    text: ['The prettiest bra I own that I can actually wear all day. The lace detail is even nicer in person.', 'Customer recommends this product.'],
+    by: 'Elena', from: 'Italy', size: '75B' },
+  { s: 5, date: '3 months ago', title: 'Comfortable all day', c: 5, q: 4, f: 5,
+    text: ['Forgot I was wearing it by lunchtime. Great shape without any padding bulk.', 'Customer recommends this product.'],
+    by: 'Charlotte', from: 'France', size: '85C' },
+  { s: 4, date: '6 months ago', title: 'Great under shirts', c: 4, q: 5, f: 4,
+    text: ['Smooth cups, no lines under work shirts. The band is snug at first but relaxes after a few wears.', 'Customer recommends this product.'],
+    by: 'Anonymous', from: 'Netherlands', size: '80C' },
+  { s: 5, date: '1 year ago', title: 'My favourite bra', c: 5, q: 5, f: 5,
+    text: ['I keep coming back to this one. Bought it in two more colours during the sale.', 'Customer recommends this product.'],
+    by: 'Hannah', from: 'Switzerland', size: '75D' },
+];
+const RVW_PAGE = 4;
+const RVW_SORTS = {
+  top:    { label: 'Top rated',   fn: (a, b) => b.s - a.s || a.i - b.i },
+  recent: { label: 'Newest',      fn: (a, b) => a.i - b.i },
+  least:  { label: 'Least stars', fn: (a, b) => a.s - b.s || a.i - b.i },
+};
+const rvwList = document.getElementById('rvwList');
+const rvwMore = document.getElementById('rvwMore');
+const rvwSortLbl = document.getElementById('rvwSortLbl');
+const rvwSortWrap = document.getElementById('rvwSortWrap');
+let rvwShown = RVW_PAGE;
+let rvwSortKey = 'recent';
+
+/* star glyph from the Figma export (Assets/pdp/reviews/stars-5.svg), one 13x13
+   cell — stamped as real paths (a shared <use> ref flickers on class changes) */
+const RVW_STAR_D = 'M6.30965 0.590212C6.36926 0.405395 6.63074 0.405394 6.69035 0.590211L7.90702 4.3628C7.93372 4.44557 8.01084 4.5016 8.09781 4.50141L12.0617 4.49274C12.2559 4.49232 12.3367 4.74101 12.1794 4.8548L8.96739 7.17773C8.89693 7.22869 8.86747 7.31935 8.89452 7.40201L10.1277 11.1692C10.1881 11.3538 9.97655 11.5075 9.81969 11.393L6.61791 9.05606C6.54766 9.00479 6.45234 9.00479 6.38209 9.05606L3.18031 11.393C3.02345 11.5075 2.81191 11.3538 2.87232 11.1692L4.10548 7.40201C4.13253 7.31935 4.10307 7.22869 4.0326 7.17773L0.820637 4.8548C0.663285 4.74101 0.744087 4.49232 0.938277 4.49274L4.90219 4.50141C4.98916 4.5016 5.06628 4.44557 5.09298 4.3628L6.30965 0.590212Z';
+const rvwStarPaths = n => [0, 1, 2, 3, 4].map(i =>
+  `<path transform="translate(${i * 15} 0)" d="${RVW_STAR_D}" fill="${i < n ? '#000' : '#F1F1F1'}"></path>`).join('');
+const rvwStars = n => `<svg class="stars" width="73" height="13" viewBox="0 0 73 13" aria-hidden="true">${rvwStarPaths(n)}</svg>`;
+/* fill the static star rows in the markup (the accordion head) */
+document.querySelectorAll('svg.stars[data-stars]').forEach(s => { s.innerHTML = rvwStarPaths(+s.dataset.stars); });
+
+function rvwRender() {
+  const sorted = RVW_REVIEWS.map((r, i) => ({ ...r, i })).sort(RVW_SORTS[rvwSortKey].fn);
+  rvwList.innerHTML = sorted.slice(0, rvwShown).map(r => `
+    <div class="rvw__item">
+      <div class="rvw__ihead">${rvwStars(r.s)}<span class="rvw__date">${r.date}</span></div>
+      <div class="rvw__ititle">${r.title}</div>
+      <div class="rvw__dots"><span>Comfort ${r.c}</span><i></i><span>Quality ${r.q}</span><i></i><span>Fit ${r.f}</span></div>
+      <div class="rvw__itext">${r.text.map(t => `<p>${t}</p>`).join('')}</div>
+      <div class="rvw__dots"><span>By ${r.by}</span><i></i><span>From ${r.from}</span><i></i><span>Size ${r.size}</span></div>
+      <button class="rvw__report">Report</button>
+      ${r.reply ? `
+      <div class="rvw__reply">
+        <div class="rvw__replyhead"><span>Reply from Triumph</span><span class="rvw__date">${r.reply.date}</span></div>
+        <div>${r.reply.text.map(t => `<p>${t}</p>`).join('')}</div>
+      </div>` : ''}
+    </div>`).join('');
+  rvwMore.textContent = rvwShown >= RVW_REVIEWS.length ? 'Show Less Reviews' : 'Load More Reviews';
+  /* the accordion opened to a measured height — refresh it for the new content */
+  const accBody = rvwList.closest('.acc__body');
+  if (accBody && accBody.closest('.acc').classList.contains('is-open')) {
+    accBody.style.maxHeight = accBody.scrollHeight + 'px';
+  }
+}
+rvwRender();
+
+/* toggles between the full list and the first page */
+rvwMore.addEventListener('click', () => {
+  rvwShown = rvwShown >= RVW_REVIEWS.length ? RVW_PAGE : RVW_REVIEWS.length;
+  rvwRender();
+});
+
+/* sort — a small dropdown; picking an option re-sorts the list */
+document.getElementById('rvwSort').addEventListener('click', e => {
+  e.stopPropagation();
+  rvwSortWrap.classList.toggle('is-open');
+});
+rvwSortWrap.querySelectorAll('.rvw__sortmenu button').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    rvwSortKey = btn.dataset.sort;
+    rvwSortLbl.textContent = RVW_SORTS[rvwSortKey].label;
+    rvwSortWrap.querySelectorAll('.rvw__sortmenu button').forEach(b => b.dataset.on = String(b === btn));
+    rvwSortWrap.classList.remove('is-open');
+    rvwRender();
+  });
+});
+document.addEventListener('click', () => rvwSortWrap.classList.remove('is-open'));
+
+/* mobile gallery carousel — progress bars track the scroll */
+const strip = document.getElementById('galleryStrip');
+const bars = [...document.querySelectorAll('.gallery__bars i')];
+strip.addEventListener('scroll', () => {
+  /* divide by the slide width, not the strip width — on tablets the
+     slides are narrower than the viewport (peek carousel) */
+  const i = Math.round(strip.scrollLeft / strip.firstElementChild.offsetWidth);
+  bars.forEach((b, j) => b.classList.toggle('is-on', j === i));
+}, { passive: true });
+
+/* mobile sticky CTA — appears when the inline CTA scrolls out above */
+const stickyCta = document.getElementById('stickyCta');
+const ctaBlock = document.getElementById('ctaBlock');
+new IntersectionObserver(([en]) => {
+  const goneAbove = !en.isIntersecting && en.boundingClientRect.top < 0;
+  stickyCta.classList.toggle('is-on', goneAbove);
+  document.body.classList.toggle('has-sticky', goneAbove);
+}, { threshold: 0 }).observe(ctaBlock);
+</script>
+
+</body>
+</html>
