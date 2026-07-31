@@ -452,10 +452,15 @@ body[data-memcolor="black"] .mem { color: var(--c-ink); }
 
 /* V2 — reads as a sentence, closing on the crown: "or £53.95 for members ♛".
    The "or" carries the gap on its right so it sits evenly between the two
-   prices (a plain word space is only ~3px) */
-body[data-member="v2"] .mem-std { display: none; }
-body[data-member="v2"] .mem-alt { display: inline; }
-body[data-member="v2"] .mem-alt .crown { display: inline-block; margin-left: 5px; }
+   prices (a plain word space is only ~3px).
+   V2.1 is the same sentence with the "or" dropped. */
+body[data-member="v2"] .mem-std,
+body[data-member="v2.1"] .mem-std { display: none; }
+body[data-member="v2"] .mem-alt,
+body[data-member="v2.1"] .mem-alt { display: inline; }
+body[data-member="v2"] .mem-alt .crown,
+body[data-member="v2.1"] .mem-alt .crown { display: inline-block; margin-left: 5px; }
+body[data-member="v2.1"] .mem-alt .mem-or { display: none; }
 .mem-or { font-style: normal; margin-right: var(--mem-gap); }
 
 /* V3 + V6 — price first, then the outlined MEMBER PRICE chip naming it, so
@@ -972,6 +977,7 @@ body.dash-open .dash { display: flex; }
     <div class="dash__seg dash__seg--member">
       <button data-k="member" data-val="v1" data-on="true" title="Member price £x">V1</button>
       <button data-k="member" data-val="v2" title="or £x for members">V2</button>
+      <button data-k="member" data-val="v2.1" title="£x for members — V2 without the &quot;or&quot;">V2.1</button>
       <button data-k="member" data-val="v3" title="MEMBER PRICE chip + £x">V3</button>
       <button data-k="member" data-val="v4" title="MEMBERS PAY £x">V4</button>
       <button data-k="member" data-val="v5" title="MEMBERS PAY + crown + £x">V5</button>
@@ -1570,7 +1576,7 @@ const dashToggle = document.querySelector('.dash-toggle');
 const CONTROLS = {
   view:     ['products', 'content'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
-  member:   ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'],
+  member:   ['v1', 'v2', 'v2.1', 'v3', 'v4', 'v5', 'v6'],
   memcolor: ['burgundy', 'black'],
   images:   ['new', 'live'],
 };
