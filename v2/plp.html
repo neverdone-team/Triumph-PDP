@@ -182,13 +182,20 @@ header {
 .results-row {
   max-width: 2400px; margin: 0 auto;
   display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+  /* --pad-x is also the grid's side padding, so the title and the filters
+     line up with the first and last card */
   padding: 36px var(--pad-x);
 }
 .results-title {
   font-size: 12px; line-height: 24px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
 }
-.results-title .count { font-size: 12px; font-weight: 300; color: var(--c-ink-soft); }
+.results-title .count {
+  font-size: 12px; font-weight: 300; color: var(--c-ink-soft);
+  /* the brackets dip below the baseline, which drops the group's optical
+     centre ~0.5px under the title's caps — lift it back level */
+  position: relative; bottom: .5px;
+}
 .results-title .nowrap { white-space: nowrap; }
 .filters { display: none; gap: 20px; align-items: center; }
 .filters button, .filters-single, .filters-mobile {
@@ -274,10 +281,11 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   grid-auto-flow: dense;
   row-gap: var(--row-gap);
   margin-bottom: 120px;
-  /* settled 2026-07-30: 24px between the cards, 48px down each side.
-     Mobile drops the side padding to zero — see the ≤760px block. */
+  /* 24px between the cards and 24px down each side — the same as --pad-x,
+     so the breadcrumb, hero title and results row all line up with the
+     first card. Mobile drops the side padding to zero (≤760px block). */
   column-gap: 24px;
-  padding: 0 48px;
+  padding: 0 var(--pad-x);
 }
 .card { cursor: pointer; } /* whole card opens the PDP (colour controls excepted) */
 .card, .ed {
@@ -306,7 +314,11 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   width: 100%; height: 100%; object-fit: cover;
   transition: transform .9s var(--ease-out);
 }
-.card:hover .card__img .ph--base { transform: scale(1.04); }
+/* pointer devices only — on touch this fires on tap and the zoom sticks
+   until you tap elsewhere, which reads as a bug */
+@media (hover: hover) {
+  .card:hover .card__img .ph--base { transform: scale(1.04); }
+}
 /* variant overlay photo — crossfades on top of the base */
 .card__img .ph--variant {
   opacity: 0;
@@ -395,20 +407,110 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   margin-top: 4px; padding-top: 2px;
   font-size: 12px; line-height: 14px;
 }
-/* burgundy sale + member price (the old "Price" exploration) — its own
-   dashboard toggle now: "standard" = plain price, "sale" = struck price
-   + burgundy reduced price + member price on the cards with sale data */
-.card__sale { display: none; }
-body[data-pricing="sale"] .card__pr.is-sale > .pr-now { text-decoration: line-through; color: var(--c-ink-soft); }
-/* discounted + member price sit on the price line, to the right of the
-   current price (not on their own line below the colour variations) */
-body[data-pricing="sale"] .card__sale {
-  display: inline;
+/* MARKDOWN vs MEMBERSHIP — two states a card can be in, never both.
+   Member pricing is only granted on products that are NOT on sale, so the
+   PRODUCTS data gives a card either `sale` or `mem`:
+     sale → SALE badge on the photo + struck original + reduced price
+     mem  → no badge, plain price + the member rate
+   Both are always on now — the plain-price "Standard" option was dropped
+   2026-07-31. Burgundy is reserved for membership: a markdown is plain
+   black, and only the member price and its wording carry the colour. */
+.card__pr.is-sale > .pr-now { text-decoration: line-through; color: var(--c-ink-soft); }
+.card__sale {
   font-size: inherit; line-height: 14px; /* matches the regular price at every breakpoint */
+  color: var(--c-ink);
+}
+/* member price — its own exploration, the "Member price" dashboard group.
+   Burgundy by default; the "Member colour" toggle swaps the whole run to
+   black. Renumbered into a clean V1–V6 run 2026-07-31.
+
+   ONE spacing token for the whole line: .card__pr is a flex row with its
+   own gap:4px, which lands only on .mem's left — so the margin subtracts
+   it and every gap on the line, inside .mem or out, comes to --mem-gap. */
+.mem {
+  --mem-gap: 8px;
+  margin-left: calc(var(--mem-gap) - 4px);
   color: var(--c-burgundy);
 }
-/* member price — dark burgundy, next to the reduced price */
-.card__sale .mem { margin-left: 12px; color: #38101F; }
+body[data-memcolor="black"] .mem { color: var(--c-ink); }
+/* every wording is rendered on every member card and CSS picks one, so
+   switching versions costs nothing and needs no re-render */
+.mem-alt, .mem-tag, .mem-note, .crown { display: none; }
+
+/* the Triumph crown (Assets/plp/triumph-crown.svg, path copied verbatim so
+   it can take currentColor and follow the member colour). Sized in em so it
+   tracks the price at both breakpoints, and dropped onto the figures'
+   optical centre rather than the baseline. */
+.crown {
+  width: .977em; height: .85em; /* the asset's own 23:20 ratio */
+  flex: none;
+  fill: currentColor;
+  position: relative; bottom: calc(0.355em - 0.425em);
+}
+
+/* V1 — the plain label: "Member price £53.95" */
+
+/* V2 — reads as a sentence, closing on the crown: "or £53.95 for members ♛".
+   The "or" carries the gap on its right so it sits evenly between the two
+   prices (a plain word space is only ~3px) */
+body[data-member="v2"] .mem-std { display: none; }
+body[data-member="v2"] .mem-alt { display: inline; }
+body[data-member="v2"] .mem-alt .crown { display: inline-block; margin-left: 5px; }
+.mem-or { font-style: normal; margin-right: var(--mem-gap); }
+
+/* V3 + V6 — price first, then the outlined MEMBER PRICE chip naming it, so
+   the figure leads and the badge qualifies it. They share one run and differ
+   only in the badge: V3 introduces the price with the word "or" and keeps a
+   text-only chip, V6 drops the "or" and sets the crown inside the chip.
+   As flex children the crown and chip need no baseline nudge. */
+body[data-member="v3"] .mem-std,
+body[data-member="v6"] .mem-std { display: none; }
+body[data-member="v3"] .mem-tag,
+body[data-member="v6"] .mem-tag { display: inline-flex; align-items: center; gap: var(--mem-gap); }
+.mem-tag .mem-or { display: none; margin-right: 0; } /* the flex gap spaces it */
+.mem-tag .crown { bottom: 0; }
+body[data-member="v3"] .mem-tag .mem-or { display: inline; }
+body[data-member="v6"] .mem-chip .crown { display: block; }
+.mem-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-style: normal;
+  font-size: 9px; line-height: 12px; letter-spacing: .06em;
+  text-transform: uppercase;
+  /* symmetric box: the 1px top bias offsets the font's own descender space
+     so the glyphs sit optically centred inside the hairline */
+  padding: 2px 5px 1px;
+  border: .5px solid currentColor;
+}
+
+/* V4 — "MEMBERS PAY £53.95", the whole run at label size so it reads as a
+   note beside the price rather than a second figure competing with it. The
+   label and its amount are only 4px apart — half the gap that separates the
+   pair from the price — so they read as one unit.
+   V5 is the same with the Triumph crown closing the line, right of the price. */
+body[data-member="v4"] .mem-std,
+body[data-member="v5"] .mem-std { display: none; }
+body[data-member="v4"] .mem-note,
+body[data-member="v5"] .mem-note { display: inline; }
+body[data-member="v4"] .mem,
+body[data-member="v5"] .mem { font-size: 10px; line-height: 12px; }
+/* a touch larger than the shared .crown size — at 10px the default reads
+   too faint next to the label, and its half-height changes with it */
+body[data-member="v5"] .mem-note .crown {
+  display: inline-block; margin-left: 5px;
+  width: 1.15em; height: 1em;
+  bottom: calc(0.355em - 0.5em);
+}
+.mem-lbl {
+  font-style: normal;
+  letter-spacing: .04em; text-transform: uppercase;
+  margin-right: 4px;
+}
+/* the whole 10px run shares a baseline with the 12px price, which leaves
+   its optical middle ~1px low — lift it onto the same centre */
+body[data-member="v4"] .mem-note,
+body[data-member="v5"] .mem-note { position: relative; bottom: 0.08em; }
+
+/* V6 — see the V3 + V6 block above */
 .cvar__label {
   flex-basis: 100%; /* wraps onto its own line below the price */
   margin-top: 3px;  /* + the row's 4px gap ≈ the old 7px offset */
@@ -416,7 +518,7 @@ body[data-pricing="sale"] .card__sale {
   font-size: 12px; line-height: 14px; font-weight: 400;
   transition: opacity .2s var(--ease-out);
 }
-.cvar__label:hover { opacity: .55; }
+@media (hover: hover) { .cvar__label:hover { opacity: .55; } }
 
 /* ============================================================
    EXPANDING COLOUR PANEL — covers the info area on open
@@ -440,7 +542,7 @@ body[data-pricing="sale"] .card__sale {
   flex: none;
 }
 .thumb img { width: 44px; height: 44px; object-fit: cover; background: #fff; border: 1px solid rgba(0,0,0,.06); }
-.thumb:hover { border-bottom-color: var(--c-line); }
+@media (hover: hover) { .thumb:hover { border-bottom-color: var(--c-line); } }
 .thumb[data-sel="true"] { border-bottom-color: var(--c-ink); }
 /* the currently worn colour — product photo cropped to the bra */
 .thumb--current img { object-position: 50% 22%; }
@@ -636,8 +738,10 @@ body.drawer-open .drawer {
   .card__info { padding: 10px 4px 0; }
   .card__cat { font-size: 11px; line-height: 16px; }
   .card__pr { margin-top: 2px; font-size: 10px; }
-  /* .card__sale inherits the regular price size (10px here); keep the member gap tighter */
-  .card__sale .mem { margin-left: 8px; }
+  /* .card__sale inherits the regular price size (10px here); keep the member
+     gap tighter — V1 only, the other versions set their own spacing */
+  /* one step tighter on the narrow cards — every gap on the line follows */
+  .mem { --mem-gap: 6px; }
   .cvar__label { margin-top: 0; font-size: 10px; }
 
   /* the heart sits closer to the corner on small cards */
@@ -719,6 +823,10 @@ body.dash-open .dash { display: flex; }
   white-space: nowrap;
   transition: color .2s, background .2s;
 }
+/* eight versions — a fixed quarter-width lays them out 4 + 4 instead of
+   letting the last two stretch across a half-empty row (must come after
+   the flex:1 above, which has the same specificity) */
+.dash__seg--member button { flex: 0 0 calc(25% - 3px); padding-left: 0; padding-right: 0; }
 .dash__seg button:hover { color: #fff; }
 .dash__seg button[data-on="true"] { background: #fff; color: #000; }
 @media (max-width: 760px) {
@@ -728,7 +836,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-pricing="standard" data-images="new">
+<body data-view="products" data-filters="some" data-member="v1" data-memcolor="burgundy" data-images="new">
 
 <!-- HEADER -->
 <header>
@@ -857,11 +965,24 @@ body.dash-open .dash { display: flex; }
        nothing to toggle. The filter behaviour + deep-link (?filters=all|some|none) still work. -->
   <!-- Colour label position removed from the panel: the label always takes a
        new line below the price, so there was nothing left to toggle. -->
+  <!-- Pricing control removed 2026-07-31: sale + member is the only state,
+       so the markdown and member rules are unconditional now. -->
   <div class="dash__group">
-    <div class="dash__label">Pricing</div>
+    <div class="dash__label">Member price</div>
+    <div class="dash__seg dash__seg--member">
+      <button data-k="member" data-val="v1" data-on="true" title="Member price £x">V1</button>
+      <button data-k="member" data-val="v2" title="or £x for members">V2</button>
+      <button data-k="member" data-val="v3" title="MEMBER PRICE chip + £x">V3</button>
+      <button data-k="member" data-val="v4" title="MEMBERS PAY £x">V4</button>
+      <button data-k="member" data-val="v5" title="MEMBERS PAY + crown + £x">V5</button>
+      <button data-k="member" data-val="v6" title="Crown inside the MEMBER PRICE chip">V6</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Member colour</div>
     <div class="dash__seg">
-      <button data-k="pricing" data-val="standard" data-on="true">Standard</button>
-      <button data-k="pricing" data-val="sale">Sale + member</button>
+      <button data-k="memcolor" data-val="burgundy" data-on="true">Burgundy</button>
+      <button data-k="memcolor" data-val="black">Black</button>
     </div>
   </div>
   <!-- Sales banner settled 2026-07-30 on the pink badge (the old V1) and the
@@ -892,33 +1013,40 @@ const SWATCHES = [
 ];
 
 const P = n => `./Assets/plp/card${n}.jpg`;
-/* sale: reduced price — the "price" version shows it on its own line under the price */
+/* `sale` and `mem` are mutually exclusive: member pricing is only granted on
+   products that are NOT marked down, so a card carries either a reduced price
+   (struck original + SALE badge) or a member price (plain price + member rate,
+   no badge) — never both. `mem` is 10% off `pr`. */
 const PRODUCTS = [
-  { cat: 'LACE BALCONETTE BRA',       pr: '£59.95', colors: 4, ph: P(6), sale: '£41.95', mem: '£37.75' },
+  { cat: 'LACE BALCONETTE BRA',       pr: '£59.95', colors: 4, ph: P(6), mem: '£53.95' },
   { cat: 'PADDED UNDERWIRE BRA',      pr: '£50.95', colors: 4, ph: P(2) },
   { cat: 'SEAMLESS T-SHIRT BRA',      pr: '£38.50', colors: 3, ph: P(3) },
-  { cat: 'PLUNGE LACE BRA',           pr: '£59.95', colors: 4, ph: P(5), sale: '£47.95', mem: '£43.15' },
+  { cat: 'PLUNGE LACE BRA',           pr: '£59.95', colors: 4, ph: P(5), sale: '£47.95' },
   { cat: 'WIRELESS COMFORT BRA',      pr: '£29.95', colors: 3, ph: P(1) },
   /* dark red — sits right of the peony interruptor */
   { cat: 'STRAPLESS PUSH-UP BRA',     pr: '£52.00', colors: 4, ph: P(4) },
-  { cat: 'DEMI CUP SATIN BRA',        pr: '£55.00', colors: 3, ph: P(3), sale: '£38.50', mem: '£34.65' },
+  { cat: 'DEMI CUP SATIN BRA',        pr: '£55.00', colors: 3, ph: P(3), mem: '£49.50' },
   { cat: 'SPORTS PERFORMANCE BRA',    pr: '£34.95', colors: 4, ph: P(2) },
   { cat: 'FULL COVERAGE BRA',         pr: '£32.00', colors: 3, ph: P(6) },
-  { cat: 'BRALETTE TRIANGLE',         pr: '£24.95', colors: 4, ph: P(5), sale: '£17.95', mem: '£16.15' },
+  { cat: 'BRALETTE TRIANGLE',         pr: '£24.95', colors: 4, ph: P(5), sale: '£17.95' },
   /* two bright pink bras — sit left of the tulle interruptor */
   { cat: 'HALTER NECK BRA',           pr: '£42.50', colors: 4, ph: P(1) },
   { cat: 'EMBROIDERED UNDERWIRE BRA', pr: '£58.00', colors: 3, ph: P(3) },
-  { cat: 'CONVERTIBLE MULTI-WAY BRA', pr: '£47.00', colors: 4, ph: P(2), sale: '£32.95', mem: '£29.65' },
+  { cat: 'CONVERTIBLE MULTI-WAY BRA', pr: '£47.00', colors: 4, ph: P(2), mem: '£42.30' },
   { cat: 'LONGLINE LACE BRA',         pr: '£62.00', colors: 3, ph: P(3) },
   { cat: 'MINIMIZER BRA',             pr: '£39.95', colors: 4, ph: P(6) },
-  { cat: 'NURSING SUPPORT BRA',       pr: '£36.00', colors: 3, ph: P(1), sale: '£25.00', mem: '£22.50' },
+  { cat: 'NURSING SUPPORT BRA',       pr: '£36.00', colors: 3, ph: P(1), sale: '£25.00' },
   { cat: 'RACERBACK SPORTS BRA',      pr: '£28.50', colors: 4, ph: P(5) },
   { cat: 'PADDED UNDERWIRE BRA',      pr: '£59.95', colors: 3, ph: P(4) },
-  { cat: 'SOFT LACE BRALETTE',        pr: '£27.95', colors: 4, ph: P(2), sale: '£19.95', mem: '£17.95' },
+  { cat: 'SOFT LACE BRALETTE',        pr: '£27.95', colors: 4, ph: P(2), mem: '£25.15' },
   { cat: 'UNWIRED SPACER BRA',        pr: '£44.95', colors: 3, ph: P(6) },
   { cat: 'HIGH APEX LACE BRA',        pr: '£49.95', colors: 4, ph: P(1) },
   { cat: 'SATIN TRIM BRA',            pr: '£41.00', colors: 3, ph: P(3) },
 ];
+
+/* the Triumph crown, inlined from Assets/plp/triumph-crown.svg (Amelie's
+   export) so it can take currentColor and follow the member-price colour */
+const CROWN = '<svg class="crown" viewBox="0 0 23 20" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 6.93399e-09L11.2574 15.8444L6.89607 4.92073e-07L6.77135 4.99014e-07L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z"/></svg>';
 
 /* new Blush & Burgundy product photos — from
    /FOR NEVER DONE BLUSH AND BURGUNDY/Colors combined (copied in) */
@@ -967,7 +1095,7 @@ PRODUCTS.forEach((p, i) => {
     </div>
     <div class="card__info">
       <div class="card__cat">${p.cat}</div>
-      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}<span class="mem">Member price ${p.mem}</span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
+      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}</span>` : ''}${p.mem ? `<span class="mem"><span class="mem-std">Member price ${p.mem}</span><span class="mem-alt"><i class="mem-or">or</i>${p.mem} for members${CROWN}</span><span class="mem-tag"><i class="mem-or">or</i><span class="mem-amt">${p.mem}</span><i class="mem-chip">${CROWN}Member price</i></span><span class="mem-note"><i class="mem-lbl">Members pay</i>${p.mem}${CROWN}</span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
       <div class="panel" role="group" aria-label="Colours">
         <button class="thumb thumb--current" data-photo="${p.ph}" data-idx="0" data-sel="true" aria-label="Selected colour" title="Selected colour">
           <img src="${p.ph}" alt="" loading="lazy" />
@@ -1442,7 +1570,8 @@ const dashToggle = document.querySelector('.dash-toggle');
 const CONTROLS = {
   view:     ['products', 'content'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
-  pricing:  ['standard', 'sale'],
+  member:   ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'],
+  memcolor: ['burgundy', 'black'],
   images:   ['new', 'live'],
 };
 
@@ -1492,7 +1621,7 @@ dashToggle.addEventListener('click', () => {
 if (window.innerWidth > 760) body.classList.add('dash-open');
 else dashToggle.setAttribute('aria-expanded', 'false');
 
-/* deep-link: plp.html?view=content&filters=some&pricing=sale&images=live&open=2
+/* deep-link: plp.html?view=content&filters=some&member=v3&memcolor=black&images=live&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
