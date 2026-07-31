@@ -432,52 +432,40 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   margin-left: calc(var(--mem-gap) - 4px);
   color: var(--c-burgundy);
 }
-body[data-memcolor="black"] .mem { color: var(--c-ink); }
-/* every wording is rendered on every member card and CSS picks one, so
+/* both alternatives are rendered on every member card and CSS picks one, so
    switching versions costs nothing and needs no re-render */
-.mem-alt, .mem-tag, .mem-note, .crown { display: none; }
+.mem-alt, .mem-tag { display: none; }
 
 /* the Triumph crown (Assets/plp/triumph-crown.svg, path copied verbatim so
-   it can take currentColor and follow the member colour). Sized in em so it
-   tracks the price at both breakpoints, and dropped onto the figures'
-   optical centre rather than the baseline. */
+   it can take currentColor). Sized in em so it tracks the price at both
+   breakpoints, and dropped onto the figures' optical centre, not the
+   baseline: they sit 0..~0.71em above it, so the middle is ~0.355em up
+   and the crown's own half-height comes off that. */
 .crown {
   width: .977em; height: .85em; /* the asset's own 23:20 ratio */
   flex: none;
   fill: currentColor;
+  /* centred on the figures, not the baseline: they sit 0..~0.71em above it,
+     so their optical middle is ~0.355em up and the crown's own half-height
+     comes off that. em-relative, so it holds at both the 12px desktop and
+     10px mobile price size. */
   position: relative; bottom: calc(0.355em - 0.425em);
+  margin-left: 5px;
 }
 
 /* V1 — the plain label: "Member price £53.95" */
 
-/* V2 — reads as a sentence, closing on the crown: "or £53.95 for members ♛".
-   The "or" carries the gap on its right so it sits evenly between the two
-   prices (a plain word space is only ~3px).
-   V2.1 is the same sentence with the "or" dropped. */
-body[data-member="v2"] .mem-std,
-body[data-member="v2.1"] .mem-std { display: none; }
-body[data-member="v2"] .mem-alt,
-body[data-member="v2.1"] .mem-alt { display: inline; }
-body[data-member="v2"] .mem-alt .crown,
-body[data-member="v2.1"] .mem-alt .crown { display: inline-block; margin-left: 5px; }
-body[data-member="v2.1"] .mem-alt .mem-or { display: none; }
-.mem-or { font-style: normal; margin-right: var(--mem-gap); }
+/* V2 — reads as a sentence, closing on the crown: "£53.95 for members ♛" */
+body[data-member="v2"] .mem-std { display: none; }
+body[data-member="v2"] .mem-alt { display: inline; }
 
-/* V3 + V6 — price first, then the outlined MEMBER PRICE chip naming it, so
-   the figure leads and the badge qualifies it. They share one run and differ
-   only in the badge: V3 introduces the price with the word "or" and keeps a
-   text-only chip, V6 drops the "or" and sets the crown inside the chip.
-   As flex children the crown and chip need no baseline nudge. */
-body[data-member="v3"] .mem-std,
-body[data-member="v6"] .mem-std { display: none; }
-body[data-member="v3"] .mem-tag,
-body[data-member="v6"] .mem-tag { display: inline-flex; align-items: center; gap: var(--mem-gap); }
-.mem-tag .mem-or { display: none; margin-right: 0; } /* the flex gap spaces it */
-.mem-tag .crown { bottom: 0; }
-body[data-member="v3"] .mem-tag .mem-or { display: inline; }
-body[data-member="v6"] .mem-chip .crown { display: block; }
+/* V3 — price first, then the outlined MEMBER PRICE chip naming it, so the
+   figure leads and the badge qualifies it. As a flex child the chip is
+   centred on the price without a baseline nudge. */
+body[data-member="v3"] .mem-std { display: none; }
+body[data-member="v3"] .mem-tag { display: inline-flex; align-items: center; gap: var(--mem-gap); }
 .mem-chip {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center;
   font-style: normal;
   font-size: 9px; line-height: 12px; letter-spacing: .06em;
   text-transform: uppercase;
@@ -486,36 +474,6 @@ body[data-member="v6"] .mem-chip .crown { display: block; }
   padding: 2px 5px 1px;
   border: .5px solid currentColor;
 }
-
-/* V4 — "MEMBERS PAY £53.95", the whole run at label size so it reads as a
-   note beside the price rather than a second figure competing with it. The
-   label and its amount are only 4px apart — half the gap that separates the
-   pair from the price — so they read as one unit.
-   V5 is the same with the Triumph crown closing the line, right of the price. */
-body[data-member="v4"] .mem-std,
-body[data-member="v5"] .mem-std { display: none; }
-body[data-member="v4"] .mem-note,
-body[data-member="v5"] .mem-note { display: inline; }
-body[data-member="v4"] .mem,
-body[data-member="v5"] .mem { font-size: 10px; line-height: 12px; }
-/* a touch larger than the shared .crown size — at 10px the default reads
-   too faint next to the label, and its half-height changes with it */
-body[data-member="v5"] .mem-note .crown {
-  display: inline-block; margin-left: 5px;
-  width: 1.15em; height: 1em;
-  bottom: calc(0.355em - 0.5em);
-}
-.mem-lbl {
-  font-style: normal;
-  letter-spacing: .04em; text-transform: uppercase;
-  margin-right: 4px;
-}
-/* the whole 10px run shares a baseline with the 12px price, which leaves
-   its optical middle ~1px low — lift it onto the same centre */
-body[data-member="v4"] .mem-note,
-body[data-member="v5"] .mem-note { position: relative; bottom: 0.08em; }
-
-/* V6 — see the V3 + V6 block above */
 .cvar__label {
   flex-basis: 100%; /* wraps onto its own line below the price */
   margin-top: 3px;  /* + the row's 4px gap ≈ the old 7px offset */
@@ -747,6 +705,8 @@ body.drawer-open .drawer {
      gap tighter — V1 only, the other versions set their own spacing */
   /* one step tighter on the narrow cards — every gap on the line follows */
   .mem { --mem-gap: 6px; }
+  /* and the V3 badge comes down a size so it doesn't dominate the caption */
+  .mem-chip { font-size: 8px; letter-spacing: .05em; padding: 2px 4px 1px; }
   .cvar__label { margin-top: 0; font-size: 10px; }
 
   /* the heart sits closer to the corner on small cards */
@@ -828,10 +788,6 @@ body.dash-open .dash { display: flex; }
   white-space: nowrap;
   transition: color .2s, background .2s;
 }
-/* eight versions — a fixed quarter-width lays them out 4 + 4 instead of
-   letting the last two stretch across a half-empty row (must come after
-   the flex:1 above, which has the same specificity) */
-.dash__seg--member button { flex: 0 0 calc(25% - 3px); padding-left: 0; padding-right: 0; }
 .dash__seg button:hover { color: #fff; }
 .dash__seg button[data-on="true"] { background: #fff; color: #000; }
 @media (max-width: 760px) {
@@ -841,7 +797,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-member="v1" data-memcolor="burgundy" data-images="new">
+<body data-view="products" data-filters="some" data-member="v1" data-images="new">
 
 <!-- HEADER -->
 <header>
@@ -974,23 +930,13 @@ body.dash-open .dash { display: flex; }
        so the markdown and member rules are unconditional now. -->
   <div class="dash__group">
     <div class="dash__label">Member price</div>
-    <div class="dash__seg dash__seg--member">
-      <button data-k="member" data-val="v1" data-on="true" title="Member price £x">V1</button>
-      <button data-k="member" data-val="v2" title="or £x for members">V2</button>
-      <button data-k="member" data-val="v2.1" title="£x for members — V2 without the &quot;or&quot;">V2.1</button>
-      <button data-k="member" data-val="v3" title="MEMBER PRICE chip + £x">V3</button>
-      <button data-k="member" data-val="v4" title="MEMBERS PAY £x">V4</button>
-      <button data-k="member" data-val="v5" title="MEMBERS PAY + crown + £x">V5</button>
-      <button data-k="member" data-val="v6" title="Crown inside the MEMBER PRICE chip">V6</button>
-    </div>
-  </div>
-  <div class="dash__group">
-    <div class="dash__label">Member colour</div>
     <div class="dash__seg">
-      <button data-k="memcolor" data-val="burgundy" data-on="true">Burgundy</button>
-      <button data-k="memcolor" data-val="black">Black</button>
+      <button data-k="member" data-val="v1" data-on="true" title="Member price £x">V1</button>
+      <button data-k="member" data-val="v2" title="£x for members ♛">V2</button>
+      <button data-k="member" data-val="v3" title="£x + MEMBER PRICE chip">V3</button>
     </div>
   </div>
+  <!-- Member colour toggle removed 2026-07-31: burgundy is the answer. -->
   <!-- Sales banner settled 2026-07-30 on the pink badge (the old V1) and the
        toggle removed with it; the badge now shows on every sale card. -->
   <div class="dash__group">
@@ -1101,7 +1047,7 @@ PRODUCTS.forEach((p, i) => {
     </div>
     <div class="card__info">
       <div class="card__cat">${p.cat}</div>
-      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}</span>` : ''}${p.mem ? `<span class="mem"><span class="mem-std">Member price ${p.mem}</span><span class="mem-alt"><i class="mem-or">or</i>${p.mem} for members${CROWN}</span><span class="mem-tag"><i class="mem-or">or</i><span class="mem-amt">${p.mem}</span><i class="mem-chip">${CROWN}Member price</i></span><span class="mem-note"><i class="mem-lbl">Members pay</i>${p.mem}${CROWN}</span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
+      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}</span>` : ''}${p.mem ? `<span class="mem"><span class="mem-std">Member price ${p.mem}</span><span class="mem-alt">${p.mem} for members${CROWN}</span><span class="mem-tag"><span class="mem-amt">${p.mem}</span><i class="mem-chip">Member price</i></span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
       <div class="panel" role="group" aria-label="Colours">
         <button class="thumb thumb--current" data-photo="${p.ph}" data-idx="0" data-sel="true" aria-label="Selected colour" title="Selected colour">
           <img src="${p.ph}" alt="" loading="lazy" />
@@ -1576,8 +1522,7 @@ const dashToggle = document.querySelector('.dash-toggle');
 const CONTROLS = {
   view:     ['products', 'content'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
-  member:   ['v1', 'v2', 'v2.1', 'v3', 'v4', 'v5', 'v6'],
-  memcolor: ['burgundy', 'black'],
+  member:   ['v1', 'v2', 'v3'],
   images:   ['new', 'live'],
 };
 
@@ -1627,7 +1572,7 @@ dashToggle.addEventListener('click', () => {
 if (window.innerWidth > 760) body.classList.add('dash-open');
 else dashToggle.setAttribute('aria-expanded', 'false');
 
-/* deep-link: plp.html?view=content&filters=some&member=v3&memcolor=black&images=live&open=2
+/* deep-link: plp.html?view=content&filters=some&member=v3&images=live&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
