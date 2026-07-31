@@ -252,12 +252,12 @@ header {
 }
 .chip:hover { border-color: var(--c-ink); }
 .chip[data-sel="true"] { border-color: var(--c-ink); background: var(--c-ink); color: #fff; }
+/* sold out — still selectable: picking one swaps the CTA to Notify Me */
 .chip--out {
   border-color: rgba(0,0,0,.05);
   color: var(--c-ink-50);
-  cursor: default;
 }
-.chip--out:hover { border-color: rgba(0,0,0,.05); }
+.chip--out:hover { border-color: rgba(0,0,0,.25); }
 .chip--out::after {
   content: "";
   position: absolute; left: 50%; top: 50%;
@@ -265,6 +265,10 @@ header {
   transform: translate(-50%,-50%);
   background: var(--c-ink-50);
 }
+/* selected sold-out chip reads as chosen but keeps its strike-through */
+.chip--out[data-sel="true"],
+.chip--out[data-sel="true"]:hover { border-color: var(--c-ink); }
+.chip[data-sel="true"]::after { background: #fff; }
 .size-link {
   align-self: flex-start;
   font-size: 14px; font-weight: 300; line-height: 14px; letter-spacing: .04em;
@@ -281,9 +285,19 @@ header {
   color: #fff;
   font-size: 14px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase;
   display: flex; align-items: center; justify-content: center;
-  transition: opacity .25s var(--ease-out);
+  transition: opacity .25s var(--ease-out),
+              background .25s var(--ease-out),
+              border-color .25s var(--ease-out),
+              color .25s var(--ease-out);
 }
 .cta:hover { opacity: .85; }
+/* Notify Me — sold-out size selected (Figma 497:3021: white fill, black rule) */
+.cta--notify {
+  background: #fff;
+  border-color: var(--c-ink);
+  color: var(--c-ink);
+  backdrop-filter: blur(10px);
+}
 .usp {
   display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
   font-size: 10px; font-weight: 300; line-height: 12px;
@@ -863,7 +877,7 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
             <button class="chip">75</button>
             <button class="chip">80</button>
             <button class="chip">85</button>
-            <button class="chip chip--out" aria-disabled="true">90</button>
+            <button class="chip chip--out" aria-label="90 — sold out, get notified">90</button>
             <button class="chip">100</button>
             <button class="chip">105</button>
             <button class="chip">110</button>
@@ -876,7 +890,7 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
             <button class="chip">B</button>
             <button class="chip">C</button>
             <button class="chip">D</button>
-            <button class="chip chip--out" aria-disabled="true">E</button>
+            <button class="chip chip--out" aria-label="E — sold out, get notified">E</button>
             <button class="chip">F</button>
             <button class="chip">G</button>
             <button class="chip">H</button>
@@ -1248,25 +1262,50 @@ document.querySelectorAll('.swatch').forEach(sw => {
   });
 });
 
-/* size chips — one selection per grid, sold-out not selectable */
+/* size chips — one selection per grid; sold-out sizes ARE selectable and
+   flip the CTA to Notify Me (Figma 497:2903) */
 document.querySelectorAll('.size-grid').forEach(grid => {
-  grid.querySelectorAll('.chip:not(.chip--out)').forEach(chip => {
+  grid.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
       const on = chip.dataset.sel === 'true';
       grid.querySelectorAll('.chip').forEach(c => c.dataset.sel = 'false');
       chip.dataset.sel = on ? 'false' : 'true';
+      syncCta();
     });
   });
 });
+
+/* main + sticky CTA follow the size selection: any sold-out size picked and
+   the button becomes an outlined Notify Me */
+const ctas = [...document.querySelectorAll('.cta')];
+function syncCta() {
+  const soldOut = [...document.querySelectorAll('.chip[data-sel="true"]')]
+    .some(c => c.classList.contains('chip--out'));
+  ctas.forEach(b => {
+    b.classList.toggle('cta--notify', soldOut);
+    if (b.dataset.notified) return; // mid-confirmation, leave the label alone
+    b.textContent = soldOut ? 'Notify Me' : 'Add to Cart';
+  });
+}
 
 /* wishlist heart */
 document.getElementById('fav').addEventListener('click', e =>
   e.currentTarget.classList.toggle('is-on'));
 
-/* add to cart — bump the header count */
+/* add to cart — bump the header count; in Notify Me mode it signs up instead */
 const cartCount = document.getElementById('cartCount');
+let notifyTimer;
 document.querySelectorAll('[data-add]').forEach(btn =>
   btn.addEventListener('click', () => {
+    if (btn.classList.contains('cta--notify')) {
+      clearTimeout(notifyTimer);
+      ctas.forEach(b => { b.dataset.notified = '1'; b.textContent = "We'll Notify You"; });
+      notifyTimer = setTimeout(() => {
+        ctas.forEach(b => delete b.dataset.notified);
+        syncCta();
+      }, 2400);
+      return;
+    }
     cartCount.textContent = +cartCount.textContent + 1;
   }));
 
