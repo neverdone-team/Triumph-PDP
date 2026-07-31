@@ -191,6 +191,17 @@ header {
   width: 240px; margin: 0;
   font-size: 12px; font-weight: 300; line-height: 20px; letter-spacing: .04em;
 }
+/* SALE — a discounted card on the PLP links through as ?sale=…&was=…, and
+   the product photos carry the same pink badge as the PLP tiles
+   (--c-sale #C1003F; matches .rec__sale below) */
+.sale-flag {
+  position: absolute; left: 16px; bottom: 16px; z-index: 3;
+  background: var(--c-sale); color: #fff;
+  padding: 2px 8px 0;
+  font-size: 14px; font-weight: 400; line-height: 20px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+
 /* mobile carousel chrome — hidden on desktop */
 .gallery__bars { display: none; }
 .gallery__slide { display: none; } /* extra swipe slides are mobile-only */
@@ -206,6 +217,8 @@ header {
 .p-price b { font-size: 14px; font-weight: 400; line-height: 16px; }
 .p-price span { font-size: 12px; font-weight: 300; line-height: 14px; color: var(--c-ink-50); }
 .price-note::before { content: "RRP"; } /* mobile shows "incl. VAT" instead */
+/* sale: struck original then the reduced price, as on the PLP cards */
+.p-price .p-was { text-decoration: line-through; color: var(--c-ink-soft); font-weight: 300; }
 .fav { width: 24px; height: 24px; flex: none; }
 .fav svg { width: 100%; height: 100%; fill: none; stroke: var(--c-ink); stroke-width: 1.2; transition: fill .25s var(--ease-out); }
 .fav.is-on svg { fill: var(--c-ink); }
@@ -713,6 +726,7 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
   .rec__nm { width: 100%; font-size: 11px; line-height: 16px; } /* matches the PLP mobile card titles */
   .rec__pr { font-size: 10px; }
   .rec__sale { left: 8px; bottom: 8px; font-size: 12px; line-height: 18px; }
+  .sale-flag { left: 12px; bottom: 12px; font-size: 12px; line-height: 18px; }
 
   /* bottom collage — swipeable row of 240x320 tiles */
   .collage-head { margin-top: 80px; padding: 0 16px; }
@@ -1171,11 +1185,21 @@ const RECS = [
 ];
 /* 20 items — fills the grid evenly at every count: 10x2 / 5x4 / 4x5 */
 
+/* a sale price for the cards badged "Sale": 20% off, kept on a .95 ending
+   (£59.95 → £47.95, the same markdown the PLP shows) */
+const minus20 = pr => {
+  const off = parseFloat(pr.replace(/[^\d.]/g, '')) * 0.8;
+  return '£' + (Math.round(off - 0.95) + 0.95).toFixed(2);
+};
+
 const recsGrid = document.getElementById('recsGrid');
 RECS.forEach(r => {
   const card = document.createElement('a');
   card.className = 'rec rv';
-  card.href = './index.html';
+  /* a discounted rec opens the PDP in its sale state, like the PLP cards do */
+  card.href = r.sale
+    ? `./index.html?sale=${encodeURIComponent(minus20(r.pr))}&was=${encodeURIComponent(r.pr)}`
+    : './index.html';
   card.innerHTML = `
     <div class="rec__img">
       ${r.noAlt ? '' : `<img src="../Assets/pdp/rec-base.jpg" alt="" loading="lazy" />`}
@@ -1188,6 +1212,35 @@ RECS.forEach(r => {
     </div>`;
   recsGrid.appendChild(card);
 });
+
+/* ============================================================
+   SALE STATE — a discounted product on the PLP (or a "Sale" rec card)
+   links through as ?sale=<reduced>&was=<original>. The PDP then shows
+   the struck original + reduced price and the pink SALE badge on the
+   product photos, so the markdown carries over from the tile.
+   ============================================================ */
+const saleQuery = new URLSearchParams(location.search);
+const salePrice = saleQuery.get('sale');
+if (salePrice) {
+  const wasPrice = saleQuery.get('was') || '£59.95';
+  const priceEl = document.querySelector('.p-head .p-price');
+  const was = document.createElement('b');
+  was.className = 'p-was';
+  was.textContent = wasPrice;            /* textContent, never innerHTML: the
+                                            values come off the query string */
+  const now = document.createElement('b');
+  now.textContent = salePrice;
+  priceEl.replaceChildren(was, now, priceEl.querySelector('.price-note'));
+
+  /* one badge per product photo — the hero on desktop, every swipe slide
+     on mobile (the editorial tiles stay clean, as on the PLP) */
+  document.querySelectorAll('.gallery__hero, .gallery__slide').forEach(shot => {
+    const flag = document.createElement('span');
+    flag.className = 'sale-flag';
+    flag.textContent = 'Sale';
+    shot.appendChild(flag);
+  });
+}
 
 /* ============================================================
    SCROLL REVEAL — one-shot blurred rise; everything entering the

@@ -1205,7 +1205,13 @@ cards.forEach(card => {
      colour label / panel / gallery / heart keep their own behaviour */
   card.addEventListener('click', e => {
     if (e.target.closest('.thumb, .cvar__label, .panel, .gal-nav, .wish')) return;
-    window.location.href = './index.html';
+    /* a discounted card hands its markdown to the PDP, which then shows the
+       struck original + reduced price and the SALE badge on the photos */
+    const cut = card.querySelector('.card__sale');
+    const was = card.querySelector('.pr-now');
+    window.location.href = './index.html' + (cut
+      ? `?sale=${encodeURIComponent(cut.textContent)}&was=${encodeURIComponent(was.textContent)}`
+      : '');
   });
 
   /* hover gallery — entering the photo shows a different shot,
