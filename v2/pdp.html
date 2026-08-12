@@ -531,20 +531,19 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
   font-size: 14px; font-weight: 400; line-height: 20px;
   letter-spacing: .04em; text-transform: uppercase;
 }
+/* title over price, both flush left — Figma 2606:18702 */
 .rec__info {
   padding-top: 16px;
-  /* centring (not flex-end) keeps the price on the title's visual axis
-     despite their different line-heights (20px vs 14px) */
-  display: flex; gap: 12px; align-items: center;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
 }
 .rec__nm {
-  flex: 1; min-width: 0;
+  width: 100%;
   /* same title style as the PLP cards */
   font-size: 12px; font-weight: 400; line-height: 20px; letter-spacing: .04em;
   text-transform: uppercase;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.rec__pr { font-size: 12px; font-weight: 400; line-height: 14px; flex: none; }
+.rec__pr { font-size: 12px; font-weight: 400; line-height: 14px; }
 
 /* ============================================================
    BOTTOM EDITORIAL COLLAGE
@@ -695,8 +694,9 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
     row-gap: 32px;
   }
   .rec__img { aspect-ratio: 155.5 / 204.6; }
-  .rec__info { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .rec__nm { width: 100%; font-size: 11px; line-height: 16px; } /* matches the PLP mobile card titles */
+  /* title over price, tighter under the photo (the 4px gap carries over) */
+  .rec__info { padding-top: 12px; }
+  .rec__nm { font-size: 11px; line-height: 16px; } /* matches the PLP mobile card titles */
   .rec__pr { font-size: 10px; }
   .rec__sale { left: 8px; bottom: 8px; font-size: 12px; line-height: 18px; }
 
@@ -754,6 +754,12 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
   /* review list — 16px gap + 16px above the rule (32px between reviews) */
   .rvw__list { gap: 16px; }
   .rvw__item + .rvw__item { padding-top: 16px; }
+
+  /* bottom collage — the tile takes two thirds of the viewport so the NEXT
+     image always peeks in at exactly 50%: on a phone the row has to read as
+     swipeable, and two fixed 240px tiles happen to fit whole from 480px up.
+     Height follows from the 240/320 ratio, so the tiles simply grow. */
+  .collage__tile { width: 66.667%; }
 }
 
 </style>
