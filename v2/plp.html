@@ -465,14 +465,27 @@ body[data-member="v2"] .mem-alt { display: inline; }
 body[data-member="v3"] .mem-std { display: none; }
 body[data-member="v3"] .mem-tag { display: inline-flex; align-items: center; gap: var(--mem-gap); }
 .mem-chip {
-  display: inline-flex; align-items: center;
+  display: inline-block; /* not inline-flex: text-box-trim below only bites on a block container */
   font-style: normal;
   font-size: 9px; line-height: 12px; letter-spacing: .06em;
   text-transform: uppercase;
-  /* symmetric box: the 1px top bias offsets the font's own descender space
-     so the glyphs sit optically centred inside the hairline */
-  padding: 2px 5px 1px;
+  /* the label is all caps, so its ink runs cap-height→baseline and the line
+     box's descender room sat inside the hairline as dead space: measured 3.4px
+     above the caps against 5.0px below, which read as top-heavy. This padding
+     pays the difference back by hand for engines without text-box below. */
+  padding: 2.8px 5px .2px;
   border: .5px solid currentColor;
+}
+/* the accurate route: trim the line box to the caps and the baseline, so the
+   padding is measured off the ink itself and symmetric = optically centred,
+   whatever the font's ascent and descent happen to be. 4px, not the 4.22px
+   that would hold the old height exactly: whole pixels are the value that
+   still snaps even at every breakpoint and 1x/2x/3x. */
+@supports (text-box: trim-both cap alphabetic) {
+  .mem-chip {
+    text-box: trim-both cap alphabetic;
+    padding: 4px 5px;
+  }
 }
 .cvar__label {
   flex-basis: 100%; /* wraps onto its own line below the price */
@@ -705,8 +718,13 @@ body.drawer-open .drawer {
      gap tighter — V1 only, the other versions set their own spacing */
   /* one step tighter on the narrow cards — every gap on the line follows */
   .mem { --mem-gap: 6px; }
-  /* and the V3 badge comes down a size so it doesn't dominate the caption */
-  .mem-chip { font-size: 8px; letter-spacing: .05em; padding: 2px 4px 1px; }
+  /* and the V3 badge comes down a size so it doesn't dominate the caption —
+     smaller caps, so the centring padding is re-derived for 8px */
+  .mem-chip { font-size: 8px; letter-spacing: .05em; padding: 2.6px 4px .4px; }
+  @supports (text-box: trim-both cap alphabetic) {
+    .mem-chip { padding: 4px; } /* the caps are shorter here, the breathing room
+      around them is the same whole 4px as desktop */
+  }
   .cvar__label { margin-top: 0; font-size: 10px; }
 
   /* the heart sits closer to the corner on small cards */
