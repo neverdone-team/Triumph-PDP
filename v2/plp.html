@@ -33,6 +33,11 @@
   --c-line:      #DADADA;
   --c-offwhite:  #F8F3F3;
   --c-burgundy:  #5E2039;
+  /* filter sheet (Figma 21-5889): hairlines between facets, a heavier edge
+     under the header / over the footer, and the selected-row wash */
+  --c-hair:      rgba(0,0,0,.05);
+  --c-edge:      rgba(0,0,0,.2);
+  --c-wash:      #F9FAFB;
 
   --font-sans: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
 
@@ -566,8 +571,14 @@ body[data-view="content"] .ed--last img { object-position: 50% 0; }
 body[data-view="content"] .ed--last .mood-cta { display: flex; }
 
 /* ============================================================
-   OFF-CANVAS FILTER & SORT — Filter V2 (Figma 931-25755)
-   420px right drawer · dim scrim · accordions · Show results
+   FILTER & SORT PANEL
+   desktop: 420px off-canvas drawer, Filter V2 (Figma 931-25755)
+   mobile:  bottom sheet (Figma 21-5889 "FILTER – MOBILE")
+
+   One DOM, one renderer, one set of facet components — only the
+   chrome and the density change at the breakpoint. --sheet-pad is
+   the single inset every part reads, so a selected row can run
+   full-bleed to the panel edge at either width.
    ============================================================ */
 .scrim {
   position: fixed; inset: 0; z-index: 90;
@@ -577,6 +588,9 @@ body[data-view="content"] .ed--last .mood-cta { display: flex; }
 }
 body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
 .drawer {
+  --sheet-pad: 24px; /* every inset in the panel derives from this */
+  --head-h: 52px;    /* facet head row */
+  --row-h: 44px;     /* option row */
   position: fixed; top: 0; right: 0; bottom: 0; z-index: 95;
   width: 420px; max-width: 92vw;
   background: #fff;
@@ -590,66 +604,207 @@ body.drawer-open .drawer {
   visibility: visible;
   transition: transform .45s var(--ease-out);
 }
+/* the grab bar only exists on the mobile sheet (see the sheet block below) */
+.drawer__grab { display: none; }
+
 .drawer__head {
   flex: none;
-  height: 72px; padding: 0 24px;
+  height: 72px; padding: 0 var(--sheet-pad);
   display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-edge);
 }
-.drawer__head span { font-size: 14px; line-height: 20px; letter-spacing: .02em; }
-.drawer__close { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.drawer__title { font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase; }
+/* "(6)" — how many filters are set (Figma note 1-1785) */
+.drawer__n { font-style: normal; color: var(--c-ink-soft); }
+.drawer__n:empty { display: none; }
+.drawer__close { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: -5px; }
 .drawer__close svg { width: 14px; height: 14px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
 .drawer__close:hover { opacity: .5; }
-.drawer__body { flex: 1; overflow-y: auto; padding: 24px; }
-.facet { border-bottom: 1px solid var(--c-line); margin-bottom: 16px; }
+.drawer__body {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0; /* the rows carry their own insets so they can run full-bleed */
+}
+
+/* ---- product view toggle — pinned above the facets (Figma 1-2313) ---- */
+.pview {
+  display: flex; align-items: center; gap: 12px;
+  height: var(--head-h); padding: 0 var(--sheet-pad);
+  border-bottom: 1px solid var(--c-hair);
+}
+.pview span { flex: 1; font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; }
+.switch {
+  flex: none; position: relative;
+  width: 40px; height: 22px; border-radius: 999px;
+  background: var(--c-ink);
+  transition: background .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.switch i {
+  position: absolute; top: 3px; left: 21px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff;
+  transition: left .25s var(--ease-out), background .25s var(--ease-out);
+}
+.switch[aria-checked="false"] { background: #fff; box-shadow: inset 0 0 0 1px var(--c-ink); }
+.switch[aria-checked="false"] i { left: 3px; background: var(--c-ink); }
+
+/* ---- facet ---- */
+.facet { border-bottom: 1px solid var(--c-hair); }
 .facet__head {
   width: 100%;
-  display: flex; align-items: center; justify-content: space-between;
-  padding-bottom: 16px;
-  font-size: 12px; line-height: 16px; letter-spacing: .04em;
-  text-transform: uppercase; font-weight: 400;
+  display: flex; align-items: center; gap: 12px;
+  height: var(--head-h); padding: 0 var(--sheet-pad);
   text-align: left;
 }
+.facet__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+.facet__lb { font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; }
+/* per-facet selection count, and the current value under "Sort by" */
+.facet__n { font-style: normal; color: var(--c-ink-soft); }
+.facet__n:empty { display: none; }
+.facet__val { font-size: 10px; line-height: 12px; font-weight: 300; color: var(--c-ink-soft); }
 .facet__head svg {
   width: 10px; height: 6px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none;
   transition: transform .3s var(--ease-out);
 }
-.facet.is-open .facet__head svg { transform: rotate(180deg); }
-.facet__body {
-  max-height: 0; overflow: hidden;
-  transition: max-height .4s var(--ease-out);
-}
-.facet.is-open .facet__body { max-height: 320px; }
-.facet__body ul { padding-bottom: 16px; }
-.facet__body li button {
+.facet.is-open > .facet__head svg { transform: rotate(180deg); }
+.facet__body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease-out); }
+.facet.is-open > .facet__body { grid-template-rows: 1fr; }
+.facet__inner { overflow: hidden; min-height: 0; }
+
+/* ---- option row: list, radio and the nested series children ---- */
+.opt {
+  width: 100%; height: var(--row-h);
   display: flex; align-items: center; gap: 10px;
-  padding: 5px 0;
-  /* one step below the 12px facet heads — visual hierarchy */
-  font-size: 11px; line-height: 16px; font-weight: 300; letter-spacing: .02em;
+  padding: 0 var(--sheet-pad);
+  font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
+  text-align: left;
+  transition: background .2s;
 }
-.facet__body li button:hover { opacity: .55; }
-.facet__body li button[data-on="true"] { font-weight: 400; }
-.facet__body li button[data-on="true"]::after { content: "✓"; font-size: 10px; }
-.facet__body img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
-/* size chips */
-.facet__sizes { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; }
-.facet__sizes button {
-  min-width: 44px; height: 32px; padding: 0 10px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--c-line);
-  font-size: 11px; font-weight: 300;
-  transition: border-color .2s, background .2s;
-}
-.facet__sizes button:hover { border-color: var(--c-ink); }
-.facet__sizes button[data-on="true"] { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
-.drawer__foot { flex: none; padding: 24px; display: flex; gap: 12px; }
-/* secondary — only shows once at least one filter is set */
-.drawer__clear {
-  flex: 1; height: 44px;
-  background: #fff; color: var(--c-ink);
-  border: 1px solid var(--c-ink);
-  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+.opt i { font-style: normal; color: var(--c-ink-soft); }
+.opt__tick { flex: none; margin-left: auto; width: 10px; height: 8px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; opacity: 0; }
+.opt[data-on="true"] { background: var(--c-wash); }
+.opt[data-on="true"] .opt__tick { opacity: 1; }
+.opt:hover { background: var(--c-wash); }
+.opt--sub { padding-left: calc(var(--sheet-pad) + 20px); }
+
+/* ---- size grids — underbust + cup, 5 across (Figma 1-77 / 1-213) ---- */
+.grids { display: flex; flex-direction: column; gap: 20px; padding: 4px var(--sheet-pad) 24px; }
+.grid-lb { font-size: 12px; line-height: 16px; font-weight: 300; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 12px; }
+.chips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.chips button {
+  height: 30px;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 0 .5px var(--c-line);
+  font-size: 12px; letter-spacing: .04em;
+  transition: background .18s, color .18s, box-shadow .18s;
+}
+.chips button:hover { box-shadow: inset 0 0 0 1px var(--c-ink); }
+.chips button[data-on="true"] { background: var(--c-ink); color: #fff; box-shadow: none; }
+
+/* ---- colour swatches — one horizontal scroller (Figma note 1-1776) ---- */
+.cols {
+  display: flex; gap: 16px;
+  padding: 4px 0 24px var(--sheet-pad);
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none;
+}
+.cols::-webkit-scrollbar { display: none; }
+.cols::after { content: ""; flex: none; width: calc(var(--sheet-pad) - 16px); } /* trailing inset */
+/* 64px is the floor, not the cap: the item widens to whatever its caption
+   needs so a long name like "BURGUNDY (12)" stays on one line, and the
+   56px swatch simply centres over it */
+.col { flex: none; min-width: 64px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.col__sw { padding: 4px; transition: box-shadow .18s; }
+.col__sw img { display: block; width: 56px; height: 56px; object-fit: cover; }
+.col:hover .col__sw { box-shadow: inset 0 0 0 1px var(--c-line); }
+.col[data-on="true"] .col__sw { box-shadow: inset 0 0 0 1px var(--c-ink); }
+.col__lb { font-size: 11px; line-height: 14px; letter-spacing: .04em; text-transform: uppercase; text-align: center; white-space: nowrap; }
+.col__lb i { font-style: normal; color: var(--c-ink-soft); }
+
+/* ---- price · option A: min/max + range (the preferred one, Figma note 1-1779) ---- */
+.facet--price .pr-b { display: none; }
+body[data-price="b"] .facet--price .pr-a { display: none; }
+body[data-price="b"] .facet--price .pr-b { display: block; }
+.pr-a { padding: 4px var(--sheet-pad) 28px; }
+.pr__fields { display: flex; align-items: center; gap: 8px; }
+.pr__box {
+  flex: 1; min-width: 0; height: 52px; padding: 0 12px;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  transition: box-shadow .18s;
+}
+.pr__box:focus-within { box-shadow: inset 0 0 0 1px var(--c-ink); }
+.pr__box span { font-size: 10px; line-height: 12px; font-weight: 300; color: var(--c-ink-soft); }
+.pr__box input {
+  width: 100%; border: 0; padding: 0; background: none; color: inherit;
+  font-family: inherit; font-size: 12px; line-height: 16px; letter-spacing: .04em;
+}
+.pr__box input:focus { outline: none; }
+.pr__dash { flex: none; font-style: normal; color: var(--c-ink-soft); }
+.pr__slider { position: relative; height: 16px; margin-top: 24px; }
+.pr__track, .pr__fill { position: absolute; top: 7.5px; height: 1px; }
+.pr__track { left: 8px; right: 8px; background: var(--c-line); }
+.pr__fill { background: var(--c-ink); }
+.pr__r {
+  position: absolute; left: 0; width: 100%; top: 0; height: 16px;
+  margin: 0; padding: 0; background: none;
+  -webkit-appearance: none; appearance: none;
+  pointer-events: none; /* only the thumbs take the pointer, so both are reachable */
+}
+.pr__r:focus { outline: none; }
+.pr__r::-webkit-slider-thumb {
+  -webkit-appearance: none; pointer-events: auto;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 1px solid #999; cursor: grab;
+}
+.pr__r::-moz-range-thumb {
+  pointer-events: auto;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #fff; border: 1px solid #999; cursor: grab;
+}
+
+/* ---- series — search + grouped list (Figma 1-1205, note 1-1782) ---- */
+.srch { position: relative; margin: 4px var(--sheet-pad) 8px; }
+.srch input {
+  width: 100%; height: 44px; padding: 0 40px 0 12px;
+  border: 0; background: rgba(0,0,0,.03); color: inherit;
+  font-family: inherit; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  -webkit-appearance: none; appearance: none;
+}
+.srch input::placeholder { color: var(--c-ink-soft); text-transform: uppercase; }
+.srch input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+.srch input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--c-ink); }
+.srch svg { position: absolute; right: 14px; top: 15px; width: 14px; height: 14px; fill: none; stroke: var(--c-ink); stroke-width: 1.1; pointer-events: none; }
+.grp__head {
+  width: 100%; height: var(--row-h);
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 var(--sheet-pad) 0 calc(var(--sheet-pad) + 20px);
+  font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
+  text-align: left;
+}
+.grp__head i { font-style: normal; color: var(--c-ink-soft); }
+.grp__head svg { margin-left: auto; width: 10px; height: 6px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; transition: transform .3s var(--ease-out); }
+.grp.is-open > .grp__head svg { transform: rotate(180deg); }
+.grp__body { display: none; }
+.grp.is-open > .grp__body { display: block; }
+.grp__body .opt { padding-left: calc(var(--sheet-pad) + 40px); }
+.grp[hidden] { display: none; }
+.srch-empty { padding: 8px var(--sheet-pad) 16px; font-size: 11px; font-weight: 300; color: var(--c-ink-soft); }
+
+/* ---- footer — sticky, results count in the CTA (Figma note 1-1773) ---- */
+.drawer__foot {
+  flex: none;
+  padding: 20px var(--sheet-pad);
+  display: flex; align-items: center; gap: 16px;
+  border-top: 1px solid var(--c-edge);
+  background: #fff;
+}
+/* only appears once at least one filter is set; clears every facet at once */
+.drawer__clear {
+  flex: none;
+  font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: underline; text-underline-offset: 3px;
   transition: opacity .2s;
 }
 .drawer__clear:hover { opacity: .55; }
@@ -657,7 +812,7 @@ body.drawer-open .drawer {
 .drawer__cta {
   flex: 1; height: 44px;
   background: var(--c-ink); color: #fff;
-  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+  font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
   display: flex; align-items: center; justify-content: center;
   transition: opacity .2s;
 }
@@ -752,11 +907,41 @@ body.drawer-open .drawer {
   }
   .mood-cta { left: 16px; bottom: 16px; padding: 8px; font-size: 12px; line-height: 16px; }
 
-  /* drawer */
-  .drawer { width: 100%; max-width: 100vw; }
-  .drawer__head, .drawer__body, .drawer__foot { padding-left: 20px; padding-right: 20px; }
-  .drawer__body { padding-top: 24px; }
-  .drawer__foot { padding-top: 0; padding-bottom: 24px; }
+  /* ---- FILTER BOTTOM SHEET (Figma 21-5889 "FILTER – MOBILE") ----
+     the panel stops sliding in from the right and rises from the bottom
+     instead, stopping 30px short of the top so the grid stays visible
+     behind it. Denser Figma rhythm: 56px heads, 48px option rows. */
+  .drawer {
+    --sheet-pad: 20px;
+    --head-h: 56px;
+    --row-h: 48px;
+    top: auto; left: 0; right: 0; bottom: 0;
+    width: 100%; max-width: none;
+    height: calc(100% - 30px);
+    height: calc(100dvh - 30px);
+    transform: translateY(100%);
+  }
+  body.drawer-open .drawer { transform: translateY(0); }
+  /* while a finger is on the grab bar the sheet tracks it 1:1 */
+  .drawer.is-dragging { transition: none; }
+
+  /* grab bar — sits over the top of the header; the header is the whole
+     drag surface, so a swipe down anywhere on it dismisses the sheet
+     (Figma note 1-1788: close by swiping down or with the ✕) */
+  .drawer__grab {
+    display: block; position: absolute; top: 8px; left: 50%;
+    width: 40px; height: 2px; margin-left: -20px;
+    background: #B3B3B3;
+  }
+  .drawer__head { touch-action: none; }
+
+  /* the page underneath must not scroll while the sheet is up, and the
+     prototype chrome would otherwise sit on top of the footer.
+     Freezing it with position:fixed (JS supplies the negative top) keeps
+     the grid exactly where it was — plain overflow:hidden would snap the
+     page back to the top behind the sheet. */
+  body.drawer-open { position: fixed; left: 0; right: 0; overflow: hidden; }
+  body.drawer-open .dash, body.drawer-open .dash-toggle { display: none; }
 
 }
 
@@ -815,7 +1000,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-member="v1" data-images="new">
+<body data-view="products" data-filters="some" data-member="v1" data-images="new" data-price="a" data-model="on">
 
 <!-- HEADER -->
 <header>
@@ -909,16 +1094,25 @@ body.dash-open .dash { display: flex; }
 
 </main>
 
-<!-- OFF-CANVAS FILTER & SORT (Filter V2, Figma 931-25755) -->
+<!-- FILTER & SORT — off-canvas drawer on desktop (Figma 931-25755),
+     bottom sheet on mobile (Figma 21-5889). Facets rendered by JS. -->
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" aria-label="Filter and sort" aria-hidden="true">
+  <div class="drawer__grab" aria-hidden="true"></div>
   <div class="drawer__head">
-    <span>Sort and Filter</span>
+    <span class="drawer__title">Sort &amp; Filter <i class="drawer__n" id="drawerN"></i></span>
     <button class="drawer__close" aria-label="Close">
       <svg viewBox="0 0 14 14"><path d="M1 1l12 12M13 1L1 13"/></svg>
     </button>
   </div>
-  <div class="drawer__body" id="facets"></div>
+  <div class="drawer__body">
+    <!-- product view — pinned above the facets (Figma 1-2313) -->
+    <div class="pview">
+      <span>Show products on model</span>
+      <button class="switch" id="modelSwitch" role="switch" aria-checked="true" aria-label="Show products on model"><i></i></button>
+    </div>
+    <div id="facets"></div>
+  </div>
   <div class="drawer__foot">
     <button class="drawer__clear" hidden>Reset filters</button>
     <button class="drawer__cta">Show results</button>
@@ -962,6 +1156,15 @@ body.dash-open .dash { display: flex; }
     <div class="dash__seg">
       <button data-k="images" data-val="new" data-on="true">New images</button>
       <button data-k="images" data-val="live">Triumph live</button>
+    </div>
+  </div>
+  <!-- still open in the Figma (note 1-1779): "if we can I would prefer
+       Option A, if not stick to B" — both are built, A is the default -->
+  <div class="dash__group">
+    <div class="dash__label">Price filter</div>
+    <div class="dash__seg">
+      <button data-k="price" data-val="a" data-on="true" title="Min/max fields + range slider">A · range</button>
+      <button data-k="price" data-val="b" title="Fixed price bands">B · bands</button>
     </div>
   </div>
   <!-- Wishlist heart removed from the panel: the reveal-on-hover heart
@@ -1156,6 +1359,23 @@ function applyPhotos(live) {
 }
 
 /* ============================================================
+   "SHOW PRODUCTS ON MODEL" — the toggle at the top of the filter
+   sheet (Figma 1-2313). There is no packshot set in this prototype,
+   so the off state falls back to the garment-led crops already in
+   Assets/plp/products — no faces, the product fills the frame.
+   Swap PACKSHOTS for real packshots once they exist.
+   ============================================================ */
+const PACKSHOTS = [1, 2, 14, 18, 11, 22, 17, 8, 5].map(PROD);
+
+function applyModelView(on) {
+  cards.forEach((card, i) => {
+    const src = on ? card.dataset.gallery.split('|')[0] : PACKSHOTS[i % PACKSHOTS.length];
+    card.querySelector('.ph--base').src = src;
+    card.querySelector('.ph--variant').src = src;
+  });
+}
+
+/* ============================================================
    INTERACTIONS
    ============================================================ */
 const body = document.body;
@@ -1308,73 +1528,372 @@ document.addEventListener('click', e => {
 });
 
 /* ============================================================
-   OFF-CANVAS FILTER & SORT (Filter V2)
+   FILTER & SORT — facet data (Figma 21-5889 "FILTER – MOBILE")
+   Every option carries the design's own count: the sheet prints it
+   beside the label, and the CTA reports the narrowest count of
+   everything currently set (Figma note 1-1773).
    ============================================================ */
-const FACETS = [
-  { label: 'Sort by',  type: 'list',   items: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'], on: 0 },
-  { label: 'Size',     type: 'sizes',  items: ['70A', '70B', '75A', '75B', '75C', '80B', '80C', '85B'] },
-  { label: 'Colour',   type: 'colors', items: SWATCHES },
-  { label: 'Fabrics',  type: 'list',   items: ['Lace', 'Satin', 'Mesh', 'Cotton'] },
-  { label: 'Price',    type: 'list',   items: ['Under £30', '£30 – £50', 'Over £50'] },
-  { label: 'Series',   type: 'list',   items: ['Love in Lace', 'Aura Spotlight', 'Signature Sheer', 'Body Make-Up'] },
-  { label: 'Product standards & traceability', type: 'list', items: ['OEKO-TEX Standard 100', 'Recycled materials', 'Organic cotton'] },
+const TOTAL_RESULTS = 36;
+
+/* Series is two levels deep — a family, then its lines. "All <family>"
+   is its own option that clears the individual lines; whether it should
+   instead tick every child is still open (Figma note 1-1782). */
+const SERIES = [
+  { n: 'Amourette', c: 18, items: [
+    { n: 'All Amourette', c: 18, all: true },
+    { n: 'Amourette Charm', c: 4 }, { n: 'Amourette Spotlight', c: 8 }, { n: 'Amourette 300', c: 6 } ] },
+  { n: 'Aura', c: 12, items: [
+    { n: 'All Aura', c: 12, all: true },
+    { n: 'Aura Spotlight', c: 7 }, { n: 'Aura Sensation', c: 5 } ] },
+  { n: 'Body Make-Up', c: 9, items: [
+    { n: 'All Body Make-Up', c: 9, all: true },
+    { n: 'Body Make-Up Soft Touch', c: 5 }, { n: 'Body Make-Up Essentials', c: 4 } ] },
+  { n: 'Signature Sheer', c: 7, items: [
+    { n: 'All Signature Sheer', c: 7, all: true },
+    { n: 'Signature Sheer Lace', c: 4 }, { n: 'Signature Sheer Minimizer', c: 3 } ] },
+  { n: 'Doreen', c: 5, items: [
+    { n: 'All Doreen', c: 5, all: true },
+    { n: 'Doreen Cotton', c: 3 } ] },
 ];
 
+/* the swatch set this page already ships — blush and burgundy lead it */
+const COLOUR_COUNTS = { Black: 8, Burgundy: 12, Red: 6, Pink: 14, Teal: 3 };
+
+const FACETS = [
+  { key: 'sort', label: 'Sort by', type: 'radio', on: 0,
+    items: [{ n: 'Newest' }, { n: 'Price (low – high)' }, { n: 'Price (high – low)' }, { n: 'Bestsellers' }] },
+  { key: 'category', label: 'Category', type: 'list',
+    items: [{ n: 'Bras', c: 24 }, { n: 'Knickers', c: 18 }, { n: 'Bodies', c: 6 }, { n: 'Nightwear', c: 9 }, { n: 'Shapewear', c: 5 }] },
+  /* Size and Colour start open — the note (1-1767) asks for the most
+     important facets expanded by default, "here e.g. Size & Color" */
+  /* the chips carry counts too, for the results arithmetic only — the
+     design deliberately keeps numbers off the size grid */
+  { key: 'size', label: 'Size', type: 'sizes', open: true, grids: [
+    { label: 'Underbust size', items: [['70', 11], ['75', 19], ['80', 22], ['85', 18], ['90', 12], ['100', 7], ['105', 5], ['110', 4]] },
+    { label: 'Cup size',       items: [['A', 8], ['B', 17], ['C', 20], ['D', 16], ['E', 11], ['F', 7], ['G', 5], ['H', 3]] } ] },
+  { key: 'colour', label: 'Colour', type: 'colours', open: true,
+    items: SWATCHES.map(s => ({ n: s.name, c: COLOUR_COUNTS[s.name], sw: s.sw })) },
+  { key: 'fabrics', label: 'Fabrics', type: 'list',
+    items: [{ n: 'Lace', c: 14 }, { n: 'Satin', c: 9 }, { n: 'Mesh', c: 6 }, { n: 'Cotton', c: 11 }] },
+  /* the bands partition all 36 products, so option A can add up the ones
+     its range covers and option B just reports the band it picked */
+  { key: 'price', label: 'Price', type: 'price', min: 25, max: 65, bands: [
+    { n: 'Under £40', c: 6, lo: 25, hi: 40 }, { n: '£40 – £50', c: 12, lo: 40, hi: 50 },
+    { n: '£50 – £60', c: 11, lo: 50, hi: 60 }, { n: 'Over £60', c: 7, lo: 60, hi: 65 } ] },
+  { key: 'series', label: 'Series', type: 'series', groups: SERIES },
+  { key: 'standards', label: 'Product standards & traceability', type: 'list',
+    items: [{ n: 'OEKO-TEX®', c: 21 }, { n: 'Recycled materials', c: 9 }, { n: 'Organic cotton', c: 6 }] },
+];
+
+/* ============================================================
+   RENDER THE FACETS
+   ============================================================ */
+const TICK = '<svg class="opt__tick" viewBox="0 0 10 8"><path d="M1 4l2.9 2.9L9 1.4"/></svg>';
+const CHEV = '<svg viewBox="0 0 10 6"><path d="M.5.5 5 5 9.5.5"/></svg>';
+const cnt = c => (c == null ? '' : ` <i>(${c})</i>`);
+const optRow = (o, on, cls = '') =>
+  `<button class="opt${cls}" data-on="${!!on}"${o.c != null ? ` data-c="${o.c}"` : ''}${o.all ? ' data-all="true"' : ''}>${o.n}${cnt(o.c)}${TICK}</button>`;
+
 const facetsEl = document.getElementById('facets');
-FACETS.forEach(f => {
-  const facet = document.createElement('div');
-  facet.className = 'facet';
-  let bodyHtml = '';
-  if (f.type === 'sizes') {
-    bodyHtml = `<div class="facet__sizes">${f.items.map(s => `<button data-on="false">${s}</button>`).join('')}</div>`;
-  } else if (f.type === 'colors') {
-    bodyHtml = `<ul>${f.items.map(s => `<li><button data-on="false"><img src="${s.sw}" alt="" />${s.name}</button></li>`).join('')}</ul>`;
-  } else {
-    bodyHtml = `<ul>${f.items.map((s, j) => `<li><button data-on="${j === f.on}">${s}</button></li>`).join('')}</ul>`;
+const facetEls = [];
+/* below this width the panel is the bottom sheet: accordions stack open,
+   above it the drawer keeps its one-at-a-time behaviour */
+const isSheet = () => window.matchMedia('(max-width: 760px)').matches;
+
+FACETS.forEach((f, i) => {
+  let inner = '';
+  if (f.type === 'radio' || f.type === 'list') {
+    inner = f.items.map((o, j) => optRow(o, f.type === 'radio' && j === f.on)).join('');
+  } else if (f.type === 'sizes') {
+    inner = `<div class="grids">${f.grids.map(g => `
+      <div>
+        <div class="grid-lb">${g.label}</div>
+        <div class="chips">${g.items.map(([s, c]) => `<button data-on="false" data-c="${c}">${s}</button>`).join('')}</div>
+      </div>`).join('')}</div>`;
+  } else if (f.type === 'colours') {
+    inner = `<div class="cols">${f.items.map(o => `
+      <button class="col" data-on="false" data-c="${o.c}" aria-label="${o.n}">
+        <span class="col__sw"><img src="${o.sw}" alt="" loading="lazy" /></span>
+        <span class="col__lb">${o.n}${cnt(o.c)}</span>
+      </button>`).join('')}</div>`;
+  } else if (f.type === 'price') {
+    inner = `
+      <div class="pr-a">
+        <div class="pr__fields">
+          <label class="pr__box"><span>Min.</span><input type="text" inputmode="numeric" class="pr__in pr__in--lo" value="£${f.min}" aria-label="Minimum price" /></label>
+          <i class="pr__dash">–</i>
+          <label class="pr__box"><span>Max.</span><input type="text" inputmode="numeric" class="pr__in pr__in--hi" value="£${f.max}" aria-label="Maximum price" /></label>
+        </div>
+        <div class="pr__slider">
+          <div class="pr__track"></div><div class="pr__fill"></div>
+          <input type="range" class="pr__r pr__r--lo" min="${f.min}" max="${f.max}" value="${f.min}" aria-label="Minimum price" />
+          <input type="range" class="pr__r pr__r--hi" min="${f.min}" max="${f.max}" value="${f.max}" aria-label="Maximum price" />
+        </div>
+      </div>
+      <div class="pr-b">${f.bands.map(b => optRow(b, false)).join('')}</div>`;
+  } else if (f.type === 'series') {
+    inner = `
+      <div class="srch">
+        <input type="search" placeholder="Search series" aria-label="Search series" />
+        <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.6"/><path d="M9.4 9.4 13 13"/></svg>
+      </div>
+      ${f.groups.map(g => `
+        <div class="grp">
+          <button class="grp__head">${g.n}${cnt(g.c)}${CHEV}</button>
+          <div class="grp__body">${g.items.map(o => optRow(o, false)).join('')}</div>
+        </div>`).join('')}
+      <div class="srch-empty" hidden>No series match that search.</div>`;
   }
+
+  const facet = document.createElement('div');
+  facet.className = 'facet facet--' + f.key;
+  facet.dataset.i = i;
+  if (f.open) facet.classList.add('is-open');
   facet.innerHTML = `
-    <button class="facet__head">${f.label}
-      <svg viewBox="0 0 10 6"><path d="M.5.5 5 5 9.5.5"/></svg>
+    <button class="facet__head">
+      <span class="facet__txt">
+        <span class="facet__lb">${f.label}<i class="facet__n"></i></span>
+        ${f.type === 'radio' ? '<span class="facet__val"></span>' : ''}
+      </span>
+      ${CHEV}
     </button>
-    <div class="facet__body">${bodyHtml}</div>`;
-  /* exclusive accordion — opening a facet closes the current one */
+    <div class="facet__body"><div class="facet__inner">${inner}</div></div>`;
+
   facet.querySelector('.facet__head').addEventListener('click', () => {
     const open = facet.classList.contains('is-open');
-    facetsEl.querySelectorAll('.facet').forEach(f => f.classList.remove('is-open'));
+    if (!isSheet()) facetEls.forEach(x => x.classList.remove('is-open'));
     facet.classList.toggle('is-open', !open);
   });
-  /* toggle options (radio for sort, checkbox elsewhere) */
-  facet.querySelectorAll('.facet__body button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (f.label === 'Sort by') facet.querySelectorAll('.facet__body button').forEach(b => b.dataset.on = 'false');
-      btn.dataset.on = btn.dataset.on === 'true' ? 'false' : 'true';
-    });
+
+  /* option rows and chips — Sort by is a radio, everything else toggles.
+     Inside Series, "All <family>" and its lines are mutually exclusive. */
+  facet.addEventListener('click', e => {
+    const btn = e.target.closest('.opt, .chips button, .col');
+    if (!btn || !facet.contains(btn)) return;
+    const wasOn = btn.dataset.on === 'true';
+    if (f.type === 'radio') {
+      facet.querySelectorAll('.opt').forEach(b => b.dataset.on = 'false');
+      btn.dataset.on = 'true';
+    } else if (f.type === 'price') {
+      /* option B is one band at a time */
+      facet.querySelectorAll('.pr-b .opt').forEach(b => b.dataset.on = 'false');
+      btn.dataset.on = String(!wasOn);
+    } else if (f.type === 'series' && btn.classList.contains('opt')) {
+      const grp = btn.closest('.grp');
+      const isAll = btn.dataset.all === 'true';
+      grp.querySelectorAll(isAll ? '.opt:not([data-all])' : '.opt[data-all]').forEach(b => b.dataset.on = 'false');
+      btn.dataset.on = String(!wasOn);
+    } else {
+      btn.dataset.on = String(!wasOn);
+    }
+    sync();
   });
+
+  /* series: group accordions + live search over family and line names */
+  if (f.type === 'series') {
+    facet.querySelectorAll('.grp__head').forEach(h => {
+      h.addEventListener('click', () => h.closest('.grp').classList.toggle('is-open'));
+    });
+    const input = facet.querySelector('.srch input');
+    const empty = facet.querySelector('.srch-empty');
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      let hits = 0;
+      facet.querySelectorAll('.grp').forEach(g => {
+        const hit = !q || g.textContent.toLowerCase().includes(q);
+        g.hidden = !hit;
+        if (hit) { hits++; if (q) g.classList.add('is-open'); }
+      });
+      empty.hidden = hits > 0;
+    });
+  }
+
+  /* price option A: two overlapping ranges, kept in order, mirrored
+     into the min/max fields (and typing in a field moves the thumb) */
+  if (f.type === 'price') {
+    const rLo = facet.querySelector('.pr__r--lo'), rHi = facet.querySelector('.pr__r--hi');
+    const inLo = facet.querySelector('.pr__in--lo'), inHi = facet.querySelector('.pr__in--hi');
+    const fill = facet.querySelector('.pr__fill');
+    const paint = () => {
+      const lo = +rLo.value, hi = +rHi.value, span = f.max - f.min;
+      fill.style.left  = `calc(8px + ${(lo - f.min) / span} * (100% - 16px))`;
+      fill.style.right = `calc(8px + ${(f.max - hi) / span} * (100% - 16px))`;
+      inLo.value = '£' + lo; inHi.value = '£' + hi;
+    };
+    rLo.addEventListener('input', () => { if (+rLo.value > +rHi.value) rLo.value = rHi.value; paint(); sync(); });
+    rHi.addEventListener('input', () => { if (+rHi.value < +rLo.value) rHi.value = rLo.value; paint(); sync(); });
+    const typed = (input, range, other, isLo) => {
+      const v = parseInt(input.value.replace(/[^\d]/g, ''), 10);
+      if (!isNaN(v)) {
+        range.value = Math.min(f.max, Math.max(f.min, v));
+        if (isLo && +range.value > +other.value) other.value = range.value;
+        if (!isLo && +range.value < +other.value) other.value = range.value;
+      }
+      paint(); sync();
+    };
+    inLo.addEventListener('change', () => typed(inLo, rLo, rHi, true));
+    inHi.addEventListener('change', () => typed(inHi, rHi, rLo, false));
+    facet._price = { rLo, rHi, paint };
+    paint();
+  }
+
+  facetEls.push(facet);
   facetsEl.appendChild(facet);
 });
 
-/* "Reset filters" appears once at least one filter is set (sort default doesn't count) */
+/* ============================================================
+   PANEL STATE — per-facet counts, the header count, and the CTA
+   ============================================================ */
+const drawerN = document.getElementById('drawerN');
 const clearBtn = document.querySelector('.drawer__clear');
-const filterFacets = [...facetsEl.querySelectorAll('.facet')].slice(1); /* skip "Sort by" */
-function updateClear() {
-  clearBtn.hidden = !filterFacets.some(f => f.querySelector('.facet__body button[data-on="true"]'));
+const ctaBtn = document.querySelector('.drawer__cta');
+
+/* price is "set" only once the range is actually narrowed; its count is
+   the sum of the bands the range still covers */
+function priceState() {
+  const f = FACETS.find(x => x.key === 'price');
+  const facet = facetEls[FACETS.indexOf(f)];
+  if (document.body.dataset.price === 'b') {
+    const on = facet.querySelector('.pr-b .opt[data-on="true"]');
+    return on ? { n: 1, c: +on.dataset.c } : { n: 0 };
+  }
+  const lo = +facet._price.rLo.value, hi = +facet._price.rHi.value;
+  if (lo === f.min && hi === f.max) return { n: 0 };
+  const c = f.bands.filter(b => b.lo < hi && b.hi > lo).reduce((s, b) => s + b.c, 0);
+  return { n: 1, c: Math.max(1, c) };
 }
-facetsEl.addEventListener('click', updateClear);
+
+/* Within one facet the choices are alternatives, so their counts add up;
+   across facets they narrow each other, so the smallest count wins. Size
+   holds two independent grids (underbust AND cup), so each counts alone. */
+function facetCounts(el, f) {
+  const groups = f.type === 'sizes' ? [...el.querySelectorAll('.chips')] : [el];
+  const out = [];
+  groups.forEach(g => {
+    let sum = 0, any = false;
+    g.querySelectorAll('[data-on="true"][data-c]').forEach(b => { sum += +b.dataset.c; any = true; });
+    if (any) out.push(Math.min(TOTAL_RESULTS, sum));
+  });
+  return out;
+}
+
+function sync() {
+  let total = 0;
+  const counts = [];
+  FACETS.forEach((f, i) => {
+    const el = facetEls[i];
+    let n = 0;
+    if (f.key === 'sort') {
+      const on = el.querySelector('.opt[data-on="true"]');
+      el.querySelector('.facet__val').textContent = on ? on.textContent.trim() : '';
+    } else if (f.type === 'price') {
+      const p = priceState();
+      n = p.n;
+      if (p.c != null) counts.push(p.c);
+    } else {
+      n = el.querySelectorAll('[data-on="true"]').length;
+      counts.push(...facetCounts(el, f));
+    }
+    el.querySelector('.facet__n').textContent = n ? ` (${n})` : '';
+    total += n;
+  });
+  drawerN.textContent = total ? `(${total})` : '';
+  clearBtn.hidden = !total;
+  const results = counts.length ? Math.min(...counts) : TOTAL_RESULTS;
+  ctaBtn.textContent = total ? `Show ${results} results` : 'Show results';
+}
+
+/* Reset wipes every facet at once; the sort choice is not a filter */
 clearBtn.addEventListener('click', () => {
-  filterFacets.forEach(f => f.querySelectorAll('.facet__body button').forEach(b => b.dataset.on = 'false'));
-  updateClear();
+  FACETS.forEach((f, i) => {
+    if (f.key === 'sort') return;
+    const el = facetEls[i];
+    el.querySelectorAll('[data-on="true"]').forEach(b => b.dataset.on = 'false');
+    if (f.type === 'price') {
+      el._price.rLo.value = f.min; el._price.rHi.value = f.max; el._price.paint();
+    }
+    if (f.type === 'series') {
+      const input = el.querySelector('.srch input');
+      input.value = '';
+      el.querySelectorAll('.grp').forEach(g => { g.hidden = false; g.classList.remove('is-open'); });
+      el.querySelector('.srch-empty').hidden = true;
+    }
+  });
+  sync();
 });
 
+/* ============================================================
+   OPEN / CLOSE — the drawer slides in from the right on desktop and
+   rises as a bottom sheet on mobile, where it can also be swiped away
+   (Figma note 1-1788)
+   ============================================================ */
 const drawer = document.querySelector('.drawer');
+
+/* freeze the page behind the sheet without losing the reader's place */
+let lockY = 0;
+function lockPage(on) {
+  if (!isSheet()) { document.body.style.top = ''; return; }
+  if (on) {
+    lockY = window.scrollY;
+    document.body.style.top = `-${lockY}px`;
+  } else {
+    document.body.style.top = '';
+    /* the frozen body has no scroll height, so force a reflow first —
+       otherwise scrollTo clamps to one viewport and lands near the top */
+    void document.body.offsetHeight;
+    window.scrollTo(0, lockY);
+  }
+}
+
 function setDrawer(open) {
-  body.classList.toggle('drawer-open', open);
+  if (open) lockPage(true);
+  document.body.classList.toggle('drawer-open', open);
   drawer.setAttribute('aria-hidden', String(!open));
+  if (!open) lockPage(false);
 }
 document.getElementById('drawerTrigger').addEventListener('click', () => setDrawer(true));
+document.querySelector('.filters-mobile').addEventListener('click', () => setDrawer(true));
 document.querySelector('.drawer__close').addEventListener('click', () => setDrawer(false));
-document.querySelector('.drawer__cta').addEventListener('click', () => setDrawer(false));
+ctaBtn.addEventListener('click', () => setDrawer(false));
 document.getElementById('scrim').addEventListener('click', () => setDrawer(false));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
+
+/* swipe down on the header (the grab bar sits on it) to dismiss —
+   past a third of the sheet, or a quick flick, closes it */
+(() => {
+  const head = drawer.querySelector('.drawer__head');
+  let y0 = 0, t0 = 0, dy = 0, live = false;
+  const end = () => {
+    if (!live) return;
+    live = false;
+    drawer.classList.remove('is-dragging');
+    drawer.style.transform = '';
+    const fast = dy > 40 && (performance.now() - t0) < 300;
+    if (dy > drawer.offsetHeight / 3 || fast) setDrawer(false);
+  };
+  head.addEventListener('pointerdown', e => {
+    if (!isSheet() || e.target.closest('.drawer__close')) return;
+    live = true; y0 = e.clientY; t0 = performance.now(); dy = 0;
+    drawer.classList.add('is-dragging');
+    head.setPointerCapture(e.pointerId);
+  });
+  head.addEventListener('pointermove', e => {
+    if (!live) return;
+    dy = Math.max(0, e.clientY - y0);
+    drawer.style.transform = `translateY(${dy}px)`;
+  });
+  head.addEventListener('pointerup', end);
+  head.addEventListener('pointercancel', end);
+})();
+
+/* the product view switch — the sheet is where this option really lives,
+   so it drives the shared body state rather than a dashboard row */
+const modelSwitch = document.getElementById('modelSwitch');
+modelSwitch.addEventListener('click', () => {
+  setOption('model', modelSwitch.getAttribute('aria-checked') === 'true' ? 'off' : 'on');
+});
+
+sync();
 
 /* ============================================================
    FILTER V1 — chip dropdowns (Figma 931-26774) + More dropdown
@@ -1542,6 +2061,8 @@ const CONTROLS = {
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
   member:   ['v1', 'v2', 'v3'],
   images:   ['new', 'live'],
+  price:    ['a', 'b'],   /* price facet: A = min/max + range, B = bands */
+  model:    ['on', 'off'], /* driven from the sheet's own switch; here for deep links */
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
@@ -1570,6 +2091,13 @@ function setOption(key, val) {
     });
   }
   if (key === 'view') applyView(val);
+  if (key === 'model') {
+    applyModelView(val === 'on');
+    modelSwitch.setAttribute('aria-checked', String(val === 'on'));
+  }
+  /* the images swap rebuilds every tile, so re-assert the product view */
+  if (key === 'images' && body.dataset.model === 'off') applyModelView(false);
+  if (key === 'price') sync();
   if (key === 'filters') { setDrawer(false); closeDropdown(); }
   closeAll();
   dash.querySelectorAll(`button[data-k="${key}"]`).forEach(b => b.dataset.on = String(b.dataset.val === val));
