@@ -204,14 +204,9 @@ body .qs.qs--sheet:not(.is-open){ transform:translateY(100%); }
 .tile__media > img{ display:block; width:100%; height:100%; object-fit:cover; }
 .tile .hs{ position:absolute; left:var(--x); top:var(--y); translate:-50% -50%; }
 
-/* desktop: hover-only control, like sloggi's own tile controls */
-body[data-context="plp"][data-device="desktop"] .tile .hs{
-  opacity:0; pointer-events:none;
-  transition:opacity calc(200ms*var(--f)) var(--ease-out);
-}
-body[data-context="plp"][data-device="desktop"] .tile:hover .hs,
-body[data-context="plp"][data-device="desktop"] .tile .hs:focus-visible,
-body[data-context="plp"][data-device="desktop"] .tile .hs.is-live{ opacity:1; pointer-events:auto; }
+/* the marker is always on — desktop and mobile alike. It does not fade in on
+   tile hover the way sloggi's own tile controls do; a hotspot you cannot see
+   until you are already over it cannot invite the hover in the first place. */
 
 .tile__info{ padding:14px 16px 0; }
 .tile__sw{ display:flex; gap:6px; margin-bottom:10px; }
@@ -442,7 +437,7 @@ const RISE = {
 };
 const CTX = {
   hero: 'Hero: the marker is anchored in the image’s coordinate space so it stays on the garment through any resize; the card is placed inside the banner, flips sides when it would overflow, and stacks below the marker when neither side fits.',
-  plp:  'PLP: rebuilt from Figma 2548:19472. An editorial tile carries the marker; the image runs full height like every other tile, and the Peek Card (360 × 140 desktop, 110 tall on mobile) comes up over its bottom edge, clipped by the tile. On desktop the marker is hover-only, exactly like sloggi’s own tile controls; on mobile it is always visible and the card opens on tap. Only the editorial tiles carry a marker — first and last in this grid, so you can see it at both ends of a row.'
+  plp:  'PLP: rebuilt from Figma 2548:19472. An editorial tile carries the marker; the image runs full height like every other tile, and the Peek Card (360 × 140 desktop, 110 tall on mobile) comes up over its bottom edge, clipped by the tile. The marker is always visible, on desktop and mobile alike — it does not fade in on tile hover; hover (or tap) opens the card. Only the editorial tiles carry a marker — first and last in this grid, so you can see it at both ends of a row.'
 };
 const MARKER_NOTE = 'Marker follows the DS component (Hotspot Marker, 2484:3172): 44 × 44 hit area, 32 px disc on desktop / 28 px on mobile, 12 px glyph. Rest = frosted dark disc (black 40% + 16 px blur), 1 px white ring, white plus. The disc and plus are the exported Figma assets (Assets/sloggi/hotspot-disc.svg, hotspot-plus.svg) — the plus is that exact path, 1 px stroke with 11 px arms in a 12 px box, inlined so its stroke can follow the disc. Hover = solid white disc with a 1 px black-12% ring and a black plus, upright. Open = the same disc with the plus rotated 45° into a close cross, 260 ms ease-reveal. Disc fill and glyph colour cross over 180 ms. The pulse ring is an addition on top of the static ring and runs in every state. Closing is the card’s own ✕, the scrim, Esc, or tapping the marker again.';
 
