@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hotspot — how the quick-shop appears</title>
+
+<style>
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Light.otf") format("opentype");   font-weight:300; font-display:swap; }
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Regular.otf") format("opentype"); font-weight:400; font-display:swap; }
+
+:root{
+  --c-ink:#000; --c-soft:rgba(0,0,0,.5); --c-line:#DADADA; --c-offwhite:#F8F3F3;
+  --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
+
+  --ease-out:    cubic-bezier(.22,.61,.36,1);
+  --ease-reveal: cubic-bezier(.22,1,.36,1);
+
+  --f:1;                        /* speed factor — the slow-mo switch */
+  --in-d:280ms; --out-d:160ms;  /* overwritten per variant */
+  --in-e:var(--ease-reveal);
+
+  --img-ratio:1.5912;           /* hero-cotton.jpg is 1448 × 910 */
+  --hero-h:min(820px, calc((100vw - 48px) / 1.5912));
+
+  --disc:32px;                  /* Hotspot Marker: 32 desktop / 28 mobile */
+  --slot:140px;                 /* Peek Card height */
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ margin:0; }
+body{ font-family:var(--font-sans); font-weight:300; color:var(--c-ink); background:#fff; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,p{ margin:0; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+.bar{
+  position:sticky; top:0; z-index:50;
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 26px;
+  padding:14px 24px; background:rgba(255,255,255,.92);
+  backdrop-filter:blur(12px); border-bottom:1px solid var(--c-line);
+}
+.bar__title{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; margin-right:auto; }
+.grp{ display:flex; align-items:center; gap:10px; }
+.grp[hidden]{ display:none; }
+.grp__label{ font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--c-soft); }
+.seg{ display:flex; border:1px solid var(--c-line); }
+.seg button{
+  padding:7px 12px; font-size:11px; letter-spacing:.04em;
+  border-right:1px solid var(--c-line); color:var(--c-soft);
+  transition:background .2s var(--ease-out), color .2s var(--ease-out);
+}
+.seg button:last-child{ border-right:0; }
+.seg button:hover{ color:var(--c-ink); }
+.seg button[aria-pressed="true"]{ background:var(--c-ink); color:#fff; }
+
+.frame{ padding:40px 24px 0; }
+body[data-device="mobile"] .frame{ padding-top:28px; }
+
+/* ============================================================
+   HOTSPOT MARKER   —   DS component 2484:3172
+   "44×44 touch target, 32px glyph on desktop / 28px on mobile.
+    Rest  = frosted dark disc + 1px white ring + white plus
+    Hover = solid white disc, black plus
+    Open  = solid white disc, black close cross"
+   Rest disc = black 32% + 16px blur, ring white 90%, 12px plus @1.5px.
+   White disc keeps a 1px black-12% ring. Hover leaves the plus upright;
+   only Open rotates it 45° into the cross.
+   ============================================================ */
+.hs{ width:44px; height:44px; display:grid; place-items:center; }   /* hit area only */
+
+.hs__disc{
+  position:relative; width:var(--disc); height:var(--disc); border-radius:50%;
+  display:grid; place-items:center;
+  background:rgba(0,0,0,.32); backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.9);
+  transition:background   calc(180ms*var(--f)) var(--ease-out),
+             border-color calc(180ms*var(--f)) var(--ease-out);
+}
+/* white disc keeps a 1px black-12% ring, or it vanishes on light imagery */
+.hs:hover .hs__disc,
+.hs.is-live .hs__disc{ background:#fff; border-color:rgba(0,0,0,.12); }
+
+/* one glyph throughout — it rotates 45° into a cross when the card is open */
+.hs__g{ grid-area:1/1; width:12px; height:12px; position:relative;
+        transition:transform calc(260ms*var(--f)) var(--ease-reveal); }
+.hs__g::before,.hs__g::after{
+  content:""; position:absolute; left:0; right:0; top:50%; height:1.5px;
+  background:#fff; translate:0 -50%;
+  transition:background calc(180ms*var(--f)) var(--ease-out);
+}
+.hs:hover .hs__g::before, .hs:hover .hs__g::after,
+.hs.is-live .hs__g::before, .hs.is-live .hs__g::after{ background:#000; }
+
+.hs__g--plus::after { rotate:90deg; }
+/* open only — hover keeps the plus upright */
+.hs.is-live .hs__g--plus{ transform:rotate(45deg); }
+
+.hs__disc::after{                             /* the pulsating ring */
+  content:""; position:absolute; inset:-1px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.85); pointer-events:none;
+  animation:ping 2.6s var(--ease-out) infinite;
+}
+@keyframes ping{
+  0%   { transform:scale(1);   opacity:.6; }
+  70%  { transform:scale(1.9); opacity:0;  }
+  100% { transform:scale(1.9); opacity:0;  }
+}
+body[data-device="mobile"]{ --disc:28px; }
+
+/* ============================================================
+   CONTEXT 1 — HERO
+   markers anchored in the image's coordinate space (the CSS-cover
+   stage from hero-hotspot-anchoring-brief.md)
+   ============================================================ */
+.ctx{ display:none; }
+body[data-context="hero"] .ctx--hero{ display:block; }
+body[data-context="plp"]  .ctx--plp { display:block; }
+
+.hero{
+  position:relative; overflow:hidden;
+  height:var(--hero-h); max-width:1440px; margin:0 auto;
+  background:var(--c-offwhite);
+}
+.stage{
+  /* --focal-x is a point in the IMAGE, pinned to the middle of the banner.
+     `translate` makes this a stacking context, so the layer carries the z-index. */
+  position:absolute; z-index:6;
+  top:0; left:50%; translate:calc(-1 * var(--focal-x,50%)) 0;
+  aspect-ratio:var(--img-ratio);
+  width:max(100%, calc(var(--hero-h) * var(--img-ratio)));
+}
+.stage img{ display:block; width:100%; height:100%; }
+.stage .hs{ position:absolute; left:var(--x); top:var(--y); translate:-50% -50%; }
+
+body[data-device="mobile"]{ --hero-h:620px; }
+body[data-device="mobile"] .hero{ width:390px; outline:1px solid var(--c-line); }
+body[data-device="mobile"] .stage{ --focal-x:38%; }
+
+/* --- the hero's floating quick-shop card ----------------------- */
+.qs{
+  position:absolute; z-index:7; width:272px;
+  background:#fff; box-shadow:0 8px 34px rgba(0,0,0,.18);
+  will-change:transform, opacity;   /* one rasterisation — stops the type re-hinting mid-move */
+  transform-origin:var(--ox,50%) var(--oy,50%);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity    calc(var(--out-d)*var(--f)) var(--ease-out),
+             transform  calc(var(--out-d)*var(--f)) var(--ease-out),
+             filter     calc(var(--out-d)*var(--f)) var(--ease-out),
+             visibility 0s linear calc(var(--out-d)*var(--f));
+}
+.qs.is-open{
+  opacity:1; visibility:visible; pointer-events:auto; transform:none; filter:none;
+  transition-duration:calc(var(--in-d)*var(--f));
+  transition-timing-function:var(--in-e);
+  transition-delay:0s;
+}
+.qs::before{ content:""; position:absolute; inset:-18px; z-index:-1; }   /* hover bridge */
+
+/* RISE — the one reveal. Fade + 14px lift, no scale anywhere, so the type
+   is never resampled and never looks like it is re-setting itself. */
+:root{ --in-d:260ms; --out-d:150ms; --in-e:var(--ease-out); }
+.qs:not(.is-open){ transform:translateY(14px); }
+
+.qs__in{ display:flex; gap:14px; padding:14px; text-decoration:none; color:inherit; align-items:center; }
+.qs__img{ width:84px; height:84px; object-fit:cover; object-position:center var(--ty,50%); background:var(--c-offwhite); flex:none; }
+.qs__eyebrow{ font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--c-soft); }
+.qs__name{ font-size:14px; margin-top:3px; line-height:1.25; }
+.qs__price{ font-size:13px; margin-top:7px; }
+.qs__cta{ display:inline-block; margin-top:10px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; border-bottom:1px solid var(--c-ink); padding-bottom:2px; }
+.qs__close{ display:none; }
+body[data-device="mobile"] .qs__close{
+  display:block; position:absolute; top:8px; right:8px;
+  width:34px; height:34px; font-size:18px; line-height:1; color:var(--c-soft);
+}
+
+.scrim{
+  position:absolute; inset:0; z-index:4; background:rgba(0,0,0,.34);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity calc(240ms*var(--f)) var(--ease-out), visibility 0s linear calc(240ms*var(--f));
+}
+.scrim.is-open{ opacity:1; visibility:visible; pointer-events:auto; transition-delay:0s; }
+
+body .qs.qs--sheet{
+  left:0 !important; top:auto !important; bottom:0; width:100%;
+  filter:none;
+  box-shadow:0 -10px 40px rgba(0,0,0,.22);
+  --in-d:420ms; --out-d:300ms; --in-e:var(--ease-out);
+}
+body .qs.qs--sheet:not(.is-open){ transform:translateY(100%); }
+.qs--sheet .qs__in{ padding:22px 18px 26px; gap:16px; }
+.qs--sheet .qs__img{ width:88px; height:88px; }
+.qs--sheet .qs__name{ font-size:16px; }
+.qs--sheet::after{ content:""; position:absolute; top:8px; left:50%; translate:-50% 0;
+                   width:36px; height:3px; border-radius:2px; background:rgba(0,0,0,.16); }
+
+/* ============================================================
+   CONTEXT 2 — PLP  ·  the Peek Card
+   Figma 2548:19472. An editorial tile carries the marker; the
+   Peek Card (360 × 140) fills the slot under the image, so the
+   tile ends flush with the product tiles beside it.
+   ============================================================ */
+.plp{ position:relative; max-width:1440px; margin:0 auto; }
+.plp__grid{ display:grid; grid-template-columns:repeat(4,1fr); row-gap:38px; }
+
+.tile__media{ position:relative; aspect-ratio:360/540; overflow:hidden; background:var(--c-offwhite); }
+.tile__media > img{ display:block; width:100%; height:100%; object-fit:cover; }
+.tile .hs{ position:absolute; left:var(--x); top:var(--y); translate:-50% -50%; }
+
+/* desktop: hover-only control, like sloggi's own tile controls */
+body[data-context="plp"][data-device="desktop"] .tile .hs{
+  opacity:0; pointer-events:none;
+  transition:opacity calc(200ms*var(--f)) var(--ease-out);
+}
+body[data-context="plp"][data-device="desktop"] .tile:hover .hs,
+body[data-context="plp"][data-device="desktop"] .tile .hs:focus-visible,
+body[data-context="plp"][data-device="desktop"] .tile .hs.is-live{ opacity:1; pointer-events:auto; }
+
+.tile__info{ padding:14px 16px 0; }
+.tile__sw{ display:flex; gap:6px; margin-bottom:10px; }
+.tile__sw i{ width:9px; height:9px; border-radius:50%; display:block; }
+.tile__brand{ font-size:11px; font-weight:400; letter-spacing:.06em; }
+.tile__name{ font-size:11px; letter-spacing:.06em; color:var(--c-soft); margin-top:3px; text-transform:uppercase; }
+.tile__price{ font-size:12px; margin-top:9px; }
+
+/* --- the card, inside the image, pinned to its bottom edge ------- */
+.peekslot{
+  position:absolute; left:0; right:0; bottom:0; height:var(--slot);
+  overflow:hidden;
+  transition:height calc(var(--out-d)*var(--f)) var(--ease-out);
+}
+.peek{
+  position:absolute; left:0; right:0; bottom:0; height:var(--slot); background:#fff;
+  display:flex; align-items:center; gap:26px; padding:10px 24px;
+  text-decoration:none; color:inherit; pointer-events:none;
+  will-change:transform, opacity;
+  transition:opacity   calc(var(--out-d)*var(--f)) var(--ease-out),
+             transform calc(var(--out-d)*var(--f)) var(--ease-out);
+}
+.peek__img{ height:120px; width:auto; max-width:124px; object-fit:contain; background:#fff; flex:none; }
+.peek__brand{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--c-soft); }
+.peek__name{ font-size:14px; letter-spacing:.06em; text-transform:uppercase; margin-top:5px; }
+.peek__price{ font-size:13px; margin-top:9px; display:flex; gap:9px; }
+.peek__price s{ color:var(--c-soft); }
+
+.peek.is-open{
+  opacity:1; transform:none; pointer-events:auto;
+  transition-duration:calc(var(--in-d)*var(--f));
+  transition-timing-function:var(--in-e);
+}
+
+/* the Peek Card uses the same Rise */
+.peek:not(.is-open){ opacity:0; transform:translateY(14px); }
+
+body[data-context="plp"][data-device="mobile"]{ --slot:110px; }
+body[data-context="plp"][data-device="mobile"] .plp{
+  width:390px; height:760px; overflow:hidden; outline:1px solid var(--c-line);
+}
+body[data-context="plp"][data-device="mobile"] .plp__grid{ grid-template-columns:repeat(2,1fr); row-gap:26px; }
+body[data-context="plp"][data-device="mobile"] .peek{ gap:14px; padding:8px 14px; }
+body[data-context="plp"][data-device="mobile"] .peek__img{ height:84px; max-width:88px; }
+body[data-context="plp"][data-device="mobile"] .peek__name{ font-size:12px; }
+body[data-context="plp"][data-device="mobile"] .peek__price{ font-size:12px; }
+
+/* ============================================================
+   SPEC READOUT
+   ============================================================ */
+.spec{ max-width:1440px; margin:34px auto 64px; padding:0 0 0 2px; }
+.spec h2{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:12px; }
+.spec__grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px; background:var(--c-line); border:1px solid var(--c-line); }
+.spec__cell{ background:#fff; padding:14px 16px; }
+.spec__k{ font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--c-soft); }
+.spec__v{ font-size:13px; margin-top:6px; font-variant-numeric:tabular-nums; }
+.spec__note{ margin-top:18px; font-size:12px; line-height:1.65; color:var(--c-soft); max-width:78ch; }
+
+@media (prefers-reduced-motion:reduce){
+  .qs, body .qs.qs--sheet, .peek{ --in-d:120ms; --out-d:90ms; transform:none; filter:none; }
+  .hs__disc::after{ animation:none; opacity:0; }
+}
+</style>
+</head>
+<body data-context="hero" data-device="desktop" data-present="anchored" data-speed="1">
+
+<div class="bar">
+  <h1 class="bar__title">Hotspot — quick-shop reveal</h1>
+
+  <div class="grp">
+    <span class="grp__label">Where</span>
+    <div class="seg" id="segContext">
+      <button data-c="hero" aria-pressed="true">Hero</button>
+      <button data-c="plp"  aria-pressed="false">PLP · Peek Card</button>
+    </div>
+  </div>
+
+  <div class="grp">
+    <span class="grp__label">Device</span>
+    <div class="seg" id="segDevice">
+      <button data-d="desktop" aria-pressed="true">Desktop · hover</button>
+      <button data-d="mobile"  aria-pressed="false">Mobile · tap</button>
+    </div>
+  </div>
+
+  <div class="grp" id="grpPresent" hidden>
+    <span class="grp__label">Mobile as</span>
+    <div class="seg" id="segPresent">
+      <button data-p="anchored" aria-pressed="true">Anchored</button>
+      <button data-p="sheet"    aria-pressed="false">Sheet</button>
+    </div>
+  </div>
+
+  <div class="grp">
+    <span class="grp__label">Speed</span>
+    <div class="seg" id="segSpeed">
+      <button data-s="1" aria-pressed="true">1×</button>
+      <button data-s="3" aria-pressed="false">⅓</button>
+      <button data-s="8" aria-pressed="false">⅛</button>
+    </div>
+  </div>
+</div>
+
+<div class="frame">
+
+  <!-- ---------- HERO ------------------------------------------------ -->
+  <div class="ctx ctx--hero">
+    <div class="hero stagebox">
+      <div class="stage">
+        <img src="./Assets/sloggi/hero-cotton.jpg" alt="">
+        <button class="hs" style="--x:34.5%; --y:68.5%" data-card="h1" aria-label="Produkt ansehen">
+          <span class="hs__disc"><span class="hs__g hs__g--plus"></span></span>
+        </button>
+        <button class="hs" style="--x:77.7%; --y:74%" data-card="h2" aria-label="Produkt ansehen">
+          <span class="hs__disc"><span class="hs__g hs__g--plus"></span></span>
+        </button>
+      </div>
+
+      <div class="scrim"></div>
+
+      <div class="qs" id="h1" role="dialog" aria-label="Quick shop">
+        <a class="qs__in" href="#">
+          <img class="qs__img" src="./Assets/sloggi/thumb-tai.jpg" alt="">
+          <span>
+            <span class="qs__eyebrow">sloggi GO</span>
+            <p class="qs__name">Ribbed Tai</p>
+            <p class="qs__price">12,95 €</p>
+            <span class="qs__cta">Jetzt kaufen</span>
+          </span>
+        </a>
+        <button class="qs__close" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="qs" id="h2" role="dialog" aria-label="Quick shop">
+        <a class="qs__in" href="#">
+          <img class="qs__img" src="./Assets/sloggi/thumb-brazil.jpg" alt="">
+          <span>
+            <span class="qs__eyebrow">sloggi GO</span>
+            <p class="qs__name">Allround String</p>
+            <p class="qs__price">10,95 €</p>
+            <span class="qs__cta">Jetzt kaufen</span>
+          </span>
+        </a>
+        <button class="qs__close" aria-label="Schließen">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- PLP -------------------------------------------------- -->
+  <div class="ctx ctx--plp">
+    <div class="plp stagebox">
+      <div class="plp__grid" id="plpGrid"></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <h2>Spec — Rise</h2>
+    <div class="spec__grid">
+      <div class="spec__cell"><div class="spec__k">Enter</div><div class="spec__v" id="sIn">—</div></div>
+      <div class="spec__cell"><div class="spec__k">Exit</div><div class="spec__v" id="sOut">—</div></div>
+      <div class="spec__cell"><div class="spec__k">Animated properties</div><div class="spec__v" id="sProps">—</div></div>
+      <div class="spec__cell"><div class="spec__k">Marker state change</div><div class="spec__v">disc 180 ms · rotate 260 ms</div></div>
+      <div class="spec__cell"><div class="spec__k">Hover-in intent</div><div class="spec__v">90 ms</div></div>
+      <div class="spec__cell"><div class="spec__k">Hover-out grace</div><div class="spec__v">220 ms</div></div>
+    </div>
+    <p class="spec__note" id="note"></p>
+    <p class="spec__note" id="noteCtx"></p>
+    <p class="spec__note" id="noteMarker"></p>
+  </div>
+</div>
+
+<script>
+const body = document.body;
+const MARKER = '<span class="hs__disc"><span class="hs__g hs__g--plus"></span></span>';
+
+/* ---------- PLP grid: two editorial tiles + six product tiles --------- */
+const ED = [
+  { id:'k1', img:'tanktop-1', brand:'SLG', name:'Shirt',  price:'24,95 €', was:'34,95 €', x:'47%', y:'40%' },
+  { id:'k2', img:'hipster',   brand:'SLG', name:'Hipster',price:'27,95 €', was:'34,95 €', x:'50%', y:'76%' },
+];
+const PR = [
+  { img:'tanktop-2', brand:'SLG BASE SOFT', name:'Herren-Tanktop', price:'19,95 €' },
+  { img:'short',     brand:'SLG BASE SOFT', name:'Herren Short',   price:'29,95 €' },
+  { img:'hipster',   brand:'SLG BASE SOFT', name:'Herren Hipster', price:'27,95 €' },
+  { img:'tanktop-1', brand:'SLG BASE SOFT', name:'Herren-Tanktop', price:'24,95 €' },
+  { img:'short',     brand:'SLG BASE SOFT', name:'Herren Short',   price:'29,95 €' },
+  { img:'tanktop-2', brand:'SLG BASE SOFT', name:'Herren-Tanktop', price:'19,95 €' },
+];
+const edTile = t => `
+  <article class="tile tile--ed">
+    <div class="tile__media">
+      <img src="./Assets/sloggi/plp/${t.img}.jpg" alt="">
+      <button class="hs" style="--x:${t.x}; --y:${t.y}" data-card="${t.id}" aria-label="Quick shop">${MARKER}</button>
+      <div class="peekslot">
+        <a class="peek" id="${t.id}" href="#">
+          <img class="peek__img" src="./Assets/sloggi/plp/pack-${t.img}.jpg" alt="">
+          <span>
+            <span class="peek__brand">${t.brand}</span>
+            <p class="peek__name">${t.name}</p>
+            <p class="peek__price"><span>${t.price}</span><s>${t.was}</s></p>
+          </span>
+        </a>
+      </div>
+    </div>
+  </article>`;
+const prTile = t => `
+  <article class="tile">
+    <div class="tile__media"><img src="./Assets/sloggi/plp/${t.img}.jpg" alt=""></div>
+    <div class="tile__info">
+      <div class="tile__sw"><i style="background:#4a6b8a"></i><i style="background:#b9b9b9"></i><i style="background:#000"></i></div>
+      <p class="tile__brand">${t.brand}</p>
+      <p class="tile__name">${t.name}</p>
+      <p class="tile__price">${t.price}</p>
+    </div>
+  </article>`;
+document.getElementById('plpGrid').innerHTML =
+  edTile(ED[0]) + PR.slice(0,3).map(prTile).join('') +
+  PR.slice(3,6).map(prTile).join('') + edTile(ED[1]);
+
+const spots = [...document.querySelectorAll('.hs')];
+const cards = [...document.querySelectorAll('.qs')];
+
+/* ---------- variant sets, per context --------------------------------- */
+const RISE = {
+  inn:'260 ms · ease-out', out:'150 ms · ease-out',
+  props:'opacity 0 → 1, translateY 14 → 0',
+  note:'One reveal everywhere — the hero card and the PLP Peek Card use the same fade-and-lift. No scale anywhere, which is the point: scaling a card scales live type, so the browser rasterises the letterforms at the start size and again at rest and they appear to re-set themselves mid-animation. 14 px is enough travel to read as an arrival without feeling slow to answer the pointer. The exit is 150 ms — a little over half the entrance, so dismissing never feels sticky.'
+};
+const CTX = {
+  hero: 'Hero: the marker is anchored in the image’s coordinate space so it stays on the garment through any resize; the card is placed inside the banner, flips sides when it would overflow, and stacks below the marker when neither side fits.',
+  plp:  'PLP: rebuilt from Figma 2548:19472. An editorial tile carries the marker; the image runs full height like every other tile, and the Peek Card (360 × 140 desktop, 110 tall on mobile) comes up over its bottom edge, clipped by the tile. On desktop the marker is hover-only, exactly like sloggi’s own tile controls; on mobile it is always visible and the card opens on tap. Only the editorial tiles carry a marker — first and last in this grid, so you can see it at both ends of a row.'
+};
+const MARKER_NOTE = 'Marker follows the DS component (Hotspot Marker, 2484:3172): 44 × 44 hit area, 32 px disc on desktop / 28 px on mobile, 12 px glyph. Rest = frosted dark disc (black 32% + 16 px blur), 1 px white-90% ring, white plus. Hover = solid white disc with a 1 px black-12% ring and a black plus, upright. Open = the same disc with the plus rotated 45° into a close cross, 260 ms ease-reveal. Disc fill and glyph colour cross over 180 ms. The pulse ring is an addition on top of the static ring and runs in every state. Closing is the card’s own ✕, the scrim, Esc, or tapping the marker again.';
+
+function paintSpec(){
+  const s = RISE;
+  sIn.textContent = s.inn; sOut.textContent = s.out; sProps.textContent = s.props;
+  note.textContent = s.note;
+  let c = CTX[body.dataset.context];
+  if (body.dataset.context === 'hero' && body.dataset.device === 'mobile' && body.dataset.present === 'sheet')
+    c += ' The sheet overrides the reveal: translateY 100% → 0 at 420 ms ease-out, exit 300 ms, scrim over 240 ms.';
+  noteCtx.textContent = c;
+  noteMarker.textContent = MARKER_NOTE;
+}
+
+/* ---------- hero card placement --------------------------------------- */
+function place(card, spot){
+  if (card.classList.contains('qs--sheet')){ card.style.left=''; card.style.top=''; return; }
+  const box = spot.closest('.ctx').querySelector('.stagebox');
+  const h = box.getBoundingClientRect(), m = spot.getBoundingClientRect();
+  const cw = card.offsetWidth, ch = card.offsetHeight, gap = 14, pad = 16;
+  const mx = m.left - h.left + m.width/2, my = m.top - h.top + m.height/2;
+  let left = mx + m.width/2 + gap, top, dx = 1, dy = 0;
+
+  if (left + cw > h.width - pad){ left = mx - m.width/2 - gap - cw; dx = -1; }
+
+  if (left < pad){
+    dx = 0;
+    left = Math.max(pad, Math.min(mx - cw/2, h.width - cw - pad));
+    top  = my + m.height/2 + gap; dy = 1;
+    if (top + ch > h.height - pad){ top = my - m.height/2 - gap - ch; dy = -1; }
+    top  = Math.max(pad, Math.min(top, h.height - ch - pad));
+  } else {
+    top  = Math.max(pad, Math.min(my - ch/2, h.height - ch - pad));
+  }
+  card.style.left = left + 'px';
+  card.style.top  = top  + 'px';
+  card.style.setProperty('--ox', (mx - left) + 'px');
+  card.style.setProperty('--oy', (my - top)  + 'px');
+  card.style.setProperty('--dx', dx);
+  card.style.setProperty('--dy', dy);
+}
+
+/* ---------- open / close ---------------------------------------------- */
+let open = null, tIn = null, tOut = null;
+
+function show(spot){
+  clearTimeout(tOut);
+  const card = document.getElementById(spot.dataset.card);
+  if (open === card) return;
+  if (open) hide();
+  if (card.classList.contains('qs')){
+    place(card, spot);
+    card.offsetHeight;                        // commit the closed state
+    if (body.dataset.device === 'mobile')
+      spot.closest('.ctx').querySelector('.scrim').classList.add('is-open');
+  }
+  card.classList.add('is-open');
+  spot.classList.add('is-live');
+  open = card; open._spot = spot;
+}
+function hide(){
+  if (!open) return;
+  open.classList.remove('is-open');
+  open._spot.classList.remove('is-live');
+  document.querySelectorAll('.scrim').forEach(s => s.classList.remove('is-open'));
+  open = null;
+}
+
+spots.forEach(spot => {
+  const card = document.getElementById(spot.dataset.card);
+
+  spot.addEventListener('pointerenter', e => {
+    if (e.pointerType !== 'mouse' || body.dataset.device === 'mobile') return;
+    clearTimeout(tOut);
+    tIn = setTimeout(() => show(spot), 90);          // hover intent
+  });
+  spot.addEventListener('pointerleave', e => {
+    if (e.pointerType !== 'mouse' || body.dataset.device === 'mobile') return;
+    clearTimeout(tIn);
+    tOut = setTimeout(hide, 220);                    // grace
+  });
+  spot.addEventListener('click', e => {
+    e.stopPropagation(); e.preventDefault();
+    if (open === card){ if (body.dataset.device === 'mobile') hide(); return; }
+    show(spot);
+  });
+  /* keyboard only — a pointer focus fires before the click and would toggle it off */
+  spot.addEventListener('focus', () => { if (spot.matches(':focus-visible')) show(spot); });
+
+  card.addEventListener('pointerenter', () => clearTimeout(tOut));
+  card.addEventListener('pointerleave', e => {
+    if (e.pointerType !== 'mouse' || body.dataset.device === 'mobile') return;
+    tOut = setTimeout(hide, 220);
+  });
+  const x = card.querySelector('.qs__close');
+  if (x) x.addEventListener('click', e => { e.preventDefault(); hide(); });
+});
+
+document.addEventListener('click', e => { if (!e.target.closest('.qs, .peek, .bar')) hide(); });
+addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+addEventListener('resize', () => { if (open && open.classList.contains('qs')) place(open, open._spot); });
+
+/* ---------- controls --------------------------------------------------- */
+function seg(id, attr, key, after){
+  document.getElementById(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    [...e.currentTarget.children].forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    body.dataset[key] = b.dataset[attr];
+    if (key === 'speed')   body.style.setProperty('--f', b.dataset.s);
+    after && after();
+    paintSpec();
+  });
+}
+seg('segSpeed','s','speed');
+seg('segContext','c','context', () => { hide(); syncGroups(); });
+seg('segPresent','p','present', applyPresent);
+seg('segDevice','d','device', () => { hide(); syncGroups(); applyPresent(); });
+
+function syncGroups(){
+  grpPresent.hidden = !(body.dataset.context === 'hero' && body.dataset.device === 'mobile');
+}
+function applyPresent(){
+  hide();
+  const sheet = body.dataset.context === 'hero' && body.dataset.device === 'mobile'
+             && body.dataset.present === 'sheet';
+  cards.forEach(c => c.classList.toggle('qs--sheet', sheet));
+}
+
+body.style.setProperty('--f', body.dataset.speed);
+syncGroups(); paintSpec();
+</script>
+</body>
+</html>
