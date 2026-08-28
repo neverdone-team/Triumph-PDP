@@ -186,7 +186,14 @@ header {
 .results-bar { background: var(--c-bg); }
 .results-row {
   max-width: 2400px; margin: 0 auto;
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+  /* Top-aligned on the type, not on the boxes. `flex-start` would sit the
+     boxes' edges level, and since the title's line box is 24px against the
+     chips' 16px, its caps would land 4.5px low (measured). `baseline` puts
+     the title on the same baseline as the FIRST chip line instead — same
+     font at the same size, so a shared baseline is a shared cap line, with
+     no magic number to re-derive if the type changes. Wrapped chip lines
+     then grow downwards and leave the title where it was. */
+  display: flex; align-items: baseline; justify-content: space-between; gap: 24px;
   /* --pad-x is also the grid's side padding, so the title and the filters
      line up with the first and last card */
   padding: 36px var(--pad-x);
@@ -194,6 +201,9 @@ header {
 .results-title {
   font-size: 12px; line-height: 24px; letter-spacing: .04em;
   text-transform: uppercase; font-weight: 400;
+  /* holds its own width so the filters wrap before the title does; it only
+     gives way once the widest chip no longer fits beside it */
+  flex: 0 1 auto; min-width: 0;
 }
 .results-title .count {
   font-size: 12px; font-weight: 300; color: var(--c-ink-soft);
@@ -202,7 +212,21 @@ header {
   position: relative; bottom: .5px;
 }
 .results-title .nowrap { white-space: nowrap; }
-.filters { display: none; gap: 20px; align-items: center; }
+/* Long translations (DE "SORTIEREN NACH: NEUHEITEN", "NACHHALTIGKEITS-
+   STANDARDS", …) can outgrow the space left of the grid edge. The chip row
+   takes whatever width remains beside the title and wraps inside it, every
+   line still flush right — so a wrapped set never crosses the page's
+   centre or pushes the title off its own line.
+   flex-basis 0 is what makes that predictable: the row claims the leftover
+   space rather than its content width, so the title keeps its size and
+   only the chips reflow. min-width stays auto, so if even the widest chip
+   won't fit next to the title, the title yields instead of the chip
+   overflowing the page. */
+.filters {
+  display: none; flex: 1 1 0;
+  flex-wrap: wrap; justify-content: flex-end; align-items: center;
+  gap: 12px 20px; /* 12px between wrapped lines, 20px between chips */
+}
 .filters button, .filters-single, .filters-mobile {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12px; line-height: 16px; letter-spacing: .04em;
@@ -214,20 +238,39 @@ header {
 .filters button:hover, .filters-single:hover, .filters-mobile:hover { opacity: .55; }
 .filters-single { display: none; }
 .filters-mobile { display: none; }
+/* the row's selected state (Figma 1-1328): the applied count beside each
+   chip label, and a Reset filters link at the end of the row */
+.chip__n { color: var(--c-ink-soft); }
+.chip__n:empty { display: none; }
+.filters__reset {
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.filters__reset[hidden] { display: none; }
 
 /* Filter V1 — chip dropdown (Figma 931-26774) */
 .results-row { position: relative; }
+/* A column: the options scroll, the foot is a real footer beneath them.
+   The foot used to be the last thing in the dropdown's own scroll and then
+   a sticky overlay — both leaked. Sticky floats the foot at the scrollport
+   bottom, but the dropdown's bottom padding sits *below* that, so option
+   rows showed through the strip under Reset. Taking the foot out of the
+   scrolling box removes the class of bug rather than patching it. */
 .dropdown {
   position: absolute; z-index: 60;
   width: 240px;
   background: #fff;
   border: 1px solid var(--c-ink);
   box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  padding: 4px 0 8px;
-  max-height: min(480px, 60vh); overflow-y: auto;
-  display: none;
+  max-height: min(480px, 60vh);
+  display: none; flex-direction: column;
+  overflow: hidden; /* nothing can escape past the foot */
 }
-.dropdown.is-open { display: block; }
+.dropdown.is-open { display: flex; }
+.dropdown__scroll {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0 0;
+}
 .dropdown__row {
   display: flex; gap: 12px; align-items: center;
   width: 100%; padding: 10px 12px;
@@ -262,12 +305,114 @@ header {
 .dd-group__head[data-open="true"] .chev { transform: rotate(180deg); }
 /* options one step below the 12px group heads — same hierarchy as the drawer */
 .dd-group__body .dropdown__row { padding-left: 24px; font-size: 11px; }
+.dropdown__row .cnt { color: var(--c-ink-soft); }
+.dropdown__row .nw { white-space: nowrap; } /* keeps the count off its own line */
+
+/* ---- Series inside the More dropdown (Figma 1-1272) ----
+   A search field, then the two-level family list. The list gets its own
+   scroller: the catalogue is far longer than a 240px dropdown can show, and
+   the dev ask was specifically for the scroll-within-a-scroll — the series
+   list scrolls inside the dropdown, which scrolls inside the page.
+   The search stays pinned above the scroller so it can't scroll out of
+   reach of the list it filters. */
+.dd-srch { position: relative; padding: 8px 8px 4px; }
+.dd-srch input {
+  width: 100%; height: 40px; padding: 0 44px 0 12px; /* clears the magnifier */
+  border: 1px solid var(--c-edge); background: var(--c-wash); color: inherit;
+  font-family: inherit;
+  font-size: 10px; line-height: 12px; letter-spacing: .04em; text-transform: uppercase;
+  -webkit-appearance: none; appearance: none;
+}
+.dd-srch input::placeholder { color: var(--c-ink); text-transform: uppercase; }
+.dd-srch input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+.dd-srch input:focus { outline: none; border-color: var(--c-ink); }
+/* the 24px icon box of the design, with the project's own magnifier in it.
+   The design's 8px right inset put the glyph 13px off the field edge against
+   a 12px text inset on the left, which read tighter than the left because the
+   magnifier's ink reaches its box corner while a letter does not — 18px is
+   the optical match. */
+.dd-srch svg {
+  position: absolute; right: 18px; top: 21px;
+  width: 14px; height: 14px;
+  fill: none; stroke: var(--c-ink); stroke-width: 1.1; pointer-events: none;
+}
+.dd-series {
+  max-height: 280px; overflow-y: auto;
+  /* a wheel inside the list must not scroll the dropdown behind it until
+     the list itself is at its end */
+  overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: rgba(0,0,0,.25) transparent;
+}
+.dd-series::-webkit-scrollbar { width: 10px; }
+.dd-series::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.22);
+  border: 3px solid #fff; /* insets the thumb without a track colour */
+  border-radius: 5px;
+}
+.dd-series::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.4); }
+/* family rows sit at the group-body indent (24px), their lines one step
+   deeper at 36px — the two levels of Figma 1-1272 */
+.dd-item[hidden], .dd-fam__body[hidden] { display: none; }
+.dd-series .dropdown__row--sub { padding-left: 36px; }
+.dd-fam__head .chev {
+  width: 7px; height: 4px; flex: none;
+  fill: none; stroke: var(--c-ink); stroke-width: 1;
+  transition: transform .2s var(--ease-out);
+}
+.dd-fam__head[data-open="true"] .chev { transform: rotate(180deg); }
+.dd-srch-empty {
+  padding: 10px 12px 14px 24px;
+  font-size: 11px; line-height: 14px; font-weight: 300;
+  letter-spacing: .04em; color: var(--c-ink-soft);
+}
+
+/* ============================================================
+   MORE DROPDOWN V2 — one scroller instead of two
+   ------------------------------------------------------------
+   V1 nests a 280px series scroller inside the panel's own scroller. The two
+   never scale together: the 280px is fixed while the panel is 60vh, so the
+   shorter the window the more of the panel one list eats (58% at 900px tall,
+   83% at 560px) and the search, the group heads and Reset are what get
+   pushed out of sight. You also see the same 7 of 26 families at every
+   screen height, because the list can't grow.
+   V2 lets the list run at its natural length and makes the panel body the
+   only scroller, so the list takes ALL the space left over. The group head
+   and its search stick to the top of the scroller while you move through the
+   options, which is what the nested box was really there to achieve.
+   ============================================================ */
+body[data-ddv="v2"] .dd-series {
+  max-height: none; overflow: visible;
+}
+/* each head is sticky inside its own group, so it leads its options down and
+   then leaves with them — no stack of piled-up headers */
+body[data-ddv="v2"] .dd-group__head {
+  position: sticky; top: 0; z-index: 3;
+  background: #fff;
+}
+body[data-ddv="v2"] .dd-group__head:hover,
+body[data-ddv="v2"] .dd-group__head[data-open="true"] { background: var(--c-wash); }
+/* the search sits directly under its head and stays reachable: it filters
+   the list you are scrolling, so it must not scroll away from it */
+body[data-ddv="v2"] .dd-srch {
+  position: sticky; top: 36px; z-index: 2; /* 36px = the head's row height */
+  background: #fff;
+}
+/* a flipped panel grows upward from the chip */
+.dropdown[data-flip="true"] { box-shadow: 0 -4px 12px rgba(0,0,0,.08); }
+/* Outside the scroller, so Reset is always reachable however deep the
+   series list is scrolled. The hairline is inset 12px on
+   .dropdown__actions — the Foot > Actions split of the Figma node. */
 .dropdown__foot {
+  flex: none;
+  background: #fff;
+  padding: 4px 12px 8px;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase;
+}
+.dropdown__foot[hidden] { display: none; }
+.dropdown__actions {
   display: flex; justify-content: space-between;
   border-top: 1px solid var(--c-line);
-  margin: 4px 12px 0;
   padding: 14px 0 2px;
-  font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase;
 }
 .dropdown__foot button { font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase; }
 .dropdown__foot button:hover { opacity: .55; }
@@ -319,15 +464,26 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   width: 100%; height: 100%; object-fit: cover;
   transition: transform .9s var(--ease-out);
 }
-/* pointer devices only — on touch this fires on tap and the zoom sticks
-   until you tap elsewhere, which reads as a bug */
+/* Same gesture as the PDP grid tiles (.gallery__tile — .9s ease-out to 1.04),
+   and it applies to EVERY layer, not just the base. The card also crossfades
+   a second shot in on hover, so if only .ph--base scaled, the incoming photo
+   would sit dead still on top and swallow the whole movement. Zooming the
+   stack means the crossfade happens mid-zoom and the motion carries through
+   the photo change.
+   Pointer devices only — on touch this fires on tap and the zoom sticks
+   until you tap elsewhere, which reads as a bug. */
 @media (hover: hover) {
-  .card:hover .card__img .ph--base { transform: scale(1.04); }
+  .card:hover .card__img .ph { transform: scale(1.04); }
 }
+/* Both overlay layers restate the zoom alongside their fade. `transition` is
+   a shorthand, so declaring only opacity here would drop the transform
+   transition inherited from .ph and the overlay would snap to 1.04 instead
+   of easing into it — the snap is invisible on the base but very visible on
+   the shot that fades in over the top. */
 /* variant overlay photo — crossfades on top of the base */
 .card__img .ph--variant {
   opacity: 0;
-  transition: opacity .38s var(--ease-out);
+  transition: opacity .38s var(--ease-out), transform .9s var(--ease-out);
   background: #fff;
 }
 .card__img .ph--variant.is-on { opacity: 1; }
@@ -335,7 +491,7 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
 /* hover gallery — a different photo fades in, chevrons page through 4 */
 .card__img .ph--hover {
   opacity: 0;
-  transition: opacity .38s var(--ease-out);
+  transition: opacity .38s var(--ease-out), transform .9s var(--ease-out);
   background: #fff;
 }
 .card__img .ph--hover.is-on { opacity: 1; }
@@ -848,7 +1004,10 @@ body[data-price="b"] .facet--price .pr-b { display: block; }
 
   /* results bar — title left (wraps under itself), "Sort & Filter +" right,
      both aligned along the bottom edge */
-  .results-row { padding: 20px 16px 16px; }
+  /* mobile keeps the shared bottom edge — the title wraps to two or three
+     lines here and "Sort & Filter +" belongs at the foot of that block,
+     not centred against it */
+  .results-row { padding: 20px 16px 16px; align-items: flex-end; gap: 10px; }
   .results-title { flex: 1; font-size: 12px; line-height: 16px; }
   .results-title .count { font-size: 10px; }
   .filters-mobile { line-height: 16px; }
@@ -1000,7 +1159,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-member="v1" data-images="new" data-price="a" data-model="on">
+<body data-view="products" data-filters="some" data-member="v1" data-images="new" data-labels="short" data-serieslist="grouped" data-ddv="v2" data-price="a" data-model="on">
 
 <!-- HEADER -->
 <header>
@@ -1061,31 +1220,33 @@ body.dash-open .dash { display: flex; }
       <!-- the last word and the count are glued together, so "(36)" never wraps alone -->
       <h2 class="results-title">Blush &amp; Burgundy <span class="nowrap">Collection <span class="count">(36)</span></span></h2>
 
-      <!-- default chips — V1-V5 (Figma 848-5899) -->
+      <!-- default chips — V1-V5 (Figma 848-5899).
+           data-long = the German label, swapped in by the dashboard's
+           "Filter labels" control so the wrapping can be reviewed -->
       <div class="filters filters--full" aria-label="Filter">
-        <button>Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button>Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button>Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button>Price <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button>Series <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button>Standards <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button>Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Größe">Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Farbe">Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Material &amp; Verarbeitung">Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Preis">Price <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Serie">Series <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Nachhaltigkeitsstandards">Standards <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-long="Sortieren nach: Neuheiten">Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
       </div>
 
       <!-- Filter V1 — reduced chips (Figma 931-23661); "More" lists the
            remaining filters in a dropdown, option dropdowns from 931-26774 -->
       <div class="filters filters--reduced" aria-label="Filter">
-        <button data-f="sort">Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button data-f="size">Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button data-f="colour">Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-        <button class="more-toggle">More <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="sort" data-long="Sortieren nach: Neuheiten">Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="size" data-long="Größe">Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button data-f="colour" data-long="Farbe">Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button class="more-toggle" data-long="Weitere Filter">More <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
       </div>
 
       <!-- Filter V2 — single trigger, opens the off-canvas (Figma 931-24643) -->
-      <button class="filters-single" id="drawerTrigger">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+      <button class="filters-single" id="drawerTrigger" data-long="Sortieren &amp; Filtern">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
 
       <!-- mobile — all versions -->
-      <button class="filters-mobile">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+      <button class="filters-mobile" data-long="Sortieren &amp; Filtern">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
     </div>
   </div>
 
@@ -1151,6 +1312,39 @@ body.dash-open .dash { display: flex; }
   <!-- Member colour toggle removed 2026-07-31: burgundy is the answer. -->
   <!-- Sales banner settled 2026-07-30 on the pink badge (the old V1) and the
        toggle removed with it; the badge now shows on every sale card. -->
+  <!-- asked by dev 2026-08-28: what happens to the desktop filter row when a
+       translation is longer than the English label. The chips wrap, still
+       flush right — this swaps in the German set so you can see it. -->
+  <!-- 2026-08-28: V2 answers the short-window review. V1 nests a fixed 280px
+       series scroller inside a 60vh panel that always opens downward; V2 uses
+       one scroller with sticky heads and sizes itself from the room beside
+       the chip, flipping above it when there is more space there.
+       (A third change — handing off to the filter drawer under 420px of
+       space — was built and then dropped on request 2026-08-28.) -->
+  <div class="dash__group">
+    <div class="dash__label">More dropdown</div>
+    <div class="dash__seg">
+      <button data-k="ddv" data-val="v1" title="Nested scroll, 60vh, always opens down">V1</button>
+      <button data-k="ddv" data-val="v2" data-on="true" title="One scroll + sticky heads, sized to the space beside the chip">V2</button>
+    </div>
+  </div>
+  <!-- open question 2026-08-28: the family accordions vs one flat list.
+       Flat drops the "All in <family>" rows, which only mean something
+       inside a hierarchy, and sorts every line alphabetically. -->
+  <div class="dash__group">
+    <div class="dash__label">Series list</div>
+    <div class="dash__seg">
+      <button data-k="serieslist" data-val="grouped" data-on="true" title="Families that expand into their lines">Grouped</button>
+      <button data-k="serieslist" data-val="flat" title="Every line in one alphabetical list">Flat</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Filter labels</div>
+    <div class="dash__seg">
+      <button data-k="labels" data-val="short" data-on="true" title="English labels">EN</button>
+      <button data-k="labels" data-val="long" title="German labels — the long-translation case">DE · long</button>
+    </div>
+  </div>
   <div class="dash__group">
     <div class="dash__label">Images</div>
     <div class="dash__seg">
@@ -1447,8 +1641,11 @@ cards.forEach(card => {
     window.location.href = './pdp.html';
   });
 
-  /* hover gallery — entering the photo shows a different shot,
-     chevrons page through all 4; leaving restores the base photo
+  /* hover gallery — entering the photo crossfades a second shot in,
+     chevrons page through all 4; leaving restores the base photo.
+     The crossfade runs *through* the zoom, not instead of it: the scale
+     is on .ph (every layer), so the incoming shot is mid-zoom when it
+     lands and the movement never stops (see .card__img .ph).
      (the photo set is read per call — versions may swap it) */
   const hoverImg = card.querySelector('.ph--hover');
   const imgWrap = card.querySelector('.card__img');
@@ -1535,26 +1732,53 @@ document.addEventListener('click', e => {
    ============================================================ */
 const TOTAL_RESULTS = 36;
 
-/* Series is two levels deep — a family, then its lines. "All <family>"
+/* Series is two levels deep — a family, then its lines. "All in <family>"
    is its own option that clears the individual lines; whether it should
-   instead tick every child is still open (Figma note 1-1782). */
-const SERIES = [
-  { n: 'Amourette', c: 18, items: [
-    { n: 'All Amourette', c: 18, all: true },
-    { n: 'Amourette Charm', c: 4 }, { n: 'Amourette Spotlight', c: 8 }, { n: 'Amourette 300', c: 6 } ] },
-  { n: 'Aura', c: 12, items: [
-    { n: 'All Aura', c: 12, all: true },
-    { n: 'Aura Spotlight', c: 7 }, { n: 'Aura Sensation', c: 5 } ] },
-  { n: 'Body Make-Up', c: 9, items: [
-    { n: 'All Body Make-Up', c: 9, all: true },
-    { n: 'Body Make-Up Soft Touch', c: 5 }, { n: 'Body Make-Up Essentials', c: 4 } ] },
-  { n: 'Signature Sheer', c: 7, items: [
-    { n: 'All Signature Sheer', c: 7, all: true },
-    { n: 'Signature Sheer Lace', c: 4 }, { n: 'Signature Sheer Minimizer', c: 3 } ] },
-  { n: 'Doreen', c: 5, items: [
-    { n: 'All Doreen', c: 5, all: true },
-    { n: 'Doreen Cotton', c: 3 } ] },
+   instead tick every child is still open (Figma note 1-1782).
+   A family with no lines of its own is a plain selectable row: Figma
+   1-1272 shows that case as "Aura Spotlight (2)" — family-level indent,
+   no chevron, ticks like any other option.
+   This is deliberately the full catalogue length rather than a token five
+   families. The facet has to hold a market that carries everything, which
+   is what forces the desktop dropdown to scroll its series list inside its
+   own scroll (see .dd-series). */
+const SERIES_SRC = [
+  { n: 'Airy Sensation', lines: [['Airy Sensation W01', 3], ['Airy Sensation Padded', 2]] },
+  { n: 'Amourette', lines: [['Amourette Charm', 4], ['Amourette Spotlight', 5], ['Amourette Graphic', 3], ['Amourette 300', 6]] },
+  { n: 'Aura', lines: [['Aura Spotlight', 7], ['Aura Sensation', 5]] },
+  { n: 'Beauty-Full', lines: [['Beauty-Full Darling', 4], ['Beauty-Full Essential', 3], ['Beauty-Full Icon', 2]] },
+  { n: 'Body Make-Up', lines: [['Body Make-Up Soft Touch', 5], ['Body Make-Up Essentials', 4], ['Body Make-Up Blossom', 3]] },
+  { n: 'Comfort', lines: [['Comfort Minimizer', 6], ['Comfort Cotton', 5]] },
+  { n: 'Doreen', lines: [['Doreen Original', 6], ['Doreen Cotton', 3]] },
+  { n: 'Essential Minimizer', lines: [['Essential Minimizer Lace', 4]] },
+  { n: 'Feel Sensational', c: 5 },
+  { n: 'Fit Smart', lines: [['Fit Smart Padded', 4], ['Fit Smart Bralette', 3]] },
+  { n: 'Flex Smart', lines: [['Flex Smart Bralette', 3], ['Flex Smart Soft', 2]] },
+  { n: 'Florale', lines: [['Florale Chiffon', 4], ['Florale Peony', 3], ['Florale W01', 2]] },
+  { n: 'Katia', lines: [['Katia Basics', 5], ['Katia Cotton', 4]] },
+  { n: 'Lovely Micro', c: 4 },
+  { n: 'Luxurious Sensation', c: 3 },
+  { n: 'Magic Wire', lines: [['Magic Wire Lite', 4], ['Magic Wire Padded', 3]] },
+  { n: 'Maximizer', lines: [['Maximizer 819', 3]] },
+  { n: 'Modern Finesse', c: 6 },
+  { n: 'Perfectly Soft', c: 4 },
+  { n: 'Sculpting Sensation', c: 5 },
+  { n: 'Shape Smart', lines: [['Shape Smart Padded', 4], ['Shape Smart Bodysuit', 2]] },
+  { n: 'Signature Sheer', lines: [['Signature Sheer Lace', 4], ['Signature Sheer Minimizer', 3]] },
+  { n: 'Smart Deco', c: 7 },
+  { n: 'True Shape Sensation', lines: [['True Shape Sensation Lace', 3], ['True Shape Sensation Soft', 2]] },
+  { n: 'Wild Peony', lines: [['Wild Peony Florale', 3], ['Wild Peony Lace', 2]] },
+  { n: 'Zero Feel', lines: [['Zero Feel Bralette', 5], ['Zero Feel Soft', 4], ['Zero Feel Cotton', 3]] },
 ];
+
+/* a family's count is always the sum of its lines, so the CTA arithmetic
+   can never contradict the number printed on the head */
+const SERIES = SERIES_SRC.map(g => {
+  if (!g.lines) return { n: g.n, c: g.c };
+  const items = g.lines.map(([n, c]) => ({ n, c }));
+  const c = items.reduce((s, o) => s + o.c, 0);
+  return { n: g.n, c, items: [{ n: `All in ${g.n}`, c, all: true }, ...items] };
+});
 
 /* the swatch set this page already ships — blush and burgundy lead it */
 const COLOUR_COUNTS = { Black: 8, Burgundy: 12, Red: 6, Pink: 14, Teal: 3 };
@@ -1637,11 +1861,12 @@ FACETS.forEach((f, i) => {
         <input type="search" placeholder="Search series" aria-label="Search series" />
         <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.6"/><path d="M9.4 9.4 13 13"/></svg>
       </div>
-      ${f.groups.map(g => `
+      ${f.groups.map(g => g.items ? `
         <div class="grp">
           <button class="grp__head">${g.n}${cnt(g.c)}${CHEV}</button>
           <div class="grp__body">${g.items.map(o => optRow(o, false)).join('')}</div>
-        </div>`).join('')}
+        </div>` : `
+        <div class="grp">${optRow(g, false, ' opt--sub')}</div>`).join('')}
       <div class="srch-empty" hidden>No series match that search.</div>`;
   }
 
@@ -1906,12 +2131,34 @@ const DD_ITEMS = {
     { name: 'White', c: '#FFFFFF' }, { name: 'Pink',  c: '#EC4899' },
     { name: 'Grey',  c: '#6B7280' },
   ],
-  series: ['Love in Lace', 'Aura Spotlight', 'Signature Sheer', 'Body Make-Up'],
+  series: [], /* filled from SERIES_ROWS below — the whole catalogue */
   fabric: ['Lace', 'Satin', 'Mesh', 'Cotton'],
   price: ['Under £30', '£30 – £50', 'Over £50'],
   standards: ['OEKO-TEX Standard 100', 'Recycled materials', 'Organic cotton'],
   sort: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'],
 };
+
+/* The series tree flattened to its selectable rows. ddState indexes into
+   this flat list, so ticking and Reset behave exactly like any other facet
+   even though the rows are drawn two levels deep. */
+const SERIES_ROWS = [];
+const SERIES_TREE = SERIES.map(g => {
+  const push = o => (SERIES_ROWS.push({ name: o.n, count: o.c, all: !!o.all }), SERIES_ROWS.length - 1);
+  /* a family with no lines is one selectable row (Figma: "Aura Spotlight") */
+  if (!g.items) return { n: g.n, c: g.c, i: push(g) };
+  return { n: g.n, c: g.c, lines: g.items.map(o => ({ ...o, i: push(o) })) };
+});
+DD_ITEMS.series = SERIES_ROWS;
+
+/* The flat alternative to the family accordions: every product line as one
+   alphabetical list, no families and no "All in <family>" rows (which mean
+   nothing once the hierarchy is gone). Indices are the SERIES_ROWS ones, so
+   switching between the two views keeps whatever was already ticked. */
+const SERIES_FLAT = SERIES_ROWS
+  .map((o, i) => ({ n: o.name, c: o.count, i, all: o.all }))
+  .filter(o => !o.all)
+  .sort((a, b) => a.n.localeCompare(b.n));
+
 const ddState = { sort: new Set([0]) }; /* per facet: selected indices */
 
 const resultsRow = document.querySelector('.results-row');
@@ -1920,12 +2167,50 @@ dropdown.className = 'dropdown';
 resultsRow.appendChild(dropdown);
 let ddChip = null;
 
+/* ---- V2 geometry ----
+   V1 sizes the panel from the viewport (max-height: min(480px, 60vh)) and
+   always opens downward, so how much of it you can see depends on where the
+   reader happened to stop scrolling. Measured at the page top: 57% of the
+   panel below the fold at 900px tall, 89% at 740px, all of it at 650px.
+   V2 sizes it from the space actually available beside the chip and flips
+   above when there is more room there, so it can't overflow the fold. */
+const V2_GAP = 8;      /* chip → panel */
+const V2_MARGIN = 16;  /* panel → viewport edge */
+
+const ddSpace = chip => {
+  const r = chip.getBoundingClientRect();
+  return {
+    below: innerHeight - r.bottom - V2_GAP - V2_MARGIN,
+    above: r.top - V2_GAP - V2_MARGIN,
+  };
+};
+
 /* sits below the anchor chip, kept inside the row */
 function anchorDropdown(chip) {
   const rowRect = resultsRow.getBoundingClientRect();
   const r = chip.getBoundingClientRect();
   dropdown.style.left = Math.min(r.left - rowRect.left, resultsRow.clientWidth - 240 - 24) + 'px';
-  dropdown.style.top = (r.bottom - rowRect.top + 8) + 'px';
+
+  if (body.dataset.ddv === 'v2') {
+    const { below, above } = ddSpace(chip);
+    /* only flip when it buys real room — a flip for 20px is just a jump */
+    const flip = above > below + 80;
+    const space = Math.max(120, flip ? above : below);
+    if (flip) {
+      dropdown.style.top = 'auto';
+      dropdown.style.bottom = (rowRect.bottom - r.top + V2_GAP) + 'px';
+    } else {
+      dropdown.style.bottom = 'auto';
+      dropdown.style.top = (r.bottom - rowRect.top + V2_GAP) + 'px';
+    }
+    dropdown.style.maxHeight = Math.min(space, 560) + 'px';
+    dropdown.dataset.flip = String(flip);
+  } else {
+    dropdown.style.bottom = 'auto';
+    dropdown.style.maxHeight = '';
+    delete dropdown.dataset.flip;
+    dropdown.style.top = (r.bottom - rowRect.top + 8) + 'px';
+  }
   dropdown.classList.add('is-open');
   ddChip = chip;
 }
@@ -1936,10 +2221,89 @@ function optionRowsHTML(key) {
   const sel = ddState[key] || (ddState[key] = new Set());
   return DD_ITEMS[key].map((it, i) => {
     const name = typeof it === 'string' ? it : it.name;
-    const sw = typeof it === 'string' ? '' : `<span class="sw" style="background:${it.c}"></span>`;
-    return `<button class="dropdown__row" data-key="${key}" data-i="${i}" data-on="${sel.has(i)}">${sw}<span class="lbl">${name}</span>
+    /* only the colour facet carries a swatch — an object item without a
+       colour (a series row) must not get an empty one */
+    const sw = typeof it === 'string' || !it.c ? '' : `<span class="sw" style="background:${it.c}"></span>`;
+    const c = typeof it === 'string' || it.count == null ? '' : ` <span class="cnt">(${it.count})</span>`;
+    return `<button class="dropdown__row" data-key="${key}" data-i="${i}" data-on="${sel.has(i)}">${sw}<span class="lbl">${name}${c}</span>
       <svg class="tick" viewBox="0 0 16 16"><path d="M2.5 8.5 6.5 12.5 13.5 4"/></svg></button>`;
   }).join('');
+}
+
+/* ---- Series (Figma 1-1272) ----
+   A search pinned above the list, then the families: those with lines are
+   accordions ("All in <family>" plus each line), those without are plain
+   rows. The list is its own scroller — see .dd-series. */
+function seriesGroupHTML() {
+  const sel = ddState.series || (ddState.series = new Set());
+  /* Names like "Signature Sheer Minimizer" wrap inside 240px, and the count
+     was landing alone on the second line. Glue it to the last word — the
+     same trick the results title uses for its "(36)". */
+  const label = (n, c) => {
+    const cut = n.lastIndexOf(' ');
+    const head = cut === -1 ? '' : n.slice(0, cut + 1);
+    const tail = cut === -1 ? n : n.slice(cut + 1);
+    return `${head}<span class="nw">${tail} <span class="cnt">(${c})</span></span>`;
+  };
+  const row = (o, cls) =>
+    `<button class="dropdown__row${cls}" data-key="series" data-i="${o.i}"
+       data-on="${sel.has(o.i)}"${o.all ? ' data-all="true"' : ''}>
+       <span class="lbl">${label(o.n, o.c)}</span>
+       <svg class="tick" viewBox="0 0 16 16"><path d="M2.5 8.5 6.5 12.5 13.5 4"/></svg></button>`;
+  /* two views of the same catalogue — the dashboard's "Series list" control */
+  const list = body.dataset.serieslist === 'flat'
+    ? SERIES_FLAT.map(o => row(o, ' dd-item')).join('')
+    : SERIES_TREE.map(g => g.lines ? `
+        <div class="dd-fam dd-item">
+          <button class="dd-fam__head dropdown__row">
+            <span class="lbl">${label(g.n, g.c)}</span>
+            <svg class="chev" viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+          <div class="dd-fam__body" hidden>${g.lines.map(o => row(o, ' dropdown__row--sub')).join('')}</div>
+        </div>` : `
+        <div class="dd-fam dd-item">${row(g, '')}</div>`).join('');
+  return `
+    <div class="dd-srch">
+      <input type="search" placeholder="Search series" aria-label="Search series" />
+      <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.6"/><path d="M9.4 9.4 13 13"/></svg>
+    </div>
+    <div class="dd-series">${list}</div>
+    <div class="dd-srch-empty" hidden>No series match that search.</div>`;
+}
+
+function bindSeriesGroup() {
+  const scroller = dropdown.querySelector('.dd-series');
+  if (!scroller) return;
+  scroller.querySelectorAll('.dd-fam__head').forEach(head => {
+    head.addEventListener('click', () => {
+      const famBody = head.nextElementSibling;
+      const open = famBody.hidden;
+      famBody.hidden = !open;
+      head.dataset.open = String(open);
+    });
+  });
+  const input = dropdown.querySelector('.dd-srch input');
+  const empty = dropdown.querySelector('.dd-srch-empty');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let hits = 0;
+    /* .dd-item is a family in the grouped view and a single line in the flat
+       one, so the same filter serves both */
+    scroller.querySelectorAll('.dd-item').forEach(item => {
+      const hit = !q || item.textContent.toLowerCase().includes(q);
+      item.hidden = !hit;
+      if (!hit) return;
+      hits++;
+      /* a match on a line is useless if the family stays shut, so searching
+         expands what it matched — and clearing the field folds it all back */
+      const famBody = item.querySelector('.dd-fam__body');
+      if (famBody) {
+        famBody.hidden = !q;
+        item.querySelector('.dd-fam__head').dataset.open = String(!!q);
+      }
+    });
+    empty.hidden = hits > 0;
+    scroller.scrollTop = 0;
+  });
 }
 
 function bindOptionRows() {
@@ -1954,23 +2318,60 @@ function bindOptionRows() {
         rowBtn.dataset.on = 'true';
         return;
       }
+      /* inside a family, "All in <family>" and its individual lines are
+         mutually exclusive — same rule as the drawer (Figma note 1-1782) */
+      if (key === 'series' && rowBtn.closest('.dd-fam')) {
+        const isAll = rowBtn.dataset.all === 'true';
+        rowBtn.closest('.dd-fam')
+          .querySelectorAll(isAll ? '.dropdown__row[data-i]:not([data-all])' : '.dropdown__row[data-all]')
+          .forEach(b => { b.dataset.on = 'false'; sel.delete(+b.dataset.i); });
+      }
       sel.has(i) ? sel.delete(i) : sel.add(i);
       rowBtn.dataset.on = String(sel.has(i));
+      syncDdFoot();
     });
   });
 }
 
+/* the facets the open dropdown covers — what Reset clears and what decides
+   whether the foot shows at all */
+let ddKeys = [];
+const FOOT_HTML = `
+  <div class="dropdown__foot" hidden>
+    <div class="dropdown__actions"><button class="dd-reset">Reset</button></div>
+  </div>`;
+
+/* Reset exists only once there is something to reset. Sort is a single
+   choice with a default, not a filter — the drawer takes the same view — so
+   it never raises the foot. */
+function syncDdFoot() {
+  const foot = dropdown.querySelector('.dropdown__foot');
+  if (foot) {
+    foot.hidden = !ddKeys.filter(k => k !== 'sort')
+      .reduce((n, k) => n + (ddState[k] ? ddState[k].size : 0), 0);
+  }
+  /* the chip row shows the same state one level up (Figma 1-1328) */
+  syncFilterRow();
+}
+
 function bindFoot(keys) {
+  ddKeys = keys;
   dropdown.querySelector('.dd-reset').addEventListener('click', () => {
     keys.forEach(k => ddState[k] && ddState[k].clear());
     dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(b => b.dataset.on = 'false');
+    /* the series query is part of the facet's state — a Reset that left a
+       search term in place would look like it had missed most of the list */
+    const srch = dropdown.querySelector('.dd-srch input');
+    if (srch) { srch.value = ''; srch.dispatchEvent(new Event('input')); }
+    syncDdFoot();
   });
-  dropdown.querySelector('.dd-save').addEventListener('click', closeDropdown);
+  syncDdFoot();
 }
 
 function openDropdown(chip, key = chip.dataset.f) {
-  dropdown.innerHTML = optionRowsHTML(key) + `
-    <div class="dropdown__foot"><button class="dd-reset">Reset</button><button class="dd-save">Save</button></div>`;
+  /* no Save: every tick applies immediately, so the dropdown closes by
+     clicking away or re-clicking its chip */
+  dropdown.innerHTML = `<div class="dropdown__scroll">${optionRowsHTML(key)}</div>` + FOOT_HTML;
   anchorDropdown(chip);
   bindOptionRows();
   bindFoot([key]);
@@ -1979,10 +2380,15 @@ function closeDropdown() {
   dropdown.classList.remove('is-open');
   ddChip = null;
 }
+/* On a pointer device the chip has already opened on hover by the time the
+   click lands, so treating the click as "toggle" closed it again and the chip
+   read as dead. A click on an already-open chip is a no-op there; closing is
+   the job of clicking away, or of moving the pointer off. */
+const HAS_HOVER = window.matchMedia('(hover: hover)').matches;
 document.querySelectorAll('.filters--reduced [data-f]').forEach(chip => {
   chip.addEventListener('click', e => {
     e.stopPropagation();
-    if (ddChip === chip) { closeDropdown(); return; }
+    if (ddChip === chip) { if (!HAS_HOVER) closeDropdown(); return; }
     openDropdown(chip);
   });
 });
@@ -1999,34 +2405,82 @@ const MORE_FILTERS = [
   { key: 'standards', label: 'Standards' },
 ];
 const moreToggle = document.querySelector('.more-toggle');
+
 function openMoreList() {
-  dropdown.innerHTML = MORE_FILTERS.map(f => `
+  dropdown.innerHTML = `<div class="dropdown__scroll">` + MORE_FILTERS.map(f => `
     <div class="dd-group">
       <button class="dd-group__head"><span class="lbl">${f.label}</span>
         <svg class="chev" viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-      <div class="dd-group__body" hidden>${optionRowsHTML(f.key)}</div>
-    </div>`).join('') + `
-    <div class="dropdown__foot"><button class="dd-reset">Reset</button><button class="dd-save">Save</button></div>`;
+      <div class="dd-group__body" hidden>${f.key === 'series' ? seriesGroupHTML() : optionRowsHTML(f.key)}</div>
+    </div>`).join('') + `</div>` + FOOT_HTML;
   anchorDropdown(moreToggle);
   bindOptionRows();
+  bindSeriesGroup();
   bindFoot(MORE_FILTERS.map(f => f.key));
   dropdown.querySelectorAll('.dd-group__head').forEach(head => {
     head.addEventListener('click', () => {
-      const body = head.nextElementSibling;
-      const willOpen = body.hidden;
+      const grpBody = head.nextElementSibling; /* not document.body */
+      const willOpen = grpBody.hidden;
       /* exclusive — opening a group closes the current one */
       dropdown.querySelectorAll('.dd-group__body').forEach(b => b.hidden = true);
       dropdown.querySelectorAll('.dd-group__head').forEach(h => h.dataset.open = 'false');
-      body.hidden = !willOpen;
+      grpBody.hidden = !willOpen;
       head.dataset.open = String(willOpen);
+      /* V2 measures its height from the chip, and an accordion changes how
+         much there is to show — re-anchor so the panel keeps hugging the
+         available space instead of holding a stale max-height */
+      if (body.dataset.ddv === 'v2') anchorDropdown(moreToggle);
     });
   });
 }
 moreToggle.addEventListener('click', e => {
   e.stopPropagation();
-  if (ddChip === moreToggle) { closeDropdown(); return; }
+  if (ddChip === moreToggle) { if (!HAS_HOVER) closeDropdown(); return; }
   openMoreList();
 });
+
+/* ---- the row's own selected state (Figma 1-1328, State=Selected) ----
+   Every chip prints how many of its options are applied, and a Reset
+   filters link joins the end of the row. Without this the row looks
+   untouched the moment a dropdown closes — a series picked four levels
+   down the More list left no trace at all.
+   Sort is a single choice with a default, so it shows its value in the
+   label and never a count. "More" reports the sum of the facets it holds,
+   which is the only way a Series pick is visible from the row. */
+const CHIP_KEYS = new Map();
+document.querySelectorAll('.filters--reduced button').forEach(chip => {
+  CHIP_KEYS.set(chip, chip === moreToggle ? MORE_FILTERS.map(f => f.key) : [chip.dataset.f]);
+  const n = document.createElement('span');
+  n.className = 'chip__n';
+  chip.insertBefore(n, chip.querySelector('svg'));
+});
+const rowReset = document.createElement('button');
+rowReset.className = 'filters__reset';
+rowReset.textContent = 'Reset filters';
+rowReset.hidden = true;
+document.querySelector('.filters--reduced').appendChild(rowReset);
+
+function syncFilterRow() {
+  let total = 0;
+  CHIP_KEYS.forEach((keys, chip) => {
+    const n = keys.filter(k => k !== 'sort')
+      .reduce((s, k) => s + (ddState[k] ? ddState[k].size : 0), 0);
+    chip.querySelector('.chip__n').textContent = n ? `(${n})` : '';
+    total += n;
+  });
+  rowReset.hidden = !total;
+}
+
+rowReset.addEventListener('click', e => {
+  e.stopPropagation();
+  Object.keys(ddState).forEach(k => { if (k !== 'sort') ddState[k].clear(); });
+  /* an open dropdown has to drop its ticks with the row */
+  dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(b => {
+    if (b.dataset.key !== 'sort') b.dataset.on = 'false';
+  });
+  syncDdFoot();
+});
+
 /* every Filter V1 chip opens on hover already (click stays for touch);
    a short grace period lets the pointer travel into the dropdown or
    across to the next chip */
@@ -2035,9 +2489,15 @@ if (window.matchMedia('(hover: hover)').matches) {
   const cancelDdClose = () => clearTimeout(ddCloseTimer);
   const scheduleDdClose = () => {
     cancelDdClose();
-    ddCloseTimer = setTimeout(() => { if (ddChip) closeDropdown(); }, 200);
+    ddCloseTimer = setTimeout(() => {
+      /* never yank the dropdown out from under a focused field — the series
+         search would otherwise vanish the moment the pointer drifted off it,
+         mid-word */
+      if (ddChip && !dropdown.contains(document.activeElement)) closeDropdown();
+    }, 200);
   };
-  document.querySelectorAll('.filters--reduced button').forEach(chip => {
+  /* the Reset link lives in the same row but opens nothing */
+  document.querySelectorAll('.filters--reduced button:not(.filters__reset)').forEach(chip => {
     chip.addEventListener('mouseenter', () => {
       cancelDdClose();
       if (ddChip === chip) return;
@@ -2056,11 +2516,25 @@ if (window.matchMedia('(hover: hover)').matches) {
 const dash = document.querySelector('.dash');
 const dashToggle = document.querySelector('.dash-toggle');
 
+/* long-translation check — every chip carries its German label in data-long;
+   swapping them in is how the wrapping in .filters gets reviewed. The label
+   is the button's leading text node, the chevron SVG follows it. */
+const LABEL_BTNS = [...document.querySelectorAll('.results-row [data-long]')];
+LABEL_BTNS.forEach(b => { b.dataset.short = b.firstChild.nodeValue.trim(); });
+function applyLabels(long) {
+  LABEL_BTNS.forEach(b => {
+    b.firstChild.nodeValue = (long ? b.dataset.long : b.dataset.short) + ' ';
+  });
+}
+
 const CONTROLS = {
   view:     ['products', 'content'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
   member:   ['v1', 'v2', 'v3'],
   images:   ['new', 'live'],
+  labels:   ['short', 'long'], /* filter chip labels: EN vs the long German set */
+  serieslist: ['grouped', 'flat'], /* series facet: family accordions vs one list */
+  ddv:      ['v1', 'v2'], /* More dropdown: nested scroll vs one scroll that fits */
   price:    ['a', 'b'],   /* price facet: A = min/max + range, B = bands */
   model:    ['on', 'off'], /* driven from the sheet's own switch; here for deep links */
 };
@@ -2090,6 +2564,11 @@ function setOption(key, val) {
       card.querySelectorAll('.thumb').forEach(t => t.dataset.sel = String(t.dataset.idx === '0'));
     });
   }
+  if (key === 'labels') applyLabels(val === 'long');
+  /* redraw in place if the series dropdown is the one on screen */
+  if (key === 'serieslist' && ddChip === moreToggle) openMoreList();
+  /* the two versions differ in geometry as well as markup — rebuild */
+  if (key === 'ddv') { const was = ddChip === moreToggle; closeDropdown(); if (was) openMoreList(); }
   if (key === 'view') applyView(val);
   if (key === 'model') {
     applyModelView(val === 'on');
