@@ -261,15 +261,24 @@ header {
   background: #fff;
   border: 1px solid var(--c-ink);
   box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  /* JS narrows this to the room beside the chip — see anchorDropdown */
   max-height: min(480px, 60vh);
   display: none; flex-direction: column;
   overflow: hidden; /* nothing can escape past the foot */
+  /* The 4px opening inset lives here, NOT on .dropdown__scroll. Chromium
+     resolves a sticky `top: 0` against the scroller's *content* box, so a
+     padding-top on the scroller parks the sticky group head 4px low and
+     leaves a 4px window for rows to scroll through behind it. Above the
+     scrollport the strip cannot be scrolled into. */
+  padding-top: 4px;
 }
+/* the size grid needs 5 columns of chips — 240px cannot hold them
+   (Figma 1-1275 draws this variant at 367px). Keep DD_WIDTH in step. */
+.dropdown[data-facet="size"] { width: 367px; }
 .dropdown.is-open { display: flex; }
 .dropdown__scroll {
   flex: 1 1 auto; min-height: 0;
   overflow-y: auto;
-  padding: 4px 0 0;
 }
 .dropdown__row {
   display: flex; gap: 12px; align-items: center;
@@ -336,64 +345,93 @@ header {
   width: 14px; height: 14px;
   fill: none; stroke: var(--c-ink); stroke-width: 1.1; pointer-events: none;
 }
-.dd-series {
-  max-height: 280px; overflow-y: auto;
-  /* a wheel inside the list must not scroll the dropdown behind it until
-     the list itself is at its end */
-  overscroll-behavior: contain;
-  scrollbar-width: thin; scrollbar-color: rgba(0,0,0,.25) transparent;
+/* ---- product view switch, head of the More panel (Figma 1-2313) ----
+   The same control as the mobile sheet's, at the desktop size the design
+   gives it: a 36px row on the panel's 12px inset, a 32x18 switch instead of
+   the sheet's 40x22, closed by the panel's own hairline. It is a view
+   control, not a facet, which is what the divider is saying. */
+/* min-height, not height: "Show products on model" needs 187px on one line
+   and a 240px panel leaves it 170px, so it takes two. The design draws it
+   nowrap at this width and simply clips — a fixed 36px here did the same,
+   dropping the second line onto the Fabric row. 10px of padding gives the
+   design's 36px exactly when the label does fit on one line. */
+.dd-pview {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 36px; padding: 10px 12px;
+  border-bottom: 1px solid var(--c-hair);
 }
-.dd-series::-webkit-scrollbar { width: 10px; }
-.dd-series::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,.22);
-  border: 3px solid #fff; /* insets the thumb without a track colour */
-  border-radius: 5px;
+.dd-pview span {
+  flex: 1;
+  font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
 }
-.dd-series::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.4); }
-/* family rows sit at the group-body indent (24px), their lines one step
-   deeper at 36px — the two levels of Figma 1-1272 */
-.dd-item[hidden], .dd-fam__body[hidden] { display: none; }
-.dd-series .dropdown__row--sub { padding-left: 36px; }
-.dd-fam__head .chev {
-  width: 7px; height: 4px; flex: none;
-  fill: none; stroke: var(--c-ink); stroke-width: 1;
-  transition: transform .2s var(--ease-out);
+/* 32x18 with a 14px knob and 2px of travel room, the same proportions as the
+   40x22 original. Doubled-up selector on purpose: the base .switch rules live
+   further down in the drawer's block, so an equal-specificity modifier up
+   here would lose on source order. */
+.switch.switch--sm { width: 32px; height: 18px; }
+.switch.switch--sm i { top: 2px; left: 16px; width: 14px; height: 14px; }
+.switch.switch--sm[aria-checked="false"] i { left: 2px; }
+
+/* ---- size grid (Figma 1-1275) ----
+   Two labelled blocks, 5 across, 8px gutters, 30px rows (the design's 68px
+   two-row box less its 8px gap). Chips are hairline #DDD at rest, the ink
+   outline on hover and solid ink when chosen — border-colour rather than
+   border-width so a selected chip never shifts its neighbours by half a
+   pixel. Labels are Light 12/16, the design's Label/Default/M. */
+.dd-grids { display: flex; flex-direction: column; gap: 16px; padding: 8px 12px 12px; }
+.dd-grid-block { display: flex; flex-direction: column; gap: 12px; }
+.dd-grid__lb {
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 300;
 }
-.dd-fam__head[data-open="true"] .chev { transform: rotate(180deg); }
+.dd-grid {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px; grid-auto-rows: 30px;
+}
+.dd-grid button {
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px;
+  border: .5px solid #DDDDDD; background: transparent; color: var(--c-ink);
+  font-size: 12px; line-height: 16px; letter-spacing: .04em;
+  text-transform: uppercase; font-weight: 300;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.dd-grid button:hover { border-color: var(--c-ink); }
+.dd-grid button[data-on="true"] {
+  background: var(--c-ink); border-color: var(--c-ink); color: #fff;
+}
+
+.dd-item[hidden] { display: none; }
 .dd-srch-empty {
   padding: 10px 12px 14px 24px;
   font-size: 11px; line-height: 14px; font-weight: 300;
   letter-spacing: .04em; color: var(--c-ink-soft);
 }
 
-/* ============================================================
-   MORE DROPDOWN V2 — one scroller instead of two
-   ------------------------------------------------------------
-   V1 nests a 280px series scroller inside the panel's own scroller. The two
-   never scale together: the 280px is fixed while the panel is 60vh, so the
-   shorter the window the more of the panel one list eats (58% at 900px tall,
-   83% at 560px) and the search, the group heads and Reset are what get
-   pushed out of sight. You also see the same 7 of 26 families at every
-   screen height, because the list can't grow.
-   V2 lets the list run at its natural length and makes the panel body the
-   only scroller, so the list takes ALL the space left over. The group head
-   and its search stick to the top of the scroller while you move through the
-   options, which is what the nested box was really there to achieve.
-   ============================================================ */
-body[data-ddv="v2"] .dd-series {
-  max-height: none; overflow: visible;
-}
+/* ---- one scroller, not two ----
+   The series list used to be a 280px scroller nested inside the panel's own
+   scroller. The two never scaled together — the 280px was fixed while the
+   panel was 60vh, so the shorter the window the more of the panel one list
+   ate (58% of it at 900px tall, 83% at 560px) and the search, the group
+   heads and Reset were what got pushed out of sight. It also showed the same
+   7 of 26 rows at every screen height, because the list could not grow.
+   Now the list runs at its natural length and the panel body is the only
+   scroller, so the list takes ALL the space left over. The group head and
+   its search stick to the top of that scroller, which is what the nested box
+   was really there to achieve. */
 /* each head is sticky inside its own group, so it leads its options down and
    then leaves with them — no stack of piled-up headers */
-body[data-ddv="v2"] .dd-group__head {
+.dd-group__head {
   position: sticky; top: 0; z-index: 3;
   background: #fff;
 }
-body[data-ddv="v2"] .dd-group__head:hover,
-body[data-ddv="v2"] .dd-group__head[data-open="true"] { background: var(--c-wash); }
+.dd-group__head:hover,
+.dd-group__head[data-open="true"] { background: var(--c-wash); }
 /* the search sits directly under its head and stays reachable: it filters
-   the list you are scrolling, so it must not scroll away from it */
-body[data-ddv="v2"] .dd-srch {
+   the list you are scrolling, so it must not scroll away from it.
+   Both offsets are measured from the scrollport's top, which is why the
+   panel's 4px opening inset has to live on .dropdown and not here. */
+.dd-srch {
   position: sticky; top: 36px; z-index: 2; /* 36px = the head's row height */
   background: #fff;
 }
@@ -414,7 +452,12 @@ body[data-ddv="v2"] .dd-srch {
   border-top: 1px solid var(--c-line);
   padding: 14px 0 2px;
 }
-.dropdown__foot button { font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase; }
+/* 12px underlined, matching both dropdown nodes and the drawer's own
+   "Reset filters" — the 14px unstyled "Reset" was the odd one out */
+.dropdown__foot button {
+  font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: underline; text-underline-offset: 3px;
+}
 .dropdown__foot button:hover { opacity: .55; }
 
 /* which filter row shows — the dashboard "Filters" control */
@@ -581,9 +624,11 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   font-size: inherit; line-height: 14px; /* matches the regular price at every breakpoint */
   color: var(--c-ink);
 }
-/* member price — its own exploration, the "Member price" dashboard group.
-   Burgundy by default; the "Member colour" toggle swaps the whole run to
-   black. Renumbered into a clean V1–V6 run 2026-07-31.
+/* member price — settled 2026-08-31 on the old V2, the only version left:
+   the price reads as a sentence closing on the crown, "£53.95 FOR MEMBERS ♛".
+   The plain "Member price £x" label (V1) and the price-plus-MEMBER-PRICE-chip
+   (V3) are gone, along with the dashboard group that switched between them.
+   Burgundy, per the 2026-07-31 decision.
 
    ONE spacing token for the whole line: .card__pr is a flex row with its
    own gap:4px, which lands only on .mem's left — so the margin subtracts
@@ -593,9 +638,6 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   margin-left: calc(var(--mem-gap) - 4px);
   color: var(--c-burgundy);
 }
-/* both alternatives are rendered on every member card and CSS picks one, so
-   switching versions costs nothing and needs no re-render */
-.mem-alt, .mem-tag { display: none; }
 
 /* the Triumph crown (Assets/plp/triumph-crown.svg, path copied verbatim so
    it can take currentColor). Sized in em so it tracks the price at both
@@ -614,40 +656,6 @@ body[data-filters="none"] .filters-single { display: inline-flex; }
   margin-left: 5px;
 }
 
-/* V1 — the plain label: "Member price £53.95" */
-
-/* V2 — reads as a sentence, closing on the crown: "£53.95 for members ♛" */
-body[data-member="v2"] .mem-std { display: none; }
-body[data-member="v2"] .mem-alt { display: inline; }
-
-/* V3 — price first, then the outlined MEMBER PRICE chip naming it, so the
-   figure leads and the badge qualifies it. As a flex child the chip is
-   centred on the price without a baseline nudge. */
-body[data-member="v3"] .mem-std { display: none; }
-body[data-member="v3"] .mem-tag { display: inline-flex; align-items: center; gap: var(--mem-gap); }
-.mem-chip {
-  display: inline-block; /* not inline-flex: text-box-trim below only bites on a block container */
-  font-style: normal;
-  font-size: 9px; line-height: 12px; letter-spacing: .06em;
-  text-transform: uppercase;
-  /* the label is all caps, so its ink runs cap-height→baseline and the line
-     box's descender room sat inside the hairline as dead space: measured 3.4px
-     above the caps against 5.0px below, which read as top-heavy. This padding
-     pays the difference back by hand for engines without text-box below. */
-  padding: 2.8px 5px .2px;
-  border: .5px solid currentColor;
-}
-/* the accurate route: trim the line box to the caps and the baseline, so the
-   padding is measured off the ink itself and symmetric = optically centred,
-   whatever the font's ascent and descent happen to be. 4px, not the 4.22px
-   that would hold the old height exactly: whole pixels are the value that
-   still snaps even at every breakpoint and 1x/2x/3x. */
-@supports (text-box: trim-both cap alphabetic) {
-  .mem-chip {
-    text-box: trim-both cap alphabetic;
-    padding: 4px 5px;
-  }
-}
 .cvar__label {
   flex-basis: 100%; /* wraps onto its own line below the price */
   margin-top: 3px;  /* + the row's 4px gap ≈ the old 7px offset */
@@ -842,7 +850,6 @@ body.drawer-open .drawer {
 .opt[data-on="true"] { background: var(--c-wash); }
 .opt[data-on="true"] .opt__tick { opacity: 1; }
 .opt:hover { background: var(--c-wash); }
-.opt--sub { padding-left: calc(var(--sheet-pad) + 20px); }
 
 /* ---- size grids — underbust + cup, 5 across (Figma 1-77 / 1-213) ---- */
 .grids { display: flex; flex-direction: column; gap: 20px; padding: 4px var(--sheet-pad) 24px; }
@@ -932,20 +939,11 @@ body[data-price="b"] .facet--price .pr-b { display: block; }
 .srch input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
 .srch input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--c-ink); }
 .srch svg { position: absolute; right: 14px; top: 15px; width: 14px; height: 14px; fill: none; stroke: var(--c-ink); stroke-width: 1.1; pointer-events: none; }
-.grp__head {
-  width: 100%; height: var(--row-h);
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 var(--sheet-pad) 0 calc(var(--sheet-pad) + 20px);
-  font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
-  text-align: left;
-}
-.grp__head i { font-style: normal; color: var(--c-ink-soft); }
-.grp__head svg { margin-left: auto; width: 10px; height: 6px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; transition: transform .3s var(--ease-out); }
-.grp.is-open > .grp__head svg { transform: rotate(180deg); }
-.grp__body { display: none; }
-.grp.is-open > .grp__body { display: block; }
-.grp__body .opt { padding-left: calc(var(--sheet-pad) + 40px); }
-.grp[hidden] { display: none; }
+/* the series rows — one consecutive list at the sheet's own inset, 11/14 as
+   Title/XXS in Figma 1-1205. The family accordions that used to wrap them
+   (.grp / .grp__head / .grp__body) are gone. */
+.opt--series { font-size: 11px; line-height: 14px; }
+.opt[hidden] { display: none; } /* .opt is a flex row, so [hidden] needs saying */
 .srch-empty { padding: 8px var(--sheet-pad) 16px; font-size: 11px; font-weight: 300; color: var(--c-ink-soft); }
 
 /* ---- footer — sticky, results count in the CTA (Figma note 1-1773) ---- */
@@ -1028,17 +1026,9 @@ body[data-price="b"] .facet--price .pr-b { display: block; }
   .card__info { padding: 10px 4px 0; }
   .card__cat { font-size: 11px; line-height: 16px; }
   .card__pr { margin-top: 2px; font-size: 10px; }
-  /* .card__sale inherits the regular price size (10px here); keep the member
-     gap tighter — V1 only, the other versions set their own spacing */
-  /* one step tighter on the narrow cards — every gap on the line follows */
+  /* .card__sale inherits the regular price size (10px here);
+     one step tighter on the narrow cards — every gap on the line follows */
   .mem { --mem-gap: 6px; }
-  /* and the V3 badge comes down a size so it doesn't dominate the caption —
-     smaller caps, so the centring padding is re-derived for 8px */
-  .mem-chip { font-size: 8px; letter-spacing: .05em; padding: 2.6px 4px .4px; }
-  @supports (text-box: trim-both cap alphabetic) {
-    .mem-chip { padding: 4px; } /* the caps are shorter here, the breathing room
-      around them is the same whole 4px as desktop */
-  }
   .cvar__label { margin-top: 0; font-size: 10px; }
 
   /* the heart sits closer to the corner on small cards */
@@ -1159,7 +1149,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-member="v1" data-images="new" data-labels="short" data-serieslist="grouped" data-ddv="v2" data-price="a" data-model="on">
+<body data-view="products" data-filters="some" data-labels="short" data-images="new" data-price="a" data-model="on">
 
 <!-- HEADER -->
 <header>
@@ -1220,9 +1210,7 @@ body.dash-open .dash { display: flex; }
       <!-- the last word and the count are glued together, so "(36)" never wraps alone -->
       <h2 class="results-title">Blush &amp; Burgundy <span class="nowrap">Collection <span class="count">(36)</span></span></h2>
 
-      <!-- default chips — V1-V5 (Figma 848-5899).
-           data-long = the German label, swapped in by the dashboard's
-           "Filter labels" control so the wrapping can be reviewed -->
+      <!-- default chips — V1-V5 (Figma 848-5899) -->
       <div class="filters filters--full" aria-label="Filter">
         <button data-long="Größe">Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
         <button data-long="Farbe">Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
@@ -1270,7 +1258,7 @@ body.dash-open .dash { display: flex; }
     <!-- product view — pinned above the facets (Figma 1-2313) -->
     <div class="pview">
       <span>Show products on model</span>
-      <button class="switch" id="modelSwitch" role="switch" aria-checked="true" aria-label="Show products on model"><i></i></button>
+      <button class="switch" id="modelSwitch" data-model-switch role="switch" aria-checked="true" aria-label="Show products on model"><i></i></button>
     </div>
     <div id="facets"></div>
   </div>
@@ -1301,43 +1289,18 @@ body.dash-open .dash { display: flex; }
        new line below the price, so there was nothing left to toggle. -->
   <!-- Pricing control removed 2026-07-31: sale + member is the only state,
        so the markdown and member rules are unconditional now. -->
-  <div class="dash__group">
-    <div class="dash__label">Member price</div>
-    <div class="dash__seg">
-      <button data-k="member" data-val="v1" data-on="true" title="Member price £x">V1</button>
-      <button data-k="member" data-val="v2" title="£x for members ♛">V2</button>
-      <button data-k="member" data-val="v3" title="£x + MEMBER PRICE chip">V3</button>
-    </div>
-  </div>
+  <!-- Member price settled 2026-08-31 on the old V2, "£x FOR MEMBERS ♛", and
+       the toggle removed with it: V1's plain label and V3's MEMBER PRICE chip
+       are deleted, not hidden. -->
   <!-- Member colour toggle removed 2026-07-31: burgundy is the answer. -->
   <!-- Sales banner settled 2026-07-30 on the pink badge (the old V1) and the
        toggle removed with it; the badge now shows on every sale card. -->
-  <!-- asked by dev 2026-08-28: what happens to the desktop filter row when a
-       translation is longer than the English label. The chips wrap, still
-       flush right — this swaps in the German set so you can see it. -->
-  <!-- 2026-08-28: V2 answers the short-window review. V1 nests a fixed 280px
-       series scroller inside a 60vh panel that always opens downward; V2 uses
-       one scroller with sticky heads and sizes itself from the room beside
-       the chip, flipping above it when there is more space there.
-       (A third change — handing off to the filter drawer under 420px of
-       space — was built and then dropped on request 2026-08-28.) -->
-  <div class="dash__group">
-    <div class="dash__label">More dropdown</div>
-    <div class="dash__seg">
-      <button data-k="ddv" data-val="v1" title="Nested scroll, 60vh, always opens down">V1</button>
-      <button data-k="ddv" data-val="v2" data-on="true" title="One scroll + sticky heads, sized to the space beside the chip">V2</button>
-    </div>
-  </div>
-  <!-- open question 2026-08-28: the family accordions vs one flat list.
-       Flat drops the "All in <family>" rows, which only mean something
-       inside a hierarchy, and sorts every line alphabetically. -->
-  <div class="dash__group">
-    <div class="dash__label">Series list</div>
-    <div class="dash__seg">
-      <button data-k="serieslist" data-val="grouped" data-on="true" title="Families that expand into their lines">Grouped</button>
-      <button data-k="serieslist" data-val="flat" title="Every line in one alphabetical list">Flat</button>
-    </div>
-  </div>
+  <!-- Settled 2026-08-31: the More dropdown is the single-scroll panel that
+       sizes itself to the space beside the chip (the old nested-scroll V1 is
+       gone) and the series facet is one flat alphabetical list in both the
+       dropdown and the sheet (the family accordions are gone). -->
+  <!-- the long-label check the dev team asked for: the chips wrap flush right
+       whatever the translation, and this swaps in the German set to show it -->
   <div class="dash__group">
     <div class="dash__label">Filter labels</div>
     <div class="dash__seg">
@@ -1462,7 +1425,7 @@ PRODUCTS.forEach((p, i) => {
     </div>
     <div class="card__info">
       <div class="card__cat">${p.cat}</div>
-      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}</span>` : ''}${p.mem ? `<span class="mem"><span class="mem-std">Member price ${p.mem}</span><span class="mem-alt">${p.mem} for members${CROWN}</span><span class="mem-tag"><span class="mem-amt">${p.mem}</span><i class="mem-chip">Member price</i></span></span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
+      <div class="card__pr${p.sale ? ' is-sale' : ''}"><span class="pr-now">${p.pr}</span>${p.sale ? `<span class="card__sale">${p.sale}</span>` : ''}${p.mem ? `<span class="mem">${p.mem} for members${CROWN}</span>` : ''}<button class="cvar__label" data-count="${p.colors}">+ ${p.colors} colors</button></div>
       <div class="panel" role="group" aria-label="Colours">
         <button class="thumb thumb--current" data-photo="${p.ph}" data-idx="0" data-sel="true" aria-label="Selected colour" title="Selected colour">
           <img src="${p.ph}" alt="" loading="lazy" />
@@ -1780,6 +1743,26 @@ const SERIES = SERIES_SRC.map(g => {
   return { n: g.n, c, items: [{ n: `All in ${g.n}`, c, all: true }, ...items] };
 });
 
+/* ---- the one series list both surfaces draw ----
+   Every product line, alphabetical, in a single consecutive list: the
+   desktop dropdown and the mobile sheet share it so they can never disagree
+   about what the catalogue contains. The family accordions the design showed
+   are gone from both (2026-08-31) — a second level of expand-and-collapse
+   cost a tap per selection and hid the row you were aiming at — and the
+   "All in <family>" rows went with them, since they only mean something
+   inside a hierarchy.
+   SERIES_ROWS keeps the pre-filter order because ddState and the drawer both
+   index into it; SERIES_FLAT is what gets drawn. */
+const SERIES_ROWS = [];
+SERIES.forEach(g => {
+  const push = o => SERIES_ROWS.push({ name: o.n, count: o.c, all: !!o.all });
+  g.items ? g.items.forEach(push) : push(g);
+});
+const SERIES_FLAT = SERIES_ROWS
+  .map((o, i) => ({ n: o.name, c: o.count, i, all: o.all }))
+  .filter(o => !o.all)
+  .sort((a, b) => a.n.localeCompare(b.n));
+
 /* the swatch set this page already ships — blush and burgundy lead it */
 const COLOUR_COUNTS = { Black: 8, Burgundy: 12, Red: 6, Pink: 14, Teal: 3 };
 
@@ -1804,9 +1787,12 @@ const FACETS = [
   { key: 'price', label: 'Price', type: 'price', min: 25, max: 65, bands: [
     { n: 'Under £40', c: 6, lo: 25, hi: 40 }, { n: '£40 – £50', c: 12, lo: 40, hi: 50 },
     { n: '£50 – £60', c: 11, lo: 50, hi: 60 }, { n: 'Over £60', c: 7, lo: 60, hi: 65 } ] },
-  { key: 'series', label: 'Series', type: 'series', groups: SERIES },
   { key: 'standards', label: 'Product standards & traceability', type: 'list',
     items: [{ n: 'OEKO-TEX®', c: 21 }, { n: 'Recycled materials', c: 9 }, { n: 'Organic cotton', c: 6 }] },
+  /* Series sits last, in the sheet and in the desktop More dropdown alike:
+     it is the longest facet by an order of magnitude, so anywhere but the end
+     it pushes every other facet below the fold the moment it is opened. */
+  { key: 'series', label: 'Series', type: 'series' },
 ];
 
 /* ============================================================
@@ -1856,17 +1842,13 @@ FACETS.forEach((f, i) => {
       </div>
       <div class="pr-b">${f.bands.map(b => optRow(b, false)).join('')}</div>`;
   } else if (f.type === 'series') {
+    /* one consecutive list, same rows as the desktop dropdown (Figma 1-1205) */
     inner = `
       <div class="srch">
         <input type="search" placeholder="Search series" aria-label="Search series" />
         <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.6"/><path d="M9.4 9.4 13 13"/></svg>
       </div>
-      ${f.groups.map(g => g.items ? `
-        <div class="grp">
-          <button class="grp__head">${g.n}${cnt(g.c)}${CHEV}</button>
-          <div class="grp__body">${g.items.map(o => optRow(o, false)).join('')}</div>
-        </div>` : `
-        <div class="grp">${optRow(g, false, ' opt--sub')}</div>`).join('')}
+      ${SERIES_FLAT.map(o => optRow({ n: o.n, c: o.c }, false, ' opt--series')).join('')}
       <div class="srch-empty" hidden>No series match that search.</div>`;
   }
 
@@ -1890,8 +1872,7 @@ FACETS.forEach((f, i) => {
     facet.classList.toggle('is-open', !open);
   });
 
-  /* option rows and chips — Sort by is a radio, everything else toggles.
-     Inside Series, "All <family>" and its lines are mutually exclusive. */
+  /* option rows and chips — Sort by is a radio, everything else toggles */
   facet.addEventListener('click', e => {
     const btn = e.target.closest('.opt, .chips button, .col');
     if (!btn || !facet.contains(btn)) return;
@@ -1903,31 +1884,24 @@ FACETS.forEach((f, i) => {
       /* option B is one band at a time */
       facet.querySelectorAll('.pr-b .opt').forEach(b => b.dataset.on = 'false');
       btn.dataset.on = String(!wasOn);
-    } else if (f.type === 'series' && btn.classList.contains('opt')) {
-      const grp = btn.closest('.grp');
-      const isAll = btn.dataset.all === 'true';
-      grp.querySelectorAll(isAll ? '.opt:not([data-all])' : '.opt[data-all]').forEach(b => b.dataset.on = 'false');
-      btn.dataset.on = String(!wasOn);
     } else {
       btn.dataset.on = String(!wasOn);
     }
     sync();
   });
 
-  /* series: group accordions + live search over family and line names */
+  /* series: live search straight over the one list — no accordions left to
+     open, so a match is simply shown and everything else hidden */
   if (f.type === 'series') {
-    facet.querySelectorAll('.grp__head').forEach(h => {
-      h.addEventListener('click', () => h.closest('.grp').classList.toggle('is-open'));
-    });
     const input = facet.querySelector('.srch input');
     const empty = facet.querySelector('.srch-empty');
     input.addEventListener('input', () => {
       const q = input.value.trim().toLowerCase();
       let hits = 0;
-      facet.querySelectorAll('.grp').forEach(g => {
-        const hit = !q || g.textContent.toLowerCase().includes(q);
-        g.hidden = !hit;
-        if (hit) { hits++; if (q) g.classList.add('is-open'); }
+      facet.querySelectorAll('.opt--series').forEach(o => {
+        const hit = !q || o.textContent.toLowerCase().includes(q);
+        o.hidden = !hit;
+        if (hit) hits++;
       });
       empty.hidden = hits > 0;
     });
@@ -2038,9 +2012,8 @@ clearBtn.addEventListener('click', () => {
       el._price.rLo.value = f.min; el._price.rHi.value = f.max; el._price.paint();
     }
     if (f.type === 'series') {
-      const input = el.querySelector('.srch input');
-      input.value = '';
-      el.querySelectorAll('.grp').forEach(g => { g.hidden = false; g.classList.remove('is-open'); });
+      el.querySelector('.srch input').value = '';
+      el.querySelectorAll('.opt--series').forEach(o => o.hidden = false);
       el.querySelector('.srch-empty').hidden = true;
     }
   });
@@ -2124,7 +2097,7 @@ sync();
    FILTER V1 — chip dropdowns (Figma 931-26774) + More dropdown
    ============================================================ */
 const DD_ITEMS = {
-  size: ['70A', '70B', '75A', '75B', '75C', '80B', '80C', '85B'],
+  size: [], /* filled from SIZE_GRIDS below — underbust then cup */
   colour: [
     { name: 'Red',   c: '#C1003F' }, { name: 'Blue',  c: '#3B82F6' },
     { name: 'Green', c: '#10B981' }, { name: 'Black', c: '#000000' },
@@ -2138,26 +2111,18 @@ const DD_ITEMS = {
   sort: ['Newest', 'Price (low – high)', 'Price (high – low)', 'Bestsellers'],
 };
 
-/* The series tree flattened to its selectable rows. ddState indexes into
-   this flat list, so ticking and Reset behave exactly like any other facet
-   even though the rows are drawn two levels deep. */
-const SERIES_ROWS = [];
-const SERIES_TREE = SERIES.map(g => {
-  const push = o => (SERIES_ROWS.push({ name: o.n, count: o.c, all: !!o.all }), SERIES_ROWS.length - 1);
-  /* a family with no lines is one selectable row (Figma: "Aura Spotlight") */
-  if (!g.items) return { n: g.n, c: g.c, i: push(g) };
-  return { n: g.n, c: g.c, lines: g.items.map(o => ({ ...o, i: push(o) })) };
-});
-DD_ITEMS.series = SERIES_ROWS;
+/* Size is a grid, not a list (Figma 1-1275 "Size grid"): two labelled 5-across
+   blocks, underbust then cup. Both read from the drawer's own size facet so
+   there is one set of sizes in the file, and both flatten into DD_ITEMS.size
+   so ticking, Reset and the chip count work like any other facet. */
+const SIZE_GRIDS = FACETS.find(f => f.key === 'size').grids.map(g => ({
+  label: g.label,
+  items: g.items.map(([s]) => ({ s, i: DD_ITEMS.size.push(s) - 1 })),
+}));
 
-/* The flat alternative to the family accordions: every product line as one
-   alphabetical list, no families and no "All in <family>" rows (which mean
-   nothing once the hierarchy is gone). Indices are the SERIES_ROWS ones, so
-   switching between the two views keeps whatever was already ticked. */
-const SERIES_FLAT = SERIES_ROWS
-  .map((o, i) => ({ n: o.name, c: o.count, i, all: o.all }))
-  .filter(o => !o.all)
-  .sort((a, b) => a.n.localeCompare(b.n));
+/* ddState indexes into SERIES_ROWS (built with the facet data further up), so
+   ticking and Reset behave exactly like any other facet */
+DD_ITEMS.series = SERIES_ROWS;
 
 const ddState = { sort: new Set([0]) }; /* per facet: selected indices */
 
@@ -2167,50 +2132,45 @@ dropdown.className = 'dropdown';
 resultsRow.appendChild(dropdown);
 let ddChip = null;
 
-/* ---- V2 geometry ----
-   V1 sizes the panel from the viewport (max-height: min(480px, 60vh)) and
-   always opens downward, so how much of it you can see depends on where the
-   reader happened to stop scrolling. Measured at the page top: 57% of the
-   panel below the fold at 900px tall, 89% at 740px, all of it at 650px.
-   V2 sizes it from the space actually available beside the chip and flips
-   above when there is more room there, so it can't overflow the fold. */
-const V2_GAP = 8;      /* chip → panel */
-const V2_MARGIN = 16;  /* panel → viewport edge */
+/* ---- panel geometry ----
+   Sized from the space actually available beside the chip, not from the
+   viewport, and flipped above the chip when there is more room there — so
+   the panel can never overflow the fold. The earlier version took
+   max-height: min(480px, 60vh) and always opened downward, which left
+   273-344px of it below the fold whenever the chip sat low in the window. */
+const DD_GAP = 8;      /* chip → panel */
+const DD_MARGIN = 16;  /* panel → viewport edge */
+/* per-facet panel width — the size grid needs 367px for its 5 columns
+   (Figma 1-1275), everything else is the standard 240px chip dropdown */
+const DD_WIDTH = { size: 367 };
+const ddWidth = () => DD_WIDTH[dropdown.dataset.facet] || 240;
 
 const ddSpace = chip => {
   const r = chip.getBoundingClientRect();
   return {
-    below: innerHeight - r.bottom - V2_GAP - V2_MARGIN,
-    above: r.top - V2_GAP - V2_MARGIN,
+    below: innerHeight - r.bottom - DD_GAP - DD_MARGIN,
+    above: r.top - DD_GAP - DD_MARGIN,
   };
 };
 
-/* sits below the anchor chip, kept inside the row */
 function anchorDropdown(chip) {
   const rowRect = resultsRow.getBoundingClientRect();
   const r = chip.getBoundingClientRect();
-  dropdown.style.left = Math.min(r.left - rowRect.left, resultsRow.clientWidth - 240 - 24) + 'px';
+  dropdown.style.left = Math.min(r.left - rowRect.left, resultsRow.clientWidth - ddWidth() - 24) + 'px';
 
-  if (body.dataset.ddv === 'v2') {
-    const { below, above } = ddSpace(chip);
-    /* only flip when it buys real room — a flip for 20px is just a jump */
-    const flip = above > below + 80;
-    const space = Math.max(120, flip ? above : below);
-    if (flip) {
-      dropdown.style.top = 'auto';
-      dropdown.style.bottom = (rowRect.bottom - r.top + V2_GAP) + 'px';
-    } else {
-      dropdown.style.bottom = 'auto';
-      dropdown.style.top = (r.bottom - rowRect.top + V2_GAP) + 'px';
-    }
-    dropdown.style.maxHeight = Math.min(space, 560) + 'px';
-    dropdown.dataset.flip = String(flip);
+  const { below, above } = ddSpace(chip);
+  /* only flip when it buys real room — a flip for 20px is just a jump */
+  const flip = above > below + 80;
+  const space = Math.max(120, flip ? above : below);
+  if (flip) {
+    dropdown.style.top = 'auto';
+    dropdown.style.bottom = (rowRect.bottom - r.top + DD_GAP) + 'px';
   } else {
     dropdown.style.bottom = 'auto';
-    dropdown.style.maxHeight = '';
-    delete dropdown.dataset.flip;
-    dropdown.style.top = (r.bottom - rowRect.top + 8) + 'px';
+    dropdown.style.top = (r.bottom - rowRect.top + DD_GAP) + 'px';
   }
+  dropdown.style.maxHeight = Math.min(space, 560) + 'px';
+  dropdown.dataset.flip = String(flip);
   dropdown.classList.add('is-open');
   ddChip = chip;
 }
@@ -2231,9 +2191,28 @@ function optionRowsHTML(key) {
 }
 
 /* ---- Series (Figma 1-1272) ----
-   A search pinned above the list, then the families: those with lines are
-   accordions ("All in <family>" plus each line), those without are plain
-   rows. The list is its own scroller — see .dd-series. */
+   A search pinned above one flat alphabetical list of every product line.
+   The family accordions the design showed were dropped on 2026-08-31: a
+   second level of expand-and-collapse inside a 240px panel cost a click per
+   selection and hid the thing you were looking for, and with a search over
+   the whole catalogue the hierarchy earned nothing. "All in <family>" went
+   with them — it only means something inside a hierarchy. */
+/* ---- Size (Figma 1-1275 "Size grid") ----
+   Not a list of made-up 70A/75B combinations but the real two-axis picker:
+   underbust and cup chosen separately, 5 across, the way the drawer and the
+   PDP already ask for a size. The panel widens to 367px for it — a 5-column
+   grid of 60px chips cannot live in 240px. No counts on the chips: the
+   design deliberately keeps numbers off the size grid. */
+function sizeGridHTML() {
+  const sel = ddState.size || (ddState.size = new Set());
+  return `<div class="dd-grids">` + SIZE_GRIDS.map(g => `
+    <div class="dd-grid-block">
+      <div class="dd-grid__lb">${g.label}</div>
+      <div class="dd-grid">${g.items.map(o =>
+        `<button data-key="size" data-i="${o.i}" data-on="${sel.has(o.i)}">${o.s}</button>`).join('')}</div>
+    </div>`).join('') + `</div>`;
+}
+
 function seriesGroupHTML() {
   const sel = ddState.series || (ddState.series = new Set());
   /* Names like "Signature Sheer Minimizer" wrap inside 240px, and the count
@@ -2245,22 +2224,12 @@ function seriesGroupHTML() {
     const tail = cut === -1 ? n : n.slice(cut + 1);
     return `${head}<span class="nw">${tail} <span class="cnt">(${c})</span></span>`;
   };
-  const row = (o, cls) =>
-    `<button class="dropdown__row${cls}" data-key="series" data-i="${o.i}"
-       data-on="${sel.has(o.i)}"${o.all ? ' data-all="true"' : ''}>
+  const row = o =>
+    `<button class="dropdown__row dd-item" data-key="series" data-i="${o.i}"
+       data-on="${sel.has(o.i)}">
        <span class="lbl">${label(o.n, o.c)}</span>
        <svg class="tick" viewBox="0 0 16 16"><path d="M2.5 8.5 6.5 12.5 13.5 4"/></svg></button>`;
-  /* two views of the same catalogue — the dashboard's "Series list" control */
-  const list = body.dataset.serieslist === 'flat'
-    ? SERIES_FLAT.map(o => row(o, ' dd-item')).join('')
-    : SERIES_TREE.map(g => g.lines ? `
-        <div class="dd-fam dd-item">
-          <button class="dd-fam__head dropdown__row">
-            <span class="lbl">${label(g.n, g.c)}</span>
-            <svg class="chev" viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
-          <div class="dd-fam__body" hidden>${g.lines.map(o => row(o, ' dropdown__row--sub')).join('')}</div>
-        </div>` : `
-        <div class="dd-fam dd-item">${row(g, '')}</div>`).join('');
+  const list = SERIES_FLAT.map(row).join('');
   return `
     <div class="dd-srch">
       <input type="search" placeholder="Search series" aria-label="Search series" />
@@ -2273,33 +2242,15 @@ function seriesGroupHTML() {
 function bindSeriesGroup() {
   const scroller = dropdown.querySelector('.dd-series');
   if (!scroller) return;
-  scroller.querySelectorAll('.dd-fam__head').forEach(head => {
-    head.addEventListener('click', () => {
-      const famBody = head.nextElementSibling;
-      const open = famBody.hidden;
-      famBody.hidden = !open;
-      head.dataset.open = String(open);
-    });
-  });
   const input = dropdown.querySelector('.dd-srch input');
   const empty = dropdown.querySelector('.dd-srch-empty');
   input.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
     let hits = 0;
-    /* .dd-item is a family in the grouped view and a single line in the flat
-       one, so the same filter serves both */
     scroller.querySelectorAll('.dd-item').forEach(item => {
       const hit = !q || item.textContent.toLowerCase().includes(q);
       item.hidden = !hit;
-      if (!hit) return;
-      hits++;
-      /* a match on a line is useless if the family stays shut, so searching
-         expands what it matched — and clearing the field folds it all back */
-      const famBody = item.querySelector('.dd-fam__body');
-      if (famBody) {
-        famBody.hidden = !q;
-        item.querySelector('.dd-fam__head').dataset.open = String(!!q);
-      }
+      if (hit) hits++;
     });
     empty.hidden = hits > 0;
     scroller.scrollTop = 0;
@@ -2307,7 +2258,9 @@ function bindSeriesGroup() {
 }
 
 function bindOptionRows() {
-  dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(rowBtn => {
+  /* [data-key][data-i] rather than .dropdown__row — the size grid's chips
+     carry the same contract without being list rows */
+  dropdown.querySelectorAll('[data-key][data-i]').forEach(rowBtn => {
     rowBtn.addEventListener('click', () => {
       const key = rowBtn.dataset.key;
       const sel = ddState[key];
@@ -2317,14 +2270,6 @@ function bindOptionRows() {
         dropdown.querySelectorAll('.dropdown__row[data-key="sort"]').forEach(b => b.dataset.on = 'false');
         rowBtn.dataset.on = 'true';
         return;
-      }
-      /* inside a family, "All in <family>" and its individual lines are
-         mutually exclusive — same rule as the drawer (Figma note 1-1782) */
-      if (key === 'series' && rowBtn.closest('.dd-fam')) {
-        const isAll = rowBtn.dataset.all === 'true';
-        rowBtn.closest('.dd-fam')
-          .querySelectorAll(isAll ? '.dropdown__row[data-i]:not([data-all])' : '.dropdown__row[data-all]')
-          .forEach(b => { b.dataset.on = 'false'; sel.delete(+b.dataset.i); });
       }
       sel.has(i) ? sel.delete(i) : sel.add(i);
       rowBtn.dataset.on = String(sel.has(i));
@@ -2338,7 +2283,7 @@ function bindOptionRows() {
 let ddKeys = [];
 const FOOT_HTML = `
   <div class="dropdown__foot" hidden>
-    <div class="dropdown__actions"><button class="dd-reset">Reset</button></div>
+    <div class="dropdown__actions"><button class="dd-reset">Reset filters</button></div>
   </div>`;
 
 /* Reset exists only once there is something to reset. Sort is a single
@@ -2358,7 +2303,7 @@ function bindFoot(keys) {
   ddKeys = keys;
   dropdown.querySelector('.dd-reset').addEventListener('click', () => {
     keys.forEach(k => ddState[k] && ddState[k].clear());
-    dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(b => b.dataset.on = 'false');
+    dropdown.querySelectorAll('[data-key][data-i]').forEach(b => b.dataset.on = 'false');
     /* the series query is part of the facet's state — a Reset that left a
        search term in place would look like it had missed most of the list */
     const srch = dropdown.querySelector('.dd-srch input');
@@ -2371,7 +2316,9 @@ function bindFoot(keys) {
 function openDropdown(chip, key = chip.dataset.f) {
   /* no Save: every tick applies immediately, so the dropdown closes by
      clicking away or re-clicking its chip */
-  dropdown.innerHTML = `<div class="dropdown__scroll">${optionRowsHTML(key)}</div>` + FOOT_HTML;
+  const inner = key === 'size' ? sizeGridHTML() : optionRowsHTML(key);
+  dropdown.dataset.facet = key; /* drives the panel width — see DD_WIDTH */
+  dropdown.innerHTML = `<div class="dropdown__scroll">${inner}</div>` + FOOT_HTML;
   anchorDropdown(chip);
   bindOptionRows();
   bindFoot([key]);
@@ -2398,21 +2345,36 @@ document.addEventListener('click', e => {
 
 /* "More" lists the remaining filters in ONE dropdown; each expands
    its options in place (accordion), no separate view */
+/* Series last, matching the sheet's facet order: it is the only group long
+   enough to need its own scroll, so anywhere but the end it pushes the other
+   groups out of view the moment it opens. */
 const MORE_FILTERS = [
   { key: 'fabric',    label: 'Fabric' },
   { key: 'price',     label: 'Price' },
-  { key: 'series',    label: 'Series' },
   { key: 'standards', label: 'Standards' },
+  { key: 'series',    label: 'Series' },
 ];
 const moreToggle = document.querySelector('.more-toggle');
 
 function openMoreList() {
-  dropdown.innerHTML = `<div class="dropdown__scroll">` + MORE_FILTERS.map(f => `
+  /* the product-view switch heads the panel, as it heads the mobile sheet
+     (Figma 1-2313, "Desktop, 240 FILL"). It is a view control rather than a
+     filter, so it sits above the divider and outside MORE_FILTERS — Reset
+     must not clear it. */
+  const pview = `
+    <div class="dd-pview">
+      <span>Show products on model</span>
+      <button class="switch switch--sm" data-model-switch role="switch"
+        aria-checked="${body.dataset.model === 'on'}"
+        aria-label="Show products on model"><i></i></button>
+    </div>`;
+  dropdown.innerHTML = `<div class="dropdown__scroll">` + pview + MORE_FILTERS.map(f => `
     <div class="dd-group">
       <button class="dd-group__head"><span class="lbl">${f.label}</span>
         <svg class="chev" viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
       <div class="dd-group__body" hidden>${f.key === 'series' ? seriesGroupHTML() : optionRowsHTML(f.key)}</div>
     </div>`).join('') + `</div>` + FOOT_HTML;
+  dropdown.dataset.facet = 'more';
   anchorDropdown(moreToggle);
   bindOptionRows();
   bindSeriesGroup();
@@ -2426,11 +2388,15 @@ function openMoreList() {
       dropdown.querySelectorAll('.dd-group__head').forEach(h => h.dataset.open = 'false');
       grpBody.hidden = !willOpen;
       head.dataset.open = String(willOpen);
-      /* V2 measures its height from the chip, and an accordion changes how
-         much there is to show — re-anchor so the panel keeps hugging the
-         available space instead of holding a stale max-height */
-      if (body.dataset.ddv === 'v2') anchorDropdown(moreToggle);
+      /* the panel measures its height from the chip, and opening a group
+         changes how much there is to show — re-anchor so it keeps hugging
+         the available space instead of holding a stale max-height */
+      anchorDropdown(moreToggle);
     });
+  });
+  dropdown.querySelector('.dd-pview .switch').addEventListener('click', e => {
+    e.stopPropagation();
+    setOption('model', body.dataset.model === 'on' ? 'off' : 'on');
   });
 }
 moreToggle.addEventListener('click', e => {
@@ -2475,7 +2441,7 @@ rowReset.addEventListener('click', e => {
   e.stopPropagation();
   Object.keys(ddState).forEach(k => { if (k !== 'sort') ddState[k].clear(); });
   /* an open dropdown has to drop its ticks with the row */
-  dropdown.querySelectorAll('.dropdown__row[data-i]').forEach(b => {
+  dropdown.querySelectorAll('[data-key][data-i]').forEach(b => {
     if (b.dataset.key !== 'sort') b.dataset.on = 'false';
   });
   syncDdFoot();
@@ -2516,9 +2482,10 @@ if (window.matchMedia('(hover: hover)').matches) {
 const dash = document.querySelector('.dash');
 const dashToggle = document.querySelector('.dash-toggle');
 
-/* long-translation check — every chip carries its German label in data-long;
-   swapping them in is how the wrapping in .filters gets reviewed. The label
-   is the button's leading text node, the chevron SVG follows it. */
+/* the long-translation check — every chip carries its German label in
+   data-long, and swapping them in is how the wrapping in .filters gets
+   reviewed. The label is the button's leading text node, the chevron
+   SVG follows it, so only that node is rewritten. */
 const LABEL_BTNS = [...document.querySelectorAll('.results-row [data-long]')];
 LABEL_BTNS.forEach(b => { b.dataset.short = b.firstChild.nodeValue.trim(); });
 function applyLabels(long) {
@@ -2530,11 +2497,8 @@ function applyLabels(long) {
 const CONTROLS = {
   view:     ['products', 'content'],
   filters:  ['all', 'some', 'none'], /* all/none hidden in the panel but kept for deep links */
-  member:   ['v1', 'v2', 'v3'],
-  images:   ['new', 'live'],
   labels:   ['short', 'long'], /* filter chip labels: EN vs the long German set */
-  serieslist: ['grouped', 'flat'], /* series facet: family accordions vs one list */
-  ddv:      ['v1', 'v2'], /* More dropdown: nested scroll vs one scroll that fits */
+  images:   ['new', 'live'],
   price:    ['a', 'b'],   /* price facet: A = min/max + range, B = bands */
   model:    ['on', 'off'], /* driven from the sheet's own switch; here for deep links */
 };
@@ -2565,14 +2529,13 @@ function setOption(key, val) {
     });
   }
   if (key === 'labels') applyLabels(val === 'long');
-  /* redraw in place if the series dropdown is the one on screen */
-  if (key === 'serieslist' && ddChip === moreToggle) openMoreList();
-  /* the two versions differ in geometry as well as markup — rebuild */
-  if (key === 'ddv') { const was = ddChip === moreToggle; closeDropdown(); if (was) openMoreList(); }
   if (key === 'view') applyView(val);
   if (key === 'model') {
     applyModelView(val === 'on');
-    modelSwitch.setAttribute('aria-checked', String(val === 'on'));
+    /* the sheet's switch and the More dropdown's are the same control in two
+       places — whichever was flipped, both have to read the new state */
+    document.querySelectorAll('[data-model-switch]')
+      .forEach(s => s.setAttribute('aria-checked', String(val === 'on')));
   }
   /* the images swap rebuilds every tile, so re-assert the product view */
   if (key === 'images' && body.dataset.model === 'off') applyModelView(false);
