@@ -347,11 +347,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .dash button{border:1px solid rgba(255,255,255,.3);padding:var(--space-6) var(--space-8);font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
 /* below 992 the sticky Checkout bar owns the bottom of the screen — the switcher
    is a prototype affordance and must never sit on top of the primary CTA */
-@media (max-width:991px){ .dash{bottom:calc(var(--space-16) + 104px)} }
+@media (max-width:991px){ .dash{bottom:calc(var(--space-16) + 80px)} }
 .dash__hide{position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;
   background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-8) var(--space-10);
   font-size:10px;letter-spacing:.08em;text-transform:uppercase}
-@media (max-width:991px){ .dash__hide{bottom:calc(var(--space-16) + 104px)} }
+@media (max-width:991px){ .dash__hide{bottom:calc(var(--space-16) + 80px)} }
 .dash button[aria-pressed="true"]{background:var(--c-on-dark);color:var(--c-ink);border-color:var(--c-on-dark)}
 
 /* ---------------- responsive ---------------- */
@@ -396,6 +396,24 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   .sizesel select{height:var(--control-44)}
+  /* The cross-sell scrolls sideways instead of wrapping. It bleeds out to both screen
+     edges and pads back in, so the first card still lines up with the text column while
+     the card the edge lands on is clipped — that cut is the only affordance saying there
+     is more (Amelie, 2026-09-10). --per is how many cards fill the viewport, the fraction
+     being the sliver that gets cut; the 220 cap keeps the card at the width the bag's own
+     packshot uses, so above ~560 the cards stop growing and the strip simply stops
+     overflowing once all three fit. */
+  .addon__grid{--per:2.25;flex-wrap:nowrap;gap:var(--space-16);
+    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;scroll-padding-inline-start:var(--space-16);
+    margin-inline:calc(var(--space-16) * -1);padding-inline:var(--space-16);
+    scrollbar-width:none}
+  .addon__grid::-webkit-scrollbar{display:none}
+  /* grow 1 / shrink 0: where all three fit they share the row out to 260, and where
+     they do not there is no free space to grow into, so the overflow — and the cut —
+     survives. Shrink must stay 0 or the cards would compress to fit and never cut. */
+  .acard{width:min(calc((100% - var(--space-16) * 2) / var(--per)), 220px);
+    flex:1 0 auto;max-width:260px;scroll-snap-align:start}
   /* the sticky bar carries the primary CTA, so the summary must not repeat it —
      one Checkout button per screen (this is finding F17 in the audit) */
   .sum__cta > .btn{display:none}
@@ -403,16 +421,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* sticky checkout bar */
   .mbar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--c-bg);
     border-top:1px solid var(--c-hair);padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom))}
-  .mbar__top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
 }
-@media (max-width:575px){
-  /* at phone width the add-on row cannot hold image + name + price + button on one
-     line, so the button drops to its own full-width line */
-  .addon__grid{gap:var(--space-20)}
-  .acard{width:calc(50% - var(--space-10))}
-  .addon__body{flex:1 1 auto;min-width:0}
 
-}
 </style>
 </head>
 <body data-member="false" data-empty="false">
@@ -601,11 +611,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 <!-- mobile sticky checkout bar -->
 <div class="mbar" id="mbar">
-  <div class="mbar__top">
-    <span class="t-body-m">Total <span class="muted t-body-s" data-count>0 items</span></span>
-    <span class="grand__num" data-total>€0.00</span>
-  </div>
-  <a class="btn btn--wide" href="./checkout.html">Checkout</a>
+  <!-- the total rides in the CTA, the same shape the checkout's pay bar uses; the item
+       count is already in the page title, so the bar does not repeat it -->
+  <a class="btn btn--wide" href="./checkout.html">Checkout · <span data-total>€0.00</span></a>
 </div>
 
 <div class="dash" id="dash">
