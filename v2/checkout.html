@@ -272,6 +272,8 @@ body{background-image:none}
 .field.is-error .field__frame{border-color:var(--hair-error)}
 .field.is-error:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float) .field__frame{
   border-color:var(--hair-edge)}
+.field.is-error input ~ .field__label,
+.field.is-error select ~ .field__label,
 .field.is-error .field__label,
 .field.is-error input,.field.is-error select{color:var(--color-error)}
 .field.is-error .field__hint{display:none}
@@ -410,9 +412,9 @@ body[data-mode="steps"][data-step="1"] .ck__form{padding:var(--space-64) var(--s
 body[data-mode="steps"][data-step="1"] .ck__railcol,
 body[data-mode="steps"][data-step="1"] .msum{display:none}
 /* three selects sharing the full form column made Month 440px wide */
-.grid--dob{grid-template-columns:96px minmax(0,1fr) 120px;max-width:420px}
+.field--dob{max-width:240px}
 @media (max-width:575px){ .gate__doors{grid-template-columns:1fr} }
-@media (max-width:575px){ .grid--dob{grid-template-columns:80px minmax(0,1fr) 96px;max-width:none} }
+@media (max-width:575px){ .field--dob{max-width:none} }
 
 /* ============================================================
    STEPPED CHECKOUT (mode = steps)
@@ -845,144 +847,17 @@ body[data-mode="steps"] .place.is-last{display:block}
             </label>
           </div>
 
-          <div>
-            <div class="grid grid--dob">
-              <label class="field">
-                <select id="regDay" required><option value="" selected disabled hidden></option>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-                <option>04</option>
-                <option>05</option>
-                <option>06</option>
-                <option>07</option>
-                <option>08</option>
-                <option>09</option>
-                <option>10</option>
-                <option>11</option>
-                <option>12</option>
-                <option>13</option>
-                <option>14</option>
-                <option>15</option>
-                <option>16</option>
-                <option>17</option>
-                <option>18</option>
-                <option>19</option>
-                <option>20</option>
-                <option>21</option>
-                <option>22</option>
-                <option>23</option>
-                <option>24</option>
-                <option>25</option>
-                <option>26</option>
-                <option>27</option>
-                <option>28</option>
-                <option>29</option>
-                <option>30</option>
-                <option>31</option>
-                </select>
-                <fieldset class="field__frame"><legend><span>Day</span></legend></fieldset>
-                <span class="field__label">Day</span>
-                <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
-              </label>
-              <label class="field">
-                <select id="regMonth" required><option value="" selected disabled hidden></option>
-                <option>January</option>
-                <option>February</option>
-                <option>March</option>
-                <option>April</option>
-                <option>May</option>
-                <option>June</option>
-                <option>July</option>
-                <option>August</option>
-                <option>September</option>
-                <option>October</option>
-                <option>November</option>
-                <option>December</option>
-                </select>
-                <fieldset class="field__frame"><legend><span>Month</span></legend></fieldset>
-                <span class="field__label">Month</span>
-                <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
-              </label>
-              <label class="field">
-                <select id="regYear" required><option value="" selected disabled hidden></option>
-                <option>2008</option>
-                <option>2007</option>
-                <option>2006</option>
-                <option>2005</option>
-                <option>2004</option>
-                <option>2003</option>
-                <option>2002</option>
-                <option>2001</option>
-                <option>2000</option>
-                <option>1999</option>
-                <option>1998</option>
-                <option>1997</option>
-                <option>1996</option>
-                <option>1995</option>
-                <option>1994</option>
-                <option>1993</option>
-                <option>1992</option>
-                <option>1991</option>
-                <option>1990</option>
-                <option>1989</option>
-                <option>1988</option>
-                <option>1987</option>
-                <option>1986</option>
-                <option>1985</option>
-                <option>1984</option>
-                <option>1983</option>
-                <option>1982</option>
-                <option>1981</option>
-                <option>1980</option>
-                <option>1979</option>
-                <option>1978</option>
-                <option>1977</option>
-                <option>1976</option>
-                <option>1975</option>
-                <option>1974</option>
-                <option>1973</option>
-                <option>1972</option>
-                <option>1971</option>
-                <option>1970</option>
-                <option>1969</option>
-                <option>1968</option>
-                <option>1967</option>
-                <option>1966</option>
-                <option>1965</option>
-                <option>1964</option>
-                <option>1963</option>
-                <option>1962</option>
-                <option>1961</option>
-                <option>1960</option>
-                <option>1959</option>
-                <option>1958</option>
-                <option>1957</option>
-                <option>1956</option>
-                <option>1955</option>
-                <option>1954</option>
-                <option>1953</option>
-                <option>1952</option>
-                <option>1951</option>
-                <option>1950</option>
-                <option>1949</option>
-                <option>1948</option>
-                <option>1947</option>
-                <option>1946</option>
-                <option>1945</option>
-                <option>1944</option>
-                <option>1943</option>
-                <option>1942</option>
-                <option>1941</option>
-                <option>1940</option>
-                </select>
-                <fieldset class="field__frame"><legend><span>Year</span></legend></fieldset>
-                <span class="field__label">Year</span>
-                <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
-              </label>
-            </div>
-            <p class="t-body-s muted" style="margin-top:var(--space-8)">Date of birth — so we can send you a birthday reward.</p>
-          </div>
+          <!-- One field with a DD / MM / YYYY mask, not three selects (Amelie, 2026-09-10).
+               The label stays in the notch the way the selects' did, and the format lives in
+               the placeholder. -->
+          <label class="field field--float field--dob" data-validate="dob">
+            <input type="text" id="regDob" inputmode="numeric" autocomplete="bday"
+                   placeholder="DD / MM / YYYY" maxlength="14" />
+            <fieldset class="field__frame"><legend><span>Date of birth</span></legend></fieldset>
+            <span class="field__label">Date of birth</span>
+            <span class="field__hint">So we can send you a birthday reward.</span>
+            <span class="field__err t-body-xs">Please enter a real date.</span>
+          </label>
 
           <label class="field" data-validate="email">
             <input type="email" id="regEmail" placeholder=" " autocomplete="email" />
@@ -1819,13 +1694,96 @@ body[data-mode="steps"] .place.is-last{display:block}
     $(cb.dataset.toggleTarget).hidden = !cb.checked;
   }));
 
+  /* ------------------------------------------------------------------
+     Date of birth: ONE field, masked DD / MM / YYYY
+     The eight digits are the model and the slashes are painted, so the caret is
+     managed in "digit space" — type two digits and it is already in the month,
+     backspace crosses a separator in a single press, and pasting 12.05.1990 or
+     12/05/1990 works. Three selects asked for one fact in three controls, and the
+     live site pre-filled them to 01 January 2008 (finding F4).
+     ------------------------------------------------------------------ */
+  const dobDigits = str => str.replace(/\D/g, '').slice(0, 8);
+  /* `trailing` paints the separator as soon as a segment is full, so finishing the day
+     puts the caret visibly into the month rather than waiting for its first digit. Only
+     insertions ask for it — on a delete it would grow back the separator you just removed. */
+  const dobPaint  = (d, trailing) => {
+    let out = [d.slice(0, 2), d.slice(2, 4), d.slice(4, 8)].filter(Boolean).join(' / ');
+    if (trailing && (d.length === 2 || d.length === 4)) out += ' / ';
+    return out;
+  };
+  // a real calendar date, not just eight digits: 31/02 and 00/13 are out, and so is
+  // a year outside 1900..this year
+  function realDate(str) {
+    const d = dobDigits(str);
+    if (d.length !== 8) return false;
+    const day = +d.slice(0, 2), mon = +d.slice(2, 4), year = +d.slice(4);
+    if (mon < 1 || mon > 12 || day < 1) return false;
+    if (year < 1900 || year > new Date().getFullYear()) return false;
+    return day <= new Date(year, mon, 0).getDate();      // month 0-length trick
+  }
+
+  (function dobMask() {
+    const el = $('#regDob');
+    if (!el) return;
+
+    const before = (v, i) => dobDigits(v.slice(0, i)).length;   // digits left of position i
+    const posOf = (d, n) => {                                   // position after digit n
+      if (n <= 0) return 0;
+      const painted = dobPaint(d);
+      let seen = 0;
+      for (let i = 0; i < painted.length; i++) {
+        if (/\d/.test(painted[i]) && ++seen === n) return i + 1;
+      }
+      return painted.length;
+    };
+
+    el.addEventListener('beforeinput', e => {
+      const t = e.inputType || '';
+      if (!t.startsWith('insert') && !t.startsWith('delete')) return;
+      e.preventDefault();
+
+      const v = el.value;
+      let d = dobDigits(v);
+      let from = before(v, el.selectionStart), to = before(v, el.selectionEnd);
+
+      if (t.startsWith('insert')) {
+        const raw = e.data != null ? e.data
+                  : (e.dataTransfer ? e.dataTransfer.getData('text') : '');
+        const add = dobDigits(raw);
+        if (!add) return;
+        d = (d.slice(0, from) + add + d.slice(to)).slice(0, 8);
+        from = Math.min(8, from + add.length);
+      } else if (from !== to) {
+        d = d.slice(0, from) + d.slice(to);
+      } else if (t === 'deleteContentBackward') {
+        if (!from) return;
+        d = d.slice(0, from - 1) + d.slice(from);
+        from -= 1;
+      } else {
+        d = d.slice(0, from) + d.slice(from + 1);
+      }
+
+      el.value = dobPaint(d, t.startsWith('insert') && from === d.length);
+      const p = from === d.length ? el.value.length : posOf(d, from);
+      el.setSelectionRange(p, p);
+      // preventDefault swallowed the native input event, and the blur validator's
+      // sibling listener clears the error state on input
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // leaving the field should not leave a dangling separator behind
+    el.addEventListener('blur', () => { el.value = dobPaint(dobDigits(el.value), false); });
+  })();
+
   // inline validation on blur — never on keystroke
   $$('.field[data-validate] input').forEach(inp => {
     inp.addEventListener('blur', () => {
       const f = inp.closest('.field');
       const kind = f.dataset.validate;
       const v = inp.value.trim();
-      const bad = kind === 'email' ? !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v) : v === '';
+      const bad = kind === 'email' ? !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v)
+                : kind === 'dob'   ? !realDate(v)
+                : v === '';
       f.classList.toggle('is-error', bad && v !== '' || (bad && inp.dataset.touched === '1'));
       inp.dataset.touched = '1';
     });
