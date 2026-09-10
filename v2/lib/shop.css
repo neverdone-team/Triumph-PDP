@@ -14,7 +14,7 @@
   --mc-grey:#F1F1F1;
   --mc-scrim:rgba(0,0,0,.38);
   --mc-green:#008000;
-  --mc-w:560px;
+  --mc-w:400px;
   --mc-pad:24px;
   --mc-ease:cubic-bezier(.22,.61,.36,1);
 
@@ -24,31 +24,36 @@
   pointer-events:none;                 /* the page behind stays live — this is a dropdown */
 }
 
-/* The sheet comes up from the bottom at every width — same idiom as the PLP filter
-   sheet. Full-bleed on a phone; above 600 it caps and centres so it does not stretch a
-   short list across a desktop. */
+/* Two shapes, one markup (Amelie, 2026-09-10):
+   · from 600 up it is a CARD hung under the basket icon — a dropdown, so no scrim and
+     the page behind stays live. place() writes top/left/width/max-height off the icon's
+     box; everything else is here.
+   · below 600 it is a bottom sheet, over a scrim, because there is nothing to hang a
+     card off a 16px icon in a full-width header.  */
 .mc__scrim{
   position:absolute; inset:0; background:var(--mc-scrim);
   opacity:0; transition:opacity .28s var(--mc-ease); pointer-events:none;
+  display:none;                        /* the card has no scrim; the sheet turns it on */
 }
 .mc[data-open="true"] .mc__scrim{opacity:1;pointer-events:auto}
 
 .mc__panel{
-  position:absolute; left:0; right:0; bottom:0; margin:0 auto;
-  width:100%; max-width:var(--mc-w);
+  position:absolute; top:0; left:0;    /* place() overrides both */
+  width:var(--mc-w); max-width:calc(100vw - 24px);
   background:var(--mc-bg);
-  display:flex; flex-direction:column; max-height:86vh;
-  border-radius:16px 16px 0 0;
-  box-shadow:0 -6px 28px rgba(0,0,0,.16);
-  padding-bottom:env(safe-area-inset-bottom);
-  transform:translateY(100%);
-  transition:transform .34s var(--mc-ease);
+  display:flex; flex-direction:column;
+  border:1px solid var(--mc-hair);
+  box-shadow:0 12px 34px rgba(0,0,0,.13);
+  /* a dropdown drops: it fades in over a short 6px fall, it does not rise */
+  opacity:0; transform:translateY(-6px);
+  transition:opacity .18s var(--mc-ease), transform .18s var(--mc-ease);
   pointer-events:none;
 }
-.mc[data-open="true"] .mc__panel{transform:none;pointer-events:auto}
+.mc[data-open="true"] .mc__panel{opacity:1;transform:none;pointer-events:auto}
 
+/* the grabber belongs to the sheet, not the card */
 .mc__grab{
-  display:block; width:36px; height:3px; border-radius:999px;
+  display:none; width:36px; height:3px; border-radius:999px;
   background:var(--mc-edge); margin:10px auto 0; flex:none;
 }
 
@@ -66,6 +71,10 @@
 }
 .mc__x svg{width:13px;height:13px;stroke:currentColor;stroke-width:1;fill:none}
 .mc__x:hover{opacity:.55}
+/* the close button takes focus when the sheet opens, so it must not flash the browser's
+   blue ring — Triumph's own hairline ring instead */
+.mc__x:focus{outline:none}
+.mc__x:focus-visible{outline:1px solid var(--mc-ink);outline-offset:3px}
 
 /* ---------------- lines ---------------- */
 .mc__body{flex:1 1 auto;min-height:0;overflow-y:auto}
@@ -105,8 +114,21 @@
 .mc__btn--primary{background:var(--mc-ink);color:#fff}
 .mc__btn--primary:hover{background:#222}
 
+/* ---------------- phone: the bottom sheet ---------------- */
 @media (max-width:599.98px){
   .mc{--mc-pad:20px;--mc-w:100%}
+  .mc__scrim{display:block}
+  .mc__panel{
+    top:auto; left:0; right:0; bottom:0; margin:0;
+    width:100%; max-width:none; max-height:86vh;
+    border:0; border-radius:16px 16px 0 0;
+    box-shadow:0 -6px 28px rgba(0,0,0,.16);
+    padding-bottom:env(safe-area-inset-bottom);
+    opacity:1; transform:translateY(100%);
+    transition:transform .34s var(--mc-ease);
+  }
+  .mc[data-open="true"] .mc__panel{transform:none}
+  .mc__grab{display:block}
 }
 
 /* someone who has asked for less motion gets the sheet without the rise */

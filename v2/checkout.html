@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Checkout | Triumph</title>
+<link rel="stylesheet" href="./lib/shop.css" />
 <style>
 /* ============================================================
    FONTS — Alliance No.1 Light + Regular (local)
@@ -528,7 +529,7 @@ body[data-mode="steps"] .place.is-last{display:block}
    ORDER SUMMARY RAIL
    ============================================================ */
 .sum__head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-32)}
-.li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;
+.li{display:grid;grid-template-columns:80px minmax(0,1fr) auto;
   column-gap:var(--space-16);row-gap:var(--space-16);
   padding:var(--space-32) 0;border-bottom:1px solid var(--c-hair)}
 .li:first-of-type{padding-top:0}
@@ -536,8 +537,10 @@ body[data-mode="steps"] .place.is-last{display:block}
 .li:last-of-type{border-bottom:0}
 /* the actions run the full width of the row, not just the text column, so Remove sits on
    the same right edge as the price above it */
-.li__imgwrap{position:relative;grid-row:1 / span 2;width:64px}
-.li__img{width:64px;height:85px;object-fit:cover;background:var(--c-grey-light)}
+/* 80×107 rather than 64×85: at 64 the packshot read like an icon next to 14px type
+   (Amelie, 2026-09-10). Still the 3:4 of every other product shot in the flow. */
+.li__imgwrap{position:relative;grid-row:1 / span 2;width:80px}
+.li__img{width:80px;height:107px;object-fit:cover;background:var(--c-grey-light)}
 .li__body{min-width:0}
 .li__name{display:block}
 .li__meta{display:block;color:var(--c-ink-soft);margin-top:var(--space-2)}

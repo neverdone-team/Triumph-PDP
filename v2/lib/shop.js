@@ -270,7 +270,49 @@ window.Shop = (function () {
   }
 
   var anchorEl = null;
-  function place() {}          // the sheet is positioned by the stylesheet
+  var SHEET = '(max-width:599.98px)';
+
+  /* the basket icon in the header — #cartBtn on the PLP and PDP, .hd__bag on the bag
+     page, and nothing at all on the checkout's slim header, which falls back to the
+     top right corner */
+  function anchor() {
+    var badge = document.querySelector('[data-cart-count]');
+    var el = badge && (badge.closest('button, a') || badge.parentElement);
+    return el || null;
+  }
+
+  /* Position the card under the basket icon. Below 600 the stylesheet owns the sheet's
+     geometry, so every inline value written here has to be cleared on the way down —
+     a resize from desktop to phone runs through this same function. */
+  function place() {
+    if (!mc) return;
+    var panel = mc.querySelector('.mc__panel');
+    if (!panel) return;
+
+    if (window.matchMedia(SHEET).matches) {
+      panel.style.top = panel.style.left = panel.style.width = panel.style.maxHeight = '';
+      return;
+    }
+
+    var w = Math.min(400, window.innerWidth - 24);
+    var top, right;
+    anchorEl = anchor();
+    if (anchorEl) {
+      var r = anchorEl.getBoundingClientRect();
+      top = r.bottom + 10;
+      right = r.right;                     // the card's right edge tracks the icon's
+    } else {
+      top = 16;
+      right = window.innerWidth - 24;
+    }
+    var left = Math.min(Math.max(12, right - w), window.innerWidth - w - 12);
+
+    panel.style.width = w + 'px';
+    panel.style.left = Math.round(left) + 'px';
+    panel.style.top = Math.round(top) + 'px';
+    // never let the card run off the bottom; its line list scrolls instead
+    panel.style.maxHeight = Math.max(220, window.innerHeight - top - 16) + 'px';
+  }
 
   function open(opts) {
     opts = opts || {};
@@ -279,8 +321,9 @@ window.Shop = (function () {
     onlySku = opts.only || null;
     mc.querySelector('[data-mc-title]').textContent = opts.title || 'Added to your bag';
     // fill it BEFORE opening, so the panel rises at its final height instead of
-    // growing under the animation
+    // growing under the animation — and anchor it before it is visible
     paintMini();
+    place();
     /* On the first open of a page load the panel has just been appended, so the browser
        has never resolved its closed state (transform:translateY(100%)) — with no start
        value the transition has nothing to run from and the sheet snaps in. Forcing one
