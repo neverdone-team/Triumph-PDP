@@ -342,10 +342,9 @@ body{background-image:none}
 
 /* inline login panel — the Sign in branch of the live gate, without the page load */
 /* the account link rides in the field's supporting-text band, right-aligned */
-.acctlink{display:flex;justify-content:flex-end;margin-top:calc(var(--space-20) * -1);
-  position:relative;z-index:2;margin-bottom:var(--space-8)}
+.acctlink{display:flex;align-items:baseline;gap:var(--space-8);margin:0 0 var(--space-16)}
 
-.login{border:1px solid var(--c-hair);padding:var(--space-24);margin-top:var(--space-20);background:transparent}
+.login{margin:var(--space-8) 0 var(--space-24);background:transparent}
 .sso{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);margin-top:var(--space-12)}
 .sso button{
   height:var(--control-44);border:1px solid var(--c-edge);background:var(--c-bg);
@@ -447,6 +446,24 @@ body[data-mode="steps"] .place{display:none}
 body[data-mode="steps"] .place.is-last{display:block}
 
 /* ============================================================
+   REVIEW (step 4)
+   ============================================================ */
+.review{margin:0;border-top:1px solid var(--c-hair)}
+.review__row{
+  display:grid;grid-template-columns:180px minmax(0,1fr) auto;
+  align-items:baseline;gap:var(--space-16);
+  padding:var(--space-20) 0;border-bottom:1px solid var(--c-hair);
+}
+.review dt{margin:0}
+.review dd{margin:0;white-space:pre-line}
+@media (max-width:575px){
+  .review__row{grid-template-columns:minmax(0,1fr) auto;gap:var(--space-4) var(--space-16)}
+  .review dt{grid-column:1 / -1}
+  .review dd{grid-column:1}
+  .review__row button{grid-column:2;grid-row:2}
+}
+
+/* ============================================================
    BUTTONS
    ============================================================ */
 .btn{
@@ -455,6 +472,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   background:var(--c-ink); color:var(--c-on-dark);
   font-weight:300;font-size:12px;line-height:16px;letter-spacing:.18em;text-transform:uppercase;
   border:1px solid var(--c-ink);
+  text-decoration:none;
   transition:opacity .15s var(--ease-out);
 }
 .btn:hover{opacity:.82}
@@ -480,7 +498,7 @@ body[data-mode="steps"] .place.is-last{display:block}
    ============================================================ */
 .sum__head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-32)}
 .li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;
-  column-gap:var(--space-20);row-gap:var(--space-16);
+  column-gap:var(--space-32);row-gap:var(--space-16);
   padding:var(--space-32) 0;border-bottom:1px solid var(--c-hair)}
 .li:first-of-type{padding-top:0}
 /* the discount row draws its own top rule */
@@ -597,7 +615,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   /* collapsible summary at the top of the page */
   /* sits under the step indicator, tinted so it reads as a summary of the order rather
      than another section of the form — and it scrolls with the page */
-  .msum{display:block;background:var(--c-grey-light);margin:0 0 var(--space-24)}
+  .msum{display:block;background:var(--c-wash);margin:0 0 var(--space-24)}
   .msum__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16)}
   /* the summary bar and the step tabs are two different controls — they need a gap */
   body[data-mode="steps"] .steps{margin-top:var(--space-24)}
@@ -673,6 +691,8 @@ body[data-mode="steps"] .place.is-last{display:block}
         <span class="steps__no">2</span><span>Delivery</span></button>
       <button class="steps__item t-title-s" type="button" data-goto="3" aria-current="false" data-done="false">
         <span class="steps__no">3</span><span>Payment</span></button>
+      <button class="steps__item t-title-s" type="button" data-goto="4" aria-current="false" data-done="false">
+        <span class="steps__no">4</span><span>Review</span></button>
     </nav>
 
     <!-- ================= MOBILE COLLAPSIBLE SUMMARY ================= -->
@@ -982,21 +1002,15 @@ body[data-mode="steps"] .place.is-last{display:block}
 
       <!-- guest / new account -->
       <div data-account-only="guest new">
-        <label class="field" data-validate="email">
-          <input type="email" id="email" placeholder=" " autocomplete="email" value="" />
-          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
-          <span class="field__label">Email</span>
-          <span class="field__err t-body-xs">Please enter a valid email address.</span>
-        </label>
-        <!-- the account decision belongs next to the email it applies to, rather than as a
-             checkbox three sections further down -->
-        <div class="acctlink" data-guest-only>
-          <button class="t-link-s" type="button" id="acctBtn" aria-expanded="false" aria-controls="loginPanel">Sign in or create an account</button>
-        </div>
 
-        <!-- the login branch of the live gate, inline: no page load, the email above is reused -->
+        <!-- the sign-in door comes before the field it would replace -->
+        <p class="acctlink" data-guest-only>
+          <span class="t-body-s muted">Already have an account?</span>
+          <button class="t-link-s" type="button" id="acctBtn" aria-expanded="false" aria-controls="loginPanel">Sign in</button>
+        </p>
+
+        <!-- the login branch of the live gate, inline: no page load, no box round it -->
         <div class="login" id="loginPanel" hidden>
-          <p class="t-title-xs" style="margin-bottom:var(--space-12)">Sign in to MyTriumph</p>
           <label class="field">
             <input type="password" placeholder=" " autocomplete="current-password" />
             <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
@@ -1017,24 +1031,36 @@ body[data-mode="steps"] .place.is-last{display:block}
               <span class="t-label-m">Facebook</span>
             </button>
           </div>
-          <p class="t-body-s muted" style="margin-top:var(--space-16)">
-            No account yet? <button class="t-link-s" type="button" id="loginNew">Create one with this order</button>
-          </p>
-        </div>
-        <div style="margin-top:var(--space-12)">
-          <label class="check">
-            <input type="checkbox" checked />
-            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
-            <span class="t-body-s">Email me Triumph news and offers</span>
-          </label>
         </div>
 
-        <div id="pwWrap" hidden style="margin-top:var(--space-20)">
+        <label class="field" data-validate="email">
+          <input type="email" id="email" placeholder=" " autocomplete="email" value="" />
+          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
+          <span class="field__label">Email</span>
+          <span class="field__err t-body-xs">Please enter a valid email address.</span>
+        </label>
+
+        <!-- creating an account is a choice made here, and it brings its own password -->
+        <label class="check" style="margin-top:var(--space-20)">
+          <input type="checkbox" id="mkAccount" />
+          <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+          <span class="t-body-m">Create an account and check out faster</span>
+        </label>
+
+        <div id="pwWrap" hidden style="margin-top:var(--space-16)">
           <label class="field">
             <input type="password" id="newPw" placeholder=" " autocomplete="new-password" />
             <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
             <span class="field__label">Password</span>
-            <span class="field__hint">At least 8 characters and a number — this creates your account.</span>
+            <span class="field__hint">At least 8 characters and a number.</span>
+          </label>
+        </div>
+
+        <div style="margin-top:var(--space-16)">
+          <label class="check">
+            <input type="checkbox" checked />
+            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+            <span class="t-body-s">Email me Triumph news and offers</span>
           </label>
         </div>
       </div>
@@ -1309,6 +1335,38 @@ body[data-mode="steps"] .place.is-last{display:block}
       </div>
     </section>
 
+    <!-- ---------- STEP 4: CHECK THE ORDER ----------
+         Stepped mode only. The one-pager needs no equivalent: every choice is already on
+         the page beside the summary rail. -->
+    <section class="sec" data-step="4" id="s-review" data-mode-only="steps" aria-labelledby="h-review">
+      <div class="sec__head"><h2 class="t-title-m" id="h-review">Check your order</h2></div>
+      <dl class="review">
+        <div class="review__row">
+          <dt class="t-label-s muted">Contact</dt>
+          <dd class="t-body-m" data-review="contact">—</dd>
+          <button class="t-link-s" type="button" data-review-edit="2">Edit</button>
+        </div>
+        <div class="review__row">
+          <dt class="t-label-s muted">Delivery address</dt>
+          <dd class="t-body-m" data-review="address">—</dd>
+          <button class="t-link-s" type="button" data-review-edit="2">Edit</button>
+        </div>
+        <div class="review__row">
+          <dt class="t-label-s muted">Delivery method</dt>
+          <dd class="t-body-m" data-review="ship">—</dd>
+          <button class="t-link-s" type="button" data-review-edit="2">Edit</button>
+        </div>
+        <div class="review__row">
+          <dt class="t-label-s muted">Payment</dt>
+          <dd class="t-body-m" data-review="pay">—</dd>
+          <button class="t-link-s" type="button" data-review-edit="3">Edit</button>
+        </div>
+      </dl>
+      <p class="t-body-s muted" style="margin-top:var(--space-24)">
+        The items and the total are in the order summary. Nothing is charged until you place the order.
+      </p>
+    </section>
+
     <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
     <div class="stepnav" id="stepnav">
       <button class="btn" type="button" id="stepNext">Continue to delivery</button>
@@ -1570,6 +1628,8 @@ body[data-mode="steps"] .place.is-last{display:block}
     // the "new + account" persona is the one that gets the password field
     const pw = $('#pwWrap');
     if (pw) pw.hidden = state.account !== 'new';
+    const mk = $('#mkAccount');
+    if (mk) mk.checked = state.account === 'new';
     recalc();
   }
 
@@ -1658,13 +1718,13 @@ body[data-mode="steps"] .place.is-last{display:block}
     panel.hidden = !panel.hidden;
     acctBtn.setAttribute('aria-expanded', String(!panel.hidden));
   });
-  const loginNew = $('#loginNew');
-  if (loginNew) loginNew.addEventListener('click', () => {
-    state.account = 'new';
-    $('#loginPanel').hidden = true;
-    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === 'new')));
+  // ticking the box IS the create-account decision, and it brings the password with it
+  const mkAccount = $('#mkAccount');
+  if (mkAccount) mkAccount.addEventListener('change', () => {
+    state.account = mkAccount.checked ? 'new' : 'guest';
+    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === state.account)));
     applyState();
-    const pw = $('#newPw'); if (pw) pw.focus();
+    if (mkAccount.checked) { const pw = $('#newPw'); if (pw) pw.focus(); }
   });
 
   const loginGo = $('#loginGo');
@@ -1737,7 +1797,8 @@ body[data-mode="steps"] .place.is-last{display:block}
   let branch = 'none';
   try { mode = localStorage.getItem(MODE_KEY) || 'onepage'; } catch (e) {}
 
-  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment' };
+  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment', 3: 'Review order' };
+  const LAST_STEP = 4;
 
   function applyMode() {
     document.body.dataset.mode = mode;
@@ -1754,7 +1815,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   }
 
   function applyStep(n) {
-    step = Math.min(3, Math.max(1, n));
+    step = Math.min(LAST_STEP, Math.max(1, n));
     document.body.dataset.step = String(step);   // step 1 drops the rail and the express row
     $$('.sec[data-step]').forEach(sec => {
       sec.classList.toggle('is-current', sec.dataset.step === String(step));
@@ -1773,16 +1834,17 @@ body[data-mode="steps"] .place.is-last{display:block}
       b.dataset.done = String(i < step);
     });
     $('#stepNext').textContent = STEP_CTA[step] || '';
-    // step 1 has the gate's own three doors, step 3 has Place order — neither wants
-    // a generic Continue underneath it
-    $('#stepnav').style.display = (step === 1 || step === 3) ? 'none' : '';
+    // step 1 has the gate's own three doors, the last step has Place order —
+    // neither wants a generic Continue underneath it
+    $('#stepnav').style.display = (step === 1 || step === LAST_STEP) ? 'none' : '';
     $('.paybar').style.display = (mode === 'steps' && step === 1) ? 'none' : '';
-    $('.place').classList.toggle('is-last', step === 3);
+    $('.place').classList.toggle('is-last', step === LAST_STEP);
+    if (step === LAST_STEP) fillReview();
     // the mobile pay bar carries the same call to action as the desktop column
     const payBtn = $('.paybar .btn');
     if (payBtn) {
       payBtn.dataset.step = String(step);
-      payBtn.innerHTML = step === 3
+      payBtn.innerHTML = step === LAST_STEP
         ? 'Place order · <span data-total>' + eur(Shop.totals({ member: state.member, ship: state.ship }).total) + '</span>'
         : STEP_CTA[step];
     }
@@ -1829,6 +1891,43 @@ body[data-mode="steps"] .place.is-last{display:block}
     applyMode();
   }));
 
+  /* ---------- step 4: what the customer is about to buy ----------
+     Read straight off the live form rather than a parallel copy of it, so the review
+     cannot drift from what will actually be submitted. */
+  const SHIP_LABEL = {
+    std: 'Standard delivery · DHL', express: 'Express delivery · DHL',
+    pickup: 'Collect in store', mytriumph: 'Free with MyTriumph',
+  };
+  const PAY_LABEL = {
+    card: 'Credit or debit card', paypal: 'PayPal', later: 'PayPal — Pay Later',
+    klarnaNow: 'Klarna — pay now', klarna30: 'Klarna — pay in 30 days', gift: 'Digital gift card',
+  };
+  function fillReview() {
+    const put = (k, v) => { const el = $('[data-review="' + k + '"]'); if (el) el.textContent = v || '—'; };
+    const val = id => { const el = $(id); return el && el.value.trim() ? el.value.trim() : ''; };
+
+    put('contact', state.account === 'member'
+      ? 'anna.musterfrau@example.com'
+      : val('#email') || 'No email yet');
+
+    const savedPicked = $('input[name="savedaddr"]:checked');
+    if (state.account === 'member' && savedPicked && savedPicked.value === 'saved') {
+      put('address', 'Anna Musterfrau\nKurfürstendamm 21\n10719 Berlin, Germany');
+    } else {
+      const name = [val('#fn'), val('#ln')].filter(Boolean).join(' ');
+      const street = [val('#street'), val('#hno')].filter(Boolean).join(' ');
+      const city = [val('#zip'), val('#city')].filter(Boolean).join(' ');
+      const country = $('#country') ? $('#country').selectedOptions[0].textContent : '';
+      const lines = [name, street, city, country].filter(Boolean);
+      put('address', lines.length > 1 ? lines.join('\n') : 'No address yet');
+    }
+
+    put('ship', SHIP_LABEL[state.ship] || '—');
+    const pay = $('.opt input[name="pay"]:checked');
+    put('pay', pay ? (PAY_LABEL[pay.value] || pay.value) : '—');
+  }
+  $$('[data-review-edit]').forEach(b => b.addEventListener('click', () => applyStep(Number(b.dataset.reviewEdit))));
+
   /* ---------- place order ----------
      The last step of the prototype: snapshot the bag, show the confirmation, then empty it
      so returning to the PDP starts a clean flow. */
@@ -1851,7 +1950,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   }
   $$('.place .btn').forEach(b => b.addEventListener('click', placeOrder));
   $('.paybar .btn').addEventListener('click', () => {
-    if (mode === 'steps' && step < 3) applyStep(step + 1);
+    if (mode === 'steps' && step < LAST_STEP) applyStep(step + 1);
     else placeOrder();
   });
 

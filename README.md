@@ -72,7 +72,9 @@ The checkout runs in **two modes**, switched from the prototype panel bottom-rig
   to a decision that has not been made yet. Choosing **Create an account** opens the registration
   form in place rather than leaving checkout. **2 Delivery** is address and delivery
   method — plus the email field when the customer came through as a guest.
-  **3 Payment**. Completed steps in the indicator are clickable to go back; on mobile the sticky bar
+  **3 Payment**, and **4 Review**, which lists the contact, address, delivery method and
+  payment read straight off the live form, each with an Edit link back to its step. Nothing
+  is charged until Place order there. Completed steps in the indicator are clickable to go back; on mobile the sticky bar
   carries the step's call to action (and stands down on step 1, where the gate has its own).
 
   Two things the live registration asks for are deliberately gone: the second *confirm your email*
