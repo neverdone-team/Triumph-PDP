@@ -610,6 +610,13 @@ body[data-mode="steps"] .place.is-last{display:block}
 .acc[data-open="true"] .acc__chev{transform:rotate(180deg)}
 .acc__body{display:none;padding-bottom:var(--space-20)}
 .acc[data-open="true"] .acc__body{display:block}
+/* an applied code, and the control that takes it off again */
+.voucherok{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);
+  margin-top:var(--space-12);padding:var(--space-12) 0;border-top:1px solid var(--c-hair);
+  color:var(--color-green)}
+.vx{width:var(--control-28);height:var(--control-28);flex:none;display:grid;place-items:center;
+  color:var(--c-ink-soft)}
+.vx:hover{color:var(--c-ink)}
 .voucher{display:flex;align-items:flex-end;gap:var(--space-8);margin:0 0 var(--space-12)}
 .voucher .field{flex:1;--ctl:var(--control-44)}
 .voucher .field__frame{background:transparent}
@@ -1397,16 +1404,21 @@ body[data-mode="steps"] .place.is-last{display:block}
           </label>
           <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
         </div>
-        <div class="alert alert--success" id="voucherOk" hidden>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
+        <div class="voucherok" id="voucherOk" hidden>
           <span class="t-body-s"><strong style="font-weight:400">WELCOME10</strong> applied — 10% off the subtotal.</span>
+          <button class="vx" type="button" id="voucherClear" aria-label="Remove this discount code">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1"/></svg>
+          </button>
         </div>
       </div>
     </div>
 
     <div class="totals">
       <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€109.85</span></div>
-      <div class="trow" id="discountRow" hidden><span class="t-body-m">Discount</span><span class="t-price" data-discount>−€10.99</span></div>
+      <div class="trow" id="discountRow" hidden>
+        <span class="t-body-m">Discount <span class="muted t-body-s" data-voucher-code></span></span>
+        <span class="t-price" data-discount>−€10.99</span>
+      </div>
       <div class="trow" data-ship-row><span class="t-body-m">Shipping</span><span class="t-price" data-shipping>€4.99</span></div>
       <div class="trow trow--grand">
         <span>
@@ -1567,6 +1579,7 @@ body[data-mode="steps"] .place.is-last{display:block}
       }
     }
     r('[data-discount]').textContent = '−' + eur(t.discount);
+    $$('[data-voucher-code]').forEach(n => { n.textContent = t.voucher ? '· ' + t.voucher : ''; });
     const shipCell = r('[data-shipping]');
     shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
     r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
@@ -1759,6 +1772,13 @@ body[data-mode="steps"] .place.is-last{display:block}
     Shop.setVoucher(code);
     $('#voucherOk').hidden = false;
     $('#voucherOk').querySelector('strong').textContent = code;
+  });
+  /* an applied code has to be removable — without this the only way out of a wrong code
+     is reloading the page (Amelie, 2026-09-10) */
+  $('#voucherClear').addEventListener('click', () => {
+    Shop.setVoucher(null);
+    $('#voucher').value = '';
+    $('#voucherOk').hidden = true;
   });
 
   // disclosure toggles

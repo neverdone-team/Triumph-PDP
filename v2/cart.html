@@ -122,11 +122,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
    link in white inside it. It sits in the summary, under Shipping, where the figure it
    would change is (Amelie, 2026-09-10). */
-.joinrow{margin:var(--space-12) 0 0}
-.joinbadge{display:inline-flex;align-items:center;gap:var(--space-8);
-  background:var(--c-burgundy);color:var(--c-on-dark);padding:var(--space-8) var(--space-12)}
-.joinbadge .t-link-s{color:var(--c-on-dark)}
-.joinbadge__note{color:rgba(255,255,255,.75)}
+.joinrow{margin:var(--space-16) 0 0}
+/* a full-width flag with its text centred, and Regular throughout — it is an offer, not
+   a footnote (Amelie, 2026-09-10) */
+.joinbadge{display:flex;width:100%;align-items:center;justify-content:center;gap:var(--space-8);
+  background:var(--c-burgundy);color:var(--c-on-dark);padding:var(--space-12)}
+.joinbadge .t-link-s,.joinbadge__note{font-weight:400;color:var(--c-on-dark)}
+.joinbadge__note{color:rgba(255,255,255,.8)}
 
 /* ---------------- line items ---------------- */
 .items{}
@@ -257,6 +259,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* what this order saves against the list prices — burgundy, the colour every member and
    sale figure in the flow uses */
 .trow--save{color:var(--c-sales)}
+/* the discount row's figure and its remove control share the right-hand cell */
+.dcell{display:inline-flex;align-items:center;gap:var(--space-8)}
+.vx{width:var(--control-28);height:var(--control-28);display:grid;place-items:center;
+  color:var(--c-ink-soft)}
+.vx:hover{color:var(--c-ink)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
 .linesave{color:var(--c-sales)}
 .grand__num{font-weight:400;font-size:20px;line-height:26px;letter-spacing:0}
@@ -492,7 +499,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .cart__left,.cart__right{display:contents}
   .cart__main,.cart__status,.sum,.cart__express{padding:0}
   .cart__express{order:1} .cart__status{order:2} .cart__main{order:3} .sum{order:4}
-  .sum{position:static;background:var(--c-wash);border:0}
+  /* No tint on the phone summary (Amelie, 2026-09-10): real space above it and one
+     hairline do the separating from the cross-sell strip. */
+  .sum{position:static;background:transparent;border:0;
+    margin-top:var(--space-16);padding-top:var(--space-32);border-top:1px solid var(--c-hair)}
   /* the grid's three tracks assume the nav is there; hiding it moved the logo into
      column 1 and pulled the icons in behind it */
   .hd__links{display:none}
@@ -706,7 +716,21 @@ h1,h2,h3,p{margin:0;font-weight:400}
       <aside class="sum" aria-label="Summary">
         <h2 class="t-title-m" style="margin-bottom:var(--space-16)">Summary</h2>
         <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€0.00</span></div>
-        <div class="trow" id="discountRow" hidden><span class="t-body-m">Discount</span><span class="t-price" data-discount>−€0.00</span></div>
+        <!-- directly under the subtotal it is read against: what these items would have
+             cost at list price (Amelie, 2026-09-10) -->
+        <div class="trow trow--save" id="saveRow" hidden>
+          <span class="t-body-m">You save</span><span class="t-price" data-saved>€0.00</span>
+        </div>
+        <div class="trow" id="discountRow" hidden>
+          <span class="t-body-m">Discount <span class="muted t-body-s" data-voucher-code></span></span>
+          <span class="dcell">
+            <span class="t-price" data-discount>−€0.00</span>
+            <!-- an applied code has to be removable, or the only way out is a reload -->
+            <button class="vx" type="button" id="voucherClear" aria-label="Remove this discount code">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1"/></svg>
+            </button>
+          </span>
+        </div>
         <div class="trow" data-ship-row>
           <span class="t-body-m">Shipping <span class="muted t-body-s">(Standard, DHL)</span></span>
           <span class="t-price" data-shipping>€4.99</span>
@@ -718,10 +742,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <span class="joinbadge__note t-body-s">always ships free</span>
           </span>
         </p>
-
-        <div class="trow trow--save" id="saveRow" hidden>
-          <span class="t-body-m">You save</span><span class="t-price" data-saved>€0.00</span>
-        </div>
 
         <!-- the code sits above the total: it changes the total, so it belongs before it -->
         <div class="acc" data-open="false" id="voucherAcc">
@@ -985,6 +1005,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('[data-subtotal]').textContent = eur(t.sub);
     $('#discountRow').hidden = !t.voucher;
     $('[data-discount]').textContent = '−' + eur(t.discount);
+    $('[data-voucher-code]').textContent = t.voucher ? '· ' + t.voucher : '';
     const shipCell = $('[data-shipping]');
     shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
     $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
@@ -1182,6 +1203,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
   $('#voucherBtn').addEventListener('click', () => {
     const code = $('#voucher').value.trim().toUpperCase();
     if (code) Shop.setVoucher(code);
+  });
+  $('#voucherClear').addEventListener('click', () => {
+    Shop.setVoucher(null);
+    $('#voucher').value = '';
+    acc.dataset.open = 'false';
+    $('#voucherToggle').setAttribute('aria-expanded', 'false');
   });
 
   $('#joinBtn').addEventListener('click', () => Shop.setMember(true));
