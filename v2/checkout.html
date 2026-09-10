@@ -466,9 +466,10 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* the review is a read-out, so the rail's lines drop their Remove there */
 body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
 /* three selects sharing the full form column made Month 440px wide */
-.field--dob{max-width:240px}
+.field--dob{max-width:none}      /* the mask is short, the field is not (Amelie, 2026-09-10) */
+.field--half{max-width:50%}
 @media (max-width:575px){ .gate__doors{grid-template-columns:1fr} }
-@media (max-width:575px){ .field--dob{max-width:none} }
+@media (max-width:575px){ .field--half{max-width:none} }
 
 /* ============================================================
    STEPPED CHECKOUT (mode = steps)
@@ -647,10 +648,12 @@ body[data-mode="steps"] .place.is-last{display:block}
 .grand__num{font-weight:300;font-size:24px;line-height:28px;letter-spacing:.01em}
 
 .promise{
-  display:flex;gap:var(--space-10);align-items:flex-start;
+  display:flex;gap:var(--space-8);align-items:center;
   margin:0 0 var(--space-32); padding:0;
   background:transparent;
 }
+.promise__icon{flex:none;position:relative;top:1px}
+.promise__label{color:var(--c-grey-medium)}
 .trust{display:flex;flex-wrap:wrap;gap:var(--space-20);margin-top:var(--space-32);color:var(--c-ink-soft)}
 .trust span{display:inline-flex;align-items:center;gap:var(--space-6)}
 
@@ -888,7 +891,7 @@ body[data-mode="steps"] .place.is-last{display:block}
         <h3 class="t-title-s gate__h">Create your account</h3>
 
         <div class="grid">
-          <label class="field">
+          <label class="field field--half">
             <select id="regTitle" required>
               <option value="" selected disabled hidden></option>
               <option>Ms</option>
@@ -900,7 +903,7 @@ body[data-mode="steps"] .place.is-last{display:block}
             <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
           </label>
 
-          <div class="grid grid--2">
+          <div class="grid">
             <label class="field" data-validate="required">
               <input type="text" id="regFn" placeholder=" " autocomplete="given-name" />
               <fieldset class="field__frame"><legend><span>First name</span></legend></fieldset>
@@ -1396,9 +1399,6 @@ body[data-mode="steps"] .place.is-last{display:block}
           <button class="t-link-s" type="button" data-review-edit="3">Edit</button>
         </div>
       </dl>
-      <p class="t-body-s muted" style="margin-top:var(--space-24)">
-        The items and the total are in the order summary. Nothing is charged until you place the order.
-      </p>
     </section>
 
     <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
@@ -1426,8 +1426,8 @@ body[data-mode="steps"] .place.is-last{display:block}
     </div>
 
     <div class="promise">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M1 5h9v6H1zM10 7h3l2 2v2h-5z" stroke="currentColor" stroke-width="1"/><circle cx="4" cy="12" r="1.4" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="1.4" stroke="currentColor" stroke-width="1"/></svg>
-      <span class="t-body-s" data-promise>Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong></span>
+      <svg class="promise__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M1.5 6.5h11.5v8.5H1.5z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><path d="M13 9.5h3.6l3.9 3.7V15H13z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><circle cx="6" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/><circle cx="16.4" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/></svg>
+      <span class="t-body-m" data-promise><span class="promise__label">Delivery</span> Fri 11 – Sat 12 Sep 2026</span>
     </div>
 
     <div id="railItems"></div>
@@ -1551,10 +1551,10 @@ body[data-mode="steps"] .place.is-last{display:block}
   // Shipping prices and the free-shipping threshold live in lib/shop.js so the cart,
   // the mini cart and this page cannot drift apart.
   const PROMISE = {
-    std: 'Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
-    mytriumph: 'Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
-    express: 'Delivery <strong style="font-weight:400">Thu 10 Sep 2026</strong>',
-    pickup: 'Ready to collect <strong style="font-weight:400">from Thu 10 Sep 2026</strong>',
+    std: '<span class="promise__label">Delivery</span> <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
+    mytriumph: '<span class="promise__label">Delivery</span> <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
+    express: '<span class="promise__label">Delivery</span> <strong style="font-weight:400">Thu 10 Sep 2026</strong>',
+    pickup: '<span class="promise__label">Ready to collect</span> <strong style="font-weight:400">from Thu 10 Sep 2026</strong>',
   };
 
   /* ---------- rail line items ---------- */

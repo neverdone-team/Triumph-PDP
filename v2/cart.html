@@ -121,7 +121,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 #shipMsg{grid-column:1;grid-row:1}
 .promise{grid-column:2;grid-row:1;justify-self:end;
   display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
-.promise svg{flex:none}
+/* the icon's optical centre sits a touch above the text's, so it drops 1px */
+.promise__icon{flex:none;position:relative;top:1px}
+.promise__label{color:var(--c-grey-medium)}
 .ship-progress__bar{grid-column:1 / -1;height:4px;background:var(--c-grey-light);overflow:hidden}
 .ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
 /* only the words and the bar go green — the box keeps its stroke */
@@ -645,9 +647,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
              2026-09-10). The MyTriumph invitation moved to the summary. -->
         <div class="statusbox" id="shipCard">
           <div class="t-body-m" id="shipMsg" data-member-only="false"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
-          <p class="promise t-body-m">
-            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 4h8v6H1zM9 6h2.5L13 7.5V10H9z" stroke="currentColor" stroke-width="1"/></svg>
-            Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep</strong>
+          <p class="promise">
+            <svg class="promise__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M1.5 6.5h11.5v8.5H1.5z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><path d="M13 9.5h3.6l3.9 3.7V15H13z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><circle cx="6" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/><circle cx="16.4" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/></svg>
+            <!-- one span, not two flex items: the row's gap was falling between the word
+                 and the date as well as after the icon -->
+            <span class="t-body-m"><span class="promise__label">Delivery</span> Fri 11 – Sat 12 Sep</span>
           </p>
           <div class="ship-progress__bar" data-member-only="false"><span class="ship-progress__fill" id="shipFill"></span></div>
           <p class="shipfree t-body-s" data-member-only="true">
