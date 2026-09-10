@@ -691,8 +691,6 @@ body[data-mode="steps"] .place.is-last{display:block}
         <span class="steps__no">2</span><span>Delivery</span></button>
       <button class="steps__item t-title-s" type="button" data-goto="3" aria-current="false" data-done="false">
         <span class="steps__no">3</span><span>Payment</span></button>
-      <button class="steps__item t-title-s" type="button" data-goto="4" aria-current="false" data-done="false">
-        <span class="steps__no">4</span><span>Review</span></button>
     </nav>
 
     <!-- ================= MOBILE COLLAPSIBLE SUMMARY ================= -->
@@ -1829,10 +1827,13 @@ body[data-mode="steps"] .place.is-last{display:block}
     // the first section that is actually on screen — a mode-hidden one must not take it
     const first = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null)[0];
     if (first) first.classList.add('is-first');
+    // the review has no tab of its own — it is the page after payment, so the indicator
+    // stays on Payment while it is showing
+    const tab = Math.min(step, 3);
     $$('.steps__item').forEach(b => {
       const i = Number(b.dataset.goto);
-      b.setAttribute('aria-current', i === step ? 'step' : 'false');
-      b.dataset.done = String(i < step);
+      b.setAttribute('aria-current', i === tab ? 'step' : 'false');
+      b.dataset.done = String(i < tab);
     });
     $('#stepNext').textContent = STEP_CTA[step] || '';
     // step 1 has the gate's own three doors, the last step has Place order —
