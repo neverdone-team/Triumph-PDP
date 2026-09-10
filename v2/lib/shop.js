@@ -111,10 +111,48 @@ window.Shop = (function () {
     return write(s);
   }
 
+  /* Colour is part of the variant too, so it re-keys the line the same way a size change
+     does — the colour slug is the middle of `series-name-colour-size`. */
+  function setColour(sku, colour) {
+    var s = read();
+    var line = s.lines.filter(function (l) { return l.sku === sku; })[0];
+    if (!line || line.colour === colour) return s;
+    var slug = String(colour).toLowerCase().replace(/\s+/g, '-');
+    var parts = sku.split('-');
+    var nextSku = parts.length > 2
+      ? parts.slice(0, -2).join('-') + '-' + slug + '-' + parts[parts.length - 1]
+      : sku + '-' + slug;
+    var twin = s.lines.filter(function (l) { return l.sku === nextSku && l !== line; })[0];
+    if (twin) {
+      twin.qty = Math.min(9, twin.qty + line.qty);
+      s.lines = s.lines.filter(function (l) { return l !== line; });
+    } else {
+      line.colour = colour;
+      line.sku = nextSku;
+    }
+    return write(s);
+  }
+
+  /* remove() keeps the line and its position so the page can offer an undo — deleting is
+     the one destructive act in the bag and it has to be reversible (Amelie, 2026-09-10) */
+  var lastRemoved = null;
   function remove(sku) {
     var s = read();
+    var i = -1;
+    s.lines.forEach(function (l, n) { if (l.sku === sku) i = n; });
+    if (i >= 0) lastRemoved = { line: JSON.parse(JSON.stringify(s.lines[i])), at: i };
     s.lines = s.lines.filter(function (l) { return l.sku !== sku; });
     return write(s);
+  }
+  function undoRemove() {
+    if (!lastRemoved) return null;
+    var s = read();
+    var at = Math.min(lastRemoved.at, s.lines.length);
+    s.lines.splice(at, 0, lastRemoved.line);
+    var name = lastRemoved.line.name;
+    lastRemoved = null;
+    write(s);
+    return name;
   }
 
   function clear() { return write(blank()); }
@@ -407,6 +445,7 @@ window.Shop = (function () {
 
   return {
     add: add, setQty: setQty, bump: bump, remove: remove, clear: clear, setSize: setSize,
+    setColour: setColour, undoRemove: undoRemove,
     read: read, count: count, totals: totals, charged: charged,
     setMember: setMember, setVoucher: setVoucher,
     money: money, onChange: onChange, refresh: emit,
