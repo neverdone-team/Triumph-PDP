@@ -498,7 +498,7 @@ body[data-mode="steps"] .place.is-last{display:block}
    ============================================================ */
 .sum__head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-32)}
 .li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;
-  column-gap:var(--space-32);row-gap:var(--space-16);
+  column-gap:var(--space-16);row-gap:var(--space-16);
   padding:var(--space-32) 0;border-bottom:1px solid var(--c-hair)}
 .li:first-of-type{padding-top:0}
 /* the discount row draws its own top rule */
@@ -513,8 +513,8 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* the stepper and the Remove link sit at opposite ends of the body column, so the
    space between them is whatever the column has left */
 .li__acts{grid-column:2 / -1;display:flex;align-items:center;justify-content:space-between;
-  gap:var(--space-16)}
-.li__price{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2)}
+  gap:var(--space-16);margin-left:0}
+.li__price{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2);padding-left:var(--space-32)}
 .li__member{color:var(--c-ink);font-size:10px;line-height:14px;letter-spacing:.14em;text-transform:uppercase}
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--c-edge);height:var(--control-28)}
@@ -1040,6 +1040,14 @@ body[data-mode="steps"] .place.is-last{display:block}
           <span class="field__err t-body-xs">Please enter a valid email address.</span>
         </label>
 
+        <div style="margin-top:var(--space-16)">
+          <label class="check">
+            <input type="checkbox" checked />
+            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+            <span class="t-body-s">Email me Triumph news and offers</span>
+          </label>
+        </div>
+
         <!-- creating an account is a choice made here, and it brings its own password -->
         <label class="check" style="margin-top:var(--space-20)">
           <input type="checkbox" id="mkAccount" />
@@ -1056,13 +1064,6 @@ body[data-mode="steps"] .place.is-last{display:block}
           </label>
         </div>
 
-        <div style="margin-top:var(--space-16)">
-          <label class="check">
-            <input type="checkbox" checked />
-            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
-            <span class="t-body-s">Email me Triumph news and offers</span>
-          </label>
-        </div>
       </div>
     </section>
 
