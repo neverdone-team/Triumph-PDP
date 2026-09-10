@@ -628,6 +628,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
     <button data-member-set="false" aria-pressed="true">Not a member</button>
     <button data-member-set="true" aria-pressed="false">Member</button>
   </div>
+  <h4>Mini cart after an add</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-mini-set="last" aria-pressed="true">Last added</button>
+    <button data-mini-set="all" aria-pressed="false">Whole bag</button>
+  </div>
   <div class="dash__row" style="margin-bottom:0">
     <button id="dashHide">Hide</button>
   </div>
@@ -819,8 +824,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const member = Shop.read().member;
     $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(member))));
     $$('[data-cart-set]').forEach(o => o.setAttribute('aria-pressed', String((o.dataset.cartSet === 'empty') === empty)));
+    const mini = Shop.miniMode();
+    $$('[data-mini-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.miniSet === mini)));
   }
   $$('[data-member-set]').forEach(b => b.addEventListener('click', () => Shop.setMember(b.dataset.memberSet === 'true')));
+  $$('[data-mini-set]').forEach(b => b.addEventListener('click', () => { Shop.setMiniMode(b.dataset.miniSet); syncDash(); }));
   $$('[data-cart-set]').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.cartSet === 'empty') { Shop.clear(); return; }
     Shop.clear();

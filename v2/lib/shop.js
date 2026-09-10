@@ -14,6 +14,11 @@ window.Shop = (function () {
   'use strict';
 
   var KEY = 'triumph.proto.cart.v1';
+  /* How much the mini cart shows after an Add (Amelie, 2026-09-10):
+       'last' — the original: the line just added, on its own, as a confirmation
+       'all'  — the whole bag, that line first, scrollable
+     Opened from the basket icon it is always the whole bag, in both modes. */
+  var MINI_KEY = 'triumph.proto.miniMode';
   var FREE_AT = 130;      // free-shipping threshold, € — matches cart + checkout
   var SHIP_STD = 4.99;
   var VAT = 0.19;
@@ -220,6 +225,36 @@ window.Shop = (function () {
     });
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
+
+    /* Desktop hovers the basket icon open; a phone has no hover, so there tapping is the
+       only way in (the tap handlers live in the pages). `(hover:hover) and (pointer:fine)`
+       keeps a touch device out even when its window is wide, because a tap on a
+       hover-bound element fires mouseenter too and the card would open behind the tap. */
+    var canHover = function () {
+      return window.matchMedia('(hover:hover) and (pointer:fine)').matches
+          && !window.matchMedia(SHEET).matches;
+    };
+    var overCard = false, leaveT = null;
+    function cancelLeave() { if (leaveT) { clearTimeout(leaveT); leaveT = null; } }
+    function leaveSoon() {                      // a grace period to travel icon → card
+      cancelLeave();
+      leaveT = setTimeout(function () { if (!overCard) close(); }, 220);
+    }
+    document.addEventListener('mouseover', function (e) {
+      if (!canHover()) return;
+      var a = anchor();
+      if (a && (e.target === a || a.contains(e.target))) { cancelLeave(); open({ hover: true }); }
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (!canHover()) return;
+      var a = anchor();
+      if (a && (e.target === a || a.contains(e.target)) && !root.contains(e.relatedTarget)) leaveSoon();
+    });
+    root.addEventListener('mouseenter', function () { overCard = true; cancelLeave(); });
+    root.addEventListener('mouseleave', function () {
+      overCard = false;
+      if (canHover() && hoverOpened) leaveSoon();   // a card opened by an Add stays put
+    });
     return root;
   }
 
@@ -241,16 +276,28 @@ window.Shop = (function () {
 
   var onlySku = null;          // set when the sheet opens straight after an add
 
+  function miniMode() {
+    try { return localStorage.getItem(MINI_KEY) === 'all' ? 'all' : 'last'; } catch (e) { return 'last'; }
+  }
+  function setMiniMode(m) {
+    try { localStorage.setItem(MINI_KEY, m === 'all' ? 'all' : 'last'); } catch (e) {}
+    if (mc && mc.getAttribute('data-open') === 'true') paintMini();
+  }
+
   function paintMini() {
     if (!mc) return;
     var t = totals();
     var body = mc.querySelector('[data-mc-body]');
-    // Opened by an Add, the sheet is a confirmation of that one line. Opened from the
-    // basket it is the bag, so it lists everything.
+    /* Opened from the basket it is always the whole bag. Opened by an Add it depends on
+       the mode: 'last' confirms that one line, 'all' lists the bag with it on top. */
     var shown = t.lines;
     if (onlySku) {
       var hit = t.lines.filter(function (l) { return l.sku === onlySku; });
-      if (hit.length) shown = hit;
+      if (hit.length) {
+        shown = miniMode() === 'all'
+          ? hit.concat(t.lines.filter(function (l) { return l.sku !== onlySku; }))
+          : hit;
+      }
     }
     body.innerHTML = shown.length
       ? shown.map(lineHTML).join('')
@@ -310,14 +357,17 @@ window.Shop = (function () {
     panel.style.width = w + 'px';
     panel.style.left = Math.round(left) + 'px';
     panel.style.top = Math.round(top) + 'px';
-    // never let the card run off the bottom; its line list scrolls instead
-    panel.style.maxHeight = Math.max(220, window.innerHeight - top - 16) + 'px';
+    // never let the card run off the bottom, and never let a long bag make a card as
+    // tall as the window — the line list scrolls inside it either way
+    panel.style.maxHeight = Math.max(220, Math.min(560, window.innerHeight - top - 16)) + 'px';
   }
 
+  var hoverOpened = false;
   function open(opts) {
     opts = opts || {};
     var fresh = !mc;                 // was the sheet built by this very call?
     build();
+    hoverOpened = !!opts.hover;
     onlySku = opts.only || null;
     mc.querySelector('[data-mc-title]').textContent = opts.title || 'Added to your bag';
     // fill it BEFORE opening, so the panel rises at its final height instead of
@@ -331,8 +381,11 @@ window.Shop = (function () {
     if (fresh) void mc.offsetHeight;
     mc.setAttribute('data-open', 'true');
     // preventScroll: focusing the close button inside a panel that is still translated
-    // down makes the browser scroll the page to chase it
-    var x = mc.querySelector('.mc__x'); if (x) x.focus({ preventScroll: true });
+    // down makes the browser scroll the page to chase it. A hover never takes focus —
+    // the pointer is still on the icon and the customer has not asked for the keyboard.
+    if (!opts.hover) {
+      var x = mc.querySelector('.mc__x'); if (x) x.focus({ preventScroll: true });
+    }
   }
 
   function close() {
@@ -358,6 +411,7 @@ window.Shop = (function () {
     setMember: setMember, setVoucher: setVoucher,
     money: money, onChange: onChange, refresh: emit,
     openMini: open, closeMini: close,
+    miniMode: miniMode, setMiniMode: setMiniMode,
     FREE_AT: FREE_AT, SHIP_STD: SHIP_STD
   };
 })();

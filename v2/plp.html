@@ -1150,7 +1150,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-labels="short" data-images="new" data-price="a" data-model="on">
+<body data-view="products" data-filters="some" data-labels="short" data-images="new" data-price="a" data-model="on" data-minicart="last">
 
 <!-- HEADER -->
 <header>
@@ -1307,6 +1307,15 @@ body.dash-open .dash { display: flex; }
     <div class="dash__seg">
       <button data-k="labels" data-val="short" data-on="true" title="English labels">EN</button>
       <button data-k="labels" data-val="long" title="German labels — the long-translation case">DE · long</button>
+    </div>
+  </div>
+  <!-- how much the mini cart shows after an Add; the setting is stored by lib/shop.js
+       so it holds across the PDP and the bag page too -->
+  <div class="dash__group">
+    <div class="dash__label">Mini cart</div>
+    <div class="dash__seg">
+      <button data-k="minicart" data-val="last" data-on="true">Last added</button>
+      <button data-k="minicart" data-val="all">Whole bag</button>
     </div>
   </div>
   <div class="dash__group">
@@ -2507,6 +2516,7 @@ const CONTROLS = {
   images:   ['new', 'live'],
   price:    ['a', 'b'],   /* price facet: A = min/max + range, B = bands */
   model:    ['on', 'off'], /* driven from the sheet's own switch; here for deep links */
+  minicart: ['last', 'all'], /* what the mini cart shows after an Add */
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
@@ -2534,6 +2544,7 @@ function setOption(key, val) {
       card.querySelectorAll('.thumb').forEach(t => t.dataset.sel = String(t.dataset.idx === '0'));
     });
   }
+  if (key === 'minicart' && window.Shop) Shop.setMiniMode(val);
   if (key === 'labels') applyLabels(val === 'long');
   if (key === 'view') applyView(val);
   if (key === 'model') {
@@ -2569,6 +2580,9 @@ else dashToggle.setAttribute('aria-expanded', 'false');
 /* deep-link: plp.html?view=content&filters=some&member=v3&images=live&open=2
    (open forces the nth colour panel open — for review/screenshots) */
 const params = new URLSearchParams(location.search);
+/* the mini cart mode is remembered by lib/shop.js, not by this page, so the panel has to
+   adopt what is stored — unless the URL says otherwise, which the loop below handles */
+if (!params.get('minicart') && window.Shop) setOption('minicart', Shop.miniMode());
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
 alignTiles();
 if (params.get('drawer')) setDrawer(true);
