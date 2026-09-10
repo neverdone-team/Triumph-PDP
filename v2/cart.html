@@ -515,11 +515,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .cart__left,.cart__right{display:contents}
   .cart__main,.cart__status,.sum,.cart__express{padding:0}
   .cart__express{order:1} .cart__status{order:2} .cart__main{order:3} .sum{order:4}
-  /* no room for two facts on one line: the delivery date leads, the gap follows */
+  /* No room for two facts on one line, so they stack: the delivery date leads, then the
+     gap (or, for a member, the free-shipping note) and the bar. Every one of these needs
+     an explicit row — .shipfree inherits row 1 from the desktop rule and would paint on
+     top of the delivery date. */
   .statusbox{grid-template-columns:minmax(0,1fr);gap:var(--space-12)}
   .promise{grid-column:1;grid-row:1;justify-self:start}
-  #shipMsg{grid-row:2}
-  .ship-progress__bar{grid-row:3}
+  #shipMsg{grid-column:1;grid-row:2}
+  .shipfree{grid-column:1;grid-row:2}
+  .ship-progress__bar{grid-column:1;grid-row:3}
   /* No tint on the phone summary (Amelie, 2026-09-10): real space above it and one
      hairline do the separating from the cross-sell strip. */
   .sum{position:static;background:transparent;border:0;
