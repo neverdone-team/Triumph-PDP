@@ -93,6 +93,10 @@ decides how many are on screen. The chosen mode persists in `localStorage`.
 | `v2/cart.html` | Bag page — renders the shared lines, cross-sell, voucher, MyTriumph |
 | `v2/checkout.html` | Checkout in both modes — renders the same lines in the summary rail and places the order |
 
+Typing two characters into **Street** (delivery or billing) opens address suggestions —
+a local list with no service behind it, purely to show the interaction. Arrow keys and
+Enter work; picking one fills street, number, postcode and city in that block.
+
 State lives in `localStorage` under `triumph.proto.cart.v1`. It works opened straight from
 disk in Chrome; if a browser blocks storage on `file://`, serve the folder instead
 (`python3 -m http.server` from the repo root, then `/v2/pdp.html`) — the code falls back to

@@ -446,6 +446,30 @@ body[data-mode="steps"] .place{display:none}
 body[data-mode="steps"] .place.is-last{display:block}
 
 /* ============================================================
+   ADDRESS SUGGESTIONS
+   A visual stand-in for an address lookup: a local list, no service behind it.
+   The panel hangs off the street field's own box, so it lines up with the outline.
+   ============================================================ */
+.field{position:relative}
+.suggest{
+  position:absolute; left:0; right:0; top:calc(6px + var(--ctl)); z-index:30;
+  background:var(--c-bg); border:1px solid var(--c-edge); border-top:0;
+  max-height:236px; overflow-y:auto;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+.suggest[hidden]{display:none}
+.suggest__item{
+  display:block; width:100%; text-align:left; cursor:pointer;
+  padding:var(--space-12) var(--space-16);
+  border-bottom:1px solid var(--c-hair);
+}
+.suggest__item:last-child{border-bottom:0}
+.suggest__item:hover,.suggest__item[aria-selected="true"]{background:var(--c-wash)}
+.suggest__line{display:block}
+.suggest__sub{display:block;color:var(--c-ink-soft);margin-top:var(--space-2)}
+.suggest__item mark{background:none;color:inherit;font-weight:400}
+
+/* ============================================================
    REVIEW (step 4)
    ============================================================ */
 .review{margin:0;border-top:1px solid var(--c-hair)}
@@ -1091,7 +1115,7 @@ body[data-mode="steps"] .place.is-last{display:block}
         </div>
       </div>
 
-      <div class="grid" id="addrForm" data-account-only="guest new">
+      <div class="grid" id="addrForm" data-address-group data-account-only="guest new">
         <label class="field">
           <select id="country" required>
             <option value="DE" selected>Germany</option>
@@ -1120,14 +1144,14 @@ body[data-mode="steps"] .place.is-last{display:block}
 
         <div class="grid grid--street">
           <label class="field" data-validate="required">
-            <input type="text" id="street" placeholder=" " autocomplete="address-line1" />
+            <input type="text" id="street" data-addr="street" autocomplete="off" placeholder=" " />
             <fieldset class="field__frame"><legend><span>Street</span></legend></fieldset>
             <span class="field__label">Street</span>
             <span class="field__hint t-body-xs">Start typing — we complete the address.</span>
             <span class="field__err t-body-xs">Please enter your street.</span>
           </label>
           <label class="field" data-validate="required">
-            <input type="text" id="hno" placeholder=" " />
+            <input type="text" id="hno" data-addr="no" placeholder=" " />
             <fieldset class="field__frame"><legend><span>No.</span></legend></fieldset>
             <span class="field__label">No.</span>
           </label>
@@ -1142,12 +1166,12 @@ body[data-mode="steps"] .place.is-last{display:block}
 
         <div class="grid grid--zip">
           <label class="field" data-validate="required">
-            <input type="text" id="zip" placeholder=" " inputmode="numeric" autocomplete="postal-code" />
+            <input type="text" id="zip" data-addr="zip" placeholder=" " inputmode="numeric" autocomplete="postal-code" />
             <fieldset class="field__frame"><legend><span>Postcode</span></legend></fieldset>
             <span class="field__label">Postcode</span>
           </label>
           <label class="field" data-validate="required">
-            <input type="text" id="city" placeholder=" " autocomplete="address-level2" />
+            <input type="text" id="city" data-addr="city" placeholder=" " autocomplete="address-level2" />
             <fieldset class="field__frame"><legend><span>City</span></legend></fieldset>
             <span class="field__label">City</span>
           </label>
@@ -1167,18 +1191,18 @@ body[data-mode="steps"] .place.is-last{display:block}
           <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
           <span class="t-body-s">Billing address is different from the delivery address</span>
         </label>
-        <div id="billing" hidden style="margin-top:var(--space-12)">
+        <div id="billing" data-address-group hidden style="margin-top:var(--space-12)">
           <div class="grid grid--2">
             <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>First name</span></legend></fieldset><span class="field__label">First name</span></label>
             <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Last name</span></legend></fieldset><span class="field__label">Last name</span></label>
           </div>
           <div class="grid grid--street" style="margin-top:var(--space-12)">
-            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Street</span></legend></fieldset><span class="field__label">Street</span></label>
-            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>No.</span></legend></fieldset><span class="field__label">No.</span></label>
+            <label class="field"><input type="text" data-addr="street" autocomplete="off" placeholder=" " /><fieldset class="field__frame"><legend><span>Street</span></legend></fieldset><span class="field__label">Street</span></label>
+            <label class="field"><input type="text" data-addr="no" placeholder=" " /><fieldset class="field__frame"><legend><span>No.</span></legend></fieldset><span class="field__label">No.</span></label>
           </div>
           <div class="grid grid--zip" style="margin-top:var(--space-12)">
-            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Postcode</span></legend></fieldset><span class="field__label">Postcode</span></label>
-            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>City</span></legend></fieldset><span class="field__label">City</span></label>
+            <label class="field"><input type="text" data-addr="zip" placeholder=" " /><fieldset class="field__frame"><legend><span>Postcode</span></legend></fieldset><span class="field__label">Postcode</span></label>
+            <label class="field"><input type="text" data-addr="city" placeholder=" " /><fieldset class="field__frame"><legend><span>City</span></legend></fieldset><span class="field__label">City</span></label>
           </div>
         </div>
       </div>
@@ -1631,6 +1655,98 @@ body[data-mode="steps"] .place.is-last{display:block}
     if (mk) mk.checked = state.account === 'new';
     recalc();
   }
+
+  /* ---------- address suggestions ----------
+     A visual stand-in for a lookup service: a local list, filtered on what has been
+     typed. Picking one fills street, number, postcode and city in the same block. */
+  const ADDRESSES = [
+    { street: 'Kurfürstendamm', no: '21',  zip: '10719', city: 'Berlin' },
+    { street: 'Kurfürstendamm', no: '195', zip: '10707', city: 'Berlin' },
+    { street: 'Kurfürstenstraße', no: '14', zip: '10785', city: 'Berlin' },
+    { street: 'Friedrichstraße', no: '76', zip: '10117', city: 'Berlin' },
+    { street: 'Friedrichstraße', no: '140', zip: '10117', city: 'Berlin' },
+    { street: 'Schlüterstraße', no: '38', zip: '10629', city: 'Berlin' },
+    { street: 'Tauentzienstraße', no: '21', zip: '10789', city: 'Berlin' },
+    { street: 'Maximilianstraße', no: '12', zip: '80539', city: 'München' },
+    { street: 'Marienplatz', no: '8', zip: '80331', city: 'München' },
+    { street: 'Neuer Wall', no: '31', zip: '20354', city: 'Hamburg' },
+    { street: 'Mönckebergstraße', no: '7', zip: '20095', city: 'Hamburg' },
+    { street: 'Königsallee', no: '56', zip: '40212', city: 'Düsseldorf' },
+    { street: 'Zeil', no: '106', zip: '60313', city: 'Frankfurt am Main' },
+    { street: 'Schildergasse', no: '65', zip: '50667', city: 'Köln' },
+  ];
+
+  function markMatch(text, q) {
+    const i = text.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0 || !q) return esc(text);
+    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
+  }
+
+  function wireAddressLookup(input) {
+    const field = input.closest('.field');
+    const group = input.closest('[data-address-group]');
+    if (!field || !group) return;
+
+    const list = document.createElement('div');
+    list.className = 'suggest';
+    list.setAttribute('role', 'listbox');
+    list.hidden = true;
+    field.appendChild(list);
+
+    let matches = [], active = -1;
+
+    const close = () => { list.hidden = true; active = -1; input.setAttribute('aria-expanded', 'false'); };
+
+    function paint(q) {
+      list.innerHTML = matches.map((a, i) =>
+        '<button class="suggest__item" type="button" role="option" data-i="' + i + '"' +
+          (i === active ? ' aria-selected="true"' : '') + '>' +
+          '<span class="suggest__line t-body-m">' + markMatch(a.street + ' ' + a.no, q) + '</span>' +
+          '<span class="suggest__sub t-body-s">' + esc(a.zip + ' ' + a.city) + '</span>' +
+        '</button>').join('');
+      list.hidden = matches.length === 0;
+      input.setAttribute('aria-expanded', String(matches.length > 0));
+    }
+
+    function pick(i) {
+      const a = matches[i];
+      if (!a) return;
+      const set = (role, v) => { const el = group.querySelector('[data-addr="' + role + '"]'); if (el) el.value = v; };
+      set('street', a.street); set('no', a.no); set('zip', a.zip); set('city', a.city);
+      close();
+      const nextEl = group.querySelector('[data-addr="no"]');
+      if (nextEl) nextEl.focus();
+    }
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      if (q.length < 2) { matches = []; close(); return; }
+      matches = ADDRESSES.filter(a => (a.street + ' ' + a.no + ' ' + a.zip + ' ' + a.city)
+        .toLowerCase().includes(q.toLowerCase())).slice(0, 5);
+      active = -1;
+      paint(q);
+    });
+
+    input.addEventListener('keydown', e => {
+      if (list.hidden) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        active = (active + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length;
+        paint(input.value.trim());
+      } else if (e.key === 'Enter' && active > -1) {
+        e.preventDefault(); pick(active);
+      } else if (e.key === 'Escape') { close(); }
+    });
+
+    // mousedown, not click: blur fires first and would close the list under the pointer
+    list.addEventListener('mousedown', e => {
+      const b = e.target.closest('[data-i]');
+      if (b) { e.preventDefault(); pick(Number(b.dataset.i)); }
+    });
+    input.addEventListener('blur', () => setTimeout(close, 120));
+  }
+
+  $$('input[data-addr="street"]').forEach(wireAddressLookup);
 
   /* ---------- saved address vs a new one ---------- */
   function syncAddrChoice() {
