@@ -1,0 +1,112 @@
+/* ============================================================================
+   Triumph prototype — mini cart
+   A modal card hung under the basket icon. Self-contained on purpose: it is injected
+   into pages that each carry their own token block (pdp.html uses --c-line/--c-chip,
+   cart.html uses --space-*), so everything it needs is declared locally on .mc and
+   nothing leaks outwards. Values are the Design System Triumph semantic tokens.
+   ============================================================================ */
+.mc{
+  --mc-ink:#000;
+  --mc-ink-50:rgba(0,0,0,.5);
+  --mc-bg:#fff;
+  --mc-hair:rgba(0,0,0,.08);
+  --mc-edge:rgba(0,0,0,.2);
+  --mc-grey:#F1F1F1;
+  --mc-scrim:rgba(0,0,0,.38);
+  --mc-green:#008000;
+  --mc-w:560px;
+  --mc-pad:24px;
+  --mc-ease:cubic-bezier(.22,.61,.36,1);
+
+  position:fixed; inset:0; z-index:9000;
+  font-family:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
+  color:var(--mc-ink);
+  pointer-events:none;                 /* the page behind stays live — this is a dropdown */
+}
+
+/* The sheet comes up from the bottom at every width — same idiom as the PLP filter
+   sheet. Full-bleed on a phone; above 600 it caps and centres so it does not stretch a
+   short list across a desktop. */
+.mc__scrim{
+  position:absolute; inset:0; background:var(--mc-scrim);
+  opacity:0; transition:opacity .28s var(--mc-ease); pointer-events:none;
+}
+.mc[data-open="true"] .mc__scrim{opacity:1;pointer-events:auto}
+
+.mc__panel{
+  position:absolute; left:0; right:0; bottom:0; margin:0 auto;
+  width:100%; max-width:var(--mc-w);
+  background:var(--mc-bg);
+  display:flex; flex-direction:column; max-height:86vh;
+  border-radius:16px 16px 0 0;
+  box-shadow:0 -6px 28px rgba(0,0,0,.16);
+  padding-bottom:env(safe-area-inset-bottom);
+  transform:translateY(100%);
+  transition:transform .34s var(--mc-ease);
+  pointer-events:none;
+}
+.mc[data-open="true"] .mc__panel{transform:none;pointer-events:auto}
+
+.mc__grab{
+  display:block; width:36px; height:3px; border-radius:999px;
+  background:var(--mc-edge); margin:10px auto 0; flex:none;
+}
+
+/* ---------------- head ---------------- */
+.mc__head{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:18px var(--mc-pad); border-bottom:1px solid var(--mc-hair);
+}
+.mc__headline{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.mc__tick{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1}
+.mc__title{font-weight:400;font-size:12px;line-height:16px;letter-spacing:.08em;text-transform:uppercase}
+.mc__x{
+  width:24px;height:24px;flex:none;display:grid;place-items:center;
+  background:none;border:0;padding:0;cursor:pointer;color:inherit;
+}
+.mc__x svg{width:13px;height:13px;stroke:currentColor;stroke-width:1;fill:none}
+.mc__x:hover{opacity:.55}
+
+/* ---------------- lines ---------------- */
+.mc__body{flex:1 1 auto;min-height:0;overflow-y:auto}
+.mc__empty{
+  margin:0;padding:40px var(--mc-pad);text-align:center;color:var(--mc-ink-50);
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em;
+}
+.mc__li{
+  display:grid;grid-template-columns:76px minmax(0,1fr);gap:16px;
+  padding:20px var(--mc-pad); border-bottom:1px solid var(--mc-hair);
+}
+.mc__li:last-child{border-bottom:0}
+.mc__thumb{display:block;width:76px;height:100px;background:var(--mc-grey);overflow:hidden}
+.mc__thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.mc__info{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mc__name{font-weight:400;font-size:13px;line-height:18px;letter-spacing:.06em;text-transform:uppercase}
+.mc__meta{font-weight:300;font-size:12px;line-height:17px;letter-spacing:.04em;color:var(--mc-ink-50)}
+.mc__num{margin-top:8px;font-weight:400;font-size:14px;line-height:18px}
+
+/* ---------------- free shipping ---------------- */
+.mc__ship{
+  flex:none;margin:0;padding:16px var(--mc-pad);border-top:1px solid var(--mc-hair);
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;
+}
+.mc__ship[data-free="true"]{color:var(--mc-green)}
+
+/* ---------------- foot ---------------- */
+.mc__foot{flex:none;padding:0 var(--mc-pad) var(--mc-pad);display:grid;gap:10px}
+.mc__btn{
+  display:flex;align-items:center;justify-content:center;height:48px;
+  border:1px solid var(--mc-ink);background:var(--mc-bg);color:var(--mc-ink);
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.18em;text-transform:uppercase;
+  text-decoration:none;cursor:pointer;
+}
+.mc__btn:hover{background:var(--mc-grey)}
+.mc__btn--primary{background:var(--mc-ink);color:#fff}
+.mc__btn--primary:hover{background:#222}
+
+@media (max-width:599.98px){
+  .mc{--mc-pad:20px;--mc-w:100%}
+}
+
+/* the card is presentation — a print or a screenshot of the page should not carry it */
+@media print{ .mc{display:none} }

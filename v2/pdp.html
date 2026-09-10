@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Aura Spotlight – Padded Underwire Bra | Triumph</title>
+<link rel="stylesheet" href="./lib/shop.css" />
 <style>
 /* ============================================================
    FONTS (local — Alliance No.1 Light + Regular)
@@ -35,6 +36,7 @@
   --c-chip:      #DDDDDD;
   --c-swatch:    rgba(0,0,0,.05);
   --c-sale:      #C1003F;
+  --c-burgundy:  #5E2039;
 
   --font-sans: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
 
@@ -206,6 +208,13 @@ header {
 .p-price b { font-size: 14px; font-weight: 400; line-height: 16px; }
 .p-price span { font-size: 12px; font-weight: 300; line-height: 14px; color: var(--c-ink-50); }
 .price-note::before { content: "RRP"; } /* mobile shows "incl. VAT" instead */
+/* MyTriumph price sits BESIDE the standard one as a second plain price —
+   never a strike-through against it (member price display rule) */
+.p-member { margin-top: 4px; font-size: 12px; line-height: 14px; font-weight: 400; color: var(--c-burgundy); letter-spacing: 0; }
+/* shown only when Add to Cart is pressed without a size */
+.size-hint { color: var(--c-sale); font-size: 12px; line-height: 16px; letter-spacing: .04em; }
+.size-hint[hidden] { display: none; }
+.size-grid.is-missing .chip { border-color: var(--c-sale); }
 .fav { width: 24px; height: 24px; flex: none; }
 .fav svg { width: 100%; height: 100%; fill: none; stroke: var(--c-ink); stroke-width: 1.2; transition: fill .25s var(--ease-out); }
 .fav.is-on svg { fill: var(--c-ink); }
@@ -793,9 +802,9 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
         <button aria-label="Wishlist">
           <svg class="icon" viewBox="0 0 24 24"><path d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z" stroke-linejoin="round"/></svg>
         </button>
-        <button aria-label="Cart">
+        <button aria-label="Cart" id="cartBtn">
           <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-          <span class="cart-count" id="cartCount">0</span>
+          <span class="cart-count" id="cartCount" data-cart-count>0</span>
         </button>
         <button class="burger" aria-label="Menu">
           <svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg>
@@ -842,7 +851,8 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
         <div class="p-head__txt">
           <div class="p-name">Aura Spotlight</div>
           <h1 class="p-title">Padded Underwire Bra</h1>
-          <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+          <div class="p-price"><b>€59.95</b><span class="price-note"></span></div>
+          <div class="p-member">€53.95 member price</div>
         </div>
         <button class="fav" id="fav" aria-label="Add to wishlist">
           <svg viewBox="0 0 24 24"><path class="hs" d="M10.4597 18.6328L11.9819 19.9434L13.5044 18.6328C14.9883 17.3571 16.2141 16.2543 17.1817 15.3244C18.1492 14.3945 18.9158 13.5628 19.4813 12.8291C20.0468 12.0955 20.4403 11.4162 20.6618 10.7912C20.8834 10.1661 20.9941 9.52346 20.9941 8.86331C20.9941 7.46189 20.5023 6.29151 19.5187 5.35217C18.5349 4.41296 17.309 3.94336 15.8411 3.94336C15.1066 3.94336 14.4073 4.07837 13.7432 4.3484C13.0793 4.61829 12.4922 5.00752 11.9819 5.51611C11.4718 5.00752 10.8847 4.61829 10.2206 4.3484C9.55672 4.07837 8.85743 3.94336 8.12275 3.94336C6.66185 3.94336 5.44185 4.41296 4.46277 5.35217C3.48368 6.29151 2.99414 7.46189 2.99414 8.86331C2.99414 9.53126 3.10691 10.1777 3.33246 10.8027C3.55801 11.4279 3.9515 12.1091 4.51294 12.8466C5.07452 13.584 5.83706 14.4158 6.80056 15.3419C7.76407 16.2679 8.98378 17.3649 10.4597 18.6328Z"/><path class="ho" d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z"/></svg>
@@ -852,10 +862,10 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
       <div class="colors rv">
         <div class="lbl" id="colorLabel">Creamy Dream</div>
         <div class="colors__opts" role="group" aria-label="Colours">
-          <button class="swatch" data-sel="true" data-color="Creamy Dream" aria-label="Creamy Dream">
+          <button class="swatch" data-sel="true" data-color="Creamy Dream" data-swatch="./Assets/pdp/swatch-creamy.png" data-shot="./Assets/pdp/gallery-1.jpg" aria-label="Creamy Dream">
             <img src="./Assets/pdp/swatch-creamy.png" alt="" />
           </button>
-          <button class="swatch" data-sel="false" data-color="Powder Blue" aria-label="Powder Blue">
+          <button class="swatch" data-sel="false" data-color="Powder Blue" data-swatch="./Assets/pdp/swatch-alt.png" data-shot="./Assets/pdp/gallery-2.jpg" aria-label="Powder Blue">
             <img src="./Assets/pdp/swatch-alt.png" alt="" />
           </button>
         </div>
@@ -891,7 +901,8 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
         <a class="size-link" href="#">Find the right size</a>
 
         <div class="cta-block" id="ctaBlock">
-          <button class="cta" data-add>Add to Cart</button>
+          <p class="size-hint" id="sizeHint" role="status" hidden>Choose an underbust and a cup size first.</p>
+          <button class="cta" data-add="main">Add to Cart</button>
           <div class="usp">
             <span>Free Delivery with <u>MYTriumph</u></span><i></i>
             <span>Easy Returns</span><i></i>
@@ -907,9 +918,9 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
             <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Panty" loading="lazy" /></div>
             <div class="set-item__txt">
               <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Panty</strong></div>
-              <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+              <div class="p-price"><b>€59.95</b><span class="price-note"></span></div>
             </div>
-            <button class="addbag" aria-label="Add to bag" data-add>
+            <button class="addbag" aria-label="Add Panty to bag" data-add="set" data-sku="aura-panty-cream-m" data-name="Panty" data-series="Aura Spotlight" data-price="59.95" data-member="53.95" data-size="M" data-colour="Creamy Dream" data-img="./Assets/pdp/gallery-3-color.jpg">
               <svg viewBox="0 0 40 40"><rect x="0.25" y="0.25" width="39.5" height="39.5" fill="none" stroke="#BDBDBD" stroke-width="0.5"/><path d="M20 15V25M25 20H15" stroke="black" stroke-width="0.8"/></svg>
             </button>
           </div>
@@ -917,19 +928,19 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
             <div class="set-item__img"><img src="./Assets/pdp/gallery-2.jpg" alt="Aura Spotlight Top" loading="lazy" /></div>
             <div class="set-item__txt">
               <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Top</strong></div>
-              <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+              <div class="p-price"><b>€59.95</b><span class="price-note"></span></div>
             </div>
-            <button class="addbag" aria-label="Add to bag" data-add>
+            <button class="addbag" aria-label="Add Top to bag" data-add="set" data-sku="aura-top-cream-m" data-name="Top" data-series="Aura Spotlight" data-price="59.95" data-member="53.95" data-size="M" data-colour="Creamy Dream" data-img="./Assets/pdp/gallery-2.jpg">
               <svg viewBox="0 0 40 40"><rect x="0.25" y="0.25" width="39.5" height="39.5" fill="none" stroke="#BDBDBD" stroke-width="0.5"/><path d="M20 15V25M25 20H15" stroke="black" stroke-width="0.8"/></svg>
             </button>
           </div>
           <div class="set-item">
-            <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Top" loading="lazy" /></div>
+            <div class="set-item__img"><img src="./Assets/pdp/gallery-3-color.jpg" alt="Aura Spotlight Shorty" loading="lazy" /></div>
             <div class="set-item__txt">
-              <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Top</strong></div>
-              <div class="p-price"><b>£59.95</b><span class="price-note"></span></div>
+              <div class="set-item__ttl"><em>Aura Spotlight</em><strong>Shorty</strong></div>
+              <div class="p-price"><b>€59.95</b><span class="price-note"></span></div>
             </div>
-            <button class="addbag" aria-label="Add to bag" data-add>
+            <button class="addbag" aria-label="Add Shorty to bag" data-add="set" data-sku="aura-shorty-cream-m" data-name="Shorty" data-series="Aura Spotlight" data-price="59.95" data-member="53.95" data-size="M" data-colour="Creamy Dream" data-img="./Assets/pdp/gallery-3-color.jpg">
               <svg viewBox="0 0 40 40"><rect x="0.25" y="0.25" width="39.5" height="39.5" fill="none" stroke="#BDBDBD" stroke-width="0.5"/><path d="M20 15V25M25 20H15" stroke="black" stroke-width="0.8"/></svg>
             </button>
           </div>
@@ -972,25 +983,25 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
             <div class="lbl acc__sec">Shipping</div>
             <div class="grp">
               <div class="lbl">Free for MyTriumph members</div>
-              <div class="prow"><span>Standard delivery in 2-3 working days<br />Join now</span><b>£0.00</b></div>
+              <div class="prow"><span>Standard delivery in 2-3 working days<br />Join now</span><b>€0.00</b></div>
             </div>
             <div class="grp">
               <div class="lbl">Home delivery</div>
-              <div class="prow"><span>Standard delivery in 2-3 working days</span><b>£4.99</b></div>
-              <div class="prow"><span>Express delivery in 1-2 working days</span><b>£7.99</b></div>
+              <div class="prow"><span>Standard delivery in 2-3 working days</span><b>€4.99</b></div>
+              <div class="prow"><span>Express delivery in 1-2 working days</span><b>€7.99</b></div>
             </div>
             <div class="grp">
               <div class="lbl">Click &amp; Collect at your Triumph store</div>
-              <div class="prow"><span>Free delivery in 2-3 working days</span><b>£0.00</b></div>
+              <div class="prow"><span>Free delivery in 2-3 working days</span><b>€0.00</b></div>
             </div>
             <div class="grp">
               <div class="lbl">Returns in Triumph stores</div>
-              <div class="prow"><span>Free of charge</span><b>£0.00</b></div>
+              <div class="prow"><span>Free of charge</span><b>€0.00</b></div>
             </div>
             <div class="lbl acc__sec">Returns</div>
             <div class="grp">
               <div class="lbl">Returns by post:</div>
-              <p>Refund to an online gift card: free of charge. Refund to the original payment method: £2.95 is deducted from the refund amount.</p>
+              <p>Refund to an online gift card: free of charge. Refund to the original payment method: €2.95 is deducted from the refund amount.</p>
             </div>
             <div class="grp">
               <div class="lbl">Sustainable returns:</div>
@@ -1130,34 +1141,35 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
 
 <!-- MOBILE STICKY CTA -->
 <div class="sticky-cta" id="stickyCta">
-  <button class="cta" data-add>Add to Cart</button>
+  <button class="cta" data-add="main">Add to Cart</button>
 </div>
 
+<script src="./lib/shop.js"></script>
 <script>
 /* ============================================================
    DATA — You might like this (Figma rows 727:2022 / 2099 / 2176)
    ============================================================ */
 const RECS = [
-  { nm: 'Jersey',    pr: '£59.95', img: 'rec-1.jpg' },
-  { nm: 'Top',       pr: '£59.95', img: 'rec-2.jpg' },
-  { nm: 'Lacey bra', pr: '£59.95', img: 'rec-3.jpg' },
-  { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-4.jpg' },
-  { nm: 'Jersey',    pr: '£59.95', img: 'rec-5.jpg' },
-  { nm: 'Top',       pr: '£59.95', img: 'rec-6.jpg' },
-  { nm: 'Lacey bra', pr: '£59.95', img: 'rec-7.jpg' },
-  { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-8.jpg' },
-  { nm: 'Jersey',    pr: '£59.95', img: 'rec-9.jpg',   sale: true },
-  { nm: 'Top',       pr: '£59.95', img: 'rec-base.jpg', sale: true, noAlt: true },
-  { nm: 'Lacey bra', pr: '£59.95', img: 'rec-8.jpg',   sale: true },
-  { nm: 'Jersey Top Extra Soft with padd', pr: '£59.95', img: 'rec-9.jpg', sale: true },
-  { nm: 'Balconette bra', pr: '£54.95', img: 'rec-3.jpg' },
-  { nm: 'Jersey',         pr: '£49.95', img: 'rec-6.jpg' },
-  { nm: 'Top',            pr: '£39.95', img: 'rec-1.jpg' },
-  { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-4.jpg' },
-  { nm: 'Jersey Top Extra Soft with padd', pr: '£44.95', img: 'rec-7.jpg' },
-  { nm: 'Top',            pr: '£34.95', img: 'rec-2.jpg' },
-  { nm: 'Lacey bra',      pr: '£59.95', img: 'rec-5.jpg', sale: true },
-  { nm: 'Jersey',         pr: '£29.95', img: 'rec-8.jpg' },
+  { nm: 'Jersey',    pr: '€59.95', img: 'rec-1.jpg' },
+  { nm: 'Top',       pr: '€59.95', img: 'rec-2.jpg' },
+  { nm: 'Lacey bra', pr: '€59.95', img: 'rec-3.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '€59.95', img: 'rec-4.jpg' },
+  { nm: 'Jersey',    pr: '€59.95', img: 'rec-5.jpg' },
+  { nm: 'Top',       pr: '€59.95', img: 'rec-6.jpg' },
+  { nm: 'Lacey bra', pr: '€59.95', img: 'rec-7.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '€59.95', img: 'rec-8.jpg' },
+  { nm: 'Jersey',    pr: '€59.95', img: 'rec-9.jpg',   sale: true },
+  { nm: 'Top',       pr: '€59.95', img: 'rec-base.jpg', sale: true, noAlt: true },
+  { nm: 'Lacey bra', pr: '€59.95', img: 'rec-8.jpg',   sale: true },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '€59.95', img: 'rec-9.jpg', sale: true },
+  { nm: 'Balconette bra', pr: '€54.95', img: 'rec-3.jpg' },
+  { nm: 'Jersey',         pr: '€49.95', img: 'rec-6.jpg' },
+  { nm: 'Top',            pr: '€39.95', img: 'rec-1.jpg' },
+  { nm: 'Lacey bra',      pr: '€59.95', img: 'rec-4.jpg' },
+  { nm: 'Jersey Top Extra Soft with padd', pr: '€44.95', img: 'rec-7.jpg' },
+  { nm: 'Top',            pr: '€34.95', img: 'rec-2.jpg' },
+  { nm: 'Lacey bra',      pr: '€59.95', img: 'rec-5.jpg', sale: true },
+  { nm: 'Jersey',         pr: '€29.95', img: 'rec-8.jpg' },
 ];
 /* 20 items — fills the grid evenly at every count: 10x2 / 5x4 / 4x5 */
 
@@ -1269,12 +1281,99 @@ document.querySelectorAll('.size-grid').forEach(grid => {
 document.getElementById('fav').addEventListener('click', e =>
   e.currentTarget.classList.toggle('is-on'));
 
-/* add to cart — bump the header count */
-const cartCount = document.getElementById('cartCount');
+/* ============================================================
+   ADD TO CART
+   Writes into the shared bag (lib/shop.js) and opens the mini cart.
+   The main CTA needs both size grids answered; the "Complete your set"
+   tiles carry their own size on the button, so they add straight away.
+   ============================================================ */
+const PRODUCT = {
+  series: 'Aura Spotlight',
+  name:   'Padded Underwire Bra',
+  unit:   59.95,
+  member: 53.95,
+};
+
+const underbustGrid = document.querySelector('[aria-label="Underbust size"]');
+const cupGrid       = document.querySelector('[aria-label="Cup size"]');
+const sizeHint      = document.getElementById('sizeHint');
+
+const chosen = grid => {
+  const c = grid && grid.querySelector('.chip[data-sel="true"]');
+  return c ? c.textContent.trim() : '';
+};
+const chosenSwatch = () =>
+  document.querySelector('.swatch[data-sel="true"]') || document.querySelector('.swatch');
+
+function flagMissing() {
+  const missBand = !chosen(underbustGrid);
+  const missCup  = !chosen(cupGrid);
+  underbustGrid.classList.toggle('is-missing', missBand);
+  cupGrid.classList.toggle('is-missing', missCup);
+  sizeHint.hidden = !(missBand || missCup);
+  if (!sizeHint.hidden) (missBand ? underbustGrid : cupGrid)
+    .scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return !(missBand || missCup);
+}
+
+/* clearing the warning as soon as a size is picked keeps it from nagging */
+[underbustGrid, cupGrid].forEach(grid =>
+  grid.addEventListener('click', () => {
+    if (!sizeHint.hidden) flagMissing();
+    else grid.classList.remove('is-missing');
+  }));
+
+/* every in-stock band × cup, so the size stays changeable once the bag has it */
+const allSizes = () => {
+  const bands = [...underbustGrid.querySelectorAll('.chip:not(.chip--out)')].map(c => c.textContent.trim());
+  const cups  = [...cupGrid.querySelectorAll('.chip:not(.chip--out)')].map(c => c.textContent.trim());
+  return bands.flatMap(b => cups.map(c => b + c));
+};
+
+function addMain() {
+  if (!flagMissing()) return;
+  const size = chosen(underbustGrid) + chosen(cupGrid);   // e.g. 75 + C
+  const sw = chosenSwatch();
+  const colour = sw.dataset.color;
+  const sku = 'aura-bra-' + colour.toLowerCase().replace(/\s+/g, '-') + '-' + size.toLowerCase();
+  Shop.add({
+    sku:    sku,
+    name:   PRODUCT.name,
+    series: PRODUCT.series,
+    colour: colour,
+    size:   size,
+    sizes:  allSizes(),
+    unit:   PRODUCT.unit,
+    member: PRODUCT.member,
+    img:    sw.dataset.shot,
+    swatch: sw.dataset.swatch,
+    stock:  { level: 'ok', text: 'In stock' },
+  });
+  Shop.openMini({ title: 'Added to your bag', only: sku });
+}
+
+function addSet(btn) {
+  const d = btn.dataset;
+  Shop.add({
+    sku: d.sku, name: d.name, series: d.series,
+    colour: d.colour, size: d.size,
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    unit: Number(d.price), member: Number(d.member),
+    img: d.img, swatch: d.swatch,
+    stock: { level: 'low', text: 'Only 3 left in ' + d.size },
+  });
+  Shop.openMini({ title: 'Added to your bag', only: d.sku });
+}
+
 document.querySelectorAll('[data-add]').forEach(btn =>
   btn.addEventListener('click', () => {
-    cartCount.textContent = +cartCount.textContent + 1;
+    if (btn.dataset.add === 'set') addSet(btn);
+    else addMain();
   }));
+
+/* the header bag opens the drawer rather than jumping straight to the cart page */
+document.getElementById('cartBtn').addEventListener('click', () =>
+  Shop.openMini({ title: 'Your bag' }));
 
 /* accordions — animated open/close, one at a time; the opened height
    is measured so long panels (shipping) unfold fully */

@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Checkout | Triumph</title>
+<style>
+/* ============================================================
+   FONTS — Alliance No.1 Light + Regular (local)
+   ============================================================ */
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Light.otf") format("opentype");   font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Regular.otf") format("opentype"); font-weight:400; font-style:normal; font-display:swap; }
+
+/* ============================================================
+   DESIGN TOKENS
+   Names match the Web code-syntax on the Figma variables in
+   "Design System Triumph" (C4UzkYsFCfJGxKr7BaakLO), so every
+   value below maps 1:1 to a Semantic / Layout variable.
+   ============================================================ */
+:root {
+  /* Semantic · colour */
+  --c-ink:          #000000;                 /* text/primary, action/primary, border/high contrast */
+  --c-ink-soft:     rgba(0,0,0,.5);          /* text/secondary */
+  --c-on-dark:      #FFFFFF;                 /* text/on-dark */
+  --c-bg:           #FFFFFF;                 /* surface/raised */
+  --c-offwhite:     #F8F3F3;                 /* surface/page */
+  --c-wash:         #F9FAFB;                 /* surface/hover */
+  --c-grey-light:   #F1F1F1;                 /* surface/muted */
+  --c-grey-medium:  #747474;                 /* icon/medium contrast */
+  --c-hair:         rgba(0,0,0,.05);         /* border/low contrast, surface/subtle */
+  --c-edge:         rgba(0,0,0,.2);          /* border/medium contrast */
+  --c-burgundy:     #5E2039;                 /* text/accent, accent/brand */
+  --c-sales:        #C1003F;                 /* surface/sales */
+  --c-scrim:        rgba(0,0,0,.38);         /* overlay/scrim */
+  /* Semantic · feedback */
+  --color-error:      #E40032;  --color-tutu:       #F8E6E8;
+  --color-green:      #008000;  --color-peppermint: #E7F8E6;
+  --color-buddha:     #CC9400;  --color-warning:    #F8F7E6;
+  --color-darkCerulean:#0F5E8B; --color-info-tint:  #E6F0F8;
+
+  /* Layout · spacing */
+  --space-2:2px;  --space-4:4px;  --space-6:6px;  --space-8:8px;  --space-10:10px;
+  --space-12:12px;--space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;
+  --space-40:40px;--space-48:48px;--space-64:64px;
+  /* Layout · radius (Triumph is square — radius/none is the default) */
+  --radius-none:0; --radius-sm:2px; --radius-full:999px;
+  /* Layout · control heights */
+  --control-24:24px; --control-28:28px; --control-36:36px;
+  --control-40:40px; --control-44:44px; --control-48:48px; --control-56:56px;
+  --icon-16:16px; --icon-20:20px; --icon-24:24px;
+
+  --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
+  --header-h:80px;
+  --ease-out:cubic-bezier(.22,.61,.36,1);
+  /* half-weight strokes: a 0.5px stroke drawn as 1px at half alpha (see .field__frame) */
+  --hair-ink:color-mix(in srgb, var(--c-ink) 50%, transparent);
+  --hair-edge:color-mix(in srgb, var(--c-edge) 50%, transparent);
+  --hair-error:color-mix(in srgb, var(--color-error) 50%, transparent);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+/* the page background lives on <html> so the fixed rail-bleed layer (.ck::after, z-index:-1)
+   can sit behind the content without <body>'s own fill covering it */
+html{background:#FFFFFF}
+body{
+  background:transparent; color:var(--c-ink);
+  font-family:var(--font-sans); font-weight:300;
+  font-size:14px; line-height:20px; letter-spacing:.04em;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;background:none;border:0;padding:0;color:inherit}
+input,select{font-family:inherit;font-size:14px;color:inherit}
+a{color:inherit}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3,p{margin:0;font-weight:400}
+[hidden]{display:none!important}
+
+/* ============================================================
+   TYPE RAMP — one class per Figma text style
+   ============================================================ */
+.t-title-l  {font-weight:400;font-size:24px;line-height:30px;letter-spacing:.14em;text-transform:uppercase}
+.t-title-m  {font-weight:400;font-size:14px;line-height:20px;letter-spacing:.20em;text-transform:uppercase}
+.t-title-s  {font-weight:400;font-size:14px;line-height:20px;letter-spacing:.16em;text-transform:uppercase}
+.t-title-xs {font-weight:300;font-size:12px;line-height:16px;letter-spacing:.16em;text-transform:uppercase}
+.t-body-m   {font-weight:300;font-size:14px;line-height:22px;letter-spacing:.05em}
+.t-body-s   {font-weight:300;font-size:12px;line-height:18px;letter-spacing:.05em}
+.t-body-xs  {font-weight:300;font-size:10px;line-height:14px;letter-spacing:.04em}
+.t-label-m  {font-weight:300;font-size:11px;line-height:16px;letter-spacing:.22em;text-transform:uppercase}
+.t-label-s  {font-weight:300;font-size:10px;line-height:12px;letter-spacing:.18em;text-transform:uppercase}
+.t-label-hm {font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase}
+.t-price    {font-weight:300;font-size:14px;line-height:18px;letter-spacing:.02em}
+.t-price-s  {font-weight:300;font-size:12px;line-height:16px;letter-spacing:.02em}
+.t-price-note{font-weight:300;font-size:12px;line-height:14px;letter-spacing:0}
+.t-link     {font-weight:300;font-size:14px;line-height:16px;letter-spacing:.04em;text-decoration:underline;text-underline-offset:3px}
+.t-link-s   {font-weight:300;font-size:12px;line-height:14px;letter-spacing:.04em;text-decoration:underline;text-underline-offset:3px}
+.muted{color:var(--c-ink-soft)}
+
+/* ============================================================
+   HEADER — checkout chrome only: logo, back, security cue
+   ============================================================ */
+.ckhead{
+  position:sticky; top:0; z-index:60;
+  background:var(--c-bg); border-bottom:1px solid var(--c-hair);
+  height:var(--header-h);
+}
+/* The two side slots are zero-basis and equal, so the wordmark sits on the header's exact
+   centre whatever the back label or the security cue measure — a 1fr grid track will not
+   shrink below its content and pushed the logo ~20px right of centre at 390. */
+.ckhead__in{
+  max-width:1280px; margin:0 auto; height:100%;
+  padding:0 var(--space-24);
+  display:flex; align-items:center; gap:var(--space-16);
+}
+.ckhead__back{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;gap:var(--space-8);
+  white-space:nowrap;overflow:hidden}
+.ckhead__logo{flex:none;display:block}
+/* height:auto keeps the wordmark on its own 156:20 ratio — a fixed 132×17 letterboxed it */
+.ckhead__logo img{display:block;width:132px;height:auto}
+.ckhead__secure{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:flex-end;
+  gap:var(--space-6);color:var(--c-ink-soft);white-space:nowrap;overflow:hidden}
+
+/* ============================================================
+   PAGE GRID — form column + sticky summary rail
+   ============================================================ */
+.ck{
+  max-width:1280px; margin:0 auto;
+  display:grid; grid-template-columns:minmax(0,1fr) 480px;
+  align-items:stretch;
+}
+.ck__form{padding:var(--space-64) var(--space-64) var(--space-64) var(--space-40);min-width:0}
+/* the tinted column is the full-height grid child; the rail inside it is what sticks */
+.ck__railcol{background:var(--c-bg);border-left:1px solid var(--c-hair);position:relative}
+/* The tint has to reach the right edge of the window, not stop at the 1200px container.
+   A hard-stop gradient on <body> does it with no extra box: an absolutely-positioned
+   `left:100%; width:100vw` bleed widened the document to 2760px, and a `position:fixed`
+   layer only covers the viewport (visibly wrong in a full-page capture). */
+/* the summary column is white, so there is no tint to bleed to the window edge */
+body{background-image:none}
+.ck__rail{
+  position:sticky; top:var(--header-h);
+  /* same top padding as the form column so the ORDER heading sits on the EXPRESS
+     CHECKOUT baseline — the two columns read as one row, not two starts */
+  padding:var(--space-64) var(--space-48) var(--space-64);
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.sec{padding:var(--space-64) 0 0}
+.sec:first-of-type{padding-top:0}
+.sec__head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-16);
+  margin-bottom:var(--space-24);
+}
+.sec__note{margin:calc(var(--space-4) * -1) 0 var(--space-16);color:var(--c-ink-soft)}
+
+/* ============================================================
+   EXPRESS CHECKOUT
+   ============================================================ */
+.express{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8)}
+.xbtn{
+  height:var(--control-56); border:1px solid var(--c-edge); background:var(--c-bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .15s var(--ease-out), background .15s var(--ease-out);
+}
+.xbtn:hover{border-color:var(--c-ink);background:var(--c-wash)}
+.xbtn svg{display:block}
+/* All three express buttons are the outlined variant: white ground, hairline border, brand
+   wordmark in its own colour. Each provider permits this — PayPal white, Apple Pay outline,
+   Klarna white — and it keeps a row of coloured blocks out of an otherwise monochrome page. */
+.or{
+  display:flex;align-items:center;gap:var(--space-24);
+  margin:var(--space-32) 0 0; color:var(--c-ink-soft);
+}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--c-hair)}
+
+/* ============================================================
+   FIELDS — Material-style outlined + notched label (DS: Outlined
+   is the form field; the notch keeps it valid on any surface)
+   ============================================================ */
+.grid{display:grid;gap:var(--space-20)}
+.grid--2{grid-template-columns:1fr 1fr}
+.grid--street{grid-template-columns:1fr 96px}
+.grid--zip{grid-template-columns:120px 1fr}
+
+/* Text Field — the DS component, node 116:229 in *Design System Triumph*.
+   Taken off the BUILT component, which differs from its own description: the box is a
+   0.5px hairline (not 1px then 2px on focus), 56px tall, 16px inner padding, and the
+   weight never changes. Empty draws the box in ink; once the field holds a value the box
+   drops to border/medium contrast and its top edge becomes two rails either side of the
+   label, which rides the line at 10px uppercase Regular. Error reddens box, label, value
+   and supporting text; disabled is the whole field at 30%. Supporting text is Body/S, 4px
+   under the box, on the same 16px indent. 6px + 56px + 24px = 86px, so switching state
+   never shifts the layout. */
+.field{position:relative;display:block;--ctl:var(--control-56);padding-top:6px}
+.field:has(.field__hint),.field:has(.field__err){padding-bottom:24px}
+/* ============================================================
+   TEXT FIELD — rebuilt against the updated DS component
+   (Design System Triumph, node 116:229, read 2026-09-09)
+   56px box, 12px inner padding, 12px gap to a 24px icon slot; 6px of notch space above
+   and a 24px supporting-text band below, so 86px total and a state change never shifts
+   the layout. Rest is a hairline in ink, focus goes solid 1px, a filled box drops to
+   border/medium contrast and its top edge becomes two rails either side of the label
+   (rail start 8px, 4px either side of the text). Placeholder, resting label and
+   supporting text are Grey/Dark, not 50% black — that is what the component uses.
+   ============================================================ */
+.field input,.field select{width:100%;height:var(--ctl);padding:0 var(--space-12) 2px;
+  border:0;background:transparent;position:relative;z-index:1;outline:0;
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em}
+.field select{appearance:none;cursor:pointer;padding-right:48px}
+/* the fieldset is the box; its legend punches the gap the floated label sits in —
+   12px of rail, then the label, matching the component's Rail start / Rail rest */
+/* The box is exactly the control — it starts below the 6px the notch needs, so the value
+   sits centred in it (with height:ctl+6 the box was 6px taller than the input and the text
+   read 3px low) and a plain 44/56px button beside it lines up on both edges. */
+/* A fieldset paints its top border through the MIDDLE of the legend, not at its own box
+   top. With top:6px/height:56 the painted box ran 6px lower than the element box, so the
+   value sat 3px above the visible centre and the floated label rode 6px above the rule.
+   Starting the box at 0 and giving it the extra 6px puts the painted border back on the
+   input's own edges: legend centre = 6px = the rule, value centre = the box centre. */
+.field__frame{position:absolute;top:0;left:0;right:0;height:calc(var(--ctl) + 6px);
+  margin:0;padding:0 var(--space-8);border:1px solid var(--hair-ink);pointer-events:none;
+  transition:border-color .12s var(--ease-out)}
+/* the legend measures the gap, so it has to render the label's own casing — mixed case
+   measured ~1px narrower than the uppercase label and the rail clipped the last letter */
+.field__frame legend{padding:0;font-weight:400;font-size:10px;line-height:12px;letter-spacing:.04em;
+  text-transform:uppercase;max-width:.01px;visibility:hidden;white-space:nowrap;
+  transition:max-width .12s var(--ease-out)}
+.field__frame legend span{display:inline-block;padding:0 var(--space-4);opacity:0;visibility:visible}
+.field__label{position:absolute;left:var(--space-12);top:calc(6px + var(--ctl) / 2 - 1px);
+  transform:translateY(-50%);z-index:2;color:var(--c-grey-medium);pointer-events:none;
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:none;
+  transition:.12s var(--ease-out)}
+.field:focus-within .field__label,
+.field input:not(:placeholder-shown) ~ .field__label,
+.field select:valid ~ .field__label,
+.field--float .field__label,
+.field.is-float .field__label{top:0;transform:none;font-weight:400;font-size:10px;line-height:12px;
+  text-transform:uppercase;color:var(--c-grey-medium)}
+.field:focus-within .field__frame legend,
+.field input:not(:placeholder-shown) ~ .field__frame legend,
+.field select:valid ~ .field__frame legend,
+.field--float .field__frame legend,
+.field.is-float .field__frame legend{max-width:100%}
+/* A filled box is the lighter one — border/medium contrast, per the component.
+   Wrapped in :where() so it carries no more specificity than the focus and error
+   rules below: as a plain `.field input:not(...) ~ .field__frame` it outranked both,
+   and a filled field stayed grey when focused and when it errored. */
+.field:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float) .field__frame{
+  border-color:var(--hair-edge)}
+/* Focus doubles the stroke, 0.5px → 1px, keeping the colour family: an empty box stays
+   ink, a filled one stays border/medium contrast. Because a browser floors any border to
+   one device pixel, a *declared* .5px paints exactly like 1px (measured — identical at 1x
+   and 2x), so the half-weight stroke is drawn as a 1px line at half the token's alpha —
+   which is what Figma's own 0.5px stroke looks like on screen — and focus goes solid. */
+.field:focus-within .field__frame{border-color:var(--c-ink)}
+.field:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float):focus-within .field__frame{border-color:var(--c-edge)}
+.field:focus-within .field__label{color:var(--c-ink)}
+.field__hint,.field__err{position:absolute;left:var(--space-4);
+  top:calc(6px + var(--ctl) + var(--space-4));margin:0;
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+.field__hint{display:block;color:var(--c-grey-medium)}
+.field__err{display:none;color:var(--color-error)}
+/* an EMPTY field reddens its box; a FILLED one keeps the grey box and reddens only the
+   label, the value and the supporting text — the component draws it that way */
+.field.is-error .field__frame{border-color:var(--hair-error)}
+.field.is-error:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float) .field__frame{
+  border-color:var(--hair-edge)}
+.field.is-error .field__label,
+.field.is-error input,.field.is-error select{color:var(--color-error)}
+.field.is-error .field__hint{display:none}
+.field.is-error .field__err{display:block}
+.field.is-disabled{opacity:.3;pointer-events:none}
+.field__chev{position:absolute;right:var(--space-12);top:calc(6px + var(--ctl) / 2);
+  transform:translateY(-50%);pointer-events:none;z-index:2}
+
+/* checkbox */
+.check{display:flex;gap:var(--space-12);align-items:flex-start;cursor:pointer;padding:var(--space-4) 0}
+.check input{position:absolute;opacity:0;width:0;height:0}
+.check__box{
+  flex:none;width:18px;height:18px;margin-top:1px;
+  border:1px solid var(--c-edge);background:var(--c-bg);
+  display:grid;place-items:center;transition:.12s var(--ease-out);
+}
+.check__box svg{opacity:0;transition:opacity .12s var(--ease-out)}
+.check input:checked + .check__box{background:var(--c-ink);border-color:var(--c-ink)}
+.check input:checked + .check__box svg{opacity:1}
+.check input:focus-visible + .check__box{outline:2px solid var(--c-ink);outline-offset:2px}
+
+/* ============================================================
+   OPTION ROWS — shipping method + payment method (DS Option Row)
+   ============================================================ */
+.opts{border-top:1px solid var(--c-hair)}
+.opt{
+  display:flex;align-items:center;gap:var(--space-16);
+  padding:var(--space-20) 0;
+  border-bottom:1px solid var(--c-hair); cursor:pointer;
+  transition:opacity .12s var(--ease-out);
+}
+.opts .opt:last-of-type{border-bottom:1px solid var(--c-hair)}
+.opt:hover .opt__title{opacity:.6}
+.opt input{position:absolute;opacity:0;width:0;height:0}
+/* DS Radio: an 18px ring centred in a 24px target, in a row of at least 44px. The ring
+   is drawn by ::before so the target can be bigger than the mark. */
+.opt__radio{
+  flex:none;position:relative;width:24px;height:24px;border-radius:var(--radius-full);
+  display:grid;place-items:center;transition:.12s var(--ease-out);
+}
+.opt__radio::before{
+  content:"";position:absolute;width:18px;height:18px;border-radius:var(--radius-full);
+  border:1px solid var(--c-edge);transition:.12s var(--ease-out);
+}
+.opt__radio::after{content:"";width:10px;height:10px;border-radius:var(--radius-full);background:var(--c-ink);transform:scale(0);transition:transform .12s var(--ease-out);position:relative}
+.opt input:checked + .opt__radio::before{border-color:var(--c-ink)}
+.opt input:checked + .opt__radio::after{transform:scale(1)}
+.opt input:focus-visible + .opt__radio::before{outline:2px solid var(--c-ink);outline-offset:2px}
+.opt__body{flex:1;min-width:0}
+.opt__title{display:block}
+.opt__meta{display:block;color:var(--c-ink-soft);margin-top:var(--space-2)}
+.opt__price{flex:none;text-align:right}
+/* DS Option Row gives every payment mark the same 38×24 box, so the logos line up */
+.opt__logo{flex:none;display:flex;align-items:center;gap:var(--space-6)}
+.opt__logo svg{max-height:24px;width:auto}
+.opt__logo img{height:20px;width:auto}
+.opt.is-on .opt__title{font-weight:400}
+.opt__panel{
+  /* the fields sit on the card's own white surface, flush with the radio above them */
+  display:none; padding:var(--space-10) 0 var(--space-32);
+  border-bottom:1px solid var(--c-hair); background:transparent;
+}
+/* A row and its open panel are one block. The row's own bottom rule would cut straight
+   through it, so it stands down while the panel is showing — the rule under the panel
+   is the one that separates this option from the next. */
+.opt:has(+ .opt__panel.is-open){border-bottom-color:transparent}
+.opts .opt__panel:last-child{border-bottom:1px solid var(--c-hair)}
+.opt__panel.is-open{display:block}
+
+/* inline login panel — the Sign in branch of the live gate, without the page load */
+/* the account link rides in the field's supporting-text band, right-aligned */
+.acctlink{display:flex;justify-content:flex-end;margin-top:calc(var(--space-20) * -1);
+  position:relative;z-index:2;margin-bottom:var(--space-8)}
+
+.login{border:1px solid var(--c-hair);padding:var(--space-24);margin-top:var(--space-20);background:transparent}
+.sso{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);margin-top:var(--space-12)}
+.sso button{
+  height:var(--control-44);border:1px solid var(--c-edge);background:var(--c-bg);
+  display:flex;align-items:center;justify-content:center;gap:var(--space-8);
+}
+.sso button:hover{border-color:var(--c-ink)}
+
+/* the MyTriumph shipping row carries the crown glyph beside its label */
+.opt__title--crown{display:inline-flex;align-items:center;gap:var(--space-8)}
+.opt__title--crown .crown{flex:none;display:block}
+.opt__secure{display:flex;gap:var(--space-8);align-items:flex-start;margin-top:var(--space-12);color:var(--c-ink-soft)}
+
+/* ============================================================
+   SIGNED-IN BAR / ACCOUNT PANELS
+   ============================================================ */
+.who{
+  display:flex;align-items:center;gap:var(--space-16);
+  padding:var(--space-20) 0;
+  border-top:1px solid var(--c-hair); border-bottom:1px solid var(--c-hair);
+}
+.who__av{
+  flex:none;width:var(--control-36);height:var(--control-36);border-radius:var(--radius-full);
+  background:var(--c-ink);color:var(--c-on-dark);display:grid;place-items:center;
+}
+.who__body{flex:1;min-width:0}
+.who__mail{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.savedaddr{border-top:1px solid var(--c-hair)}   /* an option list, not a boxed card */
+.savedaddr .opt{align-items:flex-start}
+.addr__lines{color:var(--c-ink-soft);margin-top:var(--space-4)}
+
+/* ============================================================
+   STEP 1 GATE — sign in / guest / register
+   The live site's login gate, rebuilt: two columns instead of three stacked buttons,
+   the DS outlined field instead of the grey filled box, and the registration form
+   opens in place rather than leaving checkout for /registrieren.
+   ============================================================ */
+/* one column, and the step gets the whole page: no express row, no summary rail */
+.gate__box{max-width:none}
+.gate__h{margin-bottom:var(--space-24)}
+.gate .sso{margin-top:0}
+.gate__h--new{margin-top:var(--space-48)}
+.gate .sso button{height:var(--control-56)}
+.gate__box .field{margin-bottom:var(--space-4)}
+.gate__hint{margin:0 0 var(--space-16);color:var(--c-ink-soft)}
+.gate__hint--intro{margin:var(--space-8) 0 var(--space-24)}
+.gate__meta{display:flex;justify-content:flex-end;margin:calc(var(--space-4) * -1) 0 var(--space-24)}
+.gate__doors{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-12)}
+.gate__doors .btn{padding:0 var(--space-12);white-space:nowrap}
+.gate__next{margin-top:var(--space-48);padding-top:var(--space-40);border-top:1px solid var(--c-hair)}
+.gate .or{margin:var(--space-24) 0 var(--space-16)}
+.gate__reg{max-width:560px;margin-top:var(--space-48);padding-top:var(--space-40);border-top:1px solid var(--c-hair)}
+
+/* Step 1 stands alone: the summary rail and the express row belong to a decision that has
+   not been made yet, so the page narrows to the gate and nothing else. */
+body[data-mode="steps"][data-step="1"] .ck{grid-template-columns:minmax(0,1fr);max-width:560px}
+body[data-mode="steps"][data-step="1"] .ck__form{padding:var(--space-64) var(--space-40)}
+@media (max-width:991px){ body[data-mode="steps"][data-step="1"] .ck__form{padding:0 var(--space-16) 120px} }
+body[data-mode="steps"][data-step="1"] .ck__railcol,
+body[data-mode="steps"][data-step="1"] .msum{display:none}
+/* three selects sharing the full form column made Month 440px wide */
+.grid--dob{grid-template-columns:96px minmax(0,1fr) 120px;max-width:420px}
+@media (max-width:575px){ .gate__doors{grid-template-columns:1fr} }
+@media (max-width:575px){ .grid--dob{grid-template-columns:80px minmax(0,1fr) 96px;max-width:none} }
+
+/* ============================================================
+   STEPPED CHECKOUT (mode = steps)
+   The same sections as the one-pager, shown three at a time. Nothing is duplicated —
+   each <section> carries data-step and the mode decides what is on screen.
+   ============================================================ */
+.steps{display:none;border-bottom:1px solid var(--c-hair);margin-bottom:var(--space-40)}
+body[data-mode="steps"] .steps{display:flex;gap:0}
+.steps__item{
+  /* equal thirds, so the active underline is a full tab rather than a word-length dash */
+  flex:1 1 0; min-width:0;
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--space-10);
+  padding:0 0 var(--space-16);margin-bottom:-1px;
+  border-bottom:1px solid transparent;color:var(--c-ink-soft);background:none;
+}
+.steps__item[aria-current="step"]{color:var(--c-ink);border-bottom-color:var(--c-ink)}
+.steps__item[data-done="true"]{color:var(--c-ink);cursor:pointer}
+.steps__item[data-done="false"][aria-current="false"]{pointer-events:none}
+.steps__no{
+  flex:none;width:22px;height:22px;border-radius:var(--radius-full);
+  border:1px solid currentColor;display:grid;place-items:center;
+  font-size:10px;line-height:1;letter-spacing:0;
+}
+.steps__item[data-done="true"] .steps__no{background:var(--c-ink);border-color:var(--c-ink);color:var(--c-on-dark)}
+body[data-mode="steps"] .sec[data-step]{display:none}
+body[data-mode="steps"] [data-mode-only="onepage"]{display:none!important}
+body[data-mode="onepage"] [data-mode-only="steps"]{display:none!important}
+body[data-mode="steps"] .sec[data-step].is-current{display:block}
+/* only the first section on the step loses its top padding — the ones under it keep the
+   64px rhythm, or Delivery method collides with the billing checkbox above it */
+body[data-mode="steps"] .sec[data-step].is-first{padding-top:0}
+.stepnav{display:none;margin-top:var(--space-48);gap:var(--space-16);align-items:center}
+body[data-mode="steps"] .stepnav{display:flex}
+body[data-mode="steps"] .place{display:none}
+body[data-mode="steps"] .place.is-last{display:block}
+.stepnav__back{color:var(--c-ink-soft)}
+.stepnav__back:hover{color:var(--c-ink)}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
+  height:var(--control-56); padding:0 var(--space-32);
+  background:var(--c-ink); color:var(--c-on-dark);
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid var(--c-ink);
+  transition:opacity .15s var(--ease-out);
+}
+.btn:hover{opacity:.82}
+/* DS Button: Focus draws a 2px inner ring; Disabled is surface/muted + text/secondary
+   rather than a lowered opacity, so it stays legible on any background */
+.btn:focus-visible{outline:0;box-shadow:inset 0 0 0 2px var(--c-on-dark)}
+.btn--ghost:focus-visible{box-shadow:inset 0 0 0 2px var(--c-ink)}
+.btn[aria-disabled="true"],.btn:disabled{
+  background:var(--c-grey-light);border-color:var(--c-grey-light);color:var(--c-ink-soft);
+  pointer-events:none;opacity:1;
+}
+.btn--wide{width:100%}
+.btn--ghost{background:transparent;color:var(--c-ink)}
+.btn--ghost:hover{background:var(--c-wash);opacity:1}
+.btn--sm{height:var(--control-44);padding:0 var(--space-16);font-size:12px;line-height:16px}
+
+.place{margin-top:var(--space-48)}
+.place__legal{margin-top:var(--space-12);color:var(--c-ink-soft);text-align:center}
+.place__legal a{text-decoration:underline;text-underline-offset:3px}
+
+/* ============================================================
+   ORDER SUMMARY RAIL
+   ============================================================ */
+.sum__head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-32)}
+.li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;
+  column-gap:var(--space-20);row-gap:var(--space-16);
+  padding:var(--space-32) 0;border-bottom:1px solid var(--c-hair)}
+.li:first-of-type{padding-top:0}
+/* the discount row draws its own top rule */
+.li:last-of-type{border-bottom:0}
+/* the actions run the full width of the row, not just the text column, so Remove sits on
+   the same right edge as the price above it */
+.li__imgwrap{position:relative;grid-row:1 / span 2;width:64px}
+.li__img{width:64px;height:85px;object-fit:cover;background:var(--c-grey-light)}
+.li__body{min-width:0}
+.li__name{display:block}
+.li__meta{display:block;color:var(--c-ink-soft);margin-top:var(--space-2)}
+/* the stepper and the Remove link sit at opposite ends of the body column, so the
+   space between them is whatever the column has left */
+.li__acts{grid-column:2 / -1;display:flex;align-items:center;justify-content:space-between;
+  gap:var(--space-16)}
+.li__price{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2)}
+.li__member{color:var(--c-ink);font-size:10px;line-height:14px;letter-spacing:.14em;text-transform:uppercase}
+
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--c-edge);height:var(--control-28)}
+.stepper button{width:var(--control-28);height:100%;display:grid;place-items:center}
+.stepper button:hover{background:var(--c-bg)}
+.stepper span{min-width:22px;text-align:center}
+
+/* the field reserves 6px above its box for the notch, so the row aligns on its end edge */
+/* collapsed by default — a code is the exception, not the next step */
+.acc{border-top:1px solid var(--c-hair);margin:var(--space-24) 0 0}
+.acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16) 0}
+.acc__chev{transition:transform .2s var(--ease-out)}
+.acc[data-open="true"] .acc__chev{transform:rotate(180deg)}
+.acc__body{display:none;padding-bottom:var(--space-20)}
+.acc[data-open="true"] .acc__body{display:block}
+.voucher{display:flex;align-items:flex-end;gap:var(--space-8);margin:0 0 var(--space-12)}
+.voucher .field{flex:1;--ctl:var(--control-44)}
+.voucher .field__frame{background:transparent}
+.voucher .btn{height:var(--control-44);padding:0 var(--space-16);font-size:12px}
+
+.totals{border-top:1px solid var(--c-hair);padding-top:var(--space-24)}
+.trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-8) 0}
+.trow--free [data-shipping]{color:var(--color-green)}
+.trow--grand{
+  border-top:1px solid var(--c-hair); margin-top:var(--space-20); padding-top:var(--space-24);
+  align-items:baseline;
+}
+.trow--grand .t-title-m{letter-spacing:.20em}
+.grand__num{font-weight:300;font-size:28px;line-height:32px;letter-spacing:.01em}
+
+.promise{
+  display:flex;gap:var(--space-10);align-items:flex-start;
+  margin:0 0 var(--space-32); padding:0;
+  background:transparent;
+}
+.trust{display:flex;flex-wrap:wrap;gap:var(--space-20);margin-top:var(--space-32);color:var(--c-ink-soft)}
+.trust span{display:inline-flex;align-items:center;gap:var(--space-6)}
+
+/* alerts (DS Inline Alert) */
+.alert{display:flex;gap:var(--space-12);padding:var(--space-16);margin-bottom:var(--space-20);border:1px solid var(--c-hair)}
+.alert--info{background:transparent;color:var(--c-ink)}
+.alert--success{background:transparent;color:var(--c-ink)}
+.alert--error{background:transparent;color:var(--color-error)}
+
+/* ============================================================
+   MOBILE SUMMARY DRAWER + STICKY PAY BAR
+   ============================================================ */
+.msum{display:none}
+.paybar{display:none}
+
+/* ============================================================
+   ORDER CONFIRMED
+   ============================================================ */
+.done{padding:var(--space-64) var(--space-24) 120px}
+.done__in{max-width:520px;margin:0 auto;text-align:center;display:grid;gap:var(--space-16);justify-items:center}
+.done__tick{color:var(--c-ink);margin-bottom:var(--space-8)}
+.done__facts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-24);
+  width:100%;margin:var(--space-24) 0;padding:var(--space-24) 0;
+  border-top:1px solid var(--c-hair);border-bottom:1px solid var(--c-hair)}
+.done__facts dt{margin:0}
+.done__facts dd{margin:var(--space-6) 0 0}
+
+/* ============================================================
+   PROTOTYPE SWITCHER (not part of the design)
+   ============================================================ */
+.dash{
+  position:fixed; right:var(--space-16); bottom:var(--space-16); z-index:200;
+  background:var(--c-ink); color:var(--c-on-dark);
+  padding:var(--space-12) var(--space-16); max-width:280px;
+}
+.dash h4{margin:0 0 var(--space-8);font-weight:400;font-size:10px;line-height:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.dash__row{display:flex;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-10)}
+.dash button{
+  border:1px solid rgba(255,255,255,.3); padding:var(--space-6) var(--space-8);
+  font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase;
+}
+.dash button[aria-pressed="true"]{background:var(--c-on-dark);color:var(--c-ink);border-color:var(--c-on-dark)}
+@media (max-width:991px){ .dash{bottom:calc(var(--space-16) + 104px)} }
+.dash__hide{position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-8) var(--space-10);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+@media (max-width:991px){ .dash__hide{bottom:calc(var(--space-16) + 104px)} }
+
+/* ============================================================
+   RESPONSIVE — 992 is the DS breakpoint where the rail folds
+   ============================================================ */
+@media (max-width:1180px){
+  .ck{grid-template-columns:minmax(0,1fr) 420px}
+  .ck__rail{padding-left:var(--space-40);padding-right:var(--space-40)}
+  .ck__form{padding:var(--space-32) var(--space-32) var(--space-64) var(--space-24)}
+}
+@media (max-width:991px){
+  .ck{display:block;max-width:640px}
+  .ck__form{padding:0 var(--space-16) 140px}
+  /* 64px between sections is right on a 1440 column, too loose on a phone */
+  .sec{padding:var(--space-40) 0 0}
+  .ck__railcol{display:none}
+  body{background-image:none}
+
+  /* collapsible summary at the top of the page */
+  /* sits under the step indicator, tinted so it reads as a summary of the order rather
+     than another section of the form */
+  .msum{display:block;background:var(--c-grey-light);position:sticky;top:var(--header-h);z-index:50;
+    margin:0 0 var(--space-24)}
+  .msum__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16)}
+  /* the summary bar and the step tabs are two different controls — they need a gap */
+  body[data-mode="steps"] .steps{margin-top:var(--space-24)}
+  .msum__left{display:inline-flex;align-items:center;gap:var(--space-8)}
+  .msum__chev{transition:transform .2s var(--ease-out)}
+  .msum[data-open="true"] .msum__chev{transform:rotate(180deg)}
+  .msum__body{display:none;padding:0 var(--space-16) var(--space-24)}
+  .msum[data-open="true"] .msum__body{display:block}
+  .msum .ck__rail{display:block;position:static;background:transparent;padding:0;min-height:0}
+  .msum .ck__rail::before{display:none}
+  .msum .sum__head{display:none}
+
+  .express{gap:var(--space-6)}
+  .xbtn svg{max-width:100%;height:auto}
+  /* the security cue drops out below 992 but its slot stays, or the logo loses its centre */
+  .ckhead__secure{visibility:hidden}
+  .ckhead__in{grid-template-columns:1fr auto 1fr;padding:0 var(--space-16)}
+
+  /* sticky pay bar */
+  .paybar{
+    display:block; position:fixed; left:0; right:0; bottom:0; z-index:70;
+    background:var(--c-bg); border-top:1px solid var(--c-hair);
+    padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
+  }
+  .place{display:none}
+  .paybar__legal{margin-top:var(--space-8);color:var(--c-ink-soft);text-align:center}
+  .paybar__legal a{text-decoration:underline;text-underline-offset:3px}
+}
+@media (max-width:575px){
+  .done{padding:var(--space-40) var(--space-16) 120px}
+  .done__facts{grid-template-columns:1fr;gap:var(--space-16);text-align:left}
+  .done__facts > div{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-16)}
+  .done__facts dd{margin:0}
+  /* three steps have to stay on one line, or step 3 drops to a row of its own */
+  .steps__item{gap:var(--space-6);font-size:10px;line-height:14px;letter-spacing:.10em}
+  .steps__no{width:20px;height:20px;font-size:9px}
+  .ckhead__backlabel{display:none}
+  .ckhead__logo img{width:112px}
+  .grid--2{grid-template-columns:1fr}
+  .grid--street{grid-template-columns:1fr 84px}
+}
+</style>
+</head>
+<body data-account="guest" data-member="false">
+
+<!-- ============================== HEADER ============================== -->
+<header class="ckhead">
+  <div class="ckhead__in">
+    <a class="ckhead__back t-label-m" href="./cart.html">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1"/></svg>
+      <span class="ckhead__backlabel">Shopping bag</span>
+    </a>
+    <a class="ckhead__logo" href="./index.html" aria-label="Triumph">
+      <img src="./Assets/Vector.svg" alt="Triumph" width="132" height="17" />
+    </a>
+    <span class="ckhead__secure t-label-s">
+      <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M2 6V4a4 4 0 118 0v2" stroke="currentColor" stroke-width="1"/><rect x="1" y="6" width="10" height="7" stroke="currentColor" stroke-width="1"/></svg>
+      Secure checkout
+    </span>
+  </div>
+</header>
+
+<main class="ck">
+  <!-- ============================ FORM COLUMN ============================ -->
+  <div class="ck__form">
+
+    <!-- step indicator — only rendered in the 3-step mode -->
+    <nav class="steps" id="steps" aria-label="Checkout steps">
+      <button class="steps__item t-title-s" type="button" data-goto="1" aria-current="step" data-done="false">
+        <span class="steps__no">1</span><span>Sign in</span></button>
+      <button class="steps__item t-title-s" type="button" data-goto="2" aria-current="false" data-done="false">
+        <span class="steps__no">2</span><span>Delivery</span></button>
+      <button class="steps__item t-title-s" type="button" data-goto="3" aria-current="false" data-done="false">
+        <span class="steps__no">3</span><span>Payment</span></button>
+    </nav>
+
+    <!-- ================= MOBILE COLLAPSIBLE SUMMARY ================= -->
+    <div class="msum" data-open="false">
+      <button class="msum__btn" id="msumBtn" aria-expanded="false">
+        <span class="msum__left t-body-m">
+          Order summary
+          <svg class="msum__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+        </span>
+        <span class="grand__num" data-total>€64.94</span>
+      </button>
+      <div class="msum__body" id="msumBody"><!-- the rail is cloned in here by JS --></div>
+    </div>
+
+
+    <!-- ---------- EXPRESS ---------- -->
+    <section class="sec" data-step="1" id="s-express" data-mode-only="onepage" aria-labelledby="h-express">
+      <h2 class="t-title-s" id="h-express" style="margin-bottom:var(--space-12)">Express checkout</h2>
+      <div class="express">
+        <button class="xbtn xbtn--paypal" type="button" aria-label="Mit PayPal bezahlen">
+          <svg width="66" height="18" viewBox="0 0 66 18" aria-hidden="true"><text x="0" y="14" font-family="Helvetica,Arial" font-size="15" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="30" y="14" font-family="Helvetica,Arial" font-size="15" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
+        </button>
+        <button class="xbtn xbtn--apple" type="button" aria-label="Mit Apple Pay bezahlen">
+          <svg width="62" height="20" viewBox="0 0 62 20" aria-hidden="true">
+            <path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/>
+            <text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text>
+          </svg>
+        </button>
+        <button class="xbtn xbtn--klarna" type="button" aria-label="Mit Klarna bezahlen">
+          <svg width="60" height="18" viewBox="0 0 60 18" aria-hidden="true"><text x="0" y="14" font-family="Helvetica,Arial" font-size="15" font-weight="bold" fill="#0B051D">Klarna</text></svg>
+        </button>
+      </div>
+      <p class="or t-label-m">or</p>
+    </section>
+
+    <!-- ---------- 1 · KONTAKT ---------- -->
+    <!-- ---------- STEP 1 GATE (3-step mode only) ---------- -->
+    <section class="sec gate" data-step="1" id="s-gate" data-mode-only="steps" aria-labelledby="h-gate">
+      <h2 class="t-title-m" id="h-gate" hidden>Sign in, continue as a guest, or register</h2>
+
+      <div class="gate__box">
+
+        <h3 class="t-title-s">Customer login</h3>
+        <p class="gate__hint gate__hint--intro t-body-s">Your sloggi.com login works here too.</p>
+
+        <label class="field" data-validate="email">
+          <input type="email" id="gateEmail" placeholder=" " autocomplete="email" />
+          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
+          <span class="field__label">Email</span>
+          <span class="field__err">Please enter a valid email address.</span>
+        </label>
+        <label class="field" data-validate="required">
+          <input type="password" id="gatePassword" placeholder=" " autocomplete="current-password" />
+          <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
+          <span class="field__label">Password</span>
+          <span class="field__err">Please enter your password.</span>
+        </label>
+
+        <div class="gate__meta">
+          <button class="t-link-s" type="button">Forgotten password?</button>
+        </div>
+
+        <button class="btn btn--wide" type="button" id="gateSignIn">Sign in</button>
+
+        <p class="or t-label-m">or</p>
+
+        <div class="sso">
+          <button type="button">
+            <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.5h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.6z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 010-3.4V5H.9a9 9 0 000 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 00.9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
+            <span class="t-body-s">Google</span>
+          </button>
+          <button type="button">
+            <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#1877F2" d="M18 9a9 9 0 10-10.4 8.9v-6.3H5.3V9h2.3V7c0-2.3 1.4-3.5 3.4-3.5 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.5.7-1.5 1.4V9h2.5l-.4 2.6h-2.1v6.3A9 9 0 0018 9z"/></svg>
+            <span class="t-body-s">Facebook</span>
+          </button>
+        </div>
+
+        <h3 class="t-title-s gate__h gate__h--new">Not a customer yet?</h3>
+        <div class="gate__doors">
+          <button class="btn btn--ghost" type="button" id="gateRegister" aria-expanded="false">Create an account</button>
+          <button class="btn btn--ghost" type="button" id="gateGuest">Continue as guest</button>
+        </div>
+      </div>
+
+      <!-- ---- registration, opened in place ----
+           Two things the live registration asks for are deliberately gone: the second
+           "confirm your email" field, and a date of birth pre-filled to 01 January 2008.
+           The delivery address is not here either — it is step 2, and asking twice is
+           what makes the live flow long. -->
+      <div class="gate__reg" id="gateReg" hidden>
+        <h3 class="t-title-s gate__h">Create your account</h3>
+
+        <div class="grid">
+          <label class="field">
+            <select id="regTitle" required>
+              <option value="" selected disabled hidden></option>
+              <option>Ms</option>
+              <option>Mr</option>
+              <option>Prefer not to say</option>
+            </select>
+            <fieldset class="field__frame"><legend><span>Title</span></legend></fieldset>
+            <span class="field__label">Title</span>
+            <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+          </label>
+
+          <div class="grid grid--2">
+            <label class="field" data-validate="required">
+              <input type="text" id="regFn" placeholder=" " autocomplete="given-name" />
+              <fieldset class="field__frame"><legend><span>First name</span></legend></fieldset>
+              <span class="field__label">First name</span>
+              <span class="field__err">Please enter your first name.</span>
+            </label>
+            <label class="field" data-validate="required">
+              <input type="text" id="regLn" placeholder=" " autocomplete="family-name" />
+              <fieldset class="field__frame"><legend><span>Last name</span></legend></fieldset>
+              <span class="field__label">Last name</span>
+              <span class="field__err">Please enter your last name.</span>
+            </label>
+          </div>
+
+          <div>
+            <div class="grid grid--dob">
+              <label class="field">
+                <select id="regDay" required><option value="" selected disabled hidden></option>
+                <option>01</option>
+                <option>02</option>
+                <option>03</option>
+                <option>04</option>
+                <option>05</option>
+                <option>06</option>
+                <option>07</option>
+                <option>08</option>
+                <option>09</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>13</option>
+                <option>14</option>
+                <option>15</option>
+                <option>16</option>
+                <option>17</option>
+                <option>18</option>
+                <option>19</option>
+                <option>20</option>
+                <option>21</option>
+                <option>22</option>
+                <option>23</option>
+                <option>24</option>
+                <option>25</option>
+                <option>26</option>
+                <option>27</option>
+                <option>28</option>
+                <option>29</option>
+                <option>30</option>
+                <option>31</option>
+                </select>
+                <fieldset class="field__frame"><legend><span>Day</span></legend></fieldset>
+                <span class="field__label">Day</span>
+                <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+              </label>
+              <label class="field">
+                <select id="regMonth" required><option value="" selected disabled hidden></option>
+                <option>January</option>
+                <option>February</option>
+                <option>March</option>
+                <option>April</option>
+                <option>May</option>
+                <option>June</option>
+                <option>July</option>
+                <option>August</option>
+                <option>September</option>
+                <option>October</option>
+                <option>November</option>
+                <option>December</option>
+                </select>
+                <fieldset class="field__frame"><legend><span>Month</span></legend></fieldset>
+                <span class="field__label">Month</span>
+                <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+              </label>
+              <label class="field">
+                <select id="regYear" required><option value="" selected disabled hidden></option>
+                <option>2008</option>
+                <option>2007</option>
+                <option>2006</option>
+                <option>2005</option>
+                <option>2004</option>
+                <option>2003</option>
+                <option>2002</option>
+                <option>2001</option>
+                <option>2000</option>
+                <option>1999</option>
+                <option>1998</option>
+                <option>1997</option>
+                <option>1996</option>
+                <option>1995</option>
+                <option>1994</option>
+                <option>1993</option>
+                <option>1992</option>
+                <option>1991</option>
+                <option>1990</option>
+                <option>1989</option>
+                <option>1988</option>
+                <option>1987</option>
+                <option>1986</option>
+                <option>1985</option>
+                <option>1984</option>
+                <option>1983</option>
+                <option>1982</option>
+                <option>1981</option>
+                <option>1980</option>
+                <option>1979</option>
+                <option>1978</option>
+                <option>1977</option>
+                <option>1976</option>
+                <option>1975</option>
+                <option>1974</option>
+                <option>1973</option>
+                <option>1972</option>
+                <option>1971</option>
+                <option>1970</option>
+                <option>1969</option>
+                <option>1968</option>
+                <option>1967</option>
+                <option>1966</option>
+                <option>1965</option>
+                <option>1964</option>
+                <option>1963</option>
+                <option>1962</option>
+                <option>1961</option>
+                <option>1960</option>
+                <option>1959</option>
+                <option>1958</option>
+                <option>1957</option>
+                <option>1956</option>
+                <option>1955</option>
+                <option>1954</option>
+                <option>1953</option>
+                <option>1952</option>
+                <option>1951</option>
+                <option>1950</option>
+                <option>1949</option>
+                <option>1948</option>
+                <option>1947</option>
+                <option>1946</option>
+                <option>1945</option>
+                <option>1944</option>
+                <option>1943</option>
+                <option>1942</option>
+                <option>1941</option>
+                <option>1940</option>
+                </select>
+                <fieldset class="field__frame"><legend><span>Year</span></legend></fieldset>
+                <span class="field__label">Year</span>
+                <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+              </label>
+            </div>
+            <p class="t-body-s muted" style="margin-top:var(--space-8)">Date of birth — so we can send you a birthday reward.</p>
+          </div>
+
+          <label class="field" data-validate="email">
+            <input type="email" id="regEmail" placeholder=" " autocomplete="email" />
+            <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
+            <span class="field__label">Email</span>
+            <span class="field__hint">Your order confirmation goes here.</span>
+            <span class="field__err">Please enter a valid email address.</span>
+          </label>
+
+          <label class="field" data-validate="required">
+            <input type="password" id="regPassword" placeholder=" " autocomplete="new-password" />
+            <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
+            <span class="field__label">Password</span>
+            <span class="field__hint">At least 8 characters and a number.</span>
+            <span class="field__err">Please choose a password.</span>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" id="regNews" checked />
+            <span class="check__box" aria-hidden="true">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg>
+            </span>
+            <span class="t-body-m">Email me Triumph news and offers</span>
+          </label>
+        </div>
+
+        <div class="gate__next">
+          <button class="btn btn--wide" type="button" id="gateRegGo">Create account and continue</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" data-step="2" id="s-contact" aria-labelledby="h-contact">
+      <div class="sec__head">
+        <h2 class="t-title-m" id="h-contact">Contact</h2>
+      </div>
+
+      <!-- signed-in -->
+      <div data-account-only="member">
+        <div class="who">
+          <span class="who__av t-label-hm">AM</span>
+          <span class="who__body">
+            <span class="t-body-s muted">Signed in as</span>
+            <span class="who__mail t-body-m">anna.musterfrau@example.com</span>
+          </span>
+          <button class="t-link-s" type="button">Sign out</button>
+        </div>
+      </div>
+
+      <!-- guest / new account -->
+      <div data-account-only="guest new">
+        <label class="field" data-validate="email">
+          <input type="email" id="email" placeholder=" " autocomplete="email" value="" />
+          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
+          <span class="field__label">Email</span>
+          <span class="field__err t-body-xs">Please enter a valid email address.</span>
+        </label>
+        <!-- the account decision belongs next to the email it applies to, rather than as a
+             checkbox three sections further down -->
+        <div class="acctlink" data-guest-only>
+          <button class="t-link-s" type="button" id="acctBtn" aria-expanded="false" aria-controls="loginPanel">Sign in or create an account</button>
+        </div>
+
+        <!-- the login branch of the live gate, inline: no page load, the email above is reused -->
+        <div class="login" id="loginPanel" hidden>
+          <p class="t-title-xs" style="margin-bottom:var(--space-12)">Sign in to MyTriumph</p>
+          <label class="field">
+            <input type="password" placeholder=" " autocomplete="current-password" />
+            <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
+            <span class="field__label">Password</span>
+          </label>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);margin-top:var(--space-12)">
+            <button class="btn btn--ghost" type="button" style="height:var(--control-44)" id="loginGo">Sign in</button>
+            <button class="t-link-s" type="button">Forgotten password?</button>
+          </div>
+          <p class="or t-label-m" style="margin-top:var(--space-16)">or</p>
+          <div class="sso">
+            <button type="button">
+              <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.3-.2-1.9H9v3.5h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.2-3.8H.8v2.3A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.8 10.7a5.4 5.4 0 010-3.4V5H.8a9 9 0 000 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 00.8 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
+              <span class="t-label-m">Google</span>
+            </button>
+            <button type="button">
+              <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#1877F2" d="M18 9a9 9 0 10-10.4 8.9v-6.3H5.3V9h2.3V7c0-2.3 1.4-3.6 3.5-3.6 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.4V9h2.5l-.4 2.6h-2.1v6.3A9 9 0 0018 9z"/></svg>
+              <span class="t-label-m">Facebook</span>
+            </button>
+          </div>
+          <p class="t-body-s muted" style="margin-top:var(--space-16)">
+            No account yet? <button class="t-link-s" type="button" id="loginNew">Create one with this order</button>
+          </p>
+        </div>
+        <div style="margin-top:var(--space-12)">
+          <label class="check">
+            <input type="checkbox" checked />
+            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+            <span class="t-body-s">Email me Triumph news and offers</span>
+          </label>
+        </div>
+
+        <div id="pwWrap" hidden style="margin-top:var(--space-20)">
+          <label class="field">
+            <input type="password" id="newPw" placeholder=" " autocomplete="new-password" />
+            <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
+            <span class="field__label">Password</span>
+            <span class="field__hint">At least 8 characters and a number — this creates your account.</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 2 · LIEFERADRESSE ---------- -->
+    <section class="sec" data-step="2" id="s-address" aria-labelledby="h-address">
+      <div class="sec__head">
+        <h2 class="t-title-m" id="h-address">Delivery address</h2>
+      </div>
+
+      <!-- saved addresses, members only -->
+      <div data-account-only="member" style="margin-bottom:var(--space-16)">
+        <div class="savedaddr opts">
+          <label class="opt is-on">
+            <input type="radio" name="savedaddr" value="saved" checked />
+            <span class="opt__radio"></span>
+            <span class="opt__body">
+              <span class="opt__title t-body-m">Anna Musterfrau</span>
+              <span class="addr__lines t-body-s">Kurfürstendamm 21<br />10719 Berlin, Germany</span>
+            </span>
+            <button class="t-link-s" type="button">Change</button>
+          </label>
+          <label class="opt">
+            <input type="radio" name="savedaddr" value="new" />
+            <span class="opt__radio"></span>
+            <span class="opt__body"><span class="opt__title t-body-m">Use a different address</span></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid" id="addrForm" data-account-only="guest new">
+        <label class="field">
+          <select id="country" required>
+            <option value="DE" selected>Germany</option>
+            <option value="AT">Austria</option>
+            <option value="CH">Switzerland</option>
+          </select>
+          <fieldset class="field__frame"><legend><span>Country</span></legend></fieldset>
+          <span class="field__label">Country</span>
+          <svg class="field__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+        </label>
+
+        <div class="grid grid--2">
+          <label class="field" data-validate="required">
+            <input type="text" id="fn" placeholder=" " autocomplete="given-name" />
+            <fieldset class="field__frame"><legend><span>First name</span></legend></fieldset>
+            <span class="field__label">First name</span>
+            <span class="field__err t-body-xs">Please enter your first name.</span>
+          </label>
+          <label class="field" data-validate="required">
+            <input type="text" id="ln" placeholder=" " autocomplete="family-name" />
+            <fieldset class="field__frame"><legend><span>Last name</span></legend></fieldset>
+            <span class="field__label">Last name</span>
+            <span class="field__err t-body-xs">Please enter your last name.</span>
+          </label>
+        </div>
+
+        <div class="grid grid--street">
+          <label class="field" data-validate="required">
+            <input type="text" id="street" placeholder=" " autocomplete="address-line1" />
+            <fieldset class="field__frame"><legend><span>Street</span></legend></fieldset>
+            <span class="field__label">Street</span>
+            <span class="field__hint t-body-xs">Start typing — we complete the address.</span>
+            <span class="field__err t-body-xs">Please enter your street.</span>
+          </label>
+          <label class="field" data-validate="required">
+            <input type="text" id="hno" placeholder=" " />
+            <fieldset class="field__frame"><legend><span>No.</span></legend></fieldset>
+            <span class="field__label">No.</span>
+          </label>
+        </div>
+
+        <button class="t-link-s" type="button" style="justify-self:start" data-toggle="#addr2">+ Add address line 2</button>
+        <label class="field" id="addr2" hidden>
+          <input type="text" placeholder=" " />
+          <fieldset class="field__frame"><legend><span>Address line 2</span></legend></fieldset>
+          <span class="field__label">Address line 2</span>
+        </label>
+
+        <div class="grid grid--zip">
+          <label class="field" data-validate="required">
+            <input type="text" id="zip" placeholder=" " inputmode="numeric" autocomplete="postal-code" />
+            <fieldset class="field__frame"><legend><span>Postcode</span></legend></fieldset>
+            <span class="field__label">Postcode</span>
+          </label>
+          <label class="field" data-validate="required">
+            <input type="text" id="city" placeholder=" " autocomplete="address-level2" />
+            <fieldset class="field__frame"><legend><span>City</span></legend></fieldset>
+            <span class="field__label">City</span>
+          </label>
+        </div>
+
+        <label class="field">
+          <input type="tel" id="tel" placeholder=" " autocomplete="tel" />
+          <fieldset class="field__frame"><legend><span>Phone (optional)</span></legend></fieldset>
+          <span class="field__label">Phone (optional)</span>
+          <span class="field__hint t-body-xs">Only for delivery queries.</span>
+        </label>
+      </div>
+
+      <div style="margin-top:var(--space-12)">
+        <label class="check">
+          <input type="checkbox" data-toggle-target="#billing" />
+          <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+          <span class="t-body-s">Billing address is different from the delivery address</span>
+        </label>
+        <div id="billing" hidden style="margin-top:var(--space-12)">
+          <div class="grid grid--2">
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>First name</span></legend></fieldset><span class="field__label">First name</span></label>
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Last name</span></legend></fieldset><span class="field__label">Last name</span></label>
+          </div>
+          <div class="grid grid--street" style="margin-top:var(--space-12)">
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Street</span></legend></fieldset><span class="field__label">Street</span></label>
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>No.</span></legend></fieldset><span class="field__label">No.</span></label>
+          </div>
+          <div class="grid grid--zip" style="margin-top:var(--space-12)">
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Postcode</span></legend></fieldset><span class="field__label">Postcode</span></label>
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>City</span></legend></fieldset><span class="field__label">City</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 3 · KONTO ANLEGEN (guest / new only) ---------- -->
+    <section class="sec" data-step="2" id="s-shipping" aria-labelledby="h-shipping">
+      <div class="sec__head"><h2 class="t-title-m" id="h-shipping">Delivery method</h2></div>
+      <div class="opts">
+        <!-- MyTriumph is a shipping CHOICE, not an inline nudge: a fourth radio row at €0.00.
+             It disappears for actual members and once the basket already ships free — at that
+             point it has nothing left to offer. -->
+        <label class="opt" data-ship="mytriumph" id="myTriumphShip">
+          <input type="radio" name="ship" value="mytriumph" />
+          <span class="opt__radio"></span>
+          <span class="opt__body">
+            <span class="opt__title opt__title--crown t-body-m">Free with MyTriumph<svg class="crown" width="16" height="14" viewBox="0 0 23 20" fill="none" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 6.93399e-09L11.2574 15.8444L6.89607 4.92073e-07L6.77135 4.99014e-07L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z" fill="currentColor"/></svg></span>
+            <span class="opt__meta t-body-s">Free to join — applies to this order already</span>
+          </span>
+          <span class="opt__price t-price">€0.00</span>
+        </label>
+
+        <label class="opt is-on" data-ship="std">
+          <input type="radio" name="ship" value="std" checked />
+          <span class="opt__radio"></span>
+          <span class="opt__body">
+            <span class="opt__title t-body-m">Standard delivery · DHL</span>
+            <span class="opt__meta t-body-s">Fri 11 – Sat 12 Sep 2026</span>
+          </span>
+          <span class="opt__price t-price" data-ship-price="std">€4.99</span>
+        </label>
+        <label class="opt" data-ship="express">
+          <input type="radio" name="ship" value="express" />
+          <span class="opt__radio"></span>
+          <span class="opt__body">
+            <span class="opt__title t-body-m">Express delivery · DHL</span>
+            <span class="opt__meta t-body-s">Thu 10 Sep 2026 — order by 12:00</span>
+          </span>
+          <span class="opt__price t-price" data-ship-price="express">€9.99</span>
+        </label>
+        <label class="opt" data-ship="pickup">
+          <input type="radio" name="ship" value="pickup" />
+          <span class="opt__radio"></span>
+          <span class="opt__body">
+            <span class="opt__title t-body-m">Collect in store</span>
+            <span class="opt__meta t-body-s">Triumph Store Berlin Ku'damm · from Thu 10 Sep</span>
+          </span>
+          <span class="opt__price t-price" data-ship-price="pickup">Free</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ---------- 5 · ZAHLUNG ---------- -->
+    <section class="sec" data-step="3" id="s-payment" aria-labelledby="h-payment">
+      <div class="sec__head">
+        <h2 class="t-title-m" id="h-payment">Payment</h2>
+        <span class="t-body-s muted">Encrypted &amp; secure</span>
+      </div>
+
+      <div class="opts" id="payList">
+        <label class="opt is-on" data-pay="card">
+          <input type="radio" name="pay" value="card" checked />
+          <span class="opt__radio"></span>
+          <span class="opt__body"><span class="opt__title t-body-m">Credit or debit card</span></span>
+          <span class="opt__logo">
+            <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#1A1F71"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#fff">VISA</text></svg>
+            <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="18" cy="10" r="6" fill="#F79E1B" fill-opacity=".85"/></svg>
+          </span>
+        </label>
+        <div class="opt__panel is-open" data-panel="card">
+          <div class="grid">
+            <label class="field">
+              <input type="text" placeholder=" " inputmode="numeric" autocomplete="cc-number" />
+              <fieldset class="field__frame"><legend><span>Card number</span></legend></fieldset>
+              <span class="field__label">Card number</span>
+            </label>
+            <div class="grid grid--2">
+              <label class="field"><input type="text" placeholder=" " autocomplete="cc-exp" /><fieldset class="field__frame"><legend><span>MM / YY</span></legend></fieldset><span class="field__label">MM / YY</span></label>
+              <label class="field"><input type="text" placeholder=" " autocomplete="cc-csc" /><fieldset class="field__frame"><legend><span>Security code</span></legend></fieldset><span class="field__label">Security code</span></label>
+            </div>
+            <label class="field"><input type="text" placeholder=" " autocomplete="cc-name" /><fieldset class="field__frame"><legend><span>Name on card</span></legend></fieldset><span class="field__label">Name on card</span></label>
+            <label class="check" data-account-only="member">
+              <input type="checkbox" checked />
+              <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+              <span class="t-body-s">Save this card for next time</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="opt" data-pay="paypal">
+          <input type="radio" name="pay" value="paypal" />
+          <span class="opt__radio"></span>
+          <span class="opt__body"><span class="opt__title t-body-m">PayPal</span></span>
+          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="25" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg></span>
+        </label>
+        <div class="opt__panel" data-panel="paypal">
+          <p class="t-body-s muted">After “Place order” you go to PayPal and come back here to confirm.</p>
+        </div>
+
+        <!-- PayPal's instalment product and Klarna's two methods are separate rows: they are
+             separate decisions at the till, not one "and then choose at the provider" hop -->
+        <label class="opt" data-pay="later">
+          <input type="radio" name="pay" value="later" />
+          <span class="opt__radio"></span>
+          <span class="opt__body">
+            <span class="opt__title t-body-m">PayPal — Pay Later</span>
+            <span class="opt__meta t-body-s">3 instalments · interest free</span>
+          </span>
+          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="25" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg></span>
+        </label>
+        <div class="opt__panel" data-panel="later">
+          <p class="t-body-s muted">3 instalments of <strong style="font-weight:400" data-instalment>€21.65</strong>. The first at dispatch, then monthly. Credit check by PayPal.</p>
+        </div>
+
+        <label class="opt" data-pay="klarnaNow">
+          <input type="radio" name="pay" value="klarnaNow" />
+          <span class="opt__radio"></span>
+          <span class="opt__body"><span class="opt__title t-body-m">Klarna — pay now</span></span>
+          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="6" y="12" font-family="Helvetica,Arial" font-size="11" font-weight="bold" fill="#0B051D">Klarna</text></svg></span>
+        </label>
+        <div class="opt__panel" data-panel="klarnaNow">
+          <p class="t-body-s muted">Direct debit or instant bank transfer, handled by Klarna.</p>
+        </div>
+
+        <label class="opt" data-pay="klarna30">
+          <input type="radio" name="pay" value="klarna30" />
+          <span class="opt__radio"></span>
+          <span class="opt__body">
+            <span class="opt__title t-body-m">Klarna — pay in 30 days</span>
+            <span class="opt__meta t-body-s">Try first, pay later</span>
+          </span>
+          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="6" y="12" font-family="Helvetica,Arial" font-size="11" font-weight="bold" fill="#0B051D">Klarna</text></svg></span>
+        </label>
+        <div class="opt__panel" data-panel="klarna30">
+          <p class="t-body-s muted">Payable 30 days after dispatch, no fees. Credit check by Klarna.</p>
+        </div>
+
+        <label class="opt" data-pay="gift">
+          <input type="radio" name="pay" value="gift" />
+          <span class="opt__radio"></span>
+          <span class="opt__body"><span class="opt__title t-body-m">Digital gift card</span></span>
+          <span class="opt__logo">
+            <svg width="30" height="20" viewBox="0 0 30 20" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="29" height="19" stroke="rgba(0,0,0,.3)"/><path d="M0 7h30M12 7v13M9 4a3 3 0 013-3 3 3 0 013 3M18 4a3 3 0 00-3-3" stroke="rgba(0,0,0,.3)"/></svg>
+          </span>
+        </label>
+        <div class="opt__panel" data-panel="gift">
+          <div class="grid grid--2">
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Card number</span></legend></fieldset><span class="field__label">Card number</span></label>
+            <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>PIN</span></legend></fieldset><span class="field__label">PIN</span></label>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-12);margin-top:var(--space-12);flex-wrap:wrap">
+            <button class="btn btn--ghost" type="button" style="height:var(--control-44);font-size:12px">Check balance</button>
+            <span class="t-body-s muted">19-digit number · the balance comes off the order total.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
+    <div class="stepnav" id="stepnav">
+      <button class="btn" type="button" id="stepNext">Continue to delivery</button>
+      <button class="t-link-s stepnav__back" type="button" id="stepBack" hidden>Back</button>
+    </div>
+
+    <!-- ---------- PLACE ORDER (desktop) ---------- -->
+    <div class="place">
+      <button class="btn btn--wide" type="button">Place order · <span data-total>€64.94</span></button>
+      <p class="place__legal t-body-xs">
+        By placing your order you accept our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================ SUMMARY RAIL ============================ -->
+  <div class="ck__railcol">
+  <aside class="ck__rail" id="rail" aria-label="Order summary">
+    <div class="sum__head">
+      <h2 class="t-title-m">Order summary</h2>
+      <a class="t-link-s" href="./cart.html">Edit</a>
+    </div>
+
+    <div class="promise">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M1 5h9v6H1zM10 7h3l2 2v2h-5z" stroke="currentColor" stroke-width="1"/><circle cx="4" cy="12" r="1.4" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="12" r="1.4" stroke="currentColor" stroke-width="1"/></svg>
+      <span class="t-body-s" data-promise>Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong></span>
+    </div>
+
+    <div id="railItems"></div>
+    <p class="t-body-s muted" id="railEmpty" hidden style="padding:var(--space-16) 0">
+      Your bag is empty. <a class="t-link-s" href="./pdp.html">Keep shopping</a>.
+    </p>
+
+    <div class="acc" data-open="false" id="voucherAcc">
+      <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false" aria-controls="voucherBody">
+        <span class="t-body-m">Gift card or discount code</span>
+        <svg class="acc__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+      <div class="acc__body" id="voucherBody">
+        <div class="voucher">
+          <label class="field">
+            <input type="text" id="voucher" placeholder=" " />
+            <fieldset class="field__frame"><legend><span>Discount code</span></legend></fieldset>
+            <span class="field__label">Discount code</span>
+          </label>
+          <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
+        </div>
+        <div class="alert alert--success" id="voucherOk" hidden>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span class="t-body-s"><strong style="font-weight:400">WELCOME10</strong> applied — 10% off the subtotal.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="totals">
+      <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€109.85</span></div>
+      <div class="trow" id="discountRow" hidden><span class="t-body-m">Discount</span><span class="t-price" data-discount>−€10.99</span></div>
+      <div class="trow" data-ship-row><span class="t-body-m">Shipping</span><span class="t-price" data-shipping>€4.99</span></div>
+      <div class="trow trow--grand">
+        <span>
+          <span class="t-title-m" style="display:block">Total</span>
+          <span class="t-price-note muted">incl. VAT <span data-vat>€18.26</span></span>
+        </span>
+        <span class="grand__num" data-total>€114.84</span>
+      </div>
+    </div>
+
+    <div class="trust t-body-xs">
+      <span><svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M2 6V4a4 4 0 118 0v2" stroke="currentColor" stroke-width="1"/><rect x="1" y="6" width="10" height="7" stroke="currentColor" stroke-width="1"/></svg> Secure payment</span>
+      <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1"/></svg> 30-day returns</span>
+      <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1"/></svg> Shipped by DHL</span>
+    </div>
+  </aside>
+  </div>
+</main>
+
+<!-- ---------- ORDER CONFIRMED ---------- -->
+<section class="done" id="ckDone" hidden>
+  <div class="done__in">
+    <svg class="done__tick" width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <circle cx="20" cy="20" r="19" stroke="currentColor" stroke-width="1"/>
+      <path d="M12 20.5l5.5 5.5L28 15" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    <h1 class="t-title-l">Thank you — your order is placed</h1>
+    <p class="t-body-m muted">Order <strong style="font-weight:400" id="doneNo">TR-000000</strong> ·
+      confirmation sent to <span id="doneMail">your email</span></p>
+    <dl class="done__facts">
+      <div><dt class="t-label-s muted">Items</dt><dd class="t-body-m" id="doneCount">0</dd></div>
+      <div><dt class="t-label-s muted">Total paid</dt><dd class="t-body-m" id="doneTotal">€0.00</dd></div>
+      <div><dt class="t-label-s muted">Delivery</dt><dd class="t-body-m" id="doneShip">—</dd></div>
+    </dl>
+    <a class="btn" href="./pdp.html">Continue shopping</a>
+  </div>
+</section>
+
+<!-- ---------- MOBILE STICKY PAY BAR ---------- -->
+<div class="paybar">
+  <button class="btn btn--wide" type="button">Place order · <span data-total>€114.84</span></button>
+  <p class="paybar__legal t-body-xs">By placing your order you accept our <a href="#">Terms</a>.</p>
+</div>
+
+<!-- ---------- PROTOTYPE SWITCHER ---------- -->
+<div class="dash" id="dash">
+  <h4>Checkout</h4>
+  <div class="dash__row" data-group="mode">
+    <button data-mode-set="onepage" aria-pressed="true">One page</button>
+    <button data-mode-set="steps" aria-pressed="false">3 steps</button>
+  </div>
+  <h4>Prototype · State</h4>
+  <div class="dash__row" data-group="account">
+    <button data-account-set="guest" aria-pressed="true">Guest</button>
+    <button data-account-set="member" aria-pressed="false">Signed in</button>
+    <button data-account-set="new" aria-pressed="false">New + account</button>
+  </div>
+  <h4>MyTriumph</h4>
+  <div class="dash__row" data-group="member">
+    <button data-member-set="false" aria-pressed="true">Not a member</button>
+    <button data-member-set="true" aria-pressed="false">Member</button>
+  </div>
+  <div class="dash__row" style="margin-bottom:0">
+    <button id="dashHide">Hide</button>
+  </div>
+</div>
+
+<script src="./lib/shop.js"></script>
+<script>
+(function () {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const eur = Shop.money;
+
+  /* ---------- state ---------- */
+  // The bag (lines + voucher + membership) is shared with the PDP and the cart via
+  // lib/shop.js. Everything below is this page's own UI state.
+  const state = {
+    account: 'guest',       // guest | member | new
+    get member() { return Shop.read().member; },   // MyTriumph member → free shipping
+    ship: 'std',
+  };
+  // Shipping prices and the free-shipping threshold live in lib/shop.js so the cart,
+  // the mini cart and this page cannot drift apart.
+  const PROMISE = {
+    std: 'Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
+    mytriumph: 'Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
+    express: 'Delivery <strong style="font-weight:400">Thu 10 Sep 2026</strong>',
+    pickup: 'Ready to collect <strong style="font-weight:400">from Thu 10 Sep 2026</strong>',
+  };
+
+  /* ---------- rail line items ---------- */
+  const ICON_MINUS = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8" stroke="currentColor" stroke-width="1"/></svg>';
+  const ICON_PLUS  = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1"/></svg>';
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function railLine(l, member) {
+    // In checkout the member price IS the price — the standard/member comparison belongs to
+    // the cart. Here the line shows what is charged, labelled "member price".
+    const charged = Shop.charged(l, member);
+    const meta = [l.colour, l.size].filter(Boolean).join(' · ');
+    return '' +
+      '<div class="li" data-sku="' + esc(l.sku) + '">' +
+        '<span class="li__imgwrap"><img class="li__img" src="' + esc(l.img || '') + '" alt="' + esc(l.name) + '" /></span>' +
+        '<span class="li__body">' +
+          '<span class="li__name t-title-xs">' + esc(l.name) + '</span>' +
+          (l.series ? '<span class="li__meta t-body-s">' + esc(l.series) + '</span>' : '') +
+          (meta ? '<span class="li__meta t-body-s">' + esc(meta) + '</span>' : '') +
+        '</span>' +
+        '<span class="li__price">' +
+          '<span class="t-price">' + eur(charged * l.qty) + '</span>' +
+          // a member is charged the member price, so that IS the price — showing the
+          // standard one beside it would only be noise at this point in the flow
+          (member && l.member ? '<span class="t-price-s li__member">member price</span>' : '') +
+          // one of something is its own unit price — the second line only earns its place
+          // once the quantity changes what the line total means
+          (l.qty > 1 ? '<span class="t-price-note muted">' + l.qty + ' × ' + eur(charged) + '</span>' : '') +
+        '</span>' +
+        '<span class="li__acts">' +
+          '<span class="stepper">' +
+            '<button type="button" data-step="-1" aria-label="Decrease quantity">' + ICON_MINUS + '</button>' +
+            '<span class="t-body-s" data-qty>' + l.qty + '</span>' +
+            '<button type="button" data-step="1" aria-label="Increase quantity">' + ICON_PLUS + '</button>' +
+          '</span>' +
+          '<button class="t-link-s muted" type="button" data-remove>Remove</button>' +
+        '</span>' +
+      '</div>';
+  }
+
+  /* ---------- totals ---------- */
+  function recalc() {
+    // Every totals lookup is scoped to #rail. The mobile drawer holds a CLONE of the rail that sits
+    // earlier in the DOM, so an unscoped querySelector would write to the clone and leave the real
+    // summary stale.
+    const rail = $('#rail');
+    const r = s => $(s, rail);
+    const t = Shop.totals({ member: state.member, ship: state.ship });
+
+    r('#railItems').innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
+    r('#railEmpty').hidden = t.lines.length > 0;
+    $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
+
+    r('[data-subtotal]').textContent = eur(t.sub);
+    r('#discountRow').hidden = !t.voucher;
+    // the code may have been entered on the cart page — reflect it either way
+    const vOk = $('#voucherOk');
+    if (vOk) {
+      vOk.hidden = !t.voucher;
+      if (t.voucher) {
+        vOk.querySelector('strong').textContent = t.voucher;
+        // a code applied on the bag page should not be hidden behind a closed row
+        const acc = $('#voucherAcc');
+        if (acc) { acc.dataset.open = 'true'; $('#voucherToggle').setAttribute('aria-expanded', 'true'); }
+        if ($('#voucher') && !$('#voucher').value) $('#voucher').value = t.voucher;
+      }
+    }
+    r('[data-discount]').textContent = '−' + eur(t.discount);
+    const shipCell = r('[data-shipping]');
+    shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
+    r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
+    r('[data-vat]').textContent = eur(t.vat);
+    $$('[data-total]').forEach(n => (n.textContent = eur(t.total)));
+    r('[data-promise]').innerHTML = PROMISE[state.ship];
+
+    // the standard-shipping price cell reflects membership / the free-shipping threshold
+    const stdCell = $('[data-ship-price="std"]');
+    if (stdCell) stdCell.textContent = t.freeShip ? 'Free' : eur(Shop.SHIP_STD);
+    if (stdCell) stdCell.style.color = t.freeShip ? 'var(--color-green)' : '';
+
+    // the MyTriumph row has nothing to offer a member, or a basket that already ships free
+    const myRow = $('#myTriumphShip');
+    if (myRow) {
+      myRow.hidden = t.freeShip;
+      if (myRow.hidden && state.ship === 'mytriumph') { pickShip('std'); return; }
+    }
+
+    $$('[data-instalment]').forEach(n => (n.textContent = eur(Math.round((t.total / 3) * 100) / 100)));
+    syncMobileSummary();
+  }
+
+  function pickShip(value) {
+    state.ship = value;
+    const input = $(`.opt input[name="ship"][value="${value}"]`);
+    if (input) { input.checked = true; }
+    $$('.opt input[name="ship"]').forEach(o => o.closest('.opt').classList.toggle('is-on', o.checked));
+    recalc();
+  }
+
+  /* ---------- account / member state ---------- */
+  function applyState() {
+    document.body.dataset.account = state.account;
+    document.body.dataset.member = String(state.member);
+
+    $$('[data-account-only]').forEach(el => {
+      el.hidden = !el.dataset.accountOnly.split(' ').includes(state.account);
+    });
+    $$('[data-member-only]').forEach(el => {
+      el.hidden = el.dataset.memberOnly !== String(state.member);
+    });
+    $$('[data-guest-only]').forEach(el => { el.hidden = state.account === 'member'; });
+
+    // the "new + account" persona is the one that gets the password field
+    const pw = $('#pwWrap');
+    if (pw) pw.hidden = state.account !== 'new';
+    recalc();
+  }
+
+  /* ---------- saved address vs a new one ---------- */
+  function syncAddrChoice() {
+    const form = $('#addrForm');
+    if (!form) return;
+    const picked = $('input[name="savedaddr"]:checked');
+    const wantsNew = !!picked && picked.value === 'new';
+    if (state.account === 'member') form.hidden = !wantsNew;
+    $$('input[name="savedaddr"]').forEach(r => r.closest('.opt').classList.toggle('is-on', r.checked));
+  }
+  $$('input[name="savedaddr"]').forEach(r => r.addEventListener('change', syncAddrChoice));
+
+  /* ---------- interactions ---------- */
+  // option rows (shipping + payment)
+  $$('.opt input[type="radio"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const group = r.name;
+      $$(`.opt input[name="${group}"]`).forEach(o => o.closest('.opt').classList.toggle('is-on', o.checked));
+      if (group === 'pay') {
+        $$('.opt__panel').forEach(p => p.classList.toggle('is-open', p.dataset.panel === r.value));
+      }
+      if (group === 'ship') { state.ship = r.value; recalc(); }
+    });
+  });
+
+  // quantity + remove, delegated — the rail is rebuilt on every change
+  $('#railItems').addEventListener('click', e => {
+    const li = e.target.closest('.li');
+    if (!li) return;
+    const step = e.target.closest('[data-step]');
+    if (step) { Shop.bump(li.dataset.sku, Number(step.dataset.step)); return; }
+    if (e.target.closest('[data-remove]')) Shop.remove(li.dataset.sku);
+  });
+
+  // voucher
+  const vAcc = $('#voucherAcc');
+  $('#voucherToggle').addEventListener('click', () => {
+    const open = vAcc.dataset.open === 'true';
+    vAcc.dataset.open = String(!open);
+    $('#voucherToggle').setAttribute('aria-expanded', String(!open));
+  });
+  $('#voucherBtn').addEventListener('click', () => {
+    const code = $('#voucher').value.trim().toUpperCase();
+    if (!code) return;
+    Shop.setVoucher(code);
+    $('#voucherOk').hidden = false;
+    $('#voucherOk').querySelector('strong').textContent = code;
+  });
+
+  // disclosure toggles
+  $$('[data-toggle]').forEach(b => b.addEventListener('click', () => {
+    const t = $(b.dataset.toggle);
+    t.hidden = !t.hidden;
+    b.hidden = !t.hidden ? true : false;
+  }));
+  $$('[data-toggle-target]').forEach(cb => cb.addEventListener('change', () => {
+    $(cb.dataset.toggleTarget).hidden = !cb.checked;
+  }));
+
+  // inline validation on blur — never on keystroke
+  $$('.field[data-validate] input').forEach(inp => {
+    inp.addEventListener('blur', () => {
+      const f = inp.closest('.field');
+      const kind = f.dataset.validate;
+      const v = inp.value.trim();
+      const bad = kind === 'email' ? !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v) : v === '';
+      f.classList.toggle('is-error', bad && v !== '' || (bad && inp.dataset.touched === '1'));
+      inp.dataset.touched = '1';
+    });
+    inp.addEventListener('input', () => inp.closest('.field').classList.remove('is-error'));
+  });
+
+  // the inline login panel: the Sign in branch of the live gate, no page load
+  const loginLink = $('#loginLink');
+  if (loginLink) loginLink.addEventListener('click', () => {
+    const panel = $('#loginPanel');
+    panel.hidden = !panel.hidden;
+    loginLink.setAttribute('aria-expanded', String(!panel.hidden));
+  });
+  // the account action under the newsletter line opens the same panel the Sign in link does
+  const acctBtn = $('#acctBtn');
+  if (acctBtn) acctBtn.addEventListener('click', () => {
+    const panel = $('#loginPanel');
+    panel.hidden = !panel.hidden;
+    acctBtn.setAttribute('aria-expanded', String(!panel.hidden));
+  });
+  const loginNew = $('#loginNew');
+  if (loginNew) loginNew.addEventListener('click', () => {
+    state.account = 'new';
+    $('#loginPanel').hidden = true;
+    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === 'new')));
+    applyState();
+    const pw = $('#newPw'); if (pw) pw.focus();
+  });
+
+  const loginGo = $('#loginGo');
+  if (loginGo) loginGo.addEventListener('click', () => {
+    state.account = 'member';
+    Shop.setMember(true);
+    $('#loginPanel').hidden = true;
+    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === 'member')));
+    $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === 'true')));
+    applyState();
+  });
+
+  // mobile summary: clone the rail into the drawer, keep it in sync
+  function syncMobileSummary() {
+    const body = $('#msumBody');
+    if (!body) return;
+    const clone = $('#rail').cloneNode(true);
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    // the clone is a read-only mirror — strip its controls so ids/handlers stay unique
+    clone.querySelectorAll('.acc, .voucher, .stepper, .li__acts button').forEach(n => n.remove());
+    body.replaceChildren(clone);
+  }
+  const msum = $('.msum');
+  $('#msumBtn').addEventListener('click', () => {
+    const open = msum.dataset.open === 'true';
+    msum.dataset.open = String(!open);
+    $('#msumBtn').setAttribute('aria-expanded', String(!open));
+  });
+
+  // prototype switcher
+  $$('[data-account-set]').forEach(b => b.addEventListener('click', () => {
+    state.account = b.dataset.accountSet;
+    // the signed-in persona is the MyTriumph member; guest and new-registrant start outside it
+    Shop.setMember(state.account === 'member');
+    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(state.member))));
+    applyState();
+  }));
+  $$('[data-member-set]').forEach(b => b.addEventListener('click', () => {
+    Shop.setMember(b.dataset.memberSet === 'true');
+    $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    applyState();
+  }));
+  $('#dashHide').addEventListener('click', () => {
+    $('#dash').hidden = true;
+    const b = document.createElement('button');
+    b.className = 'dash__hide'; b.textContent = 'States';
+    b.addEventListener('click', () => { $('#dash').hidden = false; b.remove(); });
+    document.body.appendChild(b);
+  });
+
+  // ?capture=1 — un-pin the fixed/sticky chrome so full-page screenshots don't stamp the
+  // pay bar across the middle of the page. Presentation only; no layout logic depends on it.
+  if (/[?&]capture=1/.test(location.search)) {
+    const s = document.createElement('style');
+    s.textContent = `.paybar{position:static!important;padding-bottom:var(--space-24)!important}
+      .ckhead,.msum,.ck__rail{position:static!important}
+      .ck__form{padding-bottom:var(--space-32)!important}
+      .dash{display:none!important}`;
+    document.head.appendChild(s);
+  }
+
+  /* ---------- one page vs three steps ----------
+     Both modes render the SAME sections; the mode only decides how many are on screen at
+     once. Nothing about the order, the totals or the fields is duplicated. */
+  const MODE_KEY = 'triumph.proto.checkoutMode';
+  let mode = 'onepage', step = 1;
+  // which door the customer took on step 1: none | signin | guest | register
+  let branch = 'none';
+  try { mode = localStorage.getItem(MODE_KEY) || 'onepage'; } catch (e) {}
+
+  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment' };
+
+  function applyMode() {
+    document.body.dataset.mode = mode;
+    if (mode === 'onepage') document.body.removeAttribute('data-step');
+    $$('[data-mode-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.modeSet === mode)));
+    if (mode === 'onepage') {
+      $$('.sec[data-step]').forEach(sec => { sec.classList.add('is-current'); sec.classList.remove('is-first'); });
+      $('.place').classList.add('is-last');
+    } else {
+      applyStep(step);
+    }
+    $('#stepnav').hidden = mode !== 'steps';
+    syncMobileSummary();
+  }
+
+  function applyStep(n) {
+    step = Math.min(3, Math.max(1, n));
+    document.body.dataset.step = String(step);   // step 1 drops the rail and the express row
+    $$('.sec[data-step]').forEach(sec => {
+      sec.classList.toggle('is-current', sec.dataset.step === String(step));
+      sec.classList.remove('is-first');
+    });
+    // a registered customer gave their email in the form; a guest gives it above the address
+    const contact = $('#s-contact');
+    if (contact) contact.classList.toggle('is-current',
+      contact.dataset.step === String(step) && branch !== 'register');
+    // the first section that is actually on screen — a mode-hidden one must not take it
+    const first = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null)[0];
+    if (first) first.classList.add('is-first');
+    $$('.steps__item').forEach(b => {
+      const i = Number(b.dataset.goto);
+      b.setAttribute('aria-current', i === step ? 'step' : 'false');
+      b.dataset.done = String(i < step);
+    });
+    $('#stepBack').hidden = step === 1;
+    $('#stepNext').textContent = STEP_CTA[step] || '';
+    // step 1 has the gate's own three doors, step 3 has Place order — neither wants
+    // a generic Continue underneath it
+    $('#stepnav').style.display = (step === 1 || step === 3) ? 'none' : '';
+    $('.paybar').style.display = (mode === 'steps' && step === 1) ? 'none' : '';
+    $('.place').classList.toggle('is-last', step === 3);
+    // the mobile pay bar carries the same call to action as the desktop column
+    const payBtn = $('.paybar .btn');
+    if (payBtn) {
+      payBtn.dataset.step = String(step);
+      payBtn.innerHTML = step === 3
+        ? 'Place order · <span data-total>' + eur(Shop.totals({ member: state.member, ship: state.ship }).total) + '</span>'
+        : STEP_CTA[step];
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ---------- the three doors on step 1 ---------- */
+  function leaveGate(kind, account) {
+    branch = kind;
+    state.account = account;
+    Shop.setMember(account === 'member');
+    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === account)));
+    $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(account === 'member'))));
+    applyState();
+    applyStep(2);
+  }
+  const gateSignIn = $('#gateSignIn');
+  if (gateSignIn) gateSignIn.addEventListener('click', () => leaveGate('signin', 'member'));
+  const gateGuest = $('#gateGuest');
+  if (gateGuest) gateGuest.addEventListener('click', () => leaveGate('guest', 'guest'));
+  const gateRegister = $('#gateRegister');
+  if (gateRegister) gateRegister.addEventListener('click', () => {
+    const reg = $('#gateReg');
+    reg.hidden = !reg.hidden;
+    gateRegister.setAttribute('aria-expanded', String(!reg.hidden));
+    gateRegister.textContent = reg.hidden ? 'Create an account' : 'Cancel registration';
+    if (!reg.hidden) reg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  const gateRegGo = $('#gateRegGo');
+  if (gateRegGo) gateRegGo.addEventListener('click', () => leaveGate('register', 'new'));
+
+  $('#stepNext').addEventListener('click', () => applyStep(step + 1));
+  $('#stepBack').addEventListener('click', () => applyStep(step - 1));
+  $$('.steps__item').forEach(b => b.addEventListener('click', () => {
+    const i = Number(b.dataset.goto);
+    if (i < step) applyStep(i);                 // only completed steps are navigable
+  }));
+  $$('[data-mode-set]').forEach(b => b.addEventListener('click', () => {
+    mode = b.dataset.modeSet;
+    try { localStorage.setItem(MODE_KEY, mode); } catch (e) {}
+    step = 1; branch = 'none';
+    const reg = $('#gateReg');
+    if (reg) { reg.hidden = true; $('#gateRegister').setAttribute('aria-expanded', 'false');
+               $('#gateRegister').textContent = 'Create an account'; }
+    applyMode();
+  }));
+
+  /* ---------- place order ----------
+     The last step of the prototype: snapshot the bag, show the confirmation, then empty it
+     so returning to the PDP starts a clean flow. */
+  function placeOrder() {
+    const t = Shop.totals({ member: state.member, ship: state.ship });
+    if (!t.lines.length) return;
+    const mail = ($('#email') && $('#email').value.trim()) ||
+                 (state.account === 'member' ? 'anna.musterfrau@example.com' : 'your email');
+    $('#doneNo').textContent = 'TR-' + String(Math.floor(100000 + Math.random() * 899999));
+    $('#doneMail').textContent = mail;
+    $('#doneCount').textContent = t.count + (t.count === 1 ? ' item' : ' items');
+    $('#doneTotal').textContent = eur(t.total);
+    $('#doneShip').textContent = $('[data-promise]').textContent.replace(/^Delivery\s*/, '');
+    $('.ck').hidden = true;
+    const msum = $('.msum'); if (msum) msum.style.display = 'none';
+    $('.paybar').style.display = 'none';
+    $('#ckDone').hidden = false;
+    window.scrollTo(0, 0);
+    Shop.clear();
+  }
+  $$('.place .btn').forEach(b => b.addEventListener('click', placeOrder));
+  $('.paybar .btn').addEventListener('click', () => {
+    if (mode === 'steps' && step < 3) applyStep(step + 1);
+    else placeOrder();
+  });
+
+  /* another page (or the mini cart) changed the bag */
+  Shop.onChange(() => { if ($('#ckDone').hidden) applyState(); });
+
+  applyMode();
+  applyState();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopping Bag | Triumph</title>
+<style>
+/* ============================================================
+   FONTS — Alliance No.1 Light + Regular (local)
+   ============================================================ */
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Light.otf") format("opentype");   font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Regular.otf") format("opentype"); font-weight:400; font-style:normal; font-display:swap; }
+
+/* ============================================================
+   DESIGN TOKENS — names match the Web code-syntax on the Figma
+   variables in "Design System Triumph" (C4UzkYsFCfJGxKr7BaakLO)
+   ============================================================ */
+:root{
+  --c-ink:#000; --c-ink-soft:rgba(0,0,0,.5); --c-on-dark:#fff;
+  --c-bg:#fff; --c-offwhite:#F8F3F3; --c-wash:#F9FAFB; --c-grey-light:#F1F1F1; --c-grey-medium:#747474;
+  --c-hair:rgba(0,0,0,.05); --c-edge:rgba(0,0,0,.2);
+  --c-burgundy:#5E2039; --c-sales:#C1003F;
+  --color-error:#E40032; --color-tutu:#F8E6E8;
+  --color-green:#008000; --color-peppermint:#E7F8E6;
+  --color-buddha:#CC9400; --color-warning:#F8F7E6;
+  --color-darkCerulean:#0F5E8B; --color-info-tint:#E6F0F8;
+
+  --space-2:2px;--space-4:4px;--space-6:6px;--space-8:8px;--space-10:10px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-28:28px;--space-32:32px;--space-40:40px;--space-48:48px;--space-64:64px;
+  --radius-none:0;--radius-sm:2px;--radius-full:999px;
+  --control-28:28px;--control-32:32px;--control-36:36px;--control-40:40px;--control-44:44px;--control-48:48px;--control-56:56px;
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+
+  --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
+  --header-h:72px;
+  --ease-out:cubic-bezier(.22,.61,.36,1);
+  /* half-weight strokes: a 0.5px stroke drawn as 1px at half alpha (see .field__frame) */
+  --hair-ink:color-mix(in srgb, var(--c-ink) 50%, transparent);
+  --hair-edge:color-mix(in srgb, var(--c-edge) 50%, transparent);
+  --hair-error:color-mix(in srgb, var(--color-error) 50%, transparent);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--c-bg);color:var(--c-ink);font-family:var(--font-sans);font-weight:300;
+  font-size:14px;line-height:20px;letter-spacing:.04em;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;background:none;border:0;padding:0;color:inherit}
+input{font-family:inherit;font-size:14px;color:inherit}
+a{color:inherit;text-decoration:none}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3,p{margin:0;font-weight:400}
+[hidden]{display:none!important}
+
+/* type ramp = Figma text styles */
+.t-title-xxl{font-weight:400;font-size:32px;line-height:38px;letter-spacing:.04em;text-transform:uppercase}
+.t-title-xl {font-weight:400;font-size:24px;line-height:30px;letter-spacing:.04em;text-transform:uppercase}
+.t-title-l  {font-weight:400;font-size:20px;line-height:26px;letter-spacing:.04em;text-transform:uppercase}
+.t-title-m  {font-weight:400;font-size:16px;line-height:24px;letter-spacing:.04em;text-transform:uppercase}
+.t-title-s  {font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase}
+.t-title-xs {font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase}
+.t-body-m   {font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em}
+.t-body-s   {font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+.t-body-xs  {font-weight:300;font-size:10px;line-height:14px;letter-spacing:.04em}
+.t-label-m  {font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase}
+.t-label-s  {font-weight:300;font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
+.t-price    {font-weight:400;font-size:14px;line-height:16px;letter-spacing:0}
+.t-price-s  {font-weight:400;font-size:12px;line-height:14px;letter-spacing:0}
+.t-price-note{font-weight:300;font-size:12px;line-height:14px;letter-spacing:0}
+.t-link-s   {font-weight:300;font-size:12px;line-height:14px;letter-spacing:.04em;text-decoration:underline;text-underline-offset:3px}
+.muted{color:var(--c-ink-soft)}
+
+/* ---------------- header ---------------- */
+.hd{position:sticky;top:0;z-index:60;background:var(--c-bg);border-bottom:1px solid var(--c-hair);height:var(--header-h)}
+.hd__in{max-width:1400px;margin:0 auto;height:100%;padding:0 var(--space-24);
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--space-16)}
+.hd__links{display:flex;gap:var(--space-24);justify-self:start}
+.hd__logo img{width:156px;height:20px}
+.hd__icons{display:flex;gap:var(--space-16);justify-self:end;align-items:center}
+.hd__bag{position:relative;display:inline-flex}
+.hd__count{position:absolute;left:100%;bottom:100%;transform:translate(-6px,6px);line-height:1}
+
+/* ---------------- page ---------------- */
+.wrap{max-width:1400px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
+.pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.pagehead span{color:var(--c-ink-soft)}
+
+/* Two columns; the right one carries the delivery status (row 1) above the summary (row 2),
+   while the product list spans both rows on the left. */
+.cart{display:grid;grid-template-columns:minmax(0,1fr) 400px;
+  /* The product column spans both rows and is taller than the status card plus the summary,
+     so an auto second row absorbed the slack and pushed the summary ~80px clear of the
+     progress bar. A flexible second row takes the leftover height instead, which docks the
+     summary at one row-gap below the status card. */
+  grid-template-rows:min-content 1fr;
+  column-gap:var(--space-64);row-gap:var(--space-24);align-items:start;margin-top:var(--space-32)}
+.cart__main{grid-column:1;grid-row:1 / span 2;min-width:0}
+.cart__status{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:var(--space-16)}
+.sum{grid-column:2;grid-row:2}
+
+/* free-shipping progress */
+.ship-progress{border:1px solid var(--c-hair);padding:var(--space-16)}
+.ship-progress__bar{height:4px;background:var(--c-grey-light);margin-top:var(--space-12);overflow:hidden}
+.ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
+
+/* ---------------- line items ---------------- */
+.items{}
+.item{display:grid;grid-template-columns:220px minmax(0,1fr) auto;
+  column-gap:var(--space-24);row-gap:0;align-content:start;
+  padding:var(--space-32) 0;border-bottom:1px solid var(--c-hair)}
+.item__media{grid-column:1;grid-row:1 / span 5}
+.item__name{grid-column:2;grid-row:1}
+.item__sub{grid-column:2;grid-row:2}
+.item__attrs{grid-column:2;grid-row:3}
+.item__row{grid-column:2;grid-row:4}
+.item .stock{grid-column:2;grid-row:5}
+.item__side{grid-column:3;grid-row:1 / 3}
+/* On desktop the packshot bleeds through the row's vertical padding so it covers the whole
+   row. The negative margins turn the stretched grid area into the full row height, and the
+   column is 188px = 3:4 of that height, so the shot fills it without a crop or a stretch. */
+/* The packshot used to bleed through the row padding so the column of images ran
+   unbroken. Keeping it inside the padding puts real white space between products. */
+.item__media{position:relative;align-self:start;aspect-ratio:3/4}
+.item__img{width:100%;height:100%;object-fit:cover;background:var(--c-grey-light)}
+.item__fav{position:absolute;top:var(--space-8);right:var(--space-8);width:var(--control-28);height:var(--control-28);
+  display:grid;place-items:center}
+.item__name{display:block}
+.item__sub{display:block;margin-top:var(--space-2)}
+.item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
+/* Size is editable in the bag — a native select styled as the chip it replaces. */
+.sizesel{position:relative;display:inline-flex;align-items:center}
+.sizesel select{
+  appearance:none;height:var(--control-36);padding:0 var(--space-28) 0 var(--space-12);
+  border:1px solid var(--c-edge);background:var(--c-bg);color:inherit;cursor:pointer;
+  font-family:inherit;font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;
+}
+.sizesel select:hover{border-color:var(--c-ink)}
+.sizesel select:focus-visible{outline:2px solid var(--c-ink);outline-offset:2px}
+.sizesel svg{position:absolute;right:var(--space-10);pointer-events:none}
+.attr-lbl{color:var(--c-ink-soft)}
+.chip{display:inline-flex;align-items:center;gap:var(--space-6);height:var(--control-28);padding:0 var(--space-10);
+  border:1px solid var(--c-edge)}
+/* Colour follows the PDP swatch, not a chip: the product in that colourway on a 5% grey
+   tile, 44px image top-aligned, 2px ink underline on the chosen one. Values lifted from
+   pdp.html .swatch so cart and PDP read as the same component. */
+.attr-colour{display:inline-flex;flex-direction:column;align-items:flex-start;gap:var(--space-6)}
+.swatch{
+  width:40px;height:48px;flex:none;background:var(--c-hair);
+  border-bottom:2px solid transparent;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:var(--space-6);
+}
+.swatch img{width:32px;height:32px;object-fit:cover}
+.swatch--sel{border-bottom-color:var(--c-ink)}
+/* on desktop the stepper and the Remove link get a wide gap between them; the
+   phone row is narrow enough that 16px is already enough (see the 991 block) */
+.item__row{display:flex;align-items:center;gap:var(--space-12);margin-top:var(--space-20);flex-wrap:wrap}
+.item__row [data-remove]{margin-left:var(--space-20)}
+.item__side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-6)}
+.item__side del{color:var(--c-ink-soft);text-decoration:line-through}
+.item__unit{color:var(--c-ink-soft)}
+
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--c-edge);height:var(--control-36)}
+.stepper button{width:var(--control-36);height:100%;display:grid;place-items:center}
+.stepper button:hover{background:var(--c-wash)}
+.stepper span{min-width:26px;text-align:center}
+
+.stock{display:inline-flex;align-items:center;gap:var(--space-6);margin-top:var(--space-20)}
+.stock--low{color:var(--color-buddha)}
+.stock--ok{color:var(--color-green)}
+
+/* member price pair — never a strike-through against the standard price */
+.pricepair{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2)}
+.pricepair__member{color:var(--c-burgundy)}
+.pricepair--member .t-price{color:var(--c-burgundy)}
+
+/* ---------------- cross-sell strip (replaces the blocking interstitial) --------- */
+/* no box around the cross-sell — the head sits on a hairline and the rows run flush
+   with the product list above, the same treatment the checkout option lists get */
+.addon{margin-top:var(--space-40)}
+.addon__head{padding:0 0 var(--space-20)}
+.addon__grid{display:flex;flex-wrap:wrap;gap:var(--space-40)}
+.acard{display:flex;flex-direction:column;flex:none;width:220px}
+.acard__img{width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--c-grey-light)}
+.acard__img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
+.acard:hover .acard__img img{transform:scale(1.04)}
+.acard__info{display:flex;flex-direction:column;gap:var(--space-2);min-width:0;padding-top:var(--space-12)}
+.acard__nm{display:block}
+/* the price and the add control share the last line — the + sits to the right of the price */
+.acard__buy{display:flex;align-items:center;gap:var(--space-16);
+  margin-top:auto;padding-top:var(--space-10)}
+.addon__btn{flex:none;width:var(--control-32);height:var(--control-32);padding:0;border:1px solid var(--c-edge);display:grid;place-items:center;
+  font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase}
+.addon__btn:hover{border-color:var(--c-ink);background:var(--c-ink);color:var(--c-on-dark)}
+.addon__btn svg{display:block;width:12px;height:12px;stroke:currentColor;stroke-width:1}
+
+/* ---------------- summary ---------------- */
+/* white, not tinted — a hairline does the separating (Amelie, 2026-09-08) */
+.sum{position:sticky;top:calc(var(--header-h) + var(--space-24));background:var(--c-bg);
+  border:1px solid var(--c-hair);padding:var(--space-24)}
+.trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-6) 0}
+.trow--free [data-shipping]{color:var(--color-green)}
+.trow--grand{border-top:1px solid var(--c-edge);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
+.grand__num{font-weight:400;font-size:20px;line-height:26px;letter-spacing:0}
+.sum__cta{margin-top:var(--space-20)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
+  height:var(--control-56);padding:0 var(--space-24);background:var(--c-ink);color:var(--c-on-dark);
+  font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--c-ink);
+  transition:opacity .15s var(--ease-out)}
+.btn:hover{opacity:.82}
+.btn--wide{width:100%}
+.btn--ghost{background:transparent;color:var(--c-ink)}
+.btn--ghost:hover{background:var(--c-bg);opacity:1}
+.express{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);margin-top:var(--space-8)}
+/* Outlined express buttons: white ground, hairline border, brand wordmark in its own colour —
+   the outlined variant each provider permits, and no coloured blocks in a monochrome page. */
+.xbtn{height:var(--control-48);display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--c-edge);background:var(--c-bg);
+  transition:border-color .15s var(--ease-out), background .15s var(--ease-out)}
+.xbtn:hover{border-color:var(--c-ink);background:var(--c-wash)}
+.or{display:flex;align-items:center;gap:var(--space-12);margin:var(--space-16) 0 0;color:var(--c-ink-soft)}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--c-edge)}
+
+.acc{border-top:1px solid var(--c-edge);margin-top:var(--space-20)}
+.acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-14,14px) 0}
+.acc__chev{transition:transform .2s var(--ease-out)}
+.acc[data-open="true"] .acc__chev{transform:rotate(180deg)}
+.acc__body{display:none;padding-bottom:var(--space-16)}
+.acc[data-open="true"] .acc__body{display:block}
+
+/* Text Field — the DS component, node 116:229 in *Design System Triumph*.
+   Taken off the BUILT component, which differs from its own description: the box is a
+   0.5px hairline (not 1px then 2px on focus), 56px tall, 16px inner padding, and the
+   weight never changes. Empty draws the box in ink; once the field holds a value the box
+   drops to border/medium contrast and its top edge becomes two rails either side of the
+   label, which rides the line at 10px uppercase Regular. Error reddens box, label, value
+   and supporting text; disabled is the whole field at 30%. Supporting text is Body/S, 4px
+   under the box, on the same 16px indent. 6px + 56px + 24px = 86px, so switching state
+   never shifts the layout. */
+.field{position:relative;display:block;--ctl:var(--control-44);padding-top:6px}
+.field:has(.field__hint),.field:has(.field__err){padding-bottom:24px}
+/* ============================================================
+   TEXT FIELD — rebuilt against the updated DS component
+   (Design System Triumph, node 116:229, read 2026-09-09)
+   56px box, 12px inner padding, 12px gap to a 24px icon slot; 6px of notch space above
+   and a 24px supporting-text band below, so 86px total and a state change never shifts
+   the layout. Rest is a hairline in ink, focus goes solid 1px, a filled box drops to
+   border/medium contrast and its top edge becomes two rails either side of the label
+   (rail start 8px, 4px either side of the text). Placeholder, resting label and
+   supporting text are Grey/Dark, not 50% black — that is what the component uses.
+   ============================================================ */
+.field input,.field select{width:100%;height:var(--ctl);padding:0 var(--space-12) 2px;
+  border:0;background:transparent;position:relative;z-index:1;outline:0;
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em}
+.field select{appearance:none;cursor:pointer;padding-right:48px}
+/* the fieldset is the box; its legend punches the gap the floated label sits in —
+   12px of rail, then the label, matching the component's Rail start / Rail rest */
+/* The box is exactly the control — it starts below the 6px the notch needs, so the value
+   sits centred in it (with height:ctl+6 the box was 6px taller than the input and the text
+   read 3px low) and a plain 44/56px button beside it lines up on both edges. */
+/* A fieldset paints its top border through the MIDDLE of the legend, not at its own box
+   top. With top:6px/height:56 the painted box ran 6px lower than the element box, so the
+   value sat 3px above the visible centre and the floated label rode 6px above the rule.
+   Starting the box at 0 and giving it the extra 6px puts the painted border back on the
+   input's own edges: legend centre = 6px = the rule, value centre = the box centre. */
+.field__frame{position:absolute;top:0;left:0;right:0;height:calc(var(--ctl) + 6px);
+  margin:0;padding:0 var(--space-8);border:1px solid var(--hair-ink);pointer-events:none;
+  transition:border-color .12s var(--ease-out)}
+/* the legend measures the gap, so it has to render the label's own casing — mixed case
+   measured ~1px narrower than the uppercase label and the rail clipped the last letter */
+.field__frame legend{padding:0;font-weight:400;font-size:10px;line-height:12px;letter-spacing:.04em;
+  text-transform:uppercase;max-width:.01px;visibility:hidden;white-space:nowrap;
+  transition:max-width .12s var(--ease-out)}
+.field__frame legend span{display:inline-block;padding:0 var(--space-4);opacity:0;visibility:visible}
+.field__label{position:absolute;left:var(--space-12);top:calc(6px + var(--ctl) / 2 - 1px);
+  transform:translateY(-50%);z-index:2;color:var(--c-grey-medium);pointer-events:none;
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:none;
+  transition:.12s var(--ease-out)}
+.field:focus-within .field__label,
+.field input:not(:placeholder-shown) ~ .field__label,
+.field select:valid ~ .field__label,
+.field--float .field__label,
+.field.is-float .field__label{top:0;transform:none;font-weight:400;font-size:10px;line-height:12px;
+  text-transform:uppercase;color:var(--c-grey-medium)}
+.field:focus-within .field__frame legend,
+.field input:not(:placeholder-shown) ~ .field__frame legend,
+.field select:valid ~ .field__frame legend,
+.field--float .field__frame legend,
+.field.is-float .field__frame legend{max-width:100%}
+/* A filled box is the lighter one — border/medium contrast, per the component.
+   Wrapped in :where() so it carries no more specificity than the focus and error
+   rules below: as a plain `.field input:not(...) ~ .field__frame` it outranked both,
+   and a filled field stayed grey when focused and when it errored. */
+.field:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float) .field__frame{
+  border-color:var(--hair-edge)}
+/* Focus doubles the stroke, 0.5px → 1px, keeping the colour family: an empty box stays
+   ink, a filled one stays border/medium contrast. Because a browser floors any border to
+   one device pixel, a *declared* .5px paints exactly like 1px (measured — identical at 1x
+   and 2x), so the half-weight stroke is drawn as a 1px line at half the token's alpha —
+   which is what Figma's own 0.5px stroke looks like on screen — and focus goes solid. */
+.field:focus-within .field__frame{border-color:var(--c-ink)}
+.field:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float):focus-within .field__frame{border-color:var(--c-edge)}
+.field:focus-within .field__label{color:var(--c-ink)}
+.field__hint,.field__err{position:absolute;left:var(--space-4);
+  top:calc(6px + var(--ctl) + var(--space-4));margin:0;
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+.field__hint{display:block;color:var(--c-grey-medium)}
+.field__err{display:none;color:var(--color-error)}
+/* an EMPTY field reddens its box; a FILLED one keeps the grey box and reddens only the
+   label, the value and the supporting text — the component draws it that way */
+.field.is-error .field__frame{border-color:var(--hair-error)}
+.field.is-error:where(:has(input:not(:placeholder-shown)),:has(select:valid),.field--float,.is-float) .field__frame{
+  border-color:var(--hair-edge)}
+.field.is-error .field__label,
+.field.is-error input,.field.is-error select{color:var(--color-error)}
+.field.is-error .field__hint{display:none}
+.field.is-error .field__err{display:block}
+.field.is-disabled{opacity:.3;pointer-events:none}
+.field__chev{position:absolute;right:var(--space-12);top:calc(6px + var(--ctl) / 2);
+  transform:translateY(-50%);pointer-events:none;z-index:2}
+
+/* the field reserves 6px above its box for the notch, so the row aligns on its end edge */
+.voucher{display:flex;align-items:flex-end;gap:var(--space-8)}
+.voucher .field{flex:1}
+.voucher .btn{height:var(--control-44);padding:0 var(--space-16);font-size:12px}
+
+.paylogos{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-20);align-items:center}
+.paylogos img,.paylogos svg{height:20px;width:auto;opacity:.8}
+.trust{display:flex;flex-direction:column;gap:var(--space-8);margin-top:var(--space-20);color:var(--c-ink-soft)}
+.trust span{display:inline-flex;align-items:center;gap:var(--space-8)}
+
+.alert{display:flex;gap:var(--space-10);padding:var(--space-12);margin-bottom:var(--space-16)}
+.alert--info{background:var(--color-info-tint);color:var(--color-darkCerulean)}
+.alert--success{background:var(--color-peppermint);color:var(--color-green)}
+
+/* ---------------- empty state ---------------- */
+.empty{max-width:520px;margin:var(--space-64) auto;text-align:center}
+.empty__icon{margin:0 auto var(--space-24)}
+.empty p{margin-top:var(--space-12);color:var(--c-ink-soft)}
+.empty .btn{margin-top:var(--space-32)}
+
+/* ---------------- prototype switcher ---------------- */
+.dash{position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-12) var(--space-16)}
+.dash h4{margin:0 0 var(--space-8);font-weight:400;font-size:10px;line-height:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.dash__row{display:flex;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-10)}
+.dash button{border:1px solid rgba(255,255,255,.3);padding:var(--space-6) var(--space-8);font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
+/* below 992 the sticky Checkout bar owns the bottom of the screen — the switcher
+   is a prototype affordance and must never sit on top of the primary CTA */
+@media (max-width:991px){ .dash{bottom:calc(var(--space-16) + 104px)} }
+.dash__hide{position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;
+  background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-8) var(--space-10);
+  font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+@media (max-width:991px){ .dash__hide{bottom:calc(var(--space-16) + 104px)} }
+.dash button[aria-pressed="true"]{background:var(--c-on-dark);color:var(--c-ink);border-color:var(--c-on-dark)}
+
+/* ---------------- responsive ---------------- */
+/* declared before the media query — the desktop default is "no sticky bar", and the
+   mobile block below turns it on. The other way round the `none` wins and it never shows. */
+.mbar{display:none}
+@media (max-width:1100px){ .cart{grid-template-columns:minmax(0,1fr) 340px;column-gap:var(--space-40)} }
+/* At tablet widths there is room to read the summary before the product list, so it
+   moves up; on a phone it stays under the products and the sticky bar carries the total. */
+@media (min-width:576px) and (max-width:991px){
+  .cart__status{order:1} .sum{order:2} .cart__main{order:3}
+}
+@media (max-width:991px){
+  .item__row{gap:var(--space-16)}
+  /* single column, source order: delivery status → products → summary */
+  .cart{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-24)}
+  .cart__main,.cart__status,.sum{grid-column:auto;grid-row:auto}
+  .sum{position:static}
+  .hd__links{display:none}
+  .wrap{padding:var(--space-24) var(--space-16) 120px}
+  .t-title-xl{font-size:20px;line-height:26px}
+  /* one text column beside the shot, with the price sitting between the series and the
+     colour — and controls at 44px so they are actually tappable */
+  .item{grid-template-columns:96px minmax(0,1fr);column-gap:var(--space-16)}
+  .item__media{grid-row:1 / span 6;align-self:start;margin:0;aspect-ratio:auto}
+  .item__img{width:96px;height:128px}
+  .item__name{grid-column:2;grid-row:1}
+  .item__sub{grid-column:2;grid-row:2}
+  .item__side{grid-column:2;grid-row:3;flex-direction:row;align-items:baseline;
+    justify-content:flex-start;width:100%;flex-wrap:wrap;gap:var(--space-8);
+    text-align:left;margin-top:var(--space-12)}
+  .item__attrs{grid-column:2;grid-row:4}
+  .item__row{grid-column:2;grid-row:5}
+  .item .stock{grid-column:2;grid-row:6}
+  .item__unit{white-space:nowrap}
+  .pricepair{flex-direction:row;align-items:baseline;gap:var(--space-8)}
+  .item__row [data-remove]{margin-left:auto}
+  .stepper{height:var(--control-44)}
+  .stepper button{width:var(--control-44)}
+  .sizesel select{height:var(--control-44)}
+  /* the sticky bar carries the primary CTA, so the summary must not repeat it —
+     one Checkout button per screen (this is finding F17 in the audit) */
+  .sum__cta > .btn{display:none}
+  .sum__cta .or{margin-top:0}
+  /* sticky checkout bar */
+  .mbar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--c-bg);
+    border-top:1px solid var(--c-hair);padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom))}
+  .mbar__top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+}
+@media (max-width:575px){
+  /* at phone width the add-on row cannot hold image + name + price + button on one
+     line, so the button drops to its own full-width line */
+  .addon__grid{gap:var(--space-20)}
+  .acard{width:calc(50% - var(--space-10))}
+  .addon__body{flex:1 1 auto;min-width:0}
+
+}
+</style>
+</head>
+<body data-member="false" data-empty="false">
+
+<header class="hd">
+  <div class="hd__in">
+    <nav class="hd__links t-label-m">
+      <a href="#">Bras</a><a href="#">Briefs</a><a href="#">Lingerie</a><a href="#">Sale</a>
+    </nav>
+    <a class="hd__logo" href="./index.html" aria-label="Triumph"><img src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" /></a>
+    <div class="hd__icons">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M7.97004 4.04495L9.40824 2.54683C10.1273 1.82772 10.9663 1.40825 11.9251 1.40825C12.824 1.40825 13.7228 1.82772 14.382 2.4869C15.7603 3.9251 15.7603 6.26218 14.382 7.76031C13.3633 8.77904 8.02996 14.4719 8.02996 14.4719C8.02996 14.4719 2.6367 8.77904 1.6779 7.76031C0.299626 6.32211 0.299626 3.98503 1.6779 2.4869C2.27715 1.82772 3.17603 1.40825 4.07491 1.40825C4.97378 1.40825 5.87266 1.82772 6.53184 2.4869L7.97004 4.04495Z" stroke="currentColor"/></svg>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="6" r="2.7" stroke="currentColor" stroke-width="1"/><path d="M3.5 15.5a5.5 5.5 0 0111 0" stroke="currentColor" stroke-width="1"/></svg>
+      <a class="hd__bag" href="./cart.html" aria-label="Shopping bag"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 5h10l-1 10H5L4 5zM7 5a2 2 0 014 0" stroke="currentColor" stroke-width="1"/></svg><span class="hd__count t-body-xs" data-cart-count>0</span></a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ======================= EMPTY STATE ======================= -->
+  <section class="empty" id="emptyState" hidden>
+    <svg class="empty__icon" width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+      <path d="M12 16h32l-3 30H15L12 16zM21 16a7 7 0 0114 0" stroke="currentColor" stroke-width="1"/>
+    </svg>
+    <h1 class="t-title-l">Your bag is empty</h1>
+    <p class="t-body-m">Nothing chosen yet. Start with the bestsellers — or find your fit with the bra size calculator.</p>
+    <a class="btn" href="./plp.html">Shop bras</a>
+    <p style="margin-top:var(--space-24)"><a class="t-link-s" href="#">Calculate my size</a></p>
+  </section>
+
+  <!-- ======================= FILLED CART ======================= -->
+  <div id="filledCart">
+    <div class="pagehead">
+      <h1 class="t-title-xl">Shopping bag</h1>
+      <span class="t-title-m" data-count>0 items</span>
+    </div>
+    <p class="t-body-s muted">Prices incl. VAT · Free returns within 30 days</p>
+
+    <div class="cart">
+      <!-- Delivery status sits directly above the summary on desktop — it is about the total,
+           not about any one product. On mobile it comes first, ahead of the product list. -->
+      <div class="cart__status">
+        <!-- free shipping progress, non-members -->
+        <div class="ship-progress" data-member-only="false">
+          <div class="t-body-m" id="shipMsg"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
+          <div class="ship-progress__bar"><span class="ship-progress__fill" id="shipFill"></span></div>
+          <p class="t-body-s muted" style="margin-top:var(--space-8)">
+            Or <button class="t-link-s" type="button" id="joinBtn" style="color:var(--c-burgundy)">join MyTriumph</button> — members always ship free.
+          </p>
+        </div>
+        <div class="alert alert--success" data-member-only="true" style="margin-bottom:0">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span class="t-body-s">As a MyTriumph member you ship free.</span>
+        </div>
+      </div>
+
+      <!-- ------------ items ------------ -->
+      <div class="cart__main">
+        <div class="items" id="cartItems"></div>
+
+        <!-- cross-sell strip: the upsell lives IN the cart, it never blocks the way out -->
+        <div class="addon">
+          <div class="addon__head">
+            <span class="t-title-s">Complete your order</span>
+          </div>
+          <div class="addon__grid">
+            <article class="acard">
+              <div class="acard__img"><img src="./Assets/10215855-0004_1.webp" alt="Amourette String" loading="lazy" /></div>
+              <div class="acard__info">
+                <span class="acard__nm t-title-xs">String</span>
+                <span class="t-body-s muted">Amourette</span>
+                <span class="t-body-s muted">Black · M</span>
+                <span class="acard__buy">
+                  <span class="acard__pr t-price">€22.95</span>
+                  <button class="addon__btn" type="button" aria-label="Add to bag" data-sku="amourette-string-black-m" data-name="String"
+                data-series="Amourette" data-colour="Black" data-size="M"
+                data-price="22.95" data-member="19.95" data-img="./Assets/10215855-0004_1.webp" data-swatch="./Assets/swatch-tai-black.webp">
+                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
+                  </button>
+                </span>
+              </div>
+            </article>
+            <article class="acard">
+              <div class="acard__img"><img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Aura Spotlight Bra" loading="lazy" /></div>
+              <div class="acard__info">
+                <span class="acard__nm t-title-xs">Aura Spotlight Bra</span>
+                <span class="t-body-s muted">Aura Spotlight</span>
+                <span class="t-body-s muted">Black · 70C</span>
+                <span class="acard__buy">
+                  <span class="acard__pr t-price">€54.95</span>
+                  <button class="addon__btn" type="button" aria-label="Add to bag" data-sku="aura-spotlight-bra-black-70c" data-name="Aura Spotlight Bra"
+                data-series="Aura Spotlight" data-colour="Black" data-size="70C"
+                data-price="54.95" data-member="49.45" data-img="./Assets/10208018-0004_1.webp" data-swatch="./Assets/swatch-bra-black.webp">
+                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
+                  </button>
+                </span>
+              </div>
+            </article>
+            <article class="acard">
+              <div class="acard__img"><img src="./Assets/ck-brief.webp" alt="Amourette Tai" loading="lazy" /></div>
+              <div class="acard__info">
+                <span class="acard__nm t-title-xs">Tai</span>
+                <span class="t-body-s muted">Amourette</span>
+                <span class="t-body-s muted">Black · M</span>
+                <span class="acard__buy">
+                  <span class="acard__pr t-price">€24.95</span>
+                  <button class="addon__btn" type="button" aria-label="Add to bag" data-sku="amourette-tai-black-m" data-name="Tai"
+                data-series="Amourette" data-colour="Black" data-size="M"
+                data-price="24.95" data-member="19.95" data-img="./Assets/ck-brief.webp" data-swatch="./Assets/swatch-tai-black.webp">
+                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
+                  </button>
+                </span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <!-- ------------ summary ------------ -->
+      <aside class="sum" aria-label="Summary">
+        <h2 class="t-title-m" style="margin-bottom:var(--space-16)">Summary</h2>
+        <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€0.00</span></div>
+        <div class="trow" id="discountRow" hidden><span class="t-body-m">Discount</span><span class="t-price" data-discount>−€0.00</span></div>
+        <div class="trow" data-ship-row>
+          <span class="t-body-m">Shipping <span class="muted t-body-s">(Standard, DHL)</span></span>
+          <span class="t-price" data-shipping>€4.99</span>
+        </div>
+        <div class="trow trow--grand">
+          <span>
+            <span class="t-title-m" style="display:block">Total</span>
+            <span class="t-price-note muted">incl. VAT <span data-vat>€0.00</span></span>
+          </span>
+          <span class="grand__num" data-total>€0.00</span>
+        </div>
+
+        <div class="sum__cta">
+          <a class="btn btn--wide" href="./checkout.html">Checkout</a>
+          <p class="or t-label-m">or express</p>
+          <div class="express">
+            <button class="xbtn xbtn--paypal" type="button" aria-label="Pay with PayPal">
+              <svg width="58" height="16" viewBox="0 0 58 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="26" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
+            </button>
+            <button class="xbtn xbtn--apple" type="button" aria-label="Pay with Apple Pay">
+              <svg width="56" height="18" viewBox="0 0 62 20" aria-hidden="true"><path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/><text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text></svg>
+            </button>
+            <button class="xbtn xbtn--klarna" type="button" aria-label="Pay with Klarna">
+              <svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="12" font-weight="bold" fill="#0B051D">Klarna</text></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="acc" data-open="false" id="voucherAcc">
+          <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
+            <span class="t-body-m">Gift card or discount code</span>
+            <svg class="acc__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+          </button>
+          <div class="acc__body">
+            <div class="voucher">
+              <label class="field">
+                <input type="text" id="voucher" placeholder=" " />
+                <fieldset class="field__frame"><legend><span>Code</span></legend></fieldset>
+                <span class="field__label">Code</span>
+              </label>
+              <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="trust t-body-s">
+          <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 6V4a4 4 0 018 0v2" stroke="currentColor" stroke-width="1"/><rect x="1.5" y="6" width="11" height="7" stroke="currentColor" stroke-width="1"/></svg> Secure, encrypted payment</span>
+          <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7a5 5 0 105-5" stroke="currentColor" stroke-width="1"/><path d="M2 3v4h4" stroke="currentColor" stroke-width="1"/></svg> Free returns for 30 days</span>
+          <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 4h8v6H1zM9 6h2.5L13 7.5V10H9z" stroke="currentColor" stroke-width="1"/></svg> Delivery Fri 11 – Sat 12 Sep</span>
+        </div>
+
+        <div class="paylogos">
+          <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#1A1F71"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#fff">VISA</text></svg>
+          <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="18" cy="10" r="6" fill="#F79E1B" fill-opacity=".85"/></svg>
+          <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-style="italic" font-weight="bold" fill="#003087">PayPal</text></svg>
+          <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#0B051D">Klarna</text></svg>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- mobile sticky checkout bar -->
+<div class="mbar" id="mbar">
+  <div class="mbar__top">
+    <span class="t-body-m">Total <span class="muted t-body-s" data-count>0 items</span></span>
+    <span class="grand__num" data-total>€0.00</span>
+  </div>
+  <a class="btn btn--wide" href="./checkout.html">Checkout</a>
+</div>
+
+<div class="dash" id="dash">
+  <h4>Prototype · Bag</h4>
+  <div class="dash__row">
+    <button data-cart-set="filled" aria-pressed="true">Sample bag</button>
+    <button data-cart-set="empty" aria-pressed="false">Empty</button>
+  </div>
+  <h4>MyTriumph</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-member-set="false" aria-pressed="true">Not a member</button>
+    <button data-member-set="true" aria-pressed="false">Member</button>
+  </div>
+  <div class="dash__row" style="margin-bottom:0">
+    <button id="dashHide">Hide</button>
+  </div>
+</div>
+
+<script src="./lib/shop.js"></script>
+<script>
+(function(){
+  const $  = (s,r=document)=>r.querySelector(s);
+  const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+  const eur = Shop.money;
+
+  /* The bag itself lives in lib/shop.js and is shared with the PDP and the
+     checkout. This page owns the presentation only: how a line is drawn, and
+     the fact that a member sees BOTH prices side by side (never a
+     strike-through — see the member price display rule). */
+
+  const ICON_FAV  = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M7.97004 4.04495L9.40824 2.54683C10.1273 1.82772 10.9663 1.40825 11.9251 1.40825C12.824 1.40825 13.7228 1.82772 14.382 2.4869C15.7603 3.9251 15.7603 6.26218 14.382 7.76031C13.3633 8.77904 8.02996 14.4719 8.02996 14.4719C8.02996 14.4719 2.6367 8.77904 1.6779 7.76031C0.299626 6.32211 0.299626 3.98503 1.6779 2.4869C2.27715 1.82772 3.17603 1.40825 4.07491 1.40825C4.97378 1.40825 5.87266 1.82772 6.53184 2.4869L7.97004 4.04495Z" stroke="currentColor"/></svg>';
+  const ICON_MINUS= '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8" stroke="currentColor" stroke-width="1"/></svg>';
+  const ICON_PLUS = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1"/></svg>';
+  const ICON_OK   = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6l2.8 2.8L10 3.4" stroke="currentColor" stroke-width="1.2"/></svg>';
+  const ICON_LOW  = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2v4.5M6 9v.6" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1"/></svg>';
+
+  const acc = $('#voucherAcc');
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const CHEV = '<svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>';
+
+  function lineHTML(l, member){
+    const stock = l.stock || { level:'ok', text:'In stock' };
+    const attrs = [];
+    if (l.swatch) attrs.push(
+      '<span class="attr-colour"><span class="t-body-s">'+esc(l.colour||'')+'</span>'+
+      '<span class="swatch swatch--sel"><img src="'+esc(l.swatch)+'" alt="" /></span></span>');
+    else if (l.colour) attrs.push('<span class="t-body-s">'+esc(l.colour)+'</span>');
+
+    // Size is changeable in the bag rather than a trip back to the PDP, and it sits with
+    // the quantity stepper because both change what is being bought.
+    const sizeCtl = l.size
+      ? '<span class="sizesel"><select data-size aria-label="Size">'+
+          (l.sizes && l.sizes.length ? l.sizes : [l.size])
+            .map(o => '<option'+(o === l.size ? ' selected' : '')+'>'+esc(o)+'</option>').join('')+
+        '</select>'+CHEV+'</span>'
+      : '';
+
+    // A member is charged the member price, so that is the only figure the line shows.
+    // A standard customer sees the standard one. Neither is ever struck through.
+    const charged = (member && l.member) ? l.member : l.unit;
+    const price = (member && l.member)
+      ? '<span class="pricepair pricepair--member">'+
+          '<span class="t-price" data-line-price>'+eur(charged*l.qty)+'</span>'+
+          '<span class="pricepair__member t-price-s">member price</span>'+
+        '</span>'
+      : '<span class="t-price" data-line-price>'+eur(charged*l.qty)+'</span>';
+
+    return ''+
+    '<article class="item" data-sku="'+esc(l.sku)+'">'+
+      '<div class="item__media">'+
+        '<img class="item__img" src="'+esc(l.img||'')+'" alt="'+esc(l.series+' '+l.name)+'" />'+
+        '<button class="item__fav" type="button" aria-label="Add to wishlist">'+ICON_FAV+'</button>'+
+      '</div>'+
+      '<span class="item__name t-title-m">'+esc(l.name)+'</span>'+
+      '<span class="item__sub t-body-s">'+esc(l.series||'')+'</span>'+
+      '<div class="item__side">'+
+        price+
+        '<span class="item__unit t-price-note"'+(l.qty>1?'':' hidden')+'>'+eur(charged)+' each</span>'+
+      '</div>'+
+      '<div class="item__attrs">'+attrs.join('')+'</div>'+
+      '<div class="item__row">'+
+        '<span class="stepper">'+
+          '<button type="button" data-step="-1" aria-label="Decrease quantity">'+ICON_MINUS+'</button>'+
+          '<span class="t-body-m" data-qty>'+l.qty+'</span>'+
+          '<button type="button" data-step="1" aria-label="Increase quantity">'+ICON_PLUS+'</button>'+
+        '</span>'+
+        sizeCtl+
+        '<button class="t-link-s muted" type="button" data-remove>Remove</button>'+
+      '</div>'+
+      '<span class="stock stock--'+(stock.level==='low'?'low':'ok')+' t-body-s">'+
+        (stock.level==='low'?ICON_LOW:ICON_OK)+' '+esc(stock.text)+'</span>'+
+    '</article>';
+  }
+
+  /* ---------------- render ---------------- */
+  function render(){
+    const bag = Shop.read();
+    const empty = bag.lines.length === 0;
+
+    document.body.dataset.member = String(bag.member);
+    document.body.dataset.empty  = String(empty);
+    $('#emptyState').hidden = !empty;
+    $('#filledCart').hidden = empty;
+    $('#mbar').style.display = empty ? 'none' : '';
+    // clear the list on the way out, or the last removed line stays in the DOM behind
+    // the hidden filled cart and comes back the moment something is added again
+    if (empty) { $('#cartItems').innerHTML = ''; syncDash(); return; }
+
+    $('#cartItems').innerHTML = bag.lines.map(l => lineHTML(l, bag.member)).join('');
+    $$('[data-member-only]').forEach(el => { el.hidden = el.dataset.memberOnly !== String(bag.member); });
+
+    const t = Shop.totals();
+    $('[data-subtotal]').textContent = eur(t.sub);
+    $('#discountRow').hidden = !t.voucher;
+    $('[data-discount]').textContent = '−' + eur(t.discount);
+    const shipCell = $('[data-shipping]');
+    shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
+    $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
+    $('[data-vat]').textContent = eur(t.vat);
+    $$('[data-total]').forEach(n => n.textContent = eur(t.total));
+    $$('[data-count]').forEach(n => n.textContent = t.count + (t.count === 1 ? ' item' : ' items'));
+
+    if (t.voucher) {
+      $('#voucher').value = t.voucher;
+      acc.dataset.open = 'true';
+      $('#voucherToggle').setAttribute('aria-expanded', 'true');
+    }
+
+    $('#shipFill').style.width = Math.min(100, (t.base / t.freeAt) * 100) + '%';
+    $('#shipMsg').innerHTML = t.gap > 0
+      ? '<strong style="font-weight:400">' + eur(t.gap) + '</strong> away from free shipping.'
+      : '<strong style="font-weight:400">Free shipping</strong> — unlocked.';
+
+    syncDash();
+  }
+
+  /* ---------------- interactions (delegated: the list is re-rendered) ---------------- */
+  $('#cartItems').addEventListener('click', e => {
+    const item = e.target.closest('.item');
+    if (!item) return;
+    const sku = item.dataset.sku;
+    const step = e.target.closest('[data-step]');
+    if (step) { Shop.bump(sku, Number(step.dataset.step)); return; }
+    if (e.target.closest('[data-remove]')) { Shop.remove(sku); return; }
+    const fav = e.target.closest('.item__fav');
+    if (fav) fav.classList.toggle('is-on');
+  });
+
+  $('#cartItems').addEventListener('change', e => {
+    const sel = e.target.closest('[data-size]');
+    if (!sel) return;
+    Shop.setSize(e.target.closest('.item').dataset.sku, sel.value);
+  });
+
+  /* cross-sell: adding from here goes into the same bag */
+  $$('.acard').forEach(row => {
+    const btn = $('.addon__btn', row);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      Shop.add({
+        sku: btn.dataset.sku, name: btn.dataset.name, series: btn.dataset.series,
+        colour: btn.dataset.colour, size: btn.dataset.size,
+        unit: Number(btn.dataset.price), member: Number(btn.dataset.member) || null,
+        sizes: /^\d/.test(btn.dataset.size) ? BRA_SIZES : BRIEF_SIZES,
+        img: btn.dataset.img, swatch: btn.dataset.swatch,
+        stock: { level:'ok', text:'In stock' },
+      });
+      row.remove();
+    });
+  });
+
+  /* voucher */
+  $('#voucherToggle').addEventListener('click', () => {
+    const open = acc.dataset.open === 'true';
+    acc.dataset.open = String(!open);
+    $('#voucherToggle').setAttribute('aria-expanded', String(!open));
+  });
+  $('#voucherBtn').addEventListener('click', () => {
+    const code = $('#voucher').value.trim().toUpperCase();
+    if (code) Shop.setVoucher(code);
+  });
+
+  $('#joinBtn').addEventListener('click', () => Shop.setMember(true));
+
+  /* prototype switcher */
+  const BRA_SIZES = [];
+  [70,75,80,85,90,95,100].forEach(b => ['A','B','C','D','E','F','G'].forEach(c => BRA_SIZES.push(b + c)));
+  const BRIEF_SIZES = ['XS','S','M','L','XL','XXL'];
+
+  const SAMPLE = [
+    { sku:'amourette-minimizer-black-70c', name:'Minimizer Bra', series:'Amourette', colour:'Black', size:'70C',
+      sizes:BRA_SIZES, unit:59.95, member:53.95, img:'./Assets/ck-bra.webp', swatch:'./Assets/swatch-bra-black.webp',
+      stock:{level:'ok',text:'In stock'} },
+    { sku:'amourette-tai-black-m', name:'Tai', series:'Amourette', colour:'Black', size:'M',
+      sizes:BRIEF_SIZES, unit:24.95, member:19.95, img:'./Assets/ck-brief.webp', swatch:'./Assets/swatch-tai-black.webp',
+      stock:{level:'low',text:'Only 3 left in M'} },
+  ];
+  function syncDash(){
+    const empty = Shop.count() === 0;
+    const member = Shop.read().member;
+    $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(member))));
+    $$('[data-cart-set]').forEach(o => o.setAttribute('aria-pressed', String((o.dataset.cartSet === 'empty') === empty)));
+  }
+  $$('[data-member-set]').forEach(b => b.addEventListener('click', () => Shop.setMember(b.dataset.memberSet === 'true')));
+  $$('[data-cart-set]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.cartSet === 'empty') { Shop.clear(); return; }
+    Shop.clear();
+    SAMPLE.forEach(l => Shop.add(l, l.sku.endsWith('-m') ? 2 : 1));
+  }));
+
+  $('#dashHide').addEventListener('click', () => {
+    $('#dash').hidden = true;
+    const b = document.createElement('button');
+    b.className = 'dash__hide'; b.textContent = 'States';
+    b.addEventListener('click', () => { $('#dash').hidden = false; b.remove(); });
+    document.body.appendChild(b);
+  });
+
+  if (/[?&]capture=1/.test(location.search)) {
+    const st = document.createElement('style');
+    st.textContent = `.mbar{position:static!important} .hd,.sum{position:static!important}
+      .wrap{padding-bottom:var(--space-32)!important} .dash{display:none!important}`;
+    document.head.appendChild(st);
+  }
+
+  Shop.onChange(render);
+  render();
+})();
+</script>
+</body>
+</html>

@@ -45,6 +45,60 @@ modules need original photography before they actually work:
   same framing, pose and light. The stock stand-ins vary in crop and pose, so the row
   currently demonstrates the layout rather than the comparison.
 
+## Connected shop flow (`/v2/`)
+
+The PLP, PDP, bag and checkout are one prototype: a single bag, shared by every page.
+
+```
+/v2/plp.html  →  /v2/pdp.html  →  mini cart  →  /v2/cart.html  →  /v2/checkout.html  →  order confirmed
+```
+
+Pick an underbust and a cup size, press **Add to Cart**, and a **bottom sheet** comes up with the
+line you just added, how far the order is from free shipping, and the two ways out
+(View bag · n / Checkout). Opened from the basket icon instead, it lists the whole bag. The header bag count follows you across all four pages,
+quantities can be changed anywhere, **Place order** shows a confirmation and empties the bag.
+Everything is in English and prices in €.
+
+The bag page's **Complete your order** is a row of compact product cards — small packshot, name,
+series, colour · size, and the price with a **+** to its right.
+
+The checkout runs in **two modes**, switched from the prototype panel bottom-right:
+
+- **One page** — every section stacked, one Place order at the foot.
+- **3 steps** — the same sections, three at a time. **1 Sign in** is the live site's login gate
+  rebuilt as one narrow column: *Customer login* (email, password, forgotten-password, Sign in),
+  then **or** → *New here?* with **Create an account** and **Continue as guest** side by side, then
+  **or** → Google / Facebook. The step carries no express row and no summary rail — neither belongs
+  to a decision that has not been made yet. Choosing **Create an account** opens the registration
+  form in place rather than leaving checkout. **2 Delivery** is address and delivery
+  method — plus the email field when the customer came through as a guest.
+  **3 Payment**. Completed steps in the indicator are clickable to go back; on mobile the sticky bar
+  carries the step's call to action (and stands down on step 1, where the gate has its own).
+
+  Two things the live registration asks for are deliberately gone: the second *confirm your email*
+  field, and a date of birth pre-filled to 01 January 2008. The delivery address is not in the
+  registration form either — it is step 2, and asking twice is what makes the live flow long.
+
+Nothing is duplicated between the modes: every section carries `data-step` and the mode only
+decides how many are on screen. The chosen mode persists in `localStorage`.
+
+| File | What it owns |
+| --- | --- |
+| `v2/lib/shop.js` | The bag itself — lines, quantities, membership, voucher, totals, the free-shipping threshold, the header badge, and the mini-cart sheet |
+| `v2/lib/shop.css` | Mini-cart styling, self-contained so it can be dropped onto any page |
+| `v2/pdp.html` | Product, size validation, add-to-cart, "complete your set" tiles |
+| `v2/cart.html` | Bag page — renders the shared lines, cross-sell, voucher, MyTriumph |
+| `v2/checkout.html` | Checkout in both modes — renders the same lines in the summary rail and places the order |
+
+State lives in `localStorage` under `triumph.proto.cart.v1`. It works opened straight from
+disk in Chrome; if a browser blocks storage on `file://`, serve the folder instead
+(`python3 -m http.server` from the repo root, then `/v2/pdp.html`) — the code falls back to
+`sessionStorage` and then to memory, so the flow degrades to a single tab rather than breaking.
+
+Both `cart.html` and `checkout.html` keep their prototype state switcher (bottom-right, with a
+**Hide** button). **Sample bag** fills the bag with the two Amourette demo lines so the design
+can be reviewed without walking the flow; **Empty** clears it.
+
 ## PDP variants
 
 The PDP includes both drafts behind a fixed toggle at the bottom-left of the screen (`Variante 1` / `Variante 2`):
