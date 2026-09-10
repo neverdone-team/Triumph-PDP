@@ -436,6 +436,9 @@ body[data-mode="steps"][data-step="2"] .ck__form,
 body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;justify-self:center}
 @media (max-width:991px){
   body[data-mode="steps"]:not([data-step="4"]) .ck__form{padding:0 var(--space-16) 120px}
+  /* the numbered steps get their air from the tab row above them; the gate has no tabs,
+     so it asks for its own (Amelie, 2026-09-10) */
+  body[data-mode="steps"][data-step="0"] .ck__form{padding-top:var(--space-32)}
   .gate__box{grid-template-columns:minmax(0,1fr);gap:var(--space-40)}
   .gate__col--new{border-left:0;padding-left:0;border-top:1px solid var(--c-hair);padding-top:var(--space-32)}
 }
@@ -526,14 +529,14 @@ body[data-mode="steps"] .place.is-last{display:block}
   gap:var(--space-6) var(--space-16);
   padding:var(--space-20) 0;border-bottom:1px solid var(--c-hair);
 }
-.review dt{margin:0;grid-column:1;grid-row:1;align-self:center;color:var(--c-ink);
+.review dt{margin:0;grid-column:1;grid-row:1;align-self:center;color:var(--c-grey-medium);
   font-weight:400;font-size:14px;line-height:20px;letter-spacing:.10em;text-transform:uppercase}
 .review__row button{grid-column:2;grid-row:1;align-self:center}
 .review dd{margin:0;white-space:pre-line;grid-column:1 / -1;grid-row:2}
 @media (max-width:575px){
-  /* on a phone the headings are light grey and Edit sits on their top line, so the ink
-     in the column is the answers, not the questions (Amelie, 2026-09-10) */
-  .review dt{color:var(--c-grey-medium);align-self:start}
+  /* the ink in this column is the answers, not the questions, and Edit sits on the
+     heading's top line (Amelie, 2026-09-10) */
+  .review dt{align-self:start}
   .review__row button{align-self:start}
 }
 
@@ -630,7 +633,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   align-items:baseline;
 }
 .trow--grand .t-title-m{letter-spacing:.20em}
-.grand__num{font-weight:300;font-size:28px;line-height:32px;letter-spacing:.01em}
+.grand__num{font-weight:300;font-size:24px;line-height:28px;letter-spacing:.01em}
 
 .promise{
   display:flex;gap:var(--space-10);align-items:flex-start;
