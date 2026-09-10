@@ -379,6 +379,8 @@ body{background-image:none}
 .who__mail{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .savedaddr{border-top:1px solid var(--c-hair)}   /* an option list, not a boxed card */
+.editnote{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-12);
+  margin:0 0 var(--space-16);color:var(--c-ink-soft)}
 .savedaddr .opt{align-items:flex-start}
 .addr__lines{color:var(--c-ink-soft);margin-top:var(--space-4)}
 
@@ -436,9 +438,10 @@ body[data-mode="steps"][data-step="2"] .ck__form,
 body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;justify-self:center}
 @media (max-width:991px){
   body[data-mode="steps"]:not([data-step="4"]) .ck__form{padding:0 var(--space-16) 120px}
-  /* the numbered steps get their air from the tab row above them; the gate has no tabs,
-     so it asks for its own (Amelie, 2026-09-10) */
+  /* the numbered steps get their air from the tab row above them; the gate and the
+     review have no tabs, so they ask for their own (Amelie, 2026-09-10) */
   body[data-mode="steps"][data-step="0"] .ck__form{padding-top:var(--space-32)}
+  body[data-mode="steps"][data-step="4"] .ck__form{padding-top:var(--space-32)}
   .gate__box{grid-template-columns:minmax(0,1fr);gap:var(--space-40)}
   .gate__col--new{border-left:0;padding-left:0;border-top:1px solid var(--c-hair);padding-top:var(--space-32)}
 }
@@ -449,7 +452,10 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* Payment logos sit between the radio and the label, so the eye lands on the brand it is
    looking for before it reads the words (Amelie, 2026-09-10). */
 #payList .opt__radio{order:-2}
-#payList .opt__logo{order:-1;width:56px;justify-content:flex-start}
+#payList .opt__logo{order:-1;width:72px;justify-content:flex-start;gap:var(--space-4)}
+/* the brand marks carry width/height attributes, so max-height cannot grow them —
+   an explicit height with width:auto does (Amelie, 2026-09-10) */
+#payList .opt__logo svg{height:26px;width:auto;max-height:none}
 #payList .opt__body{order:0}
 
 /* the review is a read-out, so the rail's lines drop their Remove there */
@@ -866,15 +872,14 @@ body[data-mode="steps"] .place.is-last{display:block}
         <button class="btn btn--ghost btn--wide" type="button" id="gateRegister" aria-expanded="false">Create an account</button>
         <!-- guest is the quiet door: an underlined text button, not a second bordered one -->
         <p class="gate__guest"><button class="t-link" type="button" id="gateGuest">Continue as guest</button></p>
-       </div>
-      </div>
 
-      <!-- ---- registration, opened in place ----
+        <!-- ---- registration, opened in place ----
            Two things the live registration asks for are deliberately gone: the second
            "confirm your email" field, and a date of birth pre-filled to 01 January 2008.
            The delivery address is not here either — it is step 2, and asking twice is
-           what makes the live flow long. -->
-      <div class="gate__reg" id="gateReg" hidden>
+             what makes the live flow long. It opens directly under the buttons that
+             offer it, in the right-hand column (Amelie, 2026-09-10). -->
+        <div class="gate__reg" id="gateReg" hidden>
         <h3 class="t-title-s gate__h">Create your account</h3>
 
         <div class="grid">
@@ -945,7 +950,9 @@ body[data-mode="steps"] .place.is-last{display:block}
         <div class="gate__next">
           <button class="btn btn--wide" type="button" id="gateRegGo">Create account and continue</button>
         </div>
-      </div>
+        </div><!-- /.gate__reg -->
+       </div><!-- /.gate__col--new -->
+      </div><!-- /.gate__box -->
     </section>
 
     <!-- Contact belongs to the one-pager only: in the stepped flow the email comes from
@@ -1054,7 +1061,7 @@ body[data-mode="steps"] .place.is-last{display:block}
               <span class="opt__title t-body-m">Anna Musterfrau</span>
               <span class="addr__lines t-body-s">Kurfürstendamm 21<br />10719 Berlin, Germany</span>
             </span>
-            <button class="t-link-s" type="button">Change</button>
+            <button class="t-link-s" type="button" id="savedChange">Change</button>
           </label>
           <label class="opt">
             <input type="radio" name="savedaddr" value="new" />
@@ -1063,6 +1070,11 @@ body[data-mode="steps"] .place.is-last{display:block}
           </label>
         </div>
       </div>
+
+      <p class="editnote" id="addrEditNote" hidden>
+        <span class="t-body-s">Editing your saved address</span>
+        <button class="t-link-s" type="button" id="addrEditCancel">Cancel</button>
+      </p>
 
       <div class="grid" id="addrForm" data-address-group data-account-only="guest new">
         <label class="field">
@@ -1185,6 +1197,31 @@ body[data-mode="steps"] .place.is-last{display:block}
           </span>
           <span class="opt__price t-price is-free">Free</span>
         </label>
+        <!-- Choosing the member rate has to be possible to act on: the join happens here,
+             not on another page (Amelie, 2026-09-10). -->
+        <div class="opt__panel" data-panel="mytriumph">
+          <p class="t-body-s muted" style="margin-bottom:var(--space-12)">
+            Free to join. Members always ship free and collect rewards on every order.
+          </p>
+          <div class="grid grid--2">
+            <label class="field">
+              <input type="email" id="joinEmail" placeholder=" " autocomplete="email" />
+              <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
+              <span class="field__label">Email</span>
+            </label>
+            <label class="field">
+              <input type="password" id="joinPw" placeholder=" " autocomplete="new-password" />
+              <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
+              <span class="field__label">Password</span>
+            </label>
+          </div>
+          <label class="check" style="margin-top:var(--space-4)">
+            <input type="checkbox" id="joinTerms" checked />
+            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+            <span class="t-body-s">I accept the MyTriumph programme terms</span>
+          </label>
+          <button class="btn btn--wide" type="button" id="joinGo" style="margin-top:var(--space-16)">Join MyTriumph</button>
+        </div>
 
         <label class="opt is-on" data-ship="std">
           <input type="radio" name="ship" value="std" checked />
@@ -1613,6 +1650,10 @@ body[data-mode="steps"] .place.is-last{display:block}
     const input = $(`.opt input[name="ship"][value="${value}"]`);
     if (input) { input.checked = true; }
     $$('.opt input[name="ship"]').forEach(o => o.closest('.opt').classList.toggle('is-on', o.checked));
+    // the MyTriumph row opens its own join panel, and only for someone not in the
+    // programme yet — a member has nothing to sign up for
+    const join = $('.opt__panel[data-panel="mytriumph"]');
+    if (join) join.classList.toggle('is-open', value === 'mytriumph' && !state.member);
     recalc();
   }
 
@@ -1730,14 +1771,43 @@ body[data-mode="steps"] .place.is-last{display:block}
   $$('input[data-addr="street"]').forEach(wireAddressLookup);
 
   /* ---------- saved address vs a new one ---------- */
+  /* The saved address that a signed-in customer has on file. Change fills the form with
+     it and opens it for editing — before this the button did nothing at all (Amelie,
+     2026-09-10). */
+  const SAVED_ADDR = { country:'DE', fn:'Anna', ln:'Musterfrau',
+                       street:'Kurfürstendamm', hno:'21', zip:'10719', city:'Berlin' };
+  let editingSaved = false;
+
   function syncAddrChoice() {
     const form = $('#addrForm');
     if (!form) return;
     const picked = $('input[name="savedaddr"]:checked');
     const wantsNew = !!picked && picked.value === 'new';
-    if (state.account === 'member') form.hidden = !wantsNew;
+    if (state.account === 'member') form.hidden = !(wantsNew || editingSaved);
+    const note = $('#addrEditNote');
+    if (note) note.hidden = !(editingSaved && state.account === 'member');
+    const picker = $('.savedaddr');
+    if (picker) picker.hidden = editingSaved && state.account === 'member';
     $$('input[name="savedaddr"]').forEach(r => r.closest('.opt').classList.toggle('is-on', r.checked));
   }
+  $$('input[name="savedaddr"]').forEach(r => r.addEventListener('change', () => {
+    editingSaved = false;                 // choosing a row leaves the edit mode
+  }));
+
+  const savedChange = $('#savedChange');
+  if (savedChange) savedChange.addEventListener('click', e => {
+    // the button lives inside the row's <label>, so a plain click would also toggle the radio
+    e.preventDefault(); e.stopPropagation();
+    Object.keys(SAVED_ADDR).forEach(k => { const el = $('#' + k); if (el) el.value = SAVED_ADDR[k]; });
+    editingSaved = true;
+    syncAddrChoice();
+    const fn = $('#fn'); if (fn) fn.focus({ preventScroll:true });
+  });
+  const addrEditCancel = $('#addrEditCancel');
+  if (addrEditCancel) addrEditCancel.addEventListener('click', () => {
+    editingSaved = false;
+    syncAddrChoice();
+  });
   $$('input[name="savedaddr"]').forEach(r => r.addEventListener('change', syncAddrChoice));
 
   /* ---------- interactions ---------- */
@@ -1747,9 +1817,11 @@ body[data-mode="steps"] .place.is-last{display:block}
       const group = r.name;
       $$(`.opt input[name="${group}"]`).forEach(o => o.closest('.opt').classList.toggle('is-on', o.checked));
       if (group === 'pay') {
-        $$('.opt__panel').forEach(p => p.classList.toggle('is-open', p.dataset.panel === r.value));
+        $$('.opt__panel[data-panel]:not([data-panel="mytriumph"])')
+          .forEach(p => p.classList.toggle('is-open', p.dataset.panel === r.value));
       }
-      if (group === 'ship') { state.ship = r.value; recalc(); }
+      // pickShip, not a bare assignment: it also opens the MyTriumph join panel
+      if (group === 'ship') pickShip(r.value);
     });
   });
 
@@ -2080,6 +2152,19 @@ body[data-mode="steps"] .place.is-last{display:block}
     applyState();
     applyStep(1);            // the gate is behind us; step 1 is the delivery address
   }
+  const joinGo = $('#joinGo');
+  if (joinGo) joinGo.addEventListener('click', () => {
+    const mail = $('#joinEmail');
+    if (mail && !mail.value.trim()) {                 // borrow what the order already knows
+      const known = ($('#email') || {}).value || ($('#addrEmail') || {}).value || '';
+      mail.value = known;
+    }
+    state.member = true;
+    Shop.setMember(true);
+    applyState();
+    pickShip('std');            // members ship free, so the join row has done its job
+  });
+
   const gateSignIn = $('#gateSignIn');
   if (gateSignIn) gateSignIn.addEventListener('click', () => leaveGate('signin', 'member'));
   const gateGuest = $('#gateGuest');

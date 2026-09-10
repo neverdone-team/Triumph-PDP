@@ -104,19 +104,23 @@ h1,h2,h3,p{margin:0;font-weight:400}
   display:flex;flex-direction:column;gap:var(--space-32)}
 .cart__status{display:flex;flex-direction:column;gap:var(--space-16)}
 
-/* the order's own facts, in one box with a stroke that does not change colour */
-.statusbox{border:1px solid var(--c-edge);padding:var(--space-16)}
-.promise{display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
+/* The order's own two facts in one box with a stroke that never changes colour: how far
+   from free shipping on the left, when it arrives at the far right, the bar under both
+   (Amelie, 2026-09-10). */
+.statusbox{border:1px solid var(--c-edge);padding:var(--space-16);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:var(--space-12) var(--space-24);align-items:baseline}
+#shipMsg{grid-column:1;grid-row:1}
+.promise{grid-column:2;grid-row:1;justify-self:end;
+  display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
 .promise svg{flex:none}
-.ship-progress{margin-top:var(--space-16);padding-top:var(--space-16);
-  border-top:1px solid var(--c-hair)}
-.ship-progress__bar{height:4px;background:var(--c-grey-light);margin-top:var(--space-12);overflow:hidden}
+.ship-progress__bar{grid-column:1 / -1;height:4px;background:var(--c-grey-light);overflow:hidden}
 .ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
 /* only the words and the bar go green — the box keeps its stroke */
 .statusbox.is-free #shipMsg{color:var(--color-green)}
 .statusbox.is-free .ship-progress__fill{background:var(--color-green)}
-.shipfree{display:flex;align-items:center;gap:var(--space-8);color:var(--color-green);
-  margin:var(--space-16) 0 0;padding-top:var(--space-16);border-top:1px solid var(--c-hair)}
+.shipfree{grid-column:1 / -1;display:flex;align-items:center;gap:var(--space-8);
+  color:var(--color-green);margin:0}
 .shipfree svg{flex:none}
 
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
@@ -134,12 +138,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .items{}
 /* No rules between products (Amelie, 2026-09-10) — the white space between rows does
    the separating, as it does between the checkout's sections. */
-/* Series above the name and the text block centred against the packshot, the way a
-   product card carries it (Amelie, 2026-09-10). A flexible row at each end does the
-   centring — the packshot spans them all, so any slack it has is shared top and bottom
-   instead of being pushed between the lines of text. */
+/* Series above the name, and the text starts 16px down from the top of the row rather
+   than being flush with the packshot (Amelie, 2026-09-10). The leading row IS that
+   padding; the trailing flexible row parks whatever height the packshot has left over,
+   so the slack never gets shared out between the lines of text. */
 .item{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr) auto;
-  grid-template-rows:1fr repeat(5,min-content) 1fr;
+  grid-template-rows:var(--space-16) repeat(5,min-content) 1fr;
   column-gap:var(--space-24);row-gap:0;
   padding:var(--space-32) 0;background:var(--c-bg)}
 .item__media{grid-column:1;grid-row:1 / -1}
@@ -158,7 +162,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__img{width:100%;height:100%;object-fit:cover;background:var(--c-grey-light)}
 .item__fav{position:absolute;top:var(--space-8);right:var(--space-8);width:var(--control-28);height:var(--control-28);
   display:grid;place-items:center}
-.item__sub{display:block;color:var(--c-ink-soft)}
+.item__sub{display:block;color:var(--c-ink)}   /* the series is ink, not grey */
 .item__name{display:block;margin-top:var(--space-2)}
 .item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
 /* Size is editable in the bag — a native select styled as the chip it replaces. */
@@ -178,14 +182,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
    tile, 44px image top-aligned, 2px ink underline on the chosen one. Values lifted from
    pdp.html .swatch so cart and PDP read as the same component. */
 .attr-colour{display:inline-flex;align-items:baseline;gap:var(--space-12)}
-/* the colour options, revealed by Change — the PLP's chip idiom: a hairline that fills
-   with ink once chosen */
-.colours{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-12)}
-.cchip{height:var(--control-32);padding:0 var(--space-12);
-  box-shadow:inset 0 0 0 1px var(--c-edge);background:var(--c-bg);color:var(--c-ink);
-  transition:box-shadow .15s var(--ease-out), background .15s var(--ease-out)}
-.cchip:hover{box-shadow:inset 0 0 0 1px var(--c-ink)}
-.cchip[data-on="true"]{background:var(--c-ink);color:var(--c-on-dark);box-shadow:none}
+/* the colour options, revealed by Change — the PLP's thumbnails, with the chosen one
+   marked by a 2px rule under it */
+/* its own line under the label, or the label rides the middle of the 44px thumbs */
+.colours{flex-basis:100%;display:flex;flex-wrap:wrap;gap:var(--space-12);margin-top:var(--space-12)}
+.cthumb{border-bottom:2px solid transparent;padding-bottom:2px;flex:none;
+  transition:border-color .2s var(--ease-out)}
+.cthumb img{display:block;width:44px;height:44px;object-fit:cover;
+  border:1px solid var(--c-hair);background:var(--c-bg)}
+.cthumb:hover{border-bottom-color:var(--c-edge)}
+.cthumb[data-sel="true"]{border-bottom-color:var(--c-ink)}
 .item__row{display:flex;align-items:center;gap:var(--space-12);margin-top:var(--space-20);flex-wrap:wrap}
 .item__side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-6)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
@@ -199,6 +205,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .stock{display:inline-flex;align-items:center;gap:var(--space-6);margin-top:var(--space-20)}
 .stock--low{color:var(--color-buddha)}
 .stock--out{color:var(--color-error)}
+/* fewer left than the bag already holds: it blocks the order, so it reads as an error */
+.stock--short{color:var(--color-error)}
+.stock--short .t-link-s{color:inherit}
+.item.is-short [data-step="1"]{opacity:.3;pointer-events:none}
 /* a sold-out line is still readable, but the shot says it is not available */
 .item.is-out .item__img{opacity:.4}
 .item.is-out .item__name,.item.is-out .item__side{opacity:.55}
@@ -226,6 +236,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 /* member price pair — never a strike-through against the standard price */
 .pricepair{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2)}
+/* the charged figure and the former price share one line; the note sits under them */
+.priceline{display:flex;align-items:baseline;gap:var(--space-8)}
 .pricepair__member{color:var(--c-burgundy)}
 .pricepair--member .t-price{color:var(--c-burgundy)}
 
@@ -258,14 +270,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .trow--grand{border-top:1px solid var(--c-edge);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
 /* what this order saves against the list prices — burgundy, the colour every member and
    sale figure in the flow uses */
-.trow--save{color:var(--c-sales)}
-/* the discount row's figure and its remove control share the right-hand cell */
-.dcell{display:inline-flex;align-items:center;gap:var(--space-8)}
-.vx{width:var(--control-28);height:var(--control-28);display:grid;place-items:center;
-  color:var(--c-ink-soft)}
-.vx:hover{color:var(--c-ink)}
+.trow--save{color:var(--color-green)}
+/* the applied code, and the control that takes it off again */
+.vapplied{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);
+  padding:var(--space-12);margin-bottom:var(--space-12);
+  background:var(--c-wash);color:var(--color-green)}
+.vapplied .t-link-s{color:var(--c-ink)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
-.linesave{color:var(--c-sales)}
+.linesave{color:var(--color-green)}
 .grand__num{font-weight:400;font-size:20px;line-height:26px;letter-spacing:0}
 .sum__cta{margin-top:var(--space-20)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
@@ -499,6 +511,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .cart__left,.cart__right{display:contents}
   .cart__main,.cart__status,.sum,.cart__express{padding:0}
   .cart__express{order:1} .cart__status{order:2} .cart__main{order:3} .sum{order:4}
+  /* no room for two facts on one line: the delivery date leads, the gap follows */
+  .statusbox{grid-template-columns:minmax(0,1fr);gap:var(--space-12)}
+  .promise{grid-column:1;grid-row:1;justify-self:start}
+  #shipMsg{grid-row:2}
+  .ship-progress__bar{grid-row:3}
   /* No tint on the phone summary (Amelie, 2026-09-10): real space above it and one
      hairline do the separating from the cross-sell strip. */
   .sum{position:static;background:transparent;border:0;
@@ -609,14 +626,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
              dark in both states — only the words and the bar go green (Amelie,
              2026-09-10). The MyTriumph invitation moved to the summary. -->
         <div class="statusbox" id="shipCard">
+          <div class="t-body-m" id="shipMsg" data-member-only="false"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
           <p class="promise t-body-m">
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 4h8v6H1zM9 6h2.5L13 7.5V10H9z" stroke="currentColor" stroke-width="1"/></svg>
             Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep</strong>
           </p>
-          <div class="ship-progress" data-member-only="false">
-            <div class="t-body-m" id="shipMsg"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
-            <div class="ship-progress__bar"><span class="ship-progress__fill" id="shipFill"></span></div>
-          </div>
+          <div class="ship-progress__bar" data-member-only="false"><span class="ship-progress__fill" id="shipFill"></span></div>
           <p class="shipfree t-body-s" data-member-only="true">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
             As a MyTriumph member you ship free.
@@ -723,13 +738,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
         </div>
         <div class="trow" id="discountRow" hidden>
           <span class="t-body-m">Discount <span class="muted t-body-s" data-voucher-code></span></span>
-          <span class="dcell">
-            <span class="t-price" data-discount>−€0.00</span>
-            <!-- an applied code has to be removable, or the only way out is a reload -->
-            <button class="vx" type="button" id="voucherClear" aria-label="Remove this discount code">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1"/></svg>
-            </button>
-          </span>
+          <span class="t-price" data-discount>−€0.00</span>
         </div>
         <div class="trow" data-ship-row>
           <span class="t-body-m">Shipping <span class="muted t-body-s">(Standard, DHL)</span></span>
@@ -750,6 +759,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <span class="acc__plus" aria-hidden="true"></span>
           </button>
           <div class="acc__body">
+            <!-- an applied code is its own box here, with the delete on it: the summary row
+                 above just states the figure (Amelie, 2026-09-10) -->
+            <div class="vapplied" id="voucherApplied" hidden>
+              <span class="t-body-s"><strong style="font-weight:400" data-voucher-name>—</strong> applied</span>
+              <button class="t-link-s" type="button" id="voucherClear">Remove</button>
+            </div>
             <div class="voucher">
               <label class="field">
                 <input type="text" id="voucher" placeholder=" " />
@@ -844,6 +859,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
     <button data-member-set="false" aria-pressed="true">Not a member</button>
     <button data-member-set="true" aria-pressed="false">Member</button>
   </div>
+  <h4>Stock</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-stock-set="ok" aria-pressed="true">All available</button>
+    <button data-stock-set="out" aria-pressed="false">One sold out</button>
+  </div>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-stock-set="short" aria-pressed="false">Fewer left than in bag</button>
+  </div>
   <h4>Pricing</h4>
   <div class="dash__row" style="margin-bottom:0">
     <button data-sale-set="off" aria-pressed="true">Standard</button>
@@ -887,8 +910,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
   const ICON_OUT = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
     '<circle cx="7" cy="7" r="5.6" stroke="currentColor" stroke-width="1"/>'+
     '<path d="M4.4 9.6l5.2-5.2" stroke="currentColor" stroke-width="1"/></svg>';
-  /* the colourways the bag offers when a line does not carry its own list */
-  const DEFAULT_COLOURS = ['Black', 'Blush', 'Burgundy', 'Nude', 'White'];
+  /* The colourways the bag offers, as image thumbnails — the same swatch pngs and the
+     same selected-underline idiom the PLP's colour row uses (Amelie, 2026-09-10). */
+  const COLOURWAYS = [
+    { name:'Black',    sw:'./Assets/plp/swatch-black.png' },
+    { name:'Blush',    sw:'./Assets/plp/swatch-pink.png' },
+    { name:'Burgundy', sw:'./Assets/plp/swatch-burgundy.png' },
+    { name:'Red',      sw:'./Assets/plp/swatch-red.png' },
+    { name:'Teal',     sw:'./Assets/plp/swatch-teal.png' },
+  ];
 
   /* Sale mode is a prototype device, not part of the bag: it derives a was-price from
      the unit so every line can show a markdown and the summary can total the saving.
@@ -900,14 +930,30 @@ h1,h2,h3,p{margin:0;font-weight:400}
              : l.unit;
   const charged = (l, member) => (member && l.member) ? l.member : l.unit;
 
-  function lineHTML(l, member){
-    const stock = l.stock || { level:'ok', text:'In stock' };
+  /* Stock is a prototype state, switched in the panel rather than baked into the sample
+     bag (Amelie, 2026-09-10): 'ok' everything available, 'out' the last line sold out,
+     'short' fewer left than the quantity already in the bag. */
+  const stockMode = () => document.body.dataset.stock || 'ok';
+  function stockOf(l, i, lines){
+    const mode = stockMode();
+    if (mode === 'out' && i === lines.length - 1)
+      return { level:'out', text:'Sold out' + (l.size ? ' in ' + l.size : '') };
+    if (mode === 'short' && l.qty > 1) {
+      const avail = l.qty - 1;
+      return { level:'short', avail:avail,
+               text:'Only ' + avail + ' left' + (l.size ? ' in ' + l.size : '') };
+    }
+    return l.stock || { level:'ok', text:'In stock' };
+  }
+
+  function lineHTML(l, member, stock){
+    stock = stock || l.stock || { level:'ok', text:'In stock' };
     const out = stock.level === 'out';
+    const short = stock.level === 'short';
 
     /* Colour is a name plus a Change link; the options only appear when asked for, the
        way the PLP reveals its colour row (Amelie, 2026-09-10). The swatch packshot is
        gone — a name and a chip say it without a second image beside the product's own. */
-    const opts = (l.colours && l.colours.length ? l.colours : DEFAULT_COLOURS);
     const attrs = [];
     if (l.colour) attrs.push(
       '<span class="attr-colour">'+
@@ -915,8 +961,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
         '<button class="t-link-s" type="button" data-colour-toggle aria-expanded="false">Change</button>'+
       '</span>'+
       '<div class="colours" hidden>'+
-        opts.map(c => '<button class="cchip t-body-s" type="button" data-colour="'+esc(c)+'"'+
-          (c === l.colour ? ' data-on="true"' : '')+'>'+esc(c)+'</button>').join('')+
+        COLOURWAYS.map(c =>
+          '<button class="cthumb" type="button" data-colour="'+esc(c.name)+'" title="'+esc(c.name)+'"'+
+            ' aria-label="'+esc(c.name)+'"'+(c.name === l.colour ? ' data-sel="true"' : '')+'>'+
+            '<img src="'+esc(c.sw)+'" alt="" />'+
+          '</button>').join('')+
       '</div>');
 
     // Size is changeable in the bag rather than a trip back to the PDP, and it sits with
@@ -935,20 +984,24 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const listed = was(l);
     const wasTag = listed > pay + 0.005
       ? '<span class="t-price-was t-price-s">'+eur(listed*l.qty)+'</span>' : '';
-    /* what this line saves, on the line — the summary total is not the only place it
-       should be visible (Amelie, 2026-09-10) */
-    const saveTag = listed > pay + 0.005
+    /* What this line saves, on the line. A member price is itself the saving, so the two
+       never appear together (Amelie, 2026-09-10). */
+    const isMember = !!(member && l.member);
+    const saveTag = (!isMember && listed > pay + 0.005)
       ? '<span class="linesave t-price-s">You save '+eur((listed - pay) * l.qty)+'</span>' : '';
-    const price = (member && l.member)
-      ? '<span class="pricepair pricepair--member">'+
+    /* One shape for every case: the figure charged (with the former price beside it if
+       there is one) on the first line, and a single note under it — either the member
+       label or the saving, never both. */
+    const price =
+      '<span class="pricepair'+(isMember ? ' pricepair--member' : '')+'">'+
+        '<span class="priceline">'+
           '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +
-          '<span class="pricepair__member t-price-s">member price</span>'+ saveTag +
-        '</span>'
-      : '<span class="pricepair"><span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+
-        wasTag + saveTag +'</span>';
+        '</span>'+
+        (isMember ? '<span class="pricepair__member t-price-s">Member price</span>' : saveTag)+
+      '</span>';
 
     return ''+
-    '<article class="item'+(out ? ' is-out' : '')+'" data-sku="'+esc(l.sku)+'">'+
+    '<article class="item'+(out ? ' is-out' : '')+(short ? ' is-short' : '')+'" data-sku="'+esc(l.sku)+'">'+
       /* the swipe track: the row slides left over a red confirm panel that only a
          deliberate tap actually deletes (mobile only — see the media query) */
       '<button class="item__confirm" type="button" data-confirm-remove aria-label="Delete this product">'+
@@ -976,11 +1029,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
         '</span>'+
         sizeCtl+
       '</div>'+
-      /* In stock is not news, so it is not shown: only a low count or a sold-out line
-         says anything worth the row (Amelie, 2026-09-10) */
-      (stock.level === 'ok' ? '' :
-        '<span class="stock stock--'+(out ? 'out' : 'low')+' t-body-s">'+
-          (out ? ICON_OUT : ICON_LOW)+' '+esc(out ? (stock.text || 'Sold out') : stock.text)+'</span>')+
+      /* In stock is not news, so it is not shown: only a short count, a sold-out line or
+         a quantity the stock cannot cover says anything worth the row. */
+      (stock.level === 'ok' ? '' : (
+        short
+          ? '<span class="stock stock--short t-body-s">'+ICON_LOW+' '+esc(stock.text)+
+              ' — <button class="t-link-s" type="button" data-reduce="'+stock.avail+'">reduce to '+stock.avail+'</button></span>'
+          : '<span class="stock stock--'+(out ? 'out' : 'low')+' t-body-s">'+
+              (out ? ICON_OUT : ICON_LOW)+' '+esc(out ? (stock.text || 'Sold out') : stock.text)+'</span>'
+      ))+
     '</article>';
   }
 
@@ -998,7 +1055,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     // the hidden filled cart and comes back the moment something is added again
     if (empty) { $('#cartItems').innerHTML = ''; syncDash(); return; }
 
-    $('#cartItems').innerHTML = bag.lines.map(l => lineHTML(l, bag.member)).join('');
+    $('#cartItems').innerHTML = bag.lines
+      .map((l, i) => lineHTML(l, bag.member, stockOf(l, i, bag.lines))).join('');
     $$('[data-member-only]').forEach(el => { el.hidden = el.dataset.memberOnly !== String(bag.member); });
 
     const t = Shop.totals();
@@ -1006,6 +1064,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#discountRow').hidden = !t.voucher;
     $('[data-discount]').textContent = '−' + eur(t.discount);
     $('[data-voucher-code]').textContent = t.voucher ? '· ' + t.voucher : '';
+    $('#voucherApplied').hidden = !t.voucher;
+    if (t.voucher) $('[data-voucher-name]').textContent = t.voucher;
     const shipCell = $('[data-shipping]');
     shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
     $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
@@ -1020,7 +1080,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
     /* what the order saves against the list prices: the sale mode's was-prices and a
        member's discount both land here, so one row covers both */
-    const saved = bag.lines.reduce((sum, l) =>
+    const saved = bag.member ? 0 : bag.lines.reduce((sum, l) =>
       sum + (was(l) - charged(l, bag.member)) * l.qty, 0);
     $('#saveRow').hidden = saved < 0.01;
     $('[data-saved]').textContent = eur(saved);
@@ -1065,6 +1125,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
     }
     const pick = e.target.closest('[data-colour]');
     if (pick) { Shop.setColour(sku, pick.dataset.colour); return; }
+
+    // "reduce to n" on a line whose stock cannot cover the quantity in the bag
+    const red = e.target.closest('[data-reduce]');
+    if (red) { Shop.setQty(sku, Number(red.dataset.reduce)); return; }
 
     const fav = e.target.closest('.item__fav');
     if (fav) fav.classList.toggle('is-on');
@@ -1225,11 +1289,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     { sku:'amourette-tai-black-m', name:'Tai', series:'Amourette', colour:'Black', size:'M',
       sizes:BRIEF_SIZES, unit:24.95, member:19.95, img:'./Assets/ck-brief.webp',
       stock:{level:'low',text:'Only 3 left in M'} },
-    /* the sold-out state is in the sample bag on purpose: all three stock cases —
-       silent, low, gone — are then visible in one screen */
     { sku:'aura-spotlight-bra-blush-75b', name:'Aura Spotlight Bra', series:'Aura Spotlight',
       colour:'Blush', size:'75B', sizes:BRA_SIZES, unit:54.95, member:49.45,
-      img:'./Assets/10208018-6720_1.webp', stock:{level:'out',text:'Sold out in 75B'} },
+      img:'./Assets/10208018-6720_1.webp', stock:{level:'ok',text:'In stock'} },
   ];
   function syncDash(){
     const empty = Shop.count() === 0;
@@ -1240,6 +1302,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $$('[data-mini-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.miniSet === mini)));
     const sale = document.body.dataset.sale || 'off';
     $$('[data-sale-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.saleSet === sale)));
+    const st = stockMode();
+    $$('[data-stock-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.stockSet === st)));
   }
   $$('[data-member-set]').forEach(b => b.addEventListener('click', () => Shop.setMember(b.dataset.memberSet === 'true')));
   $$('[data-mini-set]').forEach(b => b.addEventListener('click', () => { Shop.setMiniMode(b.dataset.miniSet); syncDash(); }));
@@ -1248,7 +1312,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
     try { localStorage.setItem('triumph.proto.cartSale', b.dataset.saleSet); } catch (e) {}
     render();
   }));
-  try { document.body.dataset.sale = localStorage.getItem('triumph.proto.cartSale') || 'off'; } catch (e) {}
+  $$('[data-stock-set]').forEach(b => b.addEventListener('click', () => {
+    document.body.dataset.stock = b.dataset.stockSet;
+    try { localStorage.setItem('triumph.proto.cartStock', b.dataset.stockSet); } catch (e) {}
+    render();
+  }));
+  try {
+    document.body.dataset.sale  = localStorage.getItem('triumph.proto.cartSale')  || 'off';
+    document.body.dataset.stock = localStorage.getItem('triumph.proto.cartStock') || 'ok';
+  } catch (e) {}
   $$('[data-cart-set]').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.cartSet === 'empty') { Shop.clear(); return; }
     Shop.clear();
