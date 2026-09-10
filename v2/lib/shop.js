@@ -264,30 +264,6 @@ window.Shop = (function () {
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
 
-    /* Desktop hovers the basket icon open; a phone has no hover, so there tapping is the
-       only way in (the tap handlers live in the pages). `(hover:hover) and (pointer:fine)`
-       keeps a touch device out even when its window is wide, because a tap on a
-       hover-bound element fires mouseenter too and the card would open behind the tap. */
-    var canHover = function () {
-      return window.matchMedia('(hover:hover) and (pointer:fine)').matches
-          && !window.matchMedia(SHEET).matches;
-    };
-    var overCard = false, leaveT = null;
-    function cancelLeave() { if (leaveT) { clearTimeout(leaveT); leaveT = null; } }
-    function leaveSoon() {                      // a grace period to travel icon → card
-      cancelLeave();
-      leaveT = setTimeout(function () { if (!overCard) close(); }, 220);
-    }
-    document.addEventListener('mouseover', function (e) {
-      if (!canHover()) return;
-      var a = anchor();
-      if (a && (e.target === a || a.contains(e.target))) { cancelLeave(); open({ hover: true }); }
-    });
-    document.addEventListener('mouseout', function (e) {
-      if (!canHover()) return;
-      var a = anchor();
-      if (a && (e.target === a || a.contains(e.target)) && !root.contains(e.relatedTarget)) leaveSoon();
-    });
     root.addEventListener('mouseenter', function () { overCard = true; cancelLeave(); });
     root.addEventListener('mouseleave', function () {
       overCard = false;
@@ -399,6 +375,35 @@ window.Shop = (function () {
     // tall as the window — the line list scrolls inside it either way
     panel.style.maxHeight = Math.max(220, Math.min(560, window.innerHeight - top - 16)) + 'px';
   }
+
+  /* ---------------- hover on desktop ----------------
+     These listeners are bound at load, NOT inside build(): build only runs on the first
+     open, so binding them there meant hovering a page whose card had never been opened
+     did nothing at all. `(hover:hover) and (pointer:fine)` keeps a touch device out even
+     when its window is wide — a tap on a hover-bound element fires mouseenter too, and
+     the card would open behind the tap. */
+  function canHover() {
+    return window.matchMedia('(hover:hover) and (pointer:fine)').matches
+        && !window.matchMedia(SHEET).matches;
+  }
+  var overCard = false, leaveT = null;
+  function cancelLeave() { if (leaveT) { clearTimeout(leaveT); leaveT = null; } }
+  function leaveSoon() {                        // a grace period to travel icon → card
+    cancelLeave();
+    leaveT = setTimeout(function () { if (!overCard) close(); }, 220);
+  }
+  document.addEventListener('mouseover', function (e) {
+    if (!canHover()) return;
+    var a = anchor();
+    if (a && (e.target === a || a.contains(e.target))) { cancelLeave(); open({ hover: true }); }
+  });
+  document.addEventListener('mouseout', function (e) {
+    if (!canHover()) return;
+    var a = anchor();
+    if (!a || !(e.target === a || a.contains(e.target))) return;
+    if (mc && mc.contains(e.relatedTarget)) return;
+    leaveSoon();
+  });
 
   var hoverOpened = false;
   function open(opts) {

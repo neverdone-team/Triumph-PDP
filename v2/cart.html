@@ -84,7 +84,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* ---------------- page ---------------- */
 .wrap{max-width:1400px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
 .pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
-.pagehead span{color:var(--c-ink-soft)}
+/* the count is part of the title, so it is ink (Amelie, 2026-09-10) */
 
 /* Two columns, separated by a hairline and with a sticky summary — the same relationship
    the one-page checkout has between its form column and its order rail (Amelie,
@@ -104,40 +104,49 @@ h1,h2,h3,p{margin:0;font-weight:400}
   display:flex;flex-direction:column;gap:var(--space-32)}
 .cart__status{display:flex;flex-direction:column;gap:var(--space-16)}
 
-/* free-shipping progress — a darker stroke than the 5% hairline it had, and the whole
-   card turns green once the threshold is met (Amelie, 2026-09-10) */
-.ship-progress{border:1px solid var(--c-edge);padding:var(--space-16)}
+/* the order's own facts, in one box with a stroke that does not change colour */
+.statusbox{border:1px solid var(--c-edge);padding:var(--space-16)}
+.promise{display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
+.promise svg{flex:none}
+.ship-progress{margin-top:var(--space-16);padding-top:var(--space-16);
+  border-top:1px solid var(--c-hair)}
 .ship-progress__bar{height:4px;background:var(--c-grey-light);margin-top:var(--space-12);overflow:hidden}
 .ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
-.ship-progress.is-free{border-color:var(--color-green)}
-.ship-progress.is-free #shipMsg{color:var(--color-green)}
-.ship-progress.is-free .ship-progress__fill{background:var(--color-green)}
+/* only the words and the bar go green — the box keeps its stroke */
+.statusbox.is-free #shipMsg{color:var(--color-green)}
+.statusbox.is-free .ship-progress__fill{background:var(--color-green)}
+.shipfree{display:flex;align-items:center;gap:var(--space-8);color:var(--color-green);
+  margin:var(--space-16) 0 0;padding-top:var(--space-16);border-top:1px solid var(--c-hair)}
+.shipfree svg{flex:none}
+
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
-   link in white inside it, not a burgundy sentence */
-.ship-progress__join{margin-top:var(--space-12)}
+   link in white inside it. It sits in the summary, under Shipping, where the figure it
+   would change is (Amelie, 2026-09-10). */
+.joinrow{margin:var(--space-12) 0 0}
 .joinbadge{display:inline-flex;align-items:center;gap:var(--space-8);
   background:var(--c-burgundy);color:var(--c-on-dark);padding:var(--space-8) var(--space-12)}
 .joinbadge .t-link-s{color:var(--c-on-dark)}
 .joinbadge__note{color:rgba(255,255,255,.75)}
-/* the delivery promise moved to the top of the order, out of the summary's foot */
-.promise{display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink)}
-.promise svg{flex:none}
 
 /* ---------------- line items ---------------- */
 .items{}
 /* No rules between products (Amelie, 2026-09-10) — the white space between rows does
    the separating, as it does between the checkout's sections. */
+/* Series above the name and the text block centred against the packshot, the way a
+   product card carries it (Amelie, 2026-09-10). A flexible row at each end does the
+   centring — the packshot spans them all, so any slack it has is shared top and bottom
+   instead of being pushed between the lines of text. */
 .item{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr) auto;
-  grid-template-rows:repeat(5,min-content) auto;
-  column-gap:var(--space-24);row-gap:0;align-content:start;
+  grid-template-rows:1fr repeat(5,min-content) 1fr;
+  column-gap:var(--space-24);row-gap:0;
   padding:var(--space-32) 0;background:var(--c-bg)}
-.item__media{grid-column:1;grid-row:1 / span 6}
-.item__name{grid-column:2;grid-row:1}
+.item__media{grid-column:1;grid-row:1 / -1}
 .item__sub{grid-column:2;grid-row:2}
-.item__attrs{grid-column:2;grid-row:3}
-.item__row{grid-column:2;grid-row:4}
-.item .stock{grid-column:2;grid-row:5}
-.item__side{grid-column:3;grid-row:1 / 3}
+.item__name{grid-column:2;grid-row:3}
+.item__attrs{grid-column:2;grid-row:4}
+.item__row{grid-column:2;grid-row:5}
+.item .stock{grid-column:2;grid-row:6}
+.item__side{grid-column:3;grid-row:2 / 4}
 /* On desktop the packshot bleeds through the row's vertical padding so it covers the whole
    row. The negative margins turn the stretched grid area into the full row height, and the
    column is 188px = 3:4 of that height, so the shot fills it without a crop or a stretch. */
@@ -147,8 +156,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__img{width:100%;height:100%;object-fit:cover;background:var(--c-grey-light)}
 .item__fav{position:absolute;top:var(--space-8);right:var(--space-8);width:var(--control-28);height:var(--control-28);
   display:grid;place-items:center}
-.item__name{display:block}
-.item__sub{display:block;margin-top:var(--space-2)}
+.item__sub{display:block;color:var(--c-ink-soft)}
+.item__name{display:block;margin-top:var(--space-2)}
 .item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
 /* Size is editable in the bag — a native select styled as the chip it replaces. */
 .sizesel{position:relative;display:inline-flex;align-items:center}
@@ -247,8 +256,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .trow--grand{border-top:1px solid var(--c-edge);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
 /* what this order saves against the list prices — burgundy, the colour every member and
    sale figure in the flow uses */
-.trow--save{color:var(--c-burgundy)}
+.trow--save{color:var(--c-sales)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
+.linesave{color:var(--c-sales)}
 .grand__num{font-weight:400;font-size:20px;line-height:26px;letter-spacing:0}
 .sum__cta{margin-top:var(--space-20)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
@@ -498,8 +508,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     grid-template-rows:repeat(6,min-content) auto}
   .item__media{grid-row:1 / span 7;align-self:start;margin:0;aspect-ratio:auto}
   .item__img{width:128px;height:171px}
-  .item__name{grid-column:2;grid-row:1;font-size:14px;line-height:20px}
-  .item__sub{grid-column:2;grid-row:2}
+  .item__sub{grid-column:2;grid-row:1}
+  .item__name{grid-column:2;grid-row:2;font-size:14px;line-height:20px}
   .item__side{grid-column:2;grid-row:3;flex-direction:row;align-items:baseline;
     justify-content:flex-start;width:100%;flex-wrap:wrap;gap:var(--space-8);
     text-align:left;margin-top:var(--space-12)}
@@ -584,25 +594,23 @@ h1,h2,h3,p{margin:0;font-weight:400}
       <!-- The delivery status leads the order on desktop as well as on mobile: it is
            about this order, so it belongs where the order is read (Amelie, 2026-09-10). -->
       <div class="cart__status">
-        <!-- the delivery promise leads: it is the answer to "when do I get this" -->
-        <p class="promise t-body-m">
-          <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 4h8v6H1zM9 6h2.5L13 7.5V10H9z" stroke="currentColor" stroke-width="1"/></svg>
-          Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep</strong>
-        </p>
-        <!-- free shipping progress, non-members -->
-        <div class="ship-progress" id="shipCard" data-member-only="false">
-          <div class="t-body-m" id="shipMsg"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
-          <div class="ship-progress__bar"><span class="ship-progress__fill" id="shipFill"></span></div>
-          <p class="ship-progress__join">
-            <span class="joinbadge">
-              <button class="t-link-s" type="button" id="joinBtn">Join MyTriumph</button>
-              <span class="joinbadge__note t-body-s">always ships free</span>
-            </span>
+        <!-- One box: when the order arrives and how far it is from free shipping are the
+             two facts about the order as a whole, so they live together. The stroke stays
+             dark in both states — only the words and the bar go green (Amelie,
+             2026-09-10). The MyTriumph invitation moved to the summary. -->
+        <div class="statusbox" id="shipCard">
+          <p class="promise t-body-m">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 4h8v6H1zM9 6h2.5L13 7.5V10H9z" stroke="currentColor" stroke-width="1"/></svg>
+            Delivery <strong style="font-weight:400">Fri 11 – Sat 12 Sep</strong>
           </p>
-        </div>
-        <div class="alert alert--success" data-member-only="true" style="margin-bottom:0">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
-          <span class="t-body-s">As a MyTriumph member you ship free.</span>
+          <div class="ship-progress" data-member-only="false">
+            <div class="t-body-m" id="shipMsg"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
+            <div class="ship-progress__bar"><span class="ship-progress__fill" id="shipFill"></span></div>
+          </div>
+          <p class="shipfree t-body-s" data-member-only="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
+            As a MyTriumph member you ship free.
+          </p>
         </div>
       </div>
 
@@ -703,6 +711,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
           <span class="t-body-m">Shipping <span class="muted t-body-s">(Standard, DHL)</span></span>
           <span class="t-price" data-shipping>€4.99</span>
         </div>
+        <!-- shown to anyone who is not a member yet: it changes the Shipping figure above -->
+        <p class="joinrow" data-member-only="false">
+          <span class="joinbadge">
+            <button class="t-link-s" type="button" id="joinBtn">Join MyTriumph</button>
+            <span class="joinbadge__note t-body-s">always ships free</span>
+          </span>
+        </p>
+
         <div class="trow trow--save" id="saveRow" hidden>
           <span class="t-body-m">You save</span><span class="t-price" data-saved>€0.00</span>
         </div>
@@ -899,12 +915,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const listed = was(l);
     const wasTag = listed > pay + 0.005
       ? '<span class="t-price-was t-price-s">'+eur(listed*l.qty)+'</span>' : '';
+    /* what this line saves, on the line — the summary total is not the only place it
+       should be visible (Amelie, 2026-09-10) */
+    const saveTag = listed > pay + 0.005
+      ? '<span class="linesave t-price-s">You save '+eur((listed - pay) * l.qty)+'</span>' : '';
     const price = (member && l.member)
       ? '<span class="pricepair pricepair--member">'+
           '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +
-          '<span class="pricepair__member t-price-s">member price</span>'+
+          '<span class="pricepair__member t-price-s">member price</span>'+ saveTag +
         '</span>'
-      : '<span class="pricepair"><span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +'</span>';
+      : '<span class="pricepair"><span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+
+        wasTag + saveTag +'</span>';
 
     return ''+
     '<article class="item'+(out ? ' is-out' : '')+'" data-sku="'+esc(l.sku)+'">'+
