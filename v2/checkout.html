@@ -1983,9 +1983,29 @@ body[data-mode="steps"] .place.is-last{display:block}
   }
 
   /* ---------- the three doors on step 1 ---------- */
+  /* The registration form has already asked for the name and the email, so step 2 must
+     not ask for them again — this is the live site's own defect (it pre-fills a logged-in
+     customer's birthday from the profile and leaves Vorname/Nachname blank).
+     Only EMPTY targets are filled, so an address the customer has already edited is never
+     overwritten by going back through the gate. */
+  function carryRegistration() {
+    const copy = (from, to) => {
+      const a = $(from), b = $(to);
+      if (!a || !b) return;
+      const v = a.value.trim();
+      if (v && !b.value.trim()) b.value = v;
+    };
+    copy('#regFn', '#fn');
+    copy('#regLn', '#ln');
+    // Contact is skipped for a registrant, and the review page reads #email for its
+    // contact line — without this it would say "No email yet"
+    copy('#regEmail', '#email');
+  }
+
   function leaveGate(kind, account) {
     branch = kind;
     state.account = account;
+    if (kind === 'register') carryRegistration();
     Shop.setMember(account === 'member');
     $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === account)));
     $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(account === 'member'))));
