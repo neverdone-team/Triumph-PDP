@@ -369,7 +369,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* single column, source order: delivery status → products → summary */
   .cart{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-24)}
   .cart__main,.cart__status,.sum{grid-column:auto;grid-row:auto}
-  .sum{position:static}
+  .sum{position:static;background:var(--c-wash);border:0}
   /* the grid's three tracks assume the nav is there; hiding it moved the logo into
      column 1 and pulled the icons in behind it */
   .hd__links{display:none}
