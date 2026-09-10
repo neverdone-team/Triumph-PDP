@@ -209,9 +209,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .stock{display:inline-flex;align-items:center;gap:var(--space-6);margin-top:var(--space-20)}
 .stock--low{color:var(--color-buddha)}
 .stock--out{color:var(--color-error)}
-/* fewer left than the bag already holds: it blocks the order, so it reads as an error */
-.stock--short{color:var(--color-error)}
-.stock--short .t-link-s{color:inherit}
+/* fewer left than the bag held: the quantity has already been corrected, so this is a
+   notice rather than an error — and the plus stays out of reach at the ceiling */
+.stock--short{color:var(--color-buddha)}
 .item.is-short [data-step="1"]{opacity:.3;pointer-events:none}
 /* a sold-out line is still readable, but the shot says it is not available */
 .item.is-out .item__img{opacity:.4}
@@ -938,15 +938,21 @@ h1,h2,h3,p{margin:0;font-weight:400}
      bag (Amelie, 2026-09-10): 'ok' everything available, 'out' the last line sold out,
      'short' fewer left than the quantity already in the bag. */
   const stockMode = () => document.body.dataset.stock || 'ok';
+  /* Which line is short is fixed when the state is chosen, and its availability is a
+     number of its own — deriving it from the quantity would move it every time the
+     quantity did, so the notice could never survive the reduction it causes. */
+  let shortSku = null;
+  const SHORT_AVAIL = 1;
+  /* Only a line this page has actually cut says so. After a reload the quantity is
+     already at the ceiling, and claiming a reduction that never happened would be a lie. */
+  const reduced = new Set();
   function stockOf(l, i, lines){
     const mode = stockMode();
     if (mode === 'out' && i === lines.length - 1)
       return { level:'out', text:'Sold out' + (l.size ? ' in ' + l.size : '') };
-    if (mode === 'short' && l.qty > 1) {
-      const avail = l.qty - 1;
-      return { level:'short', avail:avail,
-               text:'Only ' + avail + ' left' + (l.size ? ' in ' + l.size : '') };
-    }
+    if (mode === 'short' && l.sku === shortSku)
+      return { level:'short', avail:SHORT_AVAIL,
+               text:'Only ' + SHORT_AVAIL + ' left' + (l.size ? ' in ' + l.size : '') };
     return l.stock || { level:'ok', text:'In stock' };
   }
 
@@ -1038,7 +1044,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
       (stock.level === 'ok' ? '' : (
         short
           ? '<span class="stock stock--short t-body-s">'+ICON_LOW+' '+esc(stock.text)+
-              ' — <button class="t-link-s" type="button" data-reduce="'+stock.avail+'">reduce to '+stock.avail+'</button></span>'
+              (reduced.has(l.sku) ? ' — we reduced your quantity to '+stock.avail+'.' : '')+'</span>'
           : '<span class="stock stock--'+(out ? 'out' : 'low')+' t-body-s">'+
               (out ? ICON_OUT : ICON_LOW)+' '+esc(out ? (stock.text || 'Sold out') : stock.text)+'</span>'
       ))+
@@ -1058,6 +1064,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
     // clear the list on the way out, or the last removed line stays in the DOM behind
     // the hidden filled cart and comes back the moment something is added again
     if (empty) { $('#cartItems').innerHTML = ''; syncDash(); return; }
+
+    /* A line the stock cannot cover is corrected here rather than left for the customer
+       to fix: setQty writes and re-renders, and the second pass has nothing left to do
+       (Amelie, 2026-09-10) */
+    const overstocked = bag.lines.find(l => {
+      const st = stockOf(l, bag.lines.indexOf(l), bag.lines);
+      return st.level === 'short' && l.qty > st.avail;
+    });
+    if (overstocked) { reduced.add(overstocked.sku); Shop.setQty(overstocked.sku, SHORT_AVAIL); return; }
 
     $('#cartItems').innerHTML = bag.lines
       .map((l, i) => lineHTML(l, bag.member, stockOf(l, i, bag.lines))).join('');
@@ -1130,10 +1145,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
     }
     const pick = e.target.closest('[data-colour]');
     if (pick) { Shop.setColour(sku, pick.dataset.colour); return; }
-
-    // "reduce to n" on a line whose stock cannot cover the quantity in the bag
-    const red = e.target.closest('[data-reduce]');
-    if (red) { Shop.setQty(sku, Number(red.dataset.reduce)); return; }
 
     const fav = e.target.closest('.item__fav');
     if (fav) fav.classList.toggle('is-on');
@@ -1320,12 +1331,22 @@ h1,h2,h3,p{margin:0;font-weight:400}
   $$('[data-stock-set]').forEach(b => b.addEventListener('click', () => {
     document.body.dataset.stock = b.dataset.stockSet;
     try { localStorage.setItem('triumph.proto.cartStock', b.dataset.stockSet); } catch (e) {}
+    if (b.dataset.stockSet === 'short') {
+      const lines = Shop.read().lines;
+      const hit = lines.filter(l => l.qty > SHORT_AVAIL)[0] || lines[0];
+      shortSku = hit ? hit.sku : null;
+    }
     render();
   }));
   try {
     document.body.dataset.sale  = localStorage.getItem('triumph.proto.cartSale')  || 'off';
     document.body.dataset.stock = localStorage.getItem('triumph.proto.cartStock') || 'ok';
   } catch (e) {}
+  if (stockMode() === 'short') {
+    const lines = Shop.read().lines;
+    const hit = lines.filter(l => l.qty > SHORT_AVAIL)[0] || lines[0];
+    shortSku = hit ? hit.sku : null;
+  }
   $$('[data-cart-set]').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.cartSet === 'empty') { Shop.clear(); return; }
     Shop.clear();
