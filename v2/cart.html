@@ -119,8 +119,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* only the words and the bar go green — the box keeps its stroke */
 .statusbox.is-free #shipMsg{color:var(--color-green)}
 .statusbox.is-free .ship-progress__fill{background:var(--color-green)}
-.shipfree{grid-column:1 / -1;display:flex;align-items:center;gap:var(--space-8);
+.shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
   color:var(--color-green);margin:0}
+/* A member has one fact here and it is good news, so the box says so: tinted green,
+   one line, and no taller than that line (Amelie, 2026-09-10). */
+.statusbox.is-member{background:var(--color-peppermint);border-color:var(--color-green);
+  padding:var(--space-12) var(--space-16)}
 .shipfree svg{flex:none}
 
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
@@ -138,12 +142,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .items{}
 /* No rules between products (Amelie, 2026-09-10) — the white space between rows does
    the separating, as it does between the checkout's sections. */
-/* Series above the name, and the text starts 16px down from the top of the row rather
-   than being flush with the packshot (Amelie, 2026-09-10). The leading row IS that
-   padding; the trailing flexible row parks whatever height the packshot has left over,
-   so the slack never gets shared out between the lines of text. */
+/* Series above the name, and the text block centred against the packshot (Amelie,
+   2026-09-10). A flexible row at each end does the centring; the content rows stay at
+   min-content so the packshot's extra height is never shared out between the lines. */
 .item{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr) auto;
-  grid-template-rows:var(--space-16) repeat(5,min-content) 1fr;
+  grid-template-rows:1fr repeat(5,min-content) 1fr;
   column-gap:var(--space-24);row-gap:0;
   padding:var(--space-32) 0;background:var(--c-bg)}
 .item__media{grid-column:1;grid-row:1 / -1}
@@ -1087,6 +1090,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
     $('#shipFill').style.width = Math.min(100, (t.base / t.freeAt) * 100) + '%';
     $('#shipCard').classList.toggle('is-free', t.gap === 0);
+    $('#shipCard').classList.toggle('is-member', bag.member);
     $('#shipMsg').innerHTML = t.gap > 0
       ? '<strong style="font-weight:400">' + eur(t.gap) + '</strong> away from free shipping.'
       : '<strong style="font-weight:400">Free shipping</strong> — unlocked.';

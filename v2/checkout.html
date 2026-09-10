@@ -456,6 +456,9 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* the brand marks carry width/height attributes, so max-height cannot grow them —
    an explicit height with width:auto does (Amelie, 2026-09-10) */
 #payList .opt__logo svg{height:26px;width:auto;max-height:none}
+/* the panel's text lines up with the brand mark above it — radio (24) + the row's gap
+   (16) is where that column starts (Amelie, 2026-09-10) */
+#payList .opt__panel{padding-left:calc(24px + var(--space-16))}
 #payList .opt__body{order:0}
 
 /* the review is a read-out, so the rail's lines drop their Remove there */
