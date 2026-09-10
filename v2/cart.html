@@ -17,13 +17,20 @@
    variables in "Design System Triumph" (C4UzkYsFCfJGxKr7BaakLO)
    ============================================================ */
 :root{
-  --c-ink:#000; --c-ink-soft:rgba(0,0,0,.5); --c-on-dark:#fff;
+  --c-ink:#000;
+  /* rgba(0,0,0,.5) composites to #808080 — 3.95:1 on white, under AA for text. The DS
+     grey is the same intent and passes at 4.67:1 (Amelie asked for the amber; this was
+     the same failure one shade along). */
+  --c-ink-soft:#747474; --c-on-dark:#fff;
   --c-bg:#fff; --c-offwhite:#F8F3F3; --c-wash:#F9FAFB; --c-grey-light:#F1F1F1; --c-grey-medium:#747474;
   --c-hair:rgba(0,0,0,.05); --c-edge:rgba(0,0,0,.2);
   --c-burgundy:#5E2039; --c-sales:#C1003F;
   --color-error:#E40032; --color-tutu:#F8E6E8;
   --color-green:#008000; --color-peppermint:#E7F8E6;
   --color-buddha:#CC9400; --color-warning:#F8F7E6;
+  /* #CC9400 is 2.7:1 on white — under AA for text. This is the same hue taken dark
+     enough to pass (5.4:1); the brand amber stays for fills and icons. */
+  --color-buddha-ink:#8A6400;
   --color-darkCerulean:#0F5E8B; --color-info-tint:#E6F0F8;
 
   --space-2:2px;--space-4:4px;--space-6:6px;--space-8:8px;--space-10:10px;--space-12:12px;
@@ -97,9 +104,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
   margin-top:var(--space-32)}
 .cart__left{min-width:0;display:flex;flex-direction:column;gap:var(--space-24);
   padding-right:var(--space-64)}
-/* the hairline and the sticky live on the right column, exactly as the checkout's rail
-   does it — only the products scroll */
-.cart__right{border-left:1px solid var(--c-hair);padding-left:var(--space-48);
+/* No rule between the columns here (Amelie, 2026-09-10) — the bag is one list with its
+   total beside it, and 144px of gutter separates them well enough. The checkout keeps its
+   hairline, where the rail really is a second surface. */
+.cart__right{padding-left:calc(var(--space-64) + var(--space-16));
   position:sticky;top:calc(var(--header-h) + var(--space-24));
   display:flex;flex-direction:column;gap:var(--space-32)}
 .cart__status{display:flex;flex-direction:column;gap:var(--space-16)}
@@ -207,11 +215,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .stepper span{min-width:26px;text-align:center}
 
 .stock{display:inline-flex;align-items:center;gap:var(--space-6);margin-top:var(--space-20)}
-.stock--low{color:var(--color-buddha)}
+.stock--low{color:var(--color-buddha-ink)}
 .stock--out{color:var(--color-error)}
 /* fewer left than the bag held: the quantity has already been corrected, so this is a
    notice rather than an error — and the plus stays out of reach at the ceiling */
-.stock--short{color:var(--color-buddha)}
+.stock--short{color:var(--color-buddha-ink)}
 .item.is-short [data-step="1"]{opacity:.3;pointer-events:none}
 /* a sold-out line is still readable, but the shot says it is not available */
 .item.is-out .item__img{opacity:.4}
@@ -411,9 +419,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .voucher .field{flex:1}
 .voucher .btn{height:var(--control-44);padding:0 var(--space-16);font-size:12px}
 
-.paylogos{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-20);align-items:center}
+.paylogos{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-20);
+  align-items:center;justify-content:center}
 .paylogos img,.paylogos svg{height:20px;width:auto;opacity:.8}
-.trust{display:flex;flex-direction:column;gap:var(--space-8);margin-top:var(--space-20);color:var(--c-ink-soft)}
+.trust{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);
+  margin-top:var(--space-20);color:var(--c-grey-medium)}
 .trust span{display:inline-flex;align-items:center;gap:var(--space-8)}
 
 .alert{display:flex;gap:var(--space-10);padding:var(--space-12);margin-bottom:var(--space-16)}

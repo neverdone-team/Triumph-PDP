@@ -21,7 +21,9 @@
 :root {
   /* Semantic · colour */
   --c-ink:          #000000;                 /* text/primary, action/primary, border/high contrast */
-  --c-ink-soft:     rgba(0,0,0,.5);          /* text/secondary */
+  /* #747474, not rgba(0,0,0,.5): 50% black composites to #808080 = 3.95:1 on white,
+     under AA for text. The DS grey is the same intent at 4.67:1 (2026-09-10). */
+  --c-ink-soft:     #747474;                 /* text/secondary */
   --c-on-dark:      #FFFFFF;                 /* text/on-dark */
   --c-bg:           #FFFFFF;                 /* surface/raised */
   --c-offwhite:     #F8F3F3;                 /* surface/page */
