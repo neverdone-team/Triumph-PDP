@@ -445,8 +445,6 @@ body[data-mode="steps"] .sec[data-step].is-first{padding-top:0}
 body[data-mode="steps"] .stepnav{display:flex}
 body[data-mode="steps"] .place{display:none}
 body[data-mode="steps"] .place.is-last{display:block}
-.stepnav__back{color:var(--c-ink-soft)}
-.stepnav__back:hover{color:var(--c-ink)}
 
 /* ============================================================
    BUTTONS
@@ -598,9 +596,8 @@ body[data-mode="steps"] .place.is-last{display:block}
 
   /* collapsible summary at the top of the page */
   /* sits under the step indicator, tinted so it reads as a summary of the order rather
-     than another section of the form */
-  .msum{display:block;background:var(--c-grey-light);position:sticky;top:var(--header-h);z-index:50;
-    margin:0 0 var(--space-24)}
+     than another section of the form — and it scrolls with the page */
+  .msum{display:block;background:var(--c-grey-light);margin:0 0 var(--space-24)}
   .msum__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16)}
   /* the summary bar and the step tabs are two different controls — they need a gap */
   body[data-mode="steps"] .steps{margin-top:var(--space-24)}
@@ -625,7 +622,8 @@ body[data-mode="steps"] .place.is-last{display:block}
     background:var(--c-bg); border-top:1px solid var(--c-hair);
     padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   }
-  .place{display:none}
+  /* the sticky bar carries the call to action, so nothing repeats it in the flow */
+  .place,.stepnav{display:none!important}
   .paybar__legal{margin-top:var(--space-8);color:var(--c-ink-soft);text-align:center}
   .paybar__legal a{text-decoration:underline;text-underline-offset:3px}
 }
@@ -1306,10 +1304,7 @@ body[data-mode="steps"] .place.is-last{display:block}
             <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Card number</span></legend></fieldset><span class="field__label">Card number</span></label>
             <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>PIN</span></legend></fieldset><span class="field__label">PIN</span></label>
           </div>
-          <div style="display:flex;align-items:center;gap:var(--space-12);margin-top:var(--space-12);flex-wrap:wrap">
-            <button class="btn btn--ghost" type="button" style="height:var(--control-44);font-size:12px">Check balance</button>
-            <span class="t-body-s muted">19-digit number · the balance comes off the order total.</span>
-          </div>
+          <p class="t-body-s muted" style="margin-top:var(--space-12)">19-digit number · the balance comes off the order total.</p>
         </div>
       </div>
     </section>
@@ -1317,7 +1312,6 @@ body[data-mode="steps"] .place.is-last{display:block}
     <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
     <div class="stepnav" id="stepnav">
       <button class="btn" type="button" id="stepNext">Continue to delivery</button>
-      <button class="t-link-s stepnav__back" type="button" id="stepBack" hidden>Back</button>
     </div>
 
     <!-- ---------- PLACE ORDER (desktop) ---------- -->
@@ -1778,7 +1772,6 @@ body[data-mode="steps"] .place.is-last{display:block}
       b.setAttribute('aria-current', i === step ? 'step' : 'false');
       b.dataset.done = String(i < step);
     });
-    $('#stepBack').hidden = step === 1;
     $('#stepNext').textContent = STEP_CTA[step] || '';
     // step 1 has the gate's own three doors, step 3 has Place order — neither wants
     // a generic Continue underneath it
@@ -1822,7 +1815,6 @@ body[data-mode="steps"] .place.is-last{display:block}
   if (gateRegGo) gateRegGo.addEventListener('click', () => leaveGate('register', 'new'));
 
   $('#stepNext').addEventListener('click', () => applyStep(step + 1));
-  $('#stepBack').addEventListener('click', () => applyStep(step - 1));
   $$('.steps__item').forEach(b => b.addEventListener('click', () => {
     const i = Number(b.dataset.goto);
     if (i < step) applyStep(i);                 // only completed steps are navigable
