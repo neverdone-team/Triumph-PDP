@@ -492,9 +492,13 @@ body[data-mode="steps"] .place.is-last{display:block}
    ============================================================ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
-  height:var(--control-56); padding:0 var(--space-32);
+  height:var(--control-56); padding:0 var(--space-24);
   background:var(--c-ink); color:var(--c-on-dark);
-  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.18em;text-transform:uppercase;
+  /* DS Button type — Alliance Regular 14/20, 4% tracking, uppercase. The 8 Sep editorial
+     pass had put buttons at Light 12/.18em, which made the CTA visibly thinner than the
+     same button on the PLP, the PDP and the bag (Amelie, 2026-09-10). Headings came back
+     to Regular in an earlier pass; this is the last piece that stayed Light. */
+  font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase;
   border:1px solid var(--c-ink);
   text-decoration:none;
   transition:opacity .15s var(--ease-out);
@@ -1031,7 +1035,16 @@ body[data-mode="steps"] .place.is-last{display:block}
           <button class="t-link-s" type="button" id="acctBtn" aria-expanded="false" aria-controls="loginPanel">Sign in</button>
         </p>
 
-        <!-- the login branch of the live gate, inline: no page load, no box round it -->
+        <label class="field" data-validate="email">
+          <input type="email" id="email" placeholder=" " autocomplete="email" value="" />
+          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
+          <span class="field__label">Email</span>
+          <span class="field__err t-body-xs">Please enter a valid email address.</span>
+        </label>
+        <!-- The login branch of the live gate, inline: no page load, no box round it.
+             It sits BELOW the email field on purpose — opening it must not push the
+             email out from under the cursor, so only the password and the two SSO
+             buttons appear, beneath the field (Amelie, 2026-09-10). -->
         <div class="login" id="loginPanel" hidden>
           <label class="field">
             <input type="password" placeholder=" " autocomplete="current-password" />
@@ -1055,12 +1068,6 @@ body[data-mode="steps"] .place.is-last{display:block}
           </div>
         </div>
 
-        <label class="field" data-validate="email">
-          <input type="email" id="email" placeholder=" " autocomplete="email" value="" />
-          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
-          <span class="field__label">Email</span>
-          <span class="field__err t-body-xs">Please enter a valid email address.</span>
-        </label>
 
         <div>
           <label class="check">

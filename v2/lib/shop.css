@@ -97,7 +97,8 @@
 .mc__btn{
   display:flex;align-items:center;justify-content:center;height:48px;
   border:1px solid var(--mc-ink);background:var(--mc-bg);color:var(--mc-ink);
-  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.18em;text-transform:uppercase;
+  /* DS Button type, the same as every other button in the flow */
+  font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase;
   text-decoration:none;cursor:pointer;
 }
 .mc__btn:hover{background:var(--mc-grey)}
@@ -106,6 +107,11 @@
 
 @media (max-width:599.98px){
   .mc{--mc-pad:20px;--mc-w:100%}
+}
+
+/* someone who has asked for less motion gets the sheet without the rise */
+@media (prefers-reduced-motion:reduce){
+  .mc__panel,.mc__scrim{transition-duration:.01ms}
 }
 
 /* the card is presentation — a print or a screenshot of the page should not carry it */

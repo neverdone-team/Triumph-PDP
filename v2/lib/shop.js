@@ -274,12 +274,22 @@ window.Shop = (function () {
 
   function open(opts) {
     opts = opts || {};
+    var fresh = !mc;                 // was the sheet built by this very call?
     build();
     onlySku = opts.only || null;
     mc.querySelector('[data-mc-title]').textContent = opts.title || 'Added to your bag';
-    mc.setAttribute('data-open', 'true');
+    // fill it BEFORE opening, so the panel rises at its final height instead of
+    // growing under the animation
     paintMini();
-    var x = mc.querySelector('.mc__x'); if (x) x.focus();
+    /* On the first open of a page load the panel has just been appended, so the browser
+       has never resolved its closed state (transform:translateY(100%)) — with no start
+       value the transition has nothing to run from and the sheet snaps in. Forcing one
+       layout read flushes that state, and the slide then plays on every open. */
+    if (fresh) void mc.offsetHeight;
+    mc.setAttribute('data-open', 'true');
+    // preventScroll: focusing the close button inside a panel that is still translated
+    // down makes the browser scroll the page to chase it
+    var x = mc.querySelector('.mc__x'); if (x) x.focus({ preventScroll: true });
   }
 
   function close() {
