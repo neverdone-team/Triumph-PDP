@@ -247,9 +247,18 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .stock--low{color:var(--color-buddha-ink)}
 .stock--out{color:var(--color-error)}
 /* fewer left than the bag held: the quantity has already been corrected, so this is a
-   notice rather than an error — and the plus stays out of reach at the ceiling */
+   notice rather than an error. The plus at the ceiling looks spent but is NOT inert — a
+   dead control reads as a broken one, so it still takes the click and answers with the
+   reason (Amelie, 2026-09-11). */
 .stock--short{color:var(--color-buddha-ink)}
-.item.is-short [data-step="1"]{opacity:.3;pointer-events:none}
+.item.is-short [data-step="1"]{opacity:.35}
+.stock--short.is-flash{animation:stockflash .9s var(--ease-out)}
+@keyframes stockflash{
+  0%,100%{opacity:1}
+  20%{opacity:.15}
+  40%{opacity:1}
+  60%{opacity:.15}
+}
 /* A sold-out line fades its PACKSHOT and nothing else: the name and the price stay at
    full strength, because they are still the facts of the line (Amelie, 2026-09-11) —
    the red note is what says it cannot be bought. */
@@ -995,8 +1004,23 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* Which line is short is fixed when the state is chosen, and its availability is a
      number of its own — deriving it from the quantity would move it every time the
      quantity did, so the notice could never survive the reduction it causes. */
+  /* Which line is short is remembered: re-picking it on every load moved the cap onto
+     whichever line happened to be first, so a line that was never reduced ended up with
+     a dead plus (Amelie, 2026-09-11). */
+  const SHORT_KEY = 'triumph.proto.cartShortSku';
   let shortSku = null;
+  try { shortSku = localStorage.getItem(SHORT_KEY) || null; } catch (e) {}
   const SHORT_AVAIL = 1;
+  function pickShortSku(){
+    const lines = Shop.read().lines;
+    if (shortSku && lines.some(l => l.sku === shortSku)) return shortSku;   // it stays put
+    const hit = lines.filter(l => l.qty > SHORT_AVAIL)[0] || lines[0];
+    return hit ? hit.sku : null;
+  }
+  function setShortSku(sku){
+    shortSku = sku;
+    try { sku ? localStorage.setItem(SHORT_KEY, sku) : localStorage.removeItem(SHORT_KEY); } catch (e) {}
+  }
   /* Only a line this page has actually cut says so. After a reload the quantity is
      already at the ceiling, and claiming a reduction that never happened would be a lie. */
   const reduced = new Set();
@@ -1178,7 +1202,19 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const sku = item.dataset.sku;
 
     const step = e.target.closest('[data-step]');
-    if (step) { Shop.bump(sku, Number(step.dataset.step)); return; }
+    if (step) {
+      const delta = Number(step.dataset.step);
+      // at the stock ceiling the plus does not raise the quantity; it says why
+      const st = stockOf(...(() => { const b = Shop.read(); const i = b.lines.findIndex(l => l.sku === sku);
+        return [b.lines[i], i, b.lines]; })());
+      if (delta > 0 && st.level === 'short' && (Shop.read().lines.filter(l => l.sku === sku)[0] || {}).qty >= st.avail) {
+        const note = item.querySelector('.stock--short');
+        if (note) { note.classList.remove('is-flash'); void note.offsetWidth; note.classList.add('is-flash'); }
+        return;
+      }
+      Shop.bump(sku, delta);
+      return;
+    }
 
     // the stepper's trash at quantity 1, and the swiped-open red panel, both delete
     if (e.target.closest('[data-remove]') || e.target.closest('[data-confirm-remove]')) {
@@ -1409,22 +1445,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
   $$('[data-stock-set]').forEach(b => b.addEventListener('click', () => {
     document.body.dataset.stock = b.dataset.stockSet;
     try { localStorage.setItem('triumph.proto.cartStock', b.dataset.stockSet); } catch (e) {}
-    if (b.dataset.stockSet === 'short') {
-      const lines = Shop.read().lines;
-      const hit = lines.filter(l => l.qty > SHORT_AVAIL)[0] || lines[0];
-      shortSku = hit ? hit.sku : null;
-    }
+    if (b.dataset.stockSet === 'short') setShortSku(pickShortSku());
     render();
   }));
   try {
     document.body.dataset.sale  = localStorage.getItem('triumph.proto.cartSale')  || 'off';
     document.body.dataset.stock = localStorage.getItem('triumph.proto.cartStock') || 'ok';
   } catch (e) {}
-  if (stockMode() === 'short') {
-    const lines = Shop.read().lines;
-    const hit = lines.filter(l => l.qty > SHORT_AVAIL)[0] || lines[0];
-    shortSku = hit ? hit.sku : null;
-  }
+  if (stockMode() === 'short') setShortSku(pickShortSku());
   $$('[data-cart-set]').forEach(b => b.addEventListener('click', () => {
     if (b.dataset.cartSet === 'empty') { Shop.clear(); return; }
     Shop.clear();
