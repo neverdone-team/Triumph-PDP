@@ -90,7 +90,9 @@
 .mc__thumb{display:block;width:76px;height:100px;background:var(--mc-grey);overflow:hidden}
 .mc__thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .mc__info{display:flex;flex-direction:column;gap:3px;min-width:0}
-.mc__name{font-weight:400;font-size:13px;line-height:18px;letter-spacing:.06em;text-transform:uppercase}
+.mc__series{font-weight:300;font-size:12px;line-height:17px;letter-spacing:.04em;color:var(--mc-ink)}
+.mc__name{font-weight:400;font-size:13px;line-height:18px;letter-spacing:.06em;text-transform:uppercase;
+  margin-top:2px}
 .mc__meta{font-weight:300;font-size:12px;line-height:17px;letter-spacing:.04em;color:var(--mc-ink-50)}
 .mc__num{margin-top:8px;font-weight:400;font-size:14px;line-height:18px}
 

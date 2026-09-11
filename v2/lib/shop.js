@@ -282,8 +282,10 @@ window.Shop = (function () {
       '<div class="mc__li" data-sku="' + l.sku + '">' +
         '<span class="mc__thumb">' + img + '</span>' +
         '<span class="mc__info">' +
+          /* collection first in normal caps and Light, then the product in caps and
+             Regular — the same shape the bag and the rail use (Amelie, 2026-09-11) */
+          (l.series ? '<span class="mc__series">' + l.series + '</span>' : '') +
           '<span class="mc__name">' + l.name + '</span>' +
-          (l.series ? '<span class="mc__meta">' + l.series + '</span>' : '') +
           (l.colour ? '<span class="mc__meta">Colour: ' + l.colour + '</span>' : '') +
           (l.size ? '<span class="mc__meta">Size: ' + l.size + '</span>' : '') +
           (l.qty > 1 ? '<span class="mc__meta">Quantity: ' + l.qty + '</span>' : '') +

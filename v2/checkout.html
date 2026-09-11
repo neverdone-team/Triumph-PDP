@@ -607,7 +607,10 @@ body[data-mode="steps"] .place.is-last{display:block}
 .li__imgwrap{position:relative;grid-row:1 / span 2;width:80px}
 .li__img{width:80px;height:107px;object-fit:cover;background:var(--c-grey-light)}
 .li__body{min-width:0}
-.li__name{display:block}
+.li__series{display:block;color:var(--c-ink)}
+/* Regular, not the t-title-xs Light: the product name is the same weight in the bag,
+   the mini cart and here (Amelie, 2026-09-11) */
+.li__name{display:block;margin-top:var(--space-2);font-weight:400}
 .li__meta{display:block;color:var(--c-ink-soft);margin-top:var(--space-2)}
 /* the stepper and the Remove link sit at opposite ends of the body column, so the
    space between them is whatever the column has left */
@@ -1579,8 +1582,10 @@ body[data-mode="steps"] .place.is-last{display:block}
       '<div class="li" data-sku="' + esc(l.sku) + '">' +
         '<span class="li__imgwrap"><img class="li__img" src="' + esc(l.img || '') + '" alt="' + esc(l.name) + '" /></span>' +
         '<span class="li__body">' +
+          /* collection first in normal caps and Light, then the product in caps and
+             Regular — one shape everywhere (Amelie, 2026-09-11) */
+          (l.series ? '<span class="li__series t-body-s">' + esc(l.series) + '</span>' : '') +
           '<span class="li__name t-title-xs">' + esc(l.name) + '</span>' +
-          (l.series ? '<span class="li__meta t-body-s">' + esc(l.series) + '</span>' : '') +
           (meta ? '<span class="li__meta t-body-s">' + esc(meta) + '</span>' : '') +
         '</span>' +
         '<span class="li__price">' +

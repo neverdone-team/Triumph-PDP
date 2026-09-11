@@ -215,7 +215,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
   border:1px solid var(--c-hair);background:var(--c-bg)}
 .cthumb:hover{border-bottom-color:var(--c-edge)}
 .cthumb[data-sel="true"]{border-bottom-color:var(--c-ink)}
-.item__row{display:flex;align-items:center;gap:var(--space-12);margin-top:var(--space-20);flex-wrap:wrap}
+/* Size under quantity rather than beside it (Amelie, 2026-09-11) — the two controls
+   change different things, and stacked they stop reading as one segmented control. */
+.item__row{display:flex;flex-direction:column;align-items:flex-start;
+  gap:var(--space-12);margin-top:var(--space-20)}
 .item__side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-6)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
 .item__unit{color:var(--c-ink-soft)}
@@ -275,7 +278,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .acard__img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
 .acard:hover .acard__img img{transform:scale(1.04)}
 .acard__info{display:flex;flex-direction:column;gap:var(--space-2);min-width:0;padding-top:var(--space-12)}
-.acard__nm{display:block}
+.acard__series{display:block;color:var(--c-ink)}
+.acard__nm{display:block;margin-top:var(--space-2)}
 /* the price and the add control share the last line, with the + pushed to the card's
    right edge (Amelie, 2026-09-10) */
 .acard__buy{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);
@@ -689,8 +693,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <article class="acard">
               <div class="acard__img"><img src="./Assets/10215855-0004_1.webp" alt="Amourette String" loading="lazy" /></div>
               <div class="acard__info">
+                <span class="t-body-s acard__series">Amourette</span>
                 <span class="acard__nm t-title-xs">String</span>
-                <span class="t-body-s muted">Amourette</span>
                 <span class="acard__buy">
                   <span class="acard__pr t-price">€22.95</span>
                   <button class="addon__btn" type="button" aria-label="Choose a size for String"
@@ -705,8 +709,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <article class="acard">
               <div class="acard__img"><img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Bra" loading="lazy" /></div>
               <div class="acard__info">
+                <span class="t-body-s acard__series">Aura Spotlight</span>
                 <span class="acard__nm t-title-xs">Aura Spotlight Bra</span>
-                <span class="t-body-s muted">Aura Spotlight</span>
                 <span class="acard__buy">
                   <span class="acard__pr t-price">€54.95</span>
                   <button class="addon__btn" type="button" aria-label="Choose a size for Aura Spotlight Bra"
@@ -721,8 +725,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <article class="acard">
               <div class="acard__img"><img src="./Assets/ck-brief.webp" alt="Amourette Tai" loading="lazy" /></div>
               <div class="acard__info">
+                <span class="t-body-s acard__series">Amourette</span>
                 <span class="acard__nm t-title-xs">Tai</span>
-                <span class="t-body-s muted">Amourette</span>
                 <span class="acard__buy">
                   <span class="acard__pr t-price">€24.95</span>
                   <button class="addon__btn" type="button" aria-label="Choose a size for Tai"
