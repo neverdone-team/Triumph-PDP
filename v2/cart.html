@@ -804,7 +804,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
         <!-- the code sits above the total: it changes the total, so it belongs before it -->
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
-            <span class="t-body-m">Gift card or discount code</span>
+            <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
             <span class="acc__plus" aria-hidden="true"></span>
           </button>
           <div class="acc__body">
@@ -1141,11 +1141,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $$('[data-total]').forEach(n => n.textContent = eur(t.total));
     $$('[data-count]').forEach(n => n.textContent = t.count + (t.count === 1 ? ' item' : ' items'));
 
-    if (t.voucher) {
-      $('#voucher').value = t.voucher;
-      acc.dataset.open = 'true';
-      $('#voucherToggle').setAttribute('aria-expanded', 'true');
-    }
+    /* The count rides in the header so a collapsed section still says a code is on the
+       order; the panel does NOT reopen itself here, or it would fight the customer
+       opening it by hand (Amelie, 2026-09-11). */
+    $('[data-voucher-count]').textContent = t.voucher ? ' (1)' : '';
+    if (t.voucher) $('#voucher').value = t.voucher;
 
     /* what the order saves against the list prices: the sale mode's was-prices and a
        member's discount both land here, so one row covers both */
@@ -1343,13 +1343,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
   });
   $('#voucherBtn').addEventListener('click', () => {
     const code = $('#voucher').value.trim().toUpperCase();
-    if (code) Shop.setVoucher(code);
+    if (!code) return;
+    Shop.setVoucher(code);
+    // applied is done: the section folds away and the header carries the count
+    acc.dataset.open = 'false';
+    $('#voucherToggle').setAttribute('aria-expanded', 'false');
   });
   $('#voucherClear').addEventListener('click', () => {
     Shop.setVoucher(null);
     $('#voucher').value = '';
-    acc.dataset.open = 'false';
-    $('#voucherToggle').setAttribute('aria-expanded', 'false');
+    // removing it leaves the section open — the next thing wanted is probably another code
   });
 
   $('#joinBtn').addEventListener('click', () => Shop.setMember(true));

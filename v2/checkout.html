@@ -1447,7 +1447,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 
     <div class="acc" data-open="false" id="voucherAcc">
       <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false" aria-controls="voucherBody">
-        <span class="t-body-m">Gift card or discount code</span>
+        <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
         <svg class="acc__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
       </button>
       <div class="acc__body" id="voucherBody">
@@ -1637,6 +1637,7 @@ body[data-mode="steps"] .place.is-last{display:block}
     }
     r('[data-discount]').textContent = '−' + eur(t.discount);
     $$('[data-voucher-code]').forEach(n => { n.textContent = t.voucher ? '· ' + t.voucher : ''; });
+    $$('[data-voucher-count]').forEach(n => { n.textContent = t.voucher ? ' (1)' : ''; });
     const shipCell = r('[data-shipping]');
     shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
     r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
@@ -1864,6 +1865,10 @@ body[data-mode="steps"] .place.is-last{display:block}
     Shop.setVoucher(code);
     $('#voucherOk').hidden = false;
     $('#voucherOk').querySelector('strong').textContent = code;
+    // applied is done: the section folds away, and its header carries the count
+    const acc = $('#voucherAcc');
+    acc.dataset.open = 'false';
+    $('#voucherToggle').setAttribute('aria-expanded', 'false');
   });
   /* an applied code has to be removable — without this the only way out of a wrong code
      is reloading the page (Amelie, 2026-09-10) */
