@@ -246,7 +246,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__side{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;
   gap:var(--space-8);text-align:left;margin-top:var(--space-12)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
-.item__unit{color:var(--c-ink-soft)}
+/* the per-unit figure is a footnote to the line total, so it sits under it, not beside
+   the member label (Amelie, 2026-09-11) */
+.item__unit{flex-basis:100%;color:var(--c-ink-soft)}
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--c-edge);height:var(--control-36)}
 .stepper button{width:var(--control-36);height:100%;display:grid;place-items:center}
