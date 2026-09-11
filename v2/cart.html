@@ -208,15 +208,19 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the colour options, revealed by Change — the PLP's thumbnails, with the chosen one
    marked by a 2px rule under it */
 /* A popover, not a block in the flow: opening it used to push the whole line — and
-   everything under it — down the page. It opens to the RIGHT of the colour line, into the
-   row's own empty space, so nothing moves and nothing is covered (Amelie, 2026-09-11). */
+   everything under it — down the page. It drops straight under the colour line and lies
+   OVER the quantity and size fields, which are inert while a colour is being chosen
+   (Amelie, 2026-09-11) — that reads better than squeezing in beside them. */
 .attr-colour{position:relative}
-/* top-aligned with the colour line, not centred on it: centred, the panel's top edge
-   crossed the product name above */
-.colours{position:absolute;top:calc(var(--space-12) * -1);left:calc(100% + var(--space-20));
-  z-index:5;display:flex;gap:var(--space-12);white-space:nowrap;
+/* width:max-content, or an absolutely positioned box shrinks to its containing block —
+   the 150px colour line — and the five thumbs wrap into a tall column */
+.colours{position:absolute;top:calc(100% + var(--space-8));left:0;
+  z-index:5;display:flex;gap:var(--space-12);
+  width:max-content;max-width:calc(100vw - var(--space-32));
   padding:var(--space-12);background:var(--c-bg);
   border:1px solid var(--c-hair);box-shadow:0 10px 24px rgba(0,0,0,.10)}
+/* on a phone the text column is narrower than the strip, so it opens leftwards instead */
+@media (max-width:575px){ .colours{left:auto;right:0} }
 .cthumb{border-bottom:2px solid transparent;padding-bottom:2px;flex:none;
   transition:border-color .2s var(--ease-out)}
 .cthumb img{display:block;width:44px;height:44px;object-fit:cover;
@@ -589,9 +593,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .item .stock{grid-column:2;grid-row:6}
   .item__unit{white-space:nowrap}
   .pricepair{flex-direction:row;align-items:baseline;gap:var(--space-8)}
-  /* no room to the side on a phone: the popover drops below the line and overlays the
-     controls, which are inert while a colour is being chosen anyway */
-  .colours{top:calc(100% + var(--space-8));left:0;transform:none;flex-wrap:wrap;white-space:normal}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   .sizesel select{height:var(--control-44)}
