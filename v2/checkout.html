@@ -781,14 +781,25 @@ body[data-mode="steps"] .place.is-last{display:block}
     background:var(--c-bg); border-top:1px solid var(--c-hair);
     padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   }
-  /* The stepped flow's sticky bar carries the call to action, so nothing repeats it in
-     the flow. The one-pager already puts a Continue at the foot of the section being
-     worked on, so there the bar would be the same button twice — it goes, and Place
-     order stays in the page (Amelie, 2026-09-11). */
+  /* One call to action on a phone, and it is the sticky bar — its label is whatever the
+     section you are in asks for (Amelie, 2026-09-11). A sticky button cannot live inside
+     the section itself: sticky is bounded by its containing block, and the button sits at
+     that block's foot already, so it would never travel. The in-flow per-section buttons
+     are therefore desktop-only. */
   .place,.stepnav{display:none!important}
-  body[data-mode="onepage"] .paybar{display:none!important}
-  body[data-mode="onepage"] .place{display:none!important}
-  body[data-mode="onepage"] .place.is-last{display:block!important}
+  body[data-mode="onepage"] .sec__next{display:none!important}
+
+  /* the summary sits at the foot of the page, open, instead of collapsed at the top */
+  body[data-mode="onepage"]:not([data-step="0"]) .ck{display:flex;flex-direction:column}
+  body[data-mode="onepage"] .ck__form{order:1}
+  body[data-mode="onepage"]:not([data-step="0"]) .ck__railcol{display:block;order:2;
+    border-left:0;border-top:1px solid var(--c-hair)}
+  /* the rail is the last thing on the page now, so it carries the clearance the form
+     column used to — or the sticky bar sits on top of the total */
+  body[data-mode="onepage"] .ck__rail{position:static;
+    padding:var(--space-32) var(--space-16) calc(120px + env(safe-area-inset-bottom))}
+  body[data-mode="onepage"] .ck__form{padding-bottom:var(--space-32)}
+  body[data-mode="onepage"] .msum{display:none!important}
   .paybar__legal{margin-top:var(--space-8);color:var(--c-ink-soft);text-align:center}
   .paybar__legal a{text-decoration:underline;text-underline-offset:3px}
 }
@@ -2015,7 +2026,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   try { mode = localStorage.getItem(MODE_KEY) || 'onepage'; } catch (e) {}
 
   /* 0 is the gate — it is not a step, it is what happens before the flow starts */
-  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment', 3: 'Review order' };
+  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment', 3: 'Review your order' };
   const LAST_STEP = 4;
 
   function applyMode() {
