@@ -115,15 +115,20 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* The order's own two facts in one box with a stroke that never changes colour: how far
    from free shipping on the left, when it arrives at the far right, the bar under both
    (Amelie, 2026-09-10). */
+/* start, not baseline: the promise carries a 20px icon, which drags its baseline down
+   and left the two facts looking a line apart (Amelie, 2026-09-11) */
 .statusbox{border:1px solid var(--c-edge);padding:var(--space-16);
   display:grid;grid-template-columns:minmax(0,1fr) auto;
-  gap:var(--space-12) var(--space-24);align-items:baseline}
+  gap:var(--space-12) var(--space-24);align-items:start}
 #shipMsg{grid-column:1;grid-row:1}
 .promise{grid-column:2;grid-row:1;justify-self:end;
   display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
 /* the icon's optical centre sits a touch above the text's, so it drops 1px */
 .promise__icon{flex:none;position:relative;top:1px}
 .promise__label{color:var(--c-grey-medium)}
+/* the icon is exactly one line box tall, so the text sits on the same top edge as the
+   plain 14/20 line in the other column */
+.promise span{line-height:20px}
 .ship-progress__bar{grid-column:1 / -1;height:4px;background:var(--c-grey-light);overflow:hidden}
 .ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
 /* only the words and the bar go green — the box keeps its stroke */

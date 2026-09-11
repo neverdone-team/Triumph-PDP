@@ -542,7 +542,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   padding:var(--space-20) 0;border-bottom:1px solid var(--c-hair);
 }
 .review dt{margin:0;grid-column:1;grid-row:1;align-self:center;color:var(--c-grey-medium);
-  font-weight:400;font-size:14px;line-height:20px;letter-spacing:.10em;text-transform:uppercase}
+  font-weight:400;font-size:13px;line-height:18px;letter-spacing:.10em;text-transform:uppercase}
 .review__row button{grid-column:2;grid-row:1;align-self:center}
 .review dd{margin:0;white-space:pre-line;grid-column:1 / -1;grid-row:2}
 @media (max-width:575px){
@@ -590,10 +590,14 @@ body[data-mode="steps"] .place.is-last{display:block}
    ORDER SUMMARY RAIL
    ============================================================ */
 .sum__head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-32)}
+/* no rules between the products — white space separates them, as it does in the bag
+   (Amelie, 2026-09-11) */
 .li{display:grid;grid-template-columns:80px minmax(0,1fr) auto;
   column-gap:var(--space-16);row-gap:var(--space-16);
-  padding:var(--space-32) 0;border-bottom:1px solid var(--c-hair)}
+  padding:var(--space-32) 0}
 .li:first-of-type{padding-top:0}
+/* and the list keeps its distance from the code row and the totals under it */
+#railItems{padding-bottom:var(--space-24)}
 /* the discount row draws its own top rule */
 .li:last-of-type{border-bottom:0}
 /* the actions run the full width of the row, not just the text column, so Remove sits on
@@ -654,6 +658,9 @@ body[data-mode="steps"] .place.is-last{display:block}
 }
 .promise__icon{flex:none;position:relative;top:1px}
 .promise__label{color:var(--c-grey-medium)}
+/* the icon is exactly one line box tall, so the row's text sits on the same top edge as
+   any plain 14/20 line beside it */
+.promise span{line-height:20px}
 .trust{display:flex;flex-wrap:wrap;gap:var(--space-20);margin-top:var(--space-32);color:var(--c-ink-soft)}
 .trust span{display:inline-flex;align-items:center;gap:var(--space-6)}
 
