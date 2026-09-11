@@ -100,7 +100,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
    above the summary. The rule is drawn on the grid itself rather than as a border on a
    wrapper, so both right-hand blocks stay independent grid children and the phone layout
    can order them freely. */
-.cart{display:grid;grid-template-columns:minmax(0,1fr) 400px;align-items:start;
+.cart{display:grid;grid-template-columns:minmax(0,1fr) 440px;align-items:start;
   margin-top:var(--space-32)}
 /* The product column is deliberately narrower than the space it has: 160 of right
    padding puts 240px of gutter between the last product and the summary, and pulls the
@@ -207,8 +207,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .attr-colour{display:inline-flex;align-items:baseline;gap:var(--space-12)}
 /* the colour options, revealed by Change — the PLP's thumbnails, with the chosen one
    marked by a 2px rule under it */
-/* its own line under the label, or the label rides the middle of the 44px thumbs */
-.colours{flex-basis:100%;display:flex;flex-wrap:wrap;gap:var(--space-12);margin-top:var(--space-12)}
+/* A popover, not a block in the flow: opening it used to push the whole line — and
+   everything under it — down the page. It opens to the RIGHT of the colour line, into the
+   row's own empty space, so nothing moves and nothing is covered (Amelie, 2026-09-11). */
+.attr-colour{position:relative}
+/* top-aligned with the colour line, not centred on it: centred, the panel's top edge
+   crossed the product name above */
+.colours{position:absolute;top:calc(var(--space-12) * -1);left:calc(100% + var(--space-20));
+  z-index:5;display:flex;gap:var(--space-12);white-space:nowrap;
+  padding:var(--space-12);background:var(--c-bg);
+  border:1px solid var(--c-hair);box-shadow:0 10px 24px rgba(0,0,0,.10)}
 .cthumb{border-bottom:2px solid transparent;padding-bottom:2px;flex:none;
   transition:border-color .2s var(--ease-out)}
 .cthumb img{display:block;width:44px;height:44px;object-fit:cover;
@@ -216,9 +224,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .cthumb:hover{border-bottom-color:var(--c-edge)}
 .cthumb[data-sel="true"]{border-bottom-color:var(--c-ink)}
 /* Size under quantity rather than beside it (Amelie, 2026-09-11) — the two controls
-   change different things, and stacked they stop reading as one segmented control. */
-.item__row{display:flex;flex-direction:column;align-items:flex-start;
+   change different things, and stacked they stop reading as one segmented control. They
+   share one width so the stack reads as a column, not a staircase. */
+.item__row{--rowctl:112px;display:flex;flex-direction:column;align-items:flex-start;
   gap:var(--space-12);margin-top:var(--space-20)}
+.item__row .stepper{width:var(--rowctl);justify-content:space-between}
+.item__row .sizesel,.item__row .sizesel select{width:var(--rowctl)}
 .item__side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-6)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
 .item__unit{color:var(--c-ink-soft)}
@@ -578,6 +589,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .item .stock{grid-column:2;grid-row:6}
   .item__unit{white-space:nowrap}
   .pricepair{flex-direction:row;align-items:baseline;gap:var(--space-8)}
+  /* no room to the side on a phone: the popover drops below the line and overlays the
+     controls, which are inert while a colour is being chosen anyway */
+  .colours{top:calc(100% + var(--space-8));left:0;transform:none;flex-wrap:wrap;white-space:normal}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   .sizesel select{height:var(--control-44)}
@@ -1005,14 +1019,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
       '<span class="attr-colour">'+
         '<span class="t-body-s">Colour: '+esc(l.colour)+'</span>'+
         '<button class="t-link-s" type="button" data-colour-toggle aria-expanded="false">Change</button>'+
-      '</span>'+
-      '<div class="colours" hidden>'+
-        COLOURWAYS.map(c =>
-          '<button class="cthumb" type="button" data-colour="'+esc(c.name)+'" title="'+esc(c.name)+'"'+
-            ' aria-label="'+esc(c.name)+'"'+(c.name === l.colour ? ' data-sel="true"' : '')+'>'+
-            '<img src="'+esc(c.sw)+'" alt="" />'+
-          '</button>').join('')+
-      '</div>');
+        '<span class="colours" hidden>'+
+          COLOURWAYS.map(c =>
+            '<button class="cthumb" type="button" data-colour="'+esc(c.name)+'" title="'+esc(c.name)+'"'+
+              ' aria-label="'+esc(c.name)+'"'+(c.name === l.colour ? ' data-sel="true"' : '')+'>'+
+              '<img src="'+esc(c.sw)+'" alt="" />'+
+            '</button>').join('')+
+        '</span>'+
+      '</span>');
 
     // Size is changeable in the bag rather than a trip back to the PDP, and it sits with
     // the quantity stepper because both change what is being bought.
@@ -1216,6 +1230,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
       $$('.item.is-swiped').forEach(o => o.classList.remove('is-swiped'));
     });
   })();
+
+  /* the colour popover closes on a click outside it and on Escape, like any popover */
+  function closeColours(){
+    $$('.colours').forEach(c => { c.hidden = true; });
+    $$('[data-colour-toggle]').forEach(b => { b.setAttribute('aria-expanded','false'); b.textContent = 'Change'; });
+  }
+  document.addEventListener('mousedown', e => {
+    if (e.target.closest('.item__attrs')) return;
+    closeColours();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeColours(); });
 
   /* ---------------- undo ----------------
      Deleting is the only irreversible thing in the bag, so it is offered back for a
