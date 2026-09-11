@@ -323,11 +323,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* what this order saves against the list prices — burgundy, the colour every member and
    sale figure in the flow uses */
 .trow--save{color:var(--color-green)}
-/* the applied code, and the control that takes it off again */
-.vapplied{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);
-  padding:var(--space-12);margin-bottom:var(--space-12);
-  background:var(--c-wash);color:var(--color-green)}
-.vapplied .t-link-s{color:var(--c-ink)}
+/* the applied code: name and rate on one line, the remove link under them, the figure
+   in green on the right */
+.trow--code{align-items:flex-start}
+.dcode{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
+.dcode__line{display:flex;align-items:baseline;gap:var(--space-8);flex-wrap:wrap}
+.dcode__x{color:var(--c-ink-soft);align-self:flex-start}
+.dcode__x:hover{color:var(--c-ink)}
+.trow--code .t-price{color:var(--color-green)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
 .linesave{color:var(--color-green)}
 .grand__num{font-weight:400;font-size:20px;line-height:26px;letter-spacing:0}
@@ -798,8 +801,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
         <div class="trow trow--save" id="saveRow" hidden>
           <span class="t-body-m">You save</span><span class="t-price" data-saved>€0.00</span>
         </div>
-        <div class="trow" id="discountRow" hidden>
-          <span class="t-body-m">Discount <span class="muted t-body-s" data-voucher-code></span></span>
+        <!-- the applied code sits right under the subtotal it comes off, with its own
+             remove link beneath it (Amelie, 2026-09-11) -->
+        <div class="trow trow--code" id="discountRow" hidden>
+          <span class="dcode">
+            <span class="dcode__line">
+              <span class="t-body-m" data-voucher-name>CODE</span>
+              <span class="muted t-body-s">10% off</span>
+            </span>
+            <button class="t-link-s dcode__x" type="button" id="voucherClear">remove</button>
+          </span>
           <span class="t-price" data-discount>−€0.00</span>
         </div>
         <div class="trow" data-ship-row>
@@ -821,12 +832,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <span class="acc__plus" aria-hidden="true"></span>
           </button>
           <div class="acc__body">
-            <!-- an applied code is its own box here, with the delete on it: the summary row
-                 above just states the figure (Amelie, 2026-09-10) -->
-            <div class="vapplied" id="voucherApplied" hidden>
-              <span class="t-body-s"><strong style="font-weight:400" data-voucher-name>—</strong> applied</span>
-              <button class="t-link-s" type="button" id="voucherClear">Remove</button>
-            </div>
             <div class="voucher">
               <label class="field">
                 <input type="text" id="voucher" placeholder=" " />
@@ -1160,8 +1165,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('[data-subtotal]').textContent = eur(t.sub);
     $('#discountRow').hidden = !t.voucher;
     $('[data-discount]').textContent = '−' + eur(t.discount);
-    $('[data-voucher-code]').textContent = t.voucher ? '· ' + t.voucher : '';
-    $('#voucherApplied').hidden = !t.voucher;
     if (t.voucher) $('[data-voucher-name]').textContent = t.voucher;
     const shipCell = $('[data-shipping]');
     shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
