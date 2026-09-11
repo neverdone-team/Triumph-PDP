@@ -825,24 +825,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
           </span>
         </p>
 
-        <!-- the code sits above the total: it changes the total, so it belongs before it -->
-        <div class="acc" data-open="false" id="voucherAcc">
-          <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
-            <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
-            <span class="acc__plus" aria-hidden="true"></span>
-          </button>
-          <div class="acc__body">
-            <div class="voucher">
-              <label class="field">
-                <input type="text" id="voucher" placeholder=" " />
-                <fieldset class="field__frame"><legend><span>Code</span></legend></fieldset>
-                <span class="field__label">Code</span>
-              </label>
-              <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
-            </div>
-          </div>
-        </div>
-
         <div class="trow trow--grand">
           <span class="t-title-m">Total</span>
           <span class="grand__num" data-total>€0.00</span>
@@ -863,6 +845,24 @@ h1,h2,h3,p{margin:0;font-weight:400}
           <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="18" cy="10" r="6" fill="#F79E1B" fill-opacity=".85"/></svg>
           <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-style="italic" font-weight="bold" fill="#003087">PayPal</text></svg>
           <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#0B051D">Klarna</text></svg>
+        </div>
+        <!-- the field sits at the foot of the summary, under the payment marks (Amelie,
+             2026-09-11); the code it applies is stated up under the subtotal -->
+        <div class="acc" data-open="false" id="voucherAcc">
+          <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
+            <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
+            <span class="acc__plus" aria-hidden="true"></span>
+          </button>
+          <div class="acc__body">
+            <div class="voucher">
+              <label class="field">
+                <input type="text" id="voucher" placeholder=" " />
+                <fieldset class="field__frame"><legend><span>Code</span></legend></fieldset>
+                <span class="field__label">Code</span>
+              </label>
+              <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
+            </div>
+          </div>
         </div>
       </aside>
      </div><!-- /.cart__right -->
