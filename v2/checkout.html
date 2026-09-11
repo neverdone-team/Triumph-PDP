@@ -509,14 +509,19 @@ body[data-mode="steps"] .steps{display:flex;gap:0}
   font-size:10px;line-height:1;letter-spacing:0;
 }
 .steps__item[data-done="true"] .steps__no{background:var(--c-ink);border-color:var(--c-ink);color:var(--c-on-dark)}
-body[data-mode="steps"] .sec[data-step]{display:none}
+/* .is-current drives the reveal in both modes: the stepped flow marks one section, the
+   one-pager marks every section up to where you have got to (Amelie, 2026-09-11) */
+.sec[data-step]{display:none}
+.sec[data-step].is-current{display:block}
 body[data-mode="steps"] [data-mode-only="onepage"]{display:none!important}
 body[data-mode="onepage"] [data-mode-only="steps"]{display:none!important}
-body[data-mode="steps"] .sec[data-step].is-current{display:block}
-/* only the first section on the step loses its top padding — the ones under it keep the
+/* only the first section on screen loses its top padding — the ones under it keep the
    64px rhythm, or Delivery method collides with the billing checkbox above it */
-body[data-mode="steps"] .sec[data-step].is-first{padding-top:0}
+.sec[data-step].is-first{padding-top:0}
 .stepnav{display:none;margin-top:var(--space-48);gap:var(--space-16);align-items:center}
+/* the one-pager's per-section Continue, shown only on the section it belongs to */
+.sec__next{display:none;margin-top:var(--space-32)}
+.sec__next.is-on{display:block}
 body[data-mode="steps"] .stepnav{display:flex}
 body[data-mode="steps"] .place{display:none}
 body[data-mode="steps"] .place.is-last{display:block}
@@ -858,7 +863,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 
     <!-- ---------- 1 · KONTAKT ---------- -->
     <!-- ---------- STEP 1 GATE (3-step mode only) ---------- -->
-    <section class="sec gate" data-step="0" id="s-gate" data-mode-only="steps" aria-labelledby="h-gate">
+    <section class="sec gate" data-step="0" id="s-gate" aria-labelledby="h-gate">
       <h2 class="t-title-m" id="h-gate" hidden>Sign in, continue as a guest, or register</h2>
 
       <div class="gate__box">
@@ -989,97 +994,10 @@ body[data-mode="steps"] .place.is-last{display:block}
       </div><!-- /.gate__box -->
     </section>
 
-    <!-- Contact belongs to the one-pager only: in the stepped flow the email comes from
-         the gate (signing in or registering) or from the address step (a guest), and asking
-         for it a third time is what made the live flow long (Amelie, 2026-09-10). -->
-    <section class="sec" data-step="1" id="s-contact" data-mode-only="onepage" aria-labelledby="h-contact">
-      <div class="sec__head">
-        <h2 class="t-title-m" id="h-contact">Contact</h2>
-      </div>
+    <!-- Contact is gone (Amelie, 2026-09-11): identity is settled at the gate, which now
+         runs before the one-pager as well as before the stepped flow, and a guest leaves
+         their email with the address. The newsletter opt-in moved into that section. -->
 
-      <!-- signed-in -->
-      <div data-account-only="member">
-        <div class="who">
-          <span class="who__av t-label-hm">AM</span>
-          <span class="who__body">
-            <span class="t-body-s muted">Signed in as</span>
-            <span class="who__mail t-body-m">anna.musterfrau@example.com</span>
-          </span>
-          <button class="t-link-s" type="button">Sign out</button>
-        </div>
-      </div>
-
-      <!-- guest / new account -->
-      <div data-account-only="guest new">
-
-        <!-- the sign-in door comes before the field it would replace -->
-        <p class="acctlink" data-guest-only>
-          <span class="t-body-s muted">Already have an account?</span>
-          <button class="t-link-s" type="button" id="acctBtn" aria-expanded="false" aria-controls="loginPanel">Sign in</button>
-        </p>
-
-        <label class="field" data-validate="email">
-          <input type="email" id="email" placeholder=" " autocomplete="email" value="" />
-          <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
-          <span class="field__label">Email</span>
-          <span class="field__err t-body-xs">Please enter a valid email address.</span>
-        </label>
-        <!-- The login branch of the live gate, inline: no page load, no box round it.
-             It sits BELOW the email field on purpose — opening it must not push the
-             email out from under the cursor, so only the password and the two SSO
-             buttons appear, beneath the field (Amelie, 2026-09-10). -->
-        <div class="login" id="loginPanel" hidden>
-          <label class="field">
-            <input type="password" placeholder=" " autocomplete="current-password" />
-            <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
-            <span class="field__label">Password</span>
-          </label>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);margin-top:var(--space-24)">
-            <button class="btn btn--ghost" type="button" style="height:var(--control-44)" id="loginGo">Sign in</button>
-            <button class="t-link-s" type="button">Forgotten password?</button>
-          </div>
-          <p class="or t-label-m" style="margin-top:var(--space-16)">or</p>
-          <div class="sso">
-            <button type="button">
-              <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.3-.2-1.9H9v3.5h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.2-3.8H.8v2.3A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.8 10.7a5.4 5.4 0 010-3.4V5H.8a9 9 0 000 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 00.8 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
-              <span class="t-label-m">Google</span>
-            </button>
-            <button type="button">
-              <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#1877F2" d="M18 9a9 9 0 10-10.4 8.9v-6.3H5.3V9h2.3V7c0-2.3 1.4-3.6 3.5-3.6 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.4V9h2.5l-.4 2.6h-2.1v6.3A9 9 0 0018 9z"/></svg>
-              <span class="t-label-m">Facebook</span>
-            </button>
-          </div>
-        </div>
-
-
-        <div>
-          <label class="check">
-            <input type="checkbox" checked />
-            <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
-            <span class="t-body-s">Email me Triumph news and offers</span>
-          </label>
-        </div>
-
-        <!-- creating an account is a choice made here, and it brings its own password -->
-        <label class="check" style="margin-top:var(--space-8)">
-          <input type="checkbox" id="mkAccount" />
-          <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
-          <span class="t-body-s">Create an account and check out faster</span>
-        </label>
-
-        <div id="pwWrap" hidden style="margin-top:var(--space-16)">
-          <label class="field">
-            <input type="password" id="newPw" placeholder=" " autocomplete="new-password" />
-            <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
-            <span class="field__label">Password</span>
-            <span class="field__hint">At least 8 characters and a number.</span>
-          </label>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ---------- 2 · LIEFERADRESSE ---------- -->
     <section class="sec" data-step="1" id="s-address" aria-labelledby="h-address">
       <div class="sec__head">
         <h2 class="t-title-m" id="h-address">Delivery address</h2>
@@ -1172,14 +1090,19 @@ body[data-mode="steps"] .place.is-last{display:block}
           </label>
         </div>
 
-        <!-- steps mode only: the gate's guest door has no email field of its own, and the
-             order confirmation has to go somewhere -->
-        <label class="field" data-validate="email" data-mode-only="steps" data-account-only="guest new">
+        <!-- The gate's guest door has no email field of its own, and the order
+             confirmation has to go somewhere. Both modes now, since Contact is gone. -->
+        <label class="field" data-validate="email" data-account-only="guest new">
           <input type="email" id="addrEmail" placeholder=" " autocomplete="email" />
           <fieldset class="field__frame"><legend><span>Email</span></legend></fieldset>
           <span class="field__label">Email</span>
           <span class="field__hint t-body-xs">Your order confirmation goes here.</span>
           <span class="field__err t-body-xs">Please enter a valid email address.</span>
+        </label>
+        <label class="check" data-account-only="guest new" style="margin:var(--space-4) 0 var(--space-12)">
+          <input type="checkbox" checked />
+          <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
+          <span class="t-body-s">Email me Triumph news and offers</span>
         </label>
 
         <label class="field">
@@ -1213,9 +1136,14 @@ body[data-mode="steps"] .place.is-last{display:block}
           </div>
         </div>
       </div>
+
+      <!-- the one-pager reveals the next section on Continue rather than showing them all
+           at once; the stepped mode has its own nav, so these are mode-only -->
+      <div class="sec__next" data-mode-only="onepage" data-op-next="1">
+        <button class="btn btn--wide" type="button" data-op-go="2">Continue to delivery</button>
+      </div>
     </section>
 
-    <!-- ---------- 3 · KONTO ANLEGEN (guest / new only) ---------- -->
     <section class="sec" data-step="2" id="s-shipping" aria-labelledby="h-shipping">
       <div class="sec__head"><h2 class="t-title-m" id="h-shipping">Delivery method</h2></div>
       <div class="opts">
@@ -1284,6 +1212,10 @@ body[data-mode="steps"] .place.is-last{display:block}
           </span>
           <span class="opt__price t-price is-free" data-ship-price="pickup">Free</span>
         </label>
+      </div>
+
+      <div class="sec__next" data-mode-only="onepage" data-op-next="2">
+        <button class="btn btn--wide" type="button" data-op-go="3">Continue to payment</button>
       </div>
     </section>
 
@@ -1393,7 +1325,7 @@ body[data-mode="steps"] .place.is-last{display:block}
     <!-- ---------- STEP 4: CHECK THE ORDER ----------
          Stepped mode only. The one-pager needs no equivalent: every choice is already on
          the page beside the summary rail. -->
-    <section class="sec" data-step="4" id="s-review" data-mode-only="steps" aria-labelledby="h-review">
+    <section class="sec" data-step="4" id="s-review" aria-labelledby="h-review">
       <div class="sec__head"><h2 class="t-title-m" id="h-review">Check your order</h2></div>
       <!-- The value sits UNDER its heading, not beside it, and each Edit goes back to the
            step that owns that fact — address to 1, delivery to 2, payment to 3 (Amelie,
@@ -1426,6 +1358,10 @@ body[data-mode="steps"] .place.is-last{display:block}
         </div>
       </dl>
     </section>
+
+    <div class="sec__next" data-mode-only="onepage" data-op-next="3">
+      <button class="btn btn--wide" type="button" data-op-go="4">Review your order</button>
+    </div>
 
     <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
     <div class="stepnav" id="stepnav">
@@ -1704,11 +1640,6 @@ body[data-mode="steps"] .place.is-last{display:block}
     });
     $$('[data-guest-only]').forEach(el => { el.hidden = state.account === 'member'; });
 
-    // the "new + account" persona is the one that gets the password field
-    const pw = $('#pwWrap');
-    if (pw) pw.hidden = state.account !== 'new';
-    const mk = $('#mkAccount');
-    if (mk) mk.checked = state.account === 'new';
     recalc();
   }
 
@@ -2007,38 +1938,8 @@ body[data-mode="steps"] .place.is-last{display:block}
     inp.addEventListener('input', () => inp.closest('.field').classList.remove('is-error'));
   });
 
-  // the inline login panel: the Sign in branch of the live gate, no page load
-  const loginLink = $('#loginLink');
-  if (loginLink) loginLink.addEventListener('click', () => {
-    const panel = $('#loginPanel');
-    panel.hidden = !panel.hidden;
-    loginLink.setAttribute('aria-expanded', String(!panel.hidden));
-  });
-  // the account action under the newsletter line opens the same panel the Sign in link does
-  const acctBtn = $('#acctBtn');
-  if (acctBtn) acctBtn.addEventListener('click', () => {
-    const panel = $('#loginPanel');
-    panel.hidden = !panel.hidden;
-    acctBtn.setAttribute('aria-expanded', String(!panel.hidden));
-  });
-  // ticking the box IS the create-account decision, and it brings the password with it
-  const mkAccount = $('#mkAccount');
-  if (mkAccount) mkAccount.addEventListener('change', () => {
-    state.account = mkAccount.checked ? 'new' : 'guest';
-    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === state.account)));
-    applyState();
-    if (mkAccount.checked) { const pw = $('#newPw'); if (pw) pw.focus(); }
-  });
-
-  const loginGo = $('#loginGo');
-  if (loginGo) loginGo.addEventListener('click', () => {
-    state.account = 'member';
-    Shop.setMember(true);
-    $('#loginPanel').hidden = true;
-    $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.accountSet === 'member')));
-    $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === 'true')));
-    applyState();
-  });
+  /* The inline login panel and the create-account checkbox went with the Contact
+     section: signing in and registering both happen at the gate now, in both modes. */
 
   // mobile summary: clone the rail into the drawer, keep it in sync
   function syncMobileSummary() {
@@ -2107,14 +2008,9 @@ body[data-mode="steps"] .place.is-last{display:block}
 
   function applyMode() {
     document.body.dataset.mode = mode;
-    if (mode === 'onepage') document.body.removeAttribute('data-step');
     $$('[data-mode-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.modeSet === mode)));
-    if (mode === 'onepage') {
-      $$('.sec[data-step]').forEach(sec => { sec.classList.add('is-current'); sec.classList.remove('is-first'); });
-      $('.place').classList.add('is-last');
-    } else {
-      applyStep(step);
-    }
+    $('.place').classList.add('is-last');
+    applyStep(step);                 // one code path for both modes
     $('#stepnav').hidden = mode !== 'steps';
     syncMobileSummary();
   }
@@ -2122,10 +2018,21 @@ body[data-mode="steps"] .place.is-last{display:block}
   function applyStep(n) {
     step = Math.min(LAST_STEP, Math.max(0, n));
     document.body.dataset.step = String(step);   // step 1 drops the rail and the express row
+    /* Both modes walk the same sequence — gate, address, delivery, payment, review. The
+       only difference is whether the sections behind you stay on screen: the one-pager
+       accumulates them, the stepped flow replaces them (Amelie, 2026-09-11). */
+    const accumulate = mode === 'onepage';
     $$('.sec[data-step]').forEach(sec => {
-      sec.classList.toggle('is-current', sec.dataset.step === String(step));
+      const d = Number(sec.dataset.step);
+      const on = step === LAST_STEP ? d === LAST_STEP
+               : accumulate        ? (step === 0 ? d === 0 : d >= 1 && d <= step)
+               :                      d === step;
+      sec.classList.toggle('is-current', on);
       sec.classList.remove('is-first');
     });
+    // the Continue that belongs to the section you are on
+    $$('.sec__next').forEach(n => n.classList.toggle('is-on',
+      accumulate && Number(n.dataset.opNext) === step));
     // the first section that is actually on screen — a mode-hidden one must not take it
     const first = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null)[0];
     if (first) first.classList.add('is-first');
@@ -2138,14 +2045,16 @@ body[data-mode="steps"] .place.is-last{display:block}
       b.dataset.done = String(i < tab);
     });
     $('#stepNext').textContent = STEP_CTA[step] || '';
+    // Place order belongs to the review page in both modes now
+    $('.place').hidden = step !== LAST_STEP;
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it
     $('#stepnav').style.display = (step === 0 || step === LAST_STEP) ? 'none' : '';
     /* no tabs on the gate, and none on the review either: the review is not a step, and
        each Edit already goes back to the step that owns that fact (Amelie, 2026-09-10) */
     $('#steps').style.display =
-      (mode === 'steps' && (step === 0 || step === LAST_STEP)) ? 'none' : '';
-    $('.paybar').style.display = (mode === 'steps' && step === 0) ? 'none' : '';
+      (mode === 'steps' && step !== 0 && step !== LAST_STEP) ? '' : 'none';
+    $('.paybar').style.display = step === 0 ? 'none' : '';   // the gate has its own doors
     $('.place').classList.toggle('is-last', step === LAST_STEP);
     if (step === LAST_STEP) fillReview();
     // the mobile pay bar carries the same call to action as the desktop column
@@ -2174,9 +2083,8 @@ body[data-mode="steps"] .place.is-last{display:block}
     };
     copy('#regFn', '#fn');
     copy('#regLn', '#ln');
-    // Contact is skipped for a registrant, and the review page reads #email for its
-    // contact line — without this it would say "No email yet"
-    copy('#regEmail', '#email');
+    // the review reads the address block's email — without this it would say "No email yet"
+    copy('#regEmail', '#addrEmail');
   }
 
   function leaveGate(kind, account) {
@@ -2195,7 +2103,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   if (joinGo) joinGo.addEventListener('click', () => {
     const mail = $('#joinEmail');
     if (mail && !mail.value.trim()) {                 // borrow what the order already knows
-      const known = ($('#email') || {}).value || ($('#addrEmail') || {}).value || '';
+      const known = ($('#addrEmail') || {}).value || ($('#gateEmail') || {}).value || '';
       mail.value = known;
     }
     state.member = true;
@@ -2220,6 +2128,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   if (gateRegGo) gateRegGo.addEventListener('click', () => leaveGate('register', 'new'));
 
   $('#stepNext').addEventListener('click', () => applyStep(step + 1));
+  $$('[data-op-go]').forEach(b => b.addEventListener('click', () => applyStep(Number(b.dataset.opGo))));
   $$('.steps__item').forEach(b => b.addEventListener('click', () => {
     const i = Number(b.dataset.goto);
     if (i < step) applyStep(i);                 // only completed steps are navigable
@@ -2251,7 +2160,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 
     put('contact', state.account === 'member'
       ? 'anna.musterfrau@example.com'
-      : val('#email') || val('#addrEmail') || val('#gateEmail') || 'No email yet');
+      : val('#addrEmail') || val('#gateEmail') || 'No email yet');
 
     const savedPicked = $('input[name="savedaddr"]:checked');
     if (state.account === 'member' && savedPicked && savedPicked.value === 'saved') {
@@ -2297,7 +2206,8 @@ body[data-mode="steps"] .place.is-last{display:block}
   function placeOrder() {
     const t = Shop.totals({ member: state.member, ship: state.ship });
     if (!t.lines.length) return;
-    const mail = ($('#email') && $('#email').value.trim()) ||
+    const mail = ($('#addrEmail') && $('#addrEmail').value.trim()) ||
+                 ($('#gateEmail') && $('#gateEmail').value.trim()) ||
                  (state.account === 'member' ? 'anna.musterfrau@example.com' : 'your email');
     $('#doneNo').textContent = 'TR-' + String(Math.floor(100000 + Math.random() * 899999));
     $('#doneMail').textContent = mail;
@@ -2313,7 +2223,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   }
   $$('.place .btn').forEach(b => b.addEventListener('click', placeOrder));
   $('.paybar .btn').addEventListener('click', () => {
-    if (mode === 'steps' && step < LAST_STEP) applyStep(step + 1);
+    if (step < LAST_STEP) applyStep(step + 1);
     else placeOrder();
   });
 
@@ -2327,7 +2237,10 @@ body[data-mode="steps"] .place.is-last{display:block}
     state.account = 'member';
     state.member = true;
     branch = 'signin';
-    if (mode === 'steps') step = LAST_STEP;
+    /* The stepped flow can skip the lot — address, delivery and card are all on file.
+       The one-pager still walks its sections, but the gate has nothing to ask, so it
+       starts on the address (Amelie, 2026-09-11). */
+    step = mode === 'steps' ? LAST_STEP : 1;
   }
 
   applyMode();
