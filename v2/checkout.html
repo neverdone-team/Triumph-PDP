@@ -2037,6 +2037,7 @@ body[data-mode="steps"] .place.is-last{display:block}
     state.account = b.dataset.accountSet;
     // the signed-in persona is the MyTriumph member; guest and new-registrant start outside it
     Shop.setMember(state.account === 'member');
+    Shop.setAccount(state.account === 'member' ? 'member' : 'guest');   // the bag reads this too
     $$('[data-account-set]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
     $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(state.member))));
     applyState();
@@ -2292,6 +2293,16 @@ body[data-mode="steps"] .place.is-last{display:block}
 
   /* another page (or the mini cart) changed the bag */
   Shop.onChange(() => { if ($('#ckDone').hidden) applyState(); });
+
+  /* Signed in from the bag: there is no gate to pass and nothing to fill in, so the
+     stepped flow opens on the overview. Every Edit still goes back into its step
+     (Amelie, 2026-09-11). This runs last: it reads LAST_STEP, which is declared above it. */
+  if (Shop.account() === 'member') {
+    state.account = 'member';
+    state.member = true;
+    branch = 'signin';
+    if (mode === 'steps') step = LAST_STEP;
+  }
 
   applyMode();
   applyState();

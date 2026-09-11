@@ -19,6 +19,10 @@ window.Shop = (function () {
        'all'  — the whole bag, that line first, scrollable
      Opened from the basket icon it is always the whole bag, in both modes. */
   var MINI_KEY = 'triumph.proto.miniMode';
+  /* Who the shopper is, shared across the pages: 'guest' or 'member' (signed in). The bag
+     sets it so the checkout can skip its gate — a signed-in customer has an address and a
+     card on file and has nothing to fill in (Amelie, 2026-09-11). */
+  var ACCOUNT_KEY = 'triumph.proto.account';
   var FREE_AT = 130;      // free-shipping threshold, € — matches cart + checkout
   var SHIP_STD = 4.99;
   var VAT = 0.19;
@@ -290,6 +294,15 @@ window.Shop = (function () {
 
   var onlySku = null;          // set when the sheet opens straight after an add
 
+  function account() {
+    try { return localStorage.getItem(ACCOUNT_KEY) === 'member' ? 'member' : 'guest'; }
+    catch (e) { return 'guest'; }
+  }
+  function setAccount(kind) {
+    try { localStorage.setItem(ACCOUNT_KEY, kind === 'member' ? 'member' : 'guest'); } catch (e) {}
+    emit();
+  }
+
   function miniMode() {
     try { return localStorage.getItem(MINI_KEY) === 'all' ? 'all' : 'last'; } catch (e) { return 'last'; }
   }
@@ -456,6 +469,7 @@ window.Shop = (function () {
     money: money, onChange: onChange, refresh: emit,
     openMini: open, closeMini: close,
     miniMode: miniMode, setMiniMode: setMiniMode,
+    account: account, setAccount: setAccount,
     FREE_AT: FREE_AT, SHIP_STD: SHIP_STD
   };
 })();

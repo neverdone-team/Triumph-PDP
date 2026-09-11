@@ -885,6 +885,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
     <button data-cart-set="filled" aria-pressed="true">Sample bag</button>
     <button data-cart-set="empty" aria-pressed="false">Empty</button>
   </div>
+  <h4>Account</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-acct-set="guest" aria-pressed="true">Guest</button>
+    <button data-acct-set="member" aria-pressed="false">Signed in</button>
+  </div>
   <h4>MyTriumph</h4>
   <div class="dash__row" style="margin-bottom:0">
     <button data-member-set="false" aria-pressed="true">Not a member</button>
@@ -1341,6 +1346,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const member = Shop.read().member;
     $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.memberSet === String(member))));
     $$('[data-cart-set]').forEach(o => o.setAttribute('aria-pressed', String((o.dataset.cartSet === 'empty') === empty)));
+    const acct = Shop.account();
+    $$('[data-acct-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.acctSet === acct)));
     const mini = Shop.miniMode();
     $$('[data-mini-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.miniSet === mini)));
     const sale = document.body.dataset.sale || 'off';
@@ -1350,6 +1357,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
   }
   $$('[data-member-set]').forEach(b => b.addEventListener('click', () => Shop.setMember(b.dataset.memberSet === 'true')));
   $$('[data-mini-set]').forEach(b => b.addEventListener('click', () => { Shop.setMiniMode(b.dataset.miniSet); syncDash(); }));
+  /* Signing in here is what lets the stepped checkout skip straight to the overview: the
+     address, the delivery method and the card are all on file (Amelie, 2026-09-11).
+     A signed-in shopper is the MyTriumph persona, so membership follows it. */
+  $$('[data-acct-set]').forEach(b => b.addEventListener('click', () => {
+    Shop.setAccount(b.dataset.acctSet);
+    Shop.setMember(b.dataset.acctSet === 'member');
+    syncDash();
+  }));
   $$('[data-sale-set]').forEach(b => b.addEventListener('click', () => {
     document.body.dataset.sale = b.dataset.saleSet;
     try { localStorage.setItem('triumph.proto.cartSale', b.dataset.saleSet); } catch (e) {}
