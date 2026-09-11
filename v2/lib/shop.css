@@ -106,7 +106,7 @@
 /* ---------------- foot ---------------- */
 .mc__foot{flex:none;padding:0 var(--mc-pad) var(--mc-pad);display:grid;gap:10px}
 .mc__btn{
-  display:flex;align-items:center;justify-content:center;height:48px;
+  display:flex;align-items:center;justify-content:center;height:44px;
   border:1px solid var(--mc-ink);background:var(--mc-bg);color:var(--mc-ink);
   /* DS Button type, the same as every other button in the flow */
   font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase;

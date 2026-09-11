@@ -167,7 +167,7 @@ body{background-image:none}
    ============================================================ */
 .express{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8)}
 .xbtn{
-  height:var(--control-56); border:1px solid var(--c-ink); background:var(--c-bg);
+  height:var(--control-44); border:1px solid var(--c-ink); background:var(--c-bg);
   display:flex;align-items:center;justify-content:center;
   transition:border-color .15s var(--ease-out), background .15s var(--ease-out);
 }
@@ -401,7 +401,7 @@ body{background-image:none}
 .gate__h{margin-bottom:var(--space-24)}
 .gate .sso{margin-top:0}
 /* Google and Facebook wear the secondary button's clothes */
-.gate .sso button,.login .sso button{height:var(--control-56);border:1px solid var(--c-ink);
+.gate .sso button,.login .sso button{height:var(--control-44);border:1px solid var(--c-ink);
   font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase}
 .gate .sso button .t-body-s,.login .sso button .t-label-m{font:inherit;letter-spacing:inherit}
 .gate__box .field{margin-bottom:var(--space-4)}
@@ -572,7 +572,7 @@ body[data-mode="steps"] .place.is-last{display:block}
    ============================================================ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
-  height:var(--control-56); padding:0 var(--space-24);
+  height:var(--control-44); padding:0 var(--space-24);
   background:var(--c-ink); color:var(--c-on-dark);
   /* DS Button type — Alliance Regular 14/20, 4% tracking, uppercase. The 8 Sep editorial
      pass had put buttons at Light 12/.18em, which made the CTA visibly thinner than the
@@ -595,7 +595,8 @@ body[data-mode="steps"] .place.is-last{display:block}
 .btn--wide{width:100%}
 .btn--ghost{background:transparent;color:var(--c-ink)}
 .btn--ghost:hover{background:var(--c-wash);opacity:1}
-.btn--sm{height:var(--control-44);padding:0 var(--space-16);font-size:12px;line-height:16px}
+/* the base button is 44 now, so a small one steps down to 36 */
+.btn--sm{height:var(--control-36);padding:0 var(--space-16);font-size:12px;line-height:16px}
 
 .place{margin-top:var(--space-48)}
 .place__legal{margin-top:var(--space-12);color:var(--c-ink-soft);text-align:center}
