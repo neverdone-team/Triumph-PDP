@@ -165,17 +165,20 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* Series above the name, and the text block centred against the packshot (Amelie,
    2026-09-10). A flexible row at each end does the centring; the content rows stay at
    min-content so the packshot's extra height is never shared out between the lines. */
-.item{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr) auto;
-  grid-template-rows:1fr repeat(5,min-content) 1fr;
+.item{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr);
+  grid-template-rows:1fr repeat(6,min-content) 1fr;
   column-gap:var(--space-24);row-gap:0;
   padding:var(--space-32) 0;background:var(--c-bg)}
+/* series → name → price → colour → controls → stock, one column of text beside the
+   packshot. The price used to sit in a third column at the row's right edge, which left
+   it stranded metres from the product on a 790px row (Amelie, 2026-09-11). */
 .item__media{grid-column:1;grid-row:1 / -1}
 .item__sub{grid-column:2;grid-row:2}
 .item__name{grid-column:2;grid-row:3}
-.item__attrs{grid-column:2;grid-row:4}
-.item__row{grid-column:2;grid-row:5}
-.item .stock{grid-column:2;grid-row:6}
-.item__side{grid-column:3;grid-row:2 / 4}
+.item__side{grid-column:2;grid-row:4}
+.item__attrs{grid-column:2;grid-row:5}
+.item__row{grid-column:2;grid-row:6}
+.item .stock{grid-column:2;grid-row:7}
 /* On desktop the packshot bleeds through the row's vertical padding so it covers the whole
    row. The negative margins turn the stretched grid area into the full row height, and the
    column is 188px = 3:4 of that height, so the shot fills it without a crop or a stretch. */
@@ -234,7 +237,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
   gap:var(--space-12);margin-top:var(--space-20)}
 .item__row .stepper{width:var(--rowctl);justify-content:space-between}
 .item__row .sizesel,.item__row .sizesel select{width:var(--rowctl)}
-.item__side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-6)}
+.item__side{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;
+  gap:var(--space-8);text-align:left;margin-top:var(--space-12)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
 .item__unit{color:var(--c-ink-soft)}
 
@@ -286,7 +290,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 }
 
 /* member price pair — never a strike-through against the standard price */
-.pricepair{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2)}
+.pricepair{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;gap:var(--space-8)}
 /* the charged figure and the former price share one line; the note sits under them */
 .priceline{display:flex;align-items:baseline;gap:var(--space-8)}
 .pricepair__member{color:var(--c-burgundy)}
@@ -595,19 +599,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* a bigger packshot on a phone (Amelie, 2026-09-10): 96 was a thumbnail next to
      14px type, 128 gives the product the room the desktop row gives it */
   .item{grid-template-columns:128px minmax(0,1fr);column-gap:var(--space-16);
-    grid-template-rows:repeat(6,min-content) auto}
-  .item__media{grid-row:1 / span 7;align-self:start;margin:0;aspect-ratio:auto}
+    grid-template-rows:repeat(7,min-content) auto}
+  .item__media{grid-row:1 / -1;align-self:start;margin:0;aspect-ratio:auto}
   .item__img{width:128px;height:171px}
-  .item__sub{grid-column:2;grid-row:1}
-  .item__name{grid-column:2;grid-row:2;font-size:14px;line-height:20px}
-  .item__side{grid-column:2;grid-row:3;flex-direction:row;align-items:baseline;
-    justify-content:flex-start;width:100%;flex-wrap:wrap;gap:var(--space-8);
-    text-align:left;margin-top:var(--space-12)}
-  .item__attrs{grid-column:2;grid-row:4}
-  .item__row{grid-column:2;grid-row:5}
-  .item .stock{grid-column:2;grid-row:6}
+  /* the row order and the price layout are the base now; a phone only needs the name a
+     rung smaller and the shot pinned to the top */
+  .item__name{font-size:14px;line-height:20px}
   .item__unit{white-space:nowrap}
-  .pricepair{flex-direction:row;align-items:baseline;gap:var(--space-8)}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   .sizesel select{height:var(--control-44)}
