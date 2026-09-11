@@ -414,6 +414,12 @@ body{background-image:none}
 .gate .or{margin:var(--space-24) 0 var(--space-16)}
 .gate__reg{max-width:560px;margin-top:var(--space-48);padding-top:var(--space-40);border-top:1px solid var(--c-hair)}
 
+/* The gate carries no summary in either mode (Amelie, 2026-09-11): nothing has been
+   decided yet, so the page is the gate and nothing else. It appears with the first step. */
+body[data-step="0"] .ck{grid-template-columns:minmax(0,1fr);max-width:1040px}
+body[data-step="0"] .ck__railcol,
+body[data-step="0"] .msum{display:none}
+
 /* The stepped flow keeps the focus on the step: no summary rail at all until the review,
    and no collapsed summary above the content on a phone either (Amelie, 2026-09-10). The
    form column then takes the width the rail used to hold, capped at a readable measure
@@ -1397,29 +1403,6 @@ body[data-mode="steps"] .place.is-last{display:block}
       Your bag is empty. <a class="t-link-s" href="./pdp.html">Keep shopping</a>.
     </p>
 
-    <div class="acc" data-open="false" id="voucherAcc">
-      <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false" aria-controls="voucherBody">
-        <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
-        <svg class="acc__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
-      </button>
-      <div class="acc__body" id="voucherBody">
-        <div class="voucher">
-          <label class="field">
-            <input type="text" id="voucher" placeholder=" " />
-            <fieldset class="field__frame"><legend><span>Discount code</span></legend></fieldset>
-            <span class="field__label">Discount code</span>
-          </label>
-          <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
-        </div>
-        <div class="voucherok" id="voucherOk" hidden>
-          <span class="t-body-s"><strong style="font-weight:400">WELCOME10</strong> applied — 10% off the subtotal.</span>
-          <button class="vx" type="button" id="voucherClear" aria-label="Remove this discount code">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
     <div class="totals">
       <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€109.85</span></div>
       <div class="trow" id="discountRow" hidden>
@@ -1427,6 +1410,29 @@ body[data-mode="steps"] .place.is-last{display:block}
         <span class="t-price" data-discount>−€10.99</span>
       </div>
       <div class="trow" data-ship-row><span class="t-body-m">Shipping</span><span class="t-price" data-shipping>€4.99</span></div>
+    <div class="acc" data-open="false" id="voucherAcc">
+        <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false" aria-controls="voucherBody">
+          <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
+          <svg class="acc__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+        </button>
+        <div class="acc__body" id="voucherBody">
+          <div class="voucher">
+            <label class="field">
+              <input type="text" id="voucher" placeholder=" " />
+              <fieldset class="field__frame"><legend><span>Discount code</span></legend></fieldset>
+              <span class="field__label">Discount code</span>
+            </label>
+            <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
+          </div>
+          <div class="voucherok" id="voucherOk" hidden>
+            <span class="t-body-s"><strong style="font-weight:400">WELCOME10</strong> applied — 10% off the subtotal.</span>
+            <button class="vx" type="button" id="voucherClear" aria-label="Remove this discount code">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="trow trow--grand">
         <span>
           <span class="t-title-m" style="display:block">Total</span>
@@ -2065,7 +2071,19 @@ body[data-mode="steps"] .place.is-last{display:block}
         ? 'Place order · <span data-total>' + eur(Shop.totals({ member: state.member, ship: state.ship }).total) + '</span>'
         : STEP_CTA[step];
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    /* Put the section being worked on at the top of the screen. The stepped flow replaces
+       its content, so the page start IS the section; the one-pager keeps the finished ones
+       above, so it scrolls to the new one and leaves them behind the fold (Amelie,
+       2026-09-11). The header is sticky, so its height comes off the offset. */
+    const focusSec = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null).pop();
+    if (mode === 'onepage' && focusSec && step > 1 && step < LAST_STEP) {
+      const head = document.querySelector('.ckhead');
+      const pad = (head ? head.getBoundingClientRect().height : 0) + 16;
+      const y = window.scrollY + focusSec.getBoundingClientRect().top - pad;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   /* ---------- the three doors on step 1 ---------- */
