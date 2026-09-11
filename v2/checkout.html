@@ -781,8 +781,14 @@ body[data-mode="steps"] .place.is-last{display:block}
     background:var(--c-bg); border-top:1px solid var(--c-hair);
     padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   }
-  /* the sticky bar carries the call to action, so nothing repeats it in the flow */
+  /* The stepped flow's sticky bar carries the call to action, so nothing repeats it in
+     the flow. The one-pager already puts a Continue at the foot of the section being
+     worked on, so there the bar would be the same button twice — it goes, and Place
+     order stays in the page (Amelie, 2026-09-11). */
   .place,.stepnav{display:none!important}
+  body[data-mode="onepage"] .paybar{display:none!important}
+  body[data-mode="onepage"] .place{display:none!important}
+  body[data-mode="onepage"] .place.is-last{display:block!important}
   .paybar__legal{margin-top:var(--space-8);color:var(--c-ink-soft);text-align:center}
   .paybar__legal a{text-decoration:underline;text-underline-offset:3px}
 }
@@ -2015,8 +2021,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   function applyMode() {
     document.body.dataset.mode = mode;
     $$('[data-mode-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.modeSet === mode)));
-    $('.place').classList.add('is-last');
-    applyStep(step);                 // one code path for both modes
+    applyStep(step);                 // one code path for both modes, is-last included
     $('#stepnav').hidden = mode !== 'steps';
     syncMobileSummary();
   }
@@ -2051,8 +2056,10 @@ body[data-mode="steps"] .place.is-last{display:block}
       b.dataset.done = String(i < tab);
     });
     $('#stepNext').textContent = STEP_CTA[step] || '';
-    // Place order belongs to the review page in both modes now
+    /* Place order belongs to the review page in both modes. hidden AND the class, because
+       the mobile rules key off .is-last while the desktop ones read [hidden]. */
     $('.place').hidden = step !== LAST_STEP;
+    $('.place').classList.toggle('is-last', step === LAST_STEP);
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it
     $('#stepnav').style.display = (step === 0 || step === LAST_STEP) ? 'none' : '';
