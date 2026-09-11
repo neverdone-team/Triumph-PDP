@@ -135,9 +135,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .promise span{line-height:20px}
 .ship-progress__bar{grid-column:1 / -1;height:4px;background:var(--c-grey-light);overflow:hidden}
 .ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
-/* only the words and the bar go green — the box keeps its stroke */
-.statusbox.is-free #shipMsg{color:var(--color-green)}
-.statusbox.is-free .ship-progress__fill{background:var(--color-green)}
+/* Reaching the threshold ends the progress: the box becomes the same peppermint one-liner
+   a member sees, tick and all, because there is nothing left to track (Amelie,
+   2026-09-11). The bar goes with it. */
+.statusbox.is-free{background:var(--color-peppermint);border-color:transparent;
+  padding:var(--space-12) var(--space-16)}
+.statusbox.is-free .ship-progress{margin:0;padding:0;border-top:0}
+.statusbox.is-free .ship-progress__bar{display:none}
+.statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
+.statusbox.is-free #shipMsg svg{flex:none}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
   color:var(--color-green);margin:0}
 /* A member has one fact here and it is good news, so the box says so: tinted green,
@@ -980,6 +986,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
   const CHEV = '<svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>';
   const ICON_TRASH = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
     '<path d="M2.5 4h9M5.5 4V2.5h3V4M4 4l.6 8h4.8L10 4" stroke="currentColor" stroke-width="1"/></svg>';
+  const ICON_TICK = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
+    '<path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>';
   const ICON_OUT = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
     '<circle cx="7" cy="7" r="5.6" stroke="currentColor" stroke-width="1"/>'+
     '<path d="M4.4 9.6l5.2-5.2" stroke="currentColor" stroke-width="1"/></svg>';
@@ -1191,7 +1199,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#shipCard').classList.toggle('is-member', bag.member);
     $('#shipMsg').innerHTML = t.gap > 0
       ? '<strong style="font-weight:400">' + eur(t.gap) + '</strong> away from free shipping.'
-      : '<strong style="font-weight:400">Free shipping</strong> — unlocked.';
+      : ICON_TICK + '<span><strong style="font-weight:400">Free shipping</strong> — unlocked.</span>';
 
     const hint = $('#swipeHint');
     if (hint) hint.hidden = !window.matchMedia('(max-width:991px)').matches;
