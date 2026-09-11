@@ -250,9 +250,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
    notice rather than an error — and the plus stays out of reach at the ceiling */
 .stock--short{color:var(--color-buddha-ink)}
 .item.is-short [data-step="1"]{opacity:.3;pointer-events:none}
-/* a sold-out line is still readable, but the shot says it is not available */
+/* A sold-out line fades its PACKSHOT and nothing else: the name and the price stay at
+   full strength, because they are still the facts of the line (Amelie, 2026-09-11) —
+   the red note is what says it cannot be bought. */
 .item.is-out .item__img{opacity:.4}
-.item.is-out .item__name,.item.is-out .item__side{opacity:.55}
 
 /* the line price is a supporting figure, not the headline the product name is */
 .item__side .t-price{font-size:13px;line-height:18px}
