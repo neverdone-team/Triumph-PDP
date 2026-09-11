@@ -839,15 +839,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
           <a class="btn btn--wide" href="./checkout.html">Checkout</a>
         </div>
 
-        <!-- VAT and the returns promise are gone from here (Amelie, 2026-09-10); the
-             delivery date moved to the top of the order -->
-        <div class="trust t-body-s">
-          <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 6V4a4 4 0 018 0v2" stroke="currentColor" stroke-width="1"/><rect x="1.5" y="6" width="11" height="7" stroke="currentColor" stroke-width="1"/></svg> Secure, encrypted payment</span>
-        </div>
-
-        <!-- the field sits under the Checkout button and the secure-payment line, with the
-             payment marks closing the summary beneath it (Amelie, 2026-09-11); the code it
-             applies is stated up under the subtotal -->
+        <!-- straight under the Checkout button, then the secure-payment line, then the
+             payment marks (Amelie, 2026-09-11); the code it applies is stated up under
+             the subtotal -->
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
@@ -863,6 +857,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
               <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
             </div>
           </div>
+        </div>
+
+        <!-- VAT and the returns promise are gone from here (Amelie, 2026-09-10); the
+             delivery date moved to the top of the order -->
+        <div class="trust t-body-s">
+          <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 6V4a4 4 0 018 0v2" stroke="currentColor" stroke-width="1"/><rect x="1.5" y="6" width="11" height="7" stroke="currentColor" stroke-width="1"/></svg> Secure, encrypted payment</span>
         </div>
 
         <div class="paylogos">
