@@ -189,7 +189,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__fav{position:absolute;top:var(--space-8);right:var(--space-8);width:var(--control-28);height:var(--control-28);
   display:grid;place-items:center}
 .item__sub{display:block;color:var(--c-ink)}   /* the series is ink, not grey */
-.item__name{display:block;margin-top:var(--space-2)}
+.item__name{display:block;margin-top:var(--space-8)}
 .item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
 /* Size is editable in the bag — a native select styled as the chip it replaces. */
 .sizesel{position:relative;display:inline-flex;align-items:center}
@@ -321,7 +321,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* ---------------- summary ---------------- */
 /* white, not tinted — a hairline does the separating (Amelie, 2026-09-08) */
 .sum{background:var(--c-bg)}   /* the whole right column sticks, not the summary alone */
-.trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-6) 0}
+/* the figures need room to read as separate lines (Amelie, 2026-09-11) */
+.trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-10) 0}
 .trow--free [data-shipping]{color:var(--color-green)}
 .trow--grand{border-top:1px solid var(--c-edge);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
 /* what this order saves against the list prices — burgundy, the colour every member and
@@ -603,8 +604,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .item__media{grid-row:1 / -1;align-self:start;margin:0;aspect-ratio:auto}
   .item__img{width:128px;height:171px}
   /* the row order and the price layout are the base now; a phone only needs the name a
-     rung smaller and the shot pinned to the top */
-  .item__name{font-size:14px;line-height:20px}
+     rung smaller, tighter under the collection, and the shot pinned to the top */
+  .item__name{font-size:14px;line-height:20px;margin-top:var(--space-2)}
   .item__unit{white-space:nowrap}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
@@ -838,14 +839,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
           <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 6V4a4 4 0 018 0v2" stroke="currentColor" stroke-width="1"/><rect x="1.5" y="6" width="11" height="7" stroke="currentColor" stroke-width="1"/></svg> Secure, encrypted payment</span>
         </div>
 
-        <div class="paylogos">
-          <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#1A1F71"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#fff">VISA</text></svg>
-          <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="18" cy="10" r="6" fill="#F79E1B" fill-opacity=".85"/></svg>
-          <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-style="italic" font-weight="bold" fill="#003087">PayPal</text></svg>
-          <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#0B051D">Klarna</text></svg>
-        </div>
-        <!-- the field sits at the foot of the summary, under the payment marks (Amelie,
-             2026-09-11); the code it applies is stated up under the subtotal -->
+        <!-- the field sits under the Checkout button and the secure-payment line, with the
+             payment marks closing the summary beneath it (Amelie, 2026-09-11); the code it
+             applies is stated up under the subtotal -->
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
@@ -861,6 +857,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
               <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
             </div>
           </div>
+        </div>
+
+        <div class="paylogos">
+          <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#1A1F71"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#fff">VISA</text></svg>
+          <svg width="30" height="20" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="18" cy="10" r="6" fill="#F79E1B" fill-opacity=".85"/></svg>
+          <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-style="italic" font-weight="bold" fill="#003087">PayPal</text></svg>
+          <svg width="42" height="20" viewBox="0 0 42 20" aria-hidden="true"><rect width="42" height="20" fill="#fff" stroke="rgba(0,0,0,.1)"/><text x="4" y="14" font-family="Helvetica,Arial" font-size="9" font-weight="bold" fill="#0B051D">Klarna</text></svg>
         </div>
       </aside>
      </div><!-- /.cart__right -->
