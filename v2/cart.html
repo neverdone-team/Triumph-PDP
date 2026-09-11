@@ -335,14 +335,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .cart__express .express{margin-top:var(--space-12)}
 /* Outlined express buttons: white ground, hairline border, brand wordmark in its own colour —
    the outlined variant each provider permits, and no coloured blocks in a monochrome page. */
-.xbtn{height:var(--control-48);display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--c-edge);background:var(--c-bg);
-  transition:border-color .15s var(--ease-out), background .15s var(--ease-out)}
-.xbtn:hover{border-color:var(--c-ink);background:var(--c-wash)}
+/* the secondary button's clothes — 1px ink, 56 tall — with the brand mark inside
+   (Amelie, 2026-09-11) */
+.xbtn{height:var(--control-56);display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--c-ink);background:var(--c-bg);
+  transition:background .15s var(--ease-out)}
+.xbtn:hover{background:var(--c-wash)}
 .or{display:flex;align-items:center;gap:var(--space-12);margin:var(--space-16) 0 0;color:var(--c-ink-soft)}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--c-edge)}
 
-.acc{border-top:1px solid var(--c-hair);margin-top:var(--space-12)}
+.acc{margin-top:var(--space-20)}   /* no rule above it (Amelie, 2026-09-11) */
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-14,14px) 0}
 /* a plus, not a chevron: it adds a code rather than revealing more of the summary */
 .acc__plus{position:relative;width:12px;height:12px;flex:none}

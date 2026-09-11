@@ -167,7 +167,7 @@ body{background-image:none}
    ============================================================ */
 .express{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8)}
 .xbtn{
-  height:var(--control-56); border:1px solid var(--c-edge); background:var(--c-bg);
+  height:var(--control-56); border:1px solid var(--c-ink); background:var(--c-bg);
   display:flex;align-items:center;justify-content:center;
   transition:border-color .15s var(--ease-out), background .15s var(--ease-out);
 }
@@ -461,6 +461,9 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* the panel's text lines up with the brand mark above it — radio (24) + the row's gap
    (16) is where that column starts (Amelie, 2026-09-10) */
 #payList .opt__panel{padding-left:calc(24px + var(--space-16))}
+/* a phone has no width to give away: the fields run to the left edge, flush with the
+   radio above them (Amelie, 2026-09-11) */
+@media (max-width:575px){ #payList .opt__panel{padding-left:0} }
 #payList .opt__body{order:0}
 
 /* the review is a read-out, so the rail's lines drop their Remove there */
@@ -472,7 +475,11 @@ body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
    the reserved band the rhythm changed depending on which fields happened to carry a
    hint (Amelie, 2026-09-11). */
 #gateReg .field,#addrForm .field,#billing .field{padding-bottom:24px;margin-bottom:0}
-#gateReg .grid,#addrForm,#addrForm .grid,#billing .grid{gap:var(--space-4)}
+/* 4px down the column keeps the painted gap at the login's 34; across a row there is no
+   supporting band in between, so the gutter is a real 12 (Amelie, 2026-09-11) */
+#gateReg .grid,#addrForm,#addrForm .grid,#billing .grid{row-gap:var(--space-4);column-gap:var(--space-12)}
+/* the "add address line 2" link needs room under it, or the next field crowds it */
+#addrForm > .t-link-s{margin-bottom:var(--space-12)}
 
 .field--dob{max-width:none}      /* the mask is short, the field is not (Amelie, 2026-09-10) */
 .field--half{max-width:50%}
