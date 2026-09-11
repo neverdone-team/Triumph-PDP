@@ -102,8 +102,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
    can order them freely. */
 .cart{display:grid;grid-template-columns:minmax(0,1fr) 400px;align-items:start;
   margin-top:var(--space-32)}
+/* The product column is deliberately narrower than the space it has: 160 of right
+   padding puts 240px of gutter between the last product and the summary, and pulls the
+   line's price back towards its name instead of stranding it at the far edge
+   (Amelie, 2026-09-11). */
 .cart__left{min-width:0;display:flex;flex-direction:column;gap:var(--space-24);
-  padding-right:var(--space-64)}
+  padding-right:calc(var(--space-64) + var(--space-64) + var(--space-32))}
 /* No rule between the columns here (Amelie, 2026-09-10) — the bag is one list with its
    total beside it, and 144px of gutter separates them well enough. The checkout keeps its
    hairline, where the rail really is a second surface. */
