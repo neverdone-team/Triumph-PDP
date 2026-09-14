@@ -760,6 +760,8 @@ body[data-mode="steps"] .place.is-last{display:block}
 .li__acts{grid-column:2 / -1;display:flex;align-items:center;gap:var(--space-16)}
 .li__price{text-align:right;display:flex;flex-direction:column;align-items:flex-end;
   gap:var(--space-2);padding-left:var(--space-32)}
+.li__pricerow{display:flex;align-items:baseline;gap:var(--space-8)}
+.li__unit{white-space:nowrap}
 
 /* In the rail the row is barely 390px across, and three columns put both the product
    name and the figure onto two lines each. There — and only there — everything sits
@@ -1934,13 +1936,15 @@ body[data-mode="onepage"] .ck__rail{position:static;
           (meta ? '<span class="li__meta t-body-s">' + esc(meta) + '</span>' : '') +
         '</span>' +
         '<span class="li__price' + (member && l.member ? ' li__price--member' : '') + '">' +
-          '<span class="t-price">' + eur(charged * l.qty) + '</span>' +
+          /* the charged figure and what one of them costs share a line — the quantity is
+             already stated by the stepper under it (Amelie, 2026-09-14) */
+          '<span class="li__pricerow">' +
+            '<span class="t-price">' + eur(charged * l.qty) + '</span>' +
+            (l.qty > 1 ? '<span class="li__unit t-price-note muted">' + eur(charged) + ' each</span>' : '') +
+          '</span>' +
           // a member is charged the member price, so that IS the price — showing the
           // standard one beside it would only be noise at this point in the flow
           (member && l.member ? '<span class="t-price-s li__member">member price</span>' : '') +
-          // one of something is its own unit price — the second line only earns its place
-          // once the quantity changes what the line total means
-          (l.qty > 1 ? '<span class="t-price-note muted">' + l.qty + ' × ' + eur(charged) + '</span>' : '') +
         '</span>' +
         /* no Remove: at a quantity of one the minus removes the line, which is the
            only control this list needs (Amelie, 2026-09-14) */
