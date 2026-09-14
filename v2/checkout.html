@@ -817,8 +817,10 @@ body[data-mode="steps"] .place.is-last{display:block}
 .trow--code{align-items:flex-start}
 .dcode{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
 .dcode__line{display:flex;align-items:baseline;gap:var(--space-8);flex-wrap:wrap}
-.dcode__x{color:var(--c-ink-soft);align-self:flex-start}
-.dcode__x:hover{color:var(--c-ink)}
+/* the remove link follows the discount it undoes, on the same line and in ink — under
+   it, in grey, it read as a second row of the summary (Amelie, 2026-09-14) */
+.dcode__x{color:var(--c-ink)}
+.dcode__x:hover{opacity:.6}
 .trow--code .t-price{color:var(--color-green)}
 .voucher{display:flex;align-items:flex-end;gap:var(--space-8);margin:0 0 var(--space-12)}
 .voucher .field{flex:1;--ctl:var(--control-44)}
@@ -1724,8 +1726,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <span class="dcode__line">
             <span class="t-body-m" data-voucher-name>CODE</span>
             <span class="muted t-body-s">10% off</span>
+            <button class="t-link-s dcode__x" type="button" id="voucherClear">remove</button>
           </span>
-          <button class="t-link-s dcode__x" type="button" id="voucherClear">remove</button>
         </span>
         <span class="t-price" data-discount>−€10.99</span>
       </div>
