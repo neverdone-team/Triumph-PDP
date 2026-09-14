@@ -813,7 +813,6 @@ body[data-mode="steps"] .place.is-last{display:block}
   .ck__rail .li__acts{margin-top:var(--space-12)}
   body[data-mode="onepage"] .ck__rail{padding-top:var(--space-24)}
   body[data-mode="onepage"] .ck__rail #railItems{padding-top:var(--space-20)}
-  body[data-mode="onepage"] .ck__rail .rail__dhead{margin-top:var(--space-32)}
 }
 /* the block above has to follow the .ck__rail rules it overrides: at equal specificity
    the later rule wins whatever the media query says, and the 128px packshot was
@@ -1077,7 +1076,10 @@ body[data-mode="steps"] .place.is-last{display:block}
   /* moved out of the form column on one screen, the list needs an order of its own or
      it falls to 0 and lands above everything — and the gutters and the clearance the
      column used to give it (Amelie, 2026-09-14) */
-  .ck > .review__items{order:3;padding:0 var(--space-16)
+  /* the summary ends with its three assurances, and the order list is a new block
+     under it: it needs real air between them, not the rail's own bottom padding
+     (Amelie, 2026-09-14) */
+  .ck > .review__items{order:3;padding:var(--space-48) var(--space-16)
     calc(120px + env(safe-area-inset-bottom))}
   /* the rail is no longer the last thing on the page: the order list under it carries
      the sticky bar's clearance instead */
