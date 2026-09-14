@@ -569,44 +569,73 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 /* ---------------- quick shop ----------------
    A real dialog, unlike the mini cart: choosing a size is a task, so the page behind it
-   is covered and inert. */
+   is covered and inert. The shape is the PDP's own Add to cart dialog — one image, the
+   price, the colourways, the two size bands (Amelie, 2026-09-14). */
 .qs{position:fixed;inset:0;z-index:130}
 .qs__scrim{position:absolute;inset:0;background:rgba(0,0,0,.38);opacity:0;
   transition:opacity .24s var(--ease-out)}
 .qs[data-open="true"] .qs__scrim{opacity:1}
 .qs__panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);
-  width:min(680px,calc(100vw - 32px));max-height:min(86vh,720px);overflow:auto;
-  background:var(--c-bg);padding:var(--space-32);
+  width:min(880px,calc(100vw - 48px));max-height:min(88vh,760px);overflow:auto;
+  background:var(--c-bg);padding:var(--space-24) var(--space-32) var(--space-32);
   opacity:0;transition:opacity .24s var(--ease-out), transform .24s var(--ease-out)}
 .qs[data-open="true"] .qs__panel{opacity:1;transform:translate(-50%,-50%)}
-.qs__x{position:absolute;top:var(--space-16);right:var(--space-16);
-  width:var(--control-32);height:var(--control-32);display:grid;place-items:center}
-.qs__body{display:grid;grid-template-columns:220px minmax(0,1fr);gap:var(--space-32)}
-.qs__media{aspect-ratio:3/4;background:var(--c-grey-light)}
+.qs__grab{display:none}
+.qs__head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);
+  padding-bottom:var(--space-20);border-bottom:1px solid var(--c-hair);
+  margin-bottom:var(--space-32)}
+.qs__title{margin:0}
+.qs__x{width:var(--control-32);height:var(--control-32);display:grid;place-items:center;
+  flex:none;margin-right:calc(var(--space-8) * -1)}
+
+/* one image, and everything that can be chosen beside it */
+.qs__body{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);
+  column-gap:var(--space-40);row-gap:var(--space-24);align-items:start}
+.qs__media{grid-column:1;grid-row:1 / span 2;aspect-ratio:3/4;background:var(--c-grey-light)}
 .qs__media img{width:100%;height:100%;object-fit:cover;display:block}
-.qs__info{display:flex;flex-direction:column;gap:var(--space-8);min-width:0}
-.qs__info .t-title-m{margin:0}
-.qs__label{margin:var(--space-16) 0 0;color:var(--c-grey-medium)}
-/* two bands, each on its own line: an underbust and a cup are two decisions */
-#qsColour{display:block;margin:var(--space-12) 0 0}
-.qs__colours{position:static;display:flex;flex-wrap:wrap;gap:var(--space-6);
-  padding:0;background:none;border:0;box-shadow:none;width:auto;max-width:none;margin-top:var(--space-6)}
-.qs__band{margin:var(--space-12) 0 0}
-.qs__bandlabel{display:block;color:var(--c-grey-medium);margin-bottom:var(--space-6)}
-.qs__sizes{display:flex;flex-wrap:wrap;gap:var(--space-8);margin:0 0 var(--space-8)}
-.qs__sizes button{height:var(--control-40);min-width:var(--control-44);padding:0 var(--space-10);
+.qs__meta{grid-column:2;grid-row:1;min-width:0}
+.qs__name{margin:var(--space-2) 0 var(--space-10)}
+.qs__price{margin:0;display:flex;align-items:baseline;gap:var(--space-8)}
+.qs__opts{grid-column:2;grid-row:2;min-width:0}
+
+/* the colourways carry the chosen colour's name as their label, as the PDP does */
+.qs__colours{position:static;display:flex;flex-wrap:wrap;gap:var(--space-8);
+  padding:0;background:none;border:0;box-shadow:none;width:auto;max-width:none;
+  margin-top:var(--space-8)}
+.qs__band{margin:var(--space-24) 0 0}
+/* the colour block leads, so it carries no top margin; every band after it does */
+#qsColour .qs__band{margin-top:0}
+.qs__bandlabel{display:block;color:var(--c-ink);margin-bottom:var(--space-8)}
+/* five to a row, equal width — the PDP's grid, not a wrapping row of chips */
+.qs__sizes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-8)}
+.qs__sizes button{height:var(--control-40);width:100%;padding:0 var(--space-6);
   box-shadow:inset 0 0 0 1px var(--c-edge);background:var(--c-bg);
-  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+  font-weight:300;font-size:13px;line-height:18px;letter-spacing:.04em;
+  transition:box-shadow .12s var(--ease-out), background .12s var(--ease-out)}
 .qs__sizes button:hover{box-shadow:inset 0 0 0 1px var(--c-ink)}
 .qs__sizes button[data-on="true"]{background:var(--c-ink);color:var(--c-on-dark);box-shadow:none}
 .qs__sizes button[disabled]{opacity:.35;text-decoration:line-through;pointer-events:none}
-.qs__hint{color:var(--color-error)}
-.qs__more{margin-top:var(--space-12);text-align:center}
-@media (max-width:575px){
-  .qs__panel{left:0;right:0;bottom:0;top:auto;transform:translateY(12px);
-    width:100%;max-width:none;border-radius:16px 16px 0 0;max-height:90vh;padding:var(--space-20)}
+.qs__hint{color:var(--color-error);margin-top:var(--space-12)}
+.qs__cta{margin-top:var(--space-32)}
+
+@media (max-width:767px){
+  /* a bottom sheet with a grab handle: the image and the price sit side by side, and
+     everything that can be chosen runs the full width under them */
+  .qs__panel{left:0;right:0;bottom:0;top:auto;transform:translateY(16px);
+    width:100%;max-width:none;border-radius:16px 16px 0 0;max-height:92vh;
+    padding:var(--space-8) var(--space-16) 0}
   .qs[data-open="true"] .qs__panel{transform:none}
-  .qs__body{grid-template-columns:112px minmax(0,1fr);gap:var(--space-16)}
+  .qs__grab{display:block;width:44px;height:4px;border-radius:2px;background:var(--c-edge);
+    margin:var(--space-4) auto var(--space-12)}
+  .qs__head{margin-bottom:var(--space-20)}
+  .qs__body{grid-template-columns:120px minmax(0,1fr);column-gap:var(--space-16);
+    row-gap:var(--space-24)}
+  .qs__media{grid-column:1;grid-row:1;aspect-ratio:3/4}
+  .qs__meta{grid-column:2;grid-row:1;align-self:center}
+  .qs__opts{grid-column:1 / -1;grid-row:2}
+  /* the call to action stays on screen while the bands are scrolled */
+  .qs__cta{position:sticky;bottom:0;background:var(--c-bg);
+    margin-top:var(--space-24);padding:var(--space-12) 0 var(--space-16)}
 }
 
 /* ---------------- undo bar ----------------
@@ -1028,26 +1057,34 @@ h1,h2,h3,p{margin:0;font-weight:400}
      The + on a cross-sell card opens this rather than adding blind: the size is chosen
      here, the way the live site's quick shop works, and only then does it join the bag
      (Amelie, 2026-09-10). -->
+<!-- Quick shop — the PDP's Add to cart dialog (Figma 1582:29018) on desktop and its
+     bottom sheet (637:5987) on a phone: one image, the price, the colourways and the two
+     size bands. Nothing else (Amelie, 2026-09-14). -->
 <div class="qs" id="qs" data-open="false" hidden>
   <div class="qs__scrim" data-qs-close></div>
   <div class="qs__panel" role="dialog" aria-modal="true" aria-labelledby="qsName">
-    <button class="qs__x" type="button" aria-label="Close" data-qs-close>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1"/></svg>
-    </button>
+    <span class="qs__grab" aria-hidden="true"></span>
+    <div class="qs__head">
+      <h2 class="qs__title t-title-s" id="qsTitle">Add to cart</h2>
+      <button class="qs__x" type="button" aria-label="Close" data-qs-close>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+    </div>
     <div class="qs__body">
       <div class="qs__media"><img id="qsImg" src="" alt="" /></div>
-      <div class="qs__info">
-        <span class="t-body-s muted" id="qsSeries">Series</span>
-        <h2 class="t-title-m" id="qsName">Product</h2>
-        <span class="t-price" id="qsPrice">€0.00</span>
-        <p class="t-body-s muted" id="qsColour">Colour: Black</p>
-
-        <p class="qs__label t-label-s" id="qsSizeLabel">Select a size</p>
-        <div class="qs__sizes" id="qsSizes"></div>
+      <div class="qs__meta">
+        <span class="t-body-s" id="qsSeries">Series</span>
+        <h3 class="qs__name t-title-m" id="qsName">Product</h3>
+        <p class="qs__price">
+          <span class="t-price" id="qsPrice">&euro;0.00</span>
+          <span class="qs__vat t-body-s muted">incl. VAT</span>
+        </p>
+      </div>
+      <div class="qs__opts">
+        <div id="qsColour"></div>
+        <div id="qsSizes"></div>
         <p class="qs__hint t-body-s" id="qsHint" hidden>Choose a size first.</p>
-
-        <button class="btn btn--wide" type="button" id="qsAdd">Add to bag</button>
-        <p class="qs__more"><a class="t-link-s" href="./pdp.html" id="qsMore">See full product details</a></p>
+        <div class="qs__cta"><button class="btn btn--wide" type="button" id="qsAdd">Add to cart</button></div>
       </div>
     </div>
   </div>
@@ -1556,8 +1593,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   /* A bra size is two decisions, so it is shown as two bands rather than a 49-item list —
      the PDP asks for it the same way (Amelie, 2026-09-14). */
-  const BANDS = [70, 75, 80, 85, 90, 95, 100];
-  const CUPS  = ['A','B','C','D','E','F','G'];
+  /* the PDP's own sets (Figma 1582:29018): five to a row, 70 through 110 and A through H */
+  const BANDS = [70, 75, 80, 85, 90, 100, 105, 110];
+  const CUPS  = ['A','B','C','D','E','F','G','H'];
   const splitSize = sz => {
     const m = /^(\d+)([A-H])$/.exec(sz || '');
     return m ? { band: m[1], cup: m[2] } : null;
@@ -1570,11 +1608,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
           '<button type="button" data-qs-size="'+sz+'"'+(OUT_OF_STOCK[sz] ? ' disabled' : '')+
             (sz === current ? ' data-on="true"' : '')+'>'+sz+'</button>').join('') +'</div></div>';
     }
-    const band = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Underbust</span>'+
+    const band = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Underbust size</span>'+
       '<div class="qs__sizes">'+ BANDS.map(b =>
         '<button type="button" data-qs-band="'+b+'"'+(String(b) === cur.band ? ' data-on="true"' : '')+
           '>'+b+'</button>').join('') +'</div></div>';
-    const cups = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Cup</span>'+
+    const cups = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Cup size</span>'+
       '<div class="qs__sizes">'+ CUPS.map(c =>
         '<button type="button" data-qs-cup="'+c+'"'+(c === cur.cup ? ' data-on="true"' : '')+
           '>'+c+'</button>').join('') +'</div></div>';
@@ -1601,16 +1639,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#qsName').textContent = qsData.name;
     $('#qsPrice').textContent = eur(Number(qsData.price));
     /* the colourways live in the dialog now, so Change covers colour as well as size */
-    $('#qsColour').innerHTML = '<span class="qs__bandlabel t-label-s">Colour</span>'+
+    $('#qsColour').innerHTML = '<div class="qs__band">'+
+      '<span class="qs__bandlabel t-label-s" id="qsColourName">'+esc(qsData.colour || 'Colour')+'</span>'+
       '<span class="colours qs__colours">'+
         '<button class="cthumb cthumb--current" type="button" data-qs-colour="'+esc(qsData.colour)+'"'+
           ' title="'+esc(qsData.colour)+'" data-sel="true"><img src="'+esc(qsData.img || '')+'" alt="" /></button>'+
         COLOURWAYS.filter(c => c.name !== qsData.colour).map(c =>
           '<button class="cthumb" type="button" data-qs-colour="'+esc(c.name)+'" title="'+esc(c.name)+'">'+
             '<img src="'+esc(c.sw)+'" alt="" /></button>').join('')+
-      '</span>';
-    $('#qsSizeLabel').textContent = qsMode === 'size' ? 'Change size' : 'Select your size';
-    $('#qsAdd').textContent = qsMode === 'size' ? 'Update' : 'Add to bag';
+      '</span></div>';
+    $('#qsTitle').textContent = qsMode === 'size' ? 'Change size or colour' : 'Add to cart';
+    $('#qsAdd').textContent = qsMode === 'size' ? 'Update' : 'Add to cart';
     paintQsGrid();
     $('#qsHint').hidden = true;
 
@@ -1637,6 +1676,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     if (!c) return;
     qsColour = c.dataset.qsColour;
     $$('#qsColour .cthumb').forEach(o => { if (o === c) o.dataset.sel = 'true'; else delete o.dataset.sel; });
+    const nameEl = $('#qsColourName');
+    if (nameEl) nameEl.textContent = qsColour;
   });
 
   $('#qsSizes').addEventListener('click', e => {
