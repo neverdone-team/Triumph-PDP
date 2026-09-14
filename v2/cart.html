@@ -90,7 +90,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .hd__count{position:absolute;left:100%;bottom:100%;transform:translate(-6px,6px);line-height:1}
 
 /* ---------------- page ---------------- */
-.wrap{max-width:1400px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
+/* the same measure the checkout's columns sit in, so the bag and every step of the
+   checkout line up (Amelie, 2026-09-14) */
+.wrap{max-width:1280px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
 .pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
 /* the count is part of the title, in brackets after it (Amelie, 2026-09-14) */
 .pagehead__n{font-weight:inherit;color:var(--c-ink-soft)}
@@ -172,8 +174,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
    (Amelie, 2026-09-14). */
 .statusbox.is-free,.statusbox.is-member{align-content:center;min-height:54px;
   padding:var(--space-16) var(--space-20)}
-.statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
-.statusbox.is-free #shipMsg svg{flex:none}
+.statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:0}
+.statusbox.is-free #shipMsg svg{flex:none;margin-left:var(--space-6)}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
   color:var(--color-green);margin:0}
 /* A member has one fact here and it is good news, so the box says so: tinted green,
@@ -760,6 +762,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 /* ---------------- prototype switcher ---------------- */
 .dash{position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-12) var(--space-16)}
+.dash{user-select:none}
+.dash__grab{display:flex;align-items:center;gap:var(--space-8);cursor:grab;
+  margin:calc(var(--space-4) * -1) 0 var(--space-8);padding:var(--space-4) 0;opacity:.6}
+.dash__grab::before{content:"";width:22px;height:2px;background:currentColor;flex:none}
+.dash.is-dragging,.dash.is-dragging .dash__grab{cursor:grabbing}
 .dash h4{margin:0 0 var(--space-8);font-weight:400;font-size:10px;line-height:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
 .dash__row{display:flex;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-10)}
 .dash button{border:1px solid rgba(255,255,255,.3);padding:var(--space-6) var(--space-8);font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
@@ -883,12 +890,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   <!-- ======================= EMPTY STATE ======================= -->
   <section class="empty" id="emptyState" hidden>
-    <!-- Triumph's own shopping-bag mark, lifted from the live site's icon font
-         (icon-shopping-bag, U+E908). The glyph is drawn y-up, so it is flipped —
-         the same treatment the checkout's van and crown get (Amelie, 2026-09-14). -->
-    <svg class="empty__icon" width="56" height="56" viewBox="0 -960 980 1024"
-         fill="currentColor" aria-hidden="true">
-      <path transform="scale(1,-1)" d="M511 938Q440 925 386.5 879.0Q333 833 311 767L310 766L304 748L126 747V418Q126 211 126.5 148.0Q127 85 129 78Q136 46 160.5 20.0Q185 -6 217 -16L230 -20H876L890 -16Q905 -10 917.0 -3.0Q929 4 941 16Q955 30 965.0 48.5Q975 67 978 88Q978 91 978 116Q979 140 979.0 183.0Q979 226 979 287Q980 348 980 424V747H801L795 765Q773 833 717.5 880.0Q662 927 591 938Q576 940 550.5 940.0Q525 940 511 938ZM597 850Q632 840 660.0 817.0Q688 794 704 762L711 748L553 747Q488 747 441.5 747.0Q395 747 395 747Q394 748 399.5 759.5Q405 771 411 780Q428 804 451.5 822.0Q475 840 504 848L505 849Q520 853 527.0 854.0Q534 855 557 854Q573 854 581.0 853.0Q589 852 597 850ZM297 604Q297 578 297.5 560.5Q298 543 299 540Q302 528 312.5 521.5Q323 515 338 515Q349 515 357.0 517.5Q365 520 370 525Q378 533 379.5 543.0Q381 553 382 602V661H724V604Q724 579 724.5 561.0Q725 543 725 540Q729 528 739.0 521.5Q749 515 764 515Q776 515 783.5 517.5Q791 520 797 525Q805 533 806.5 543.0Q808 553 809 602V661H894V379Q893 168 892.5 131.5Q892 95 890 89Q886 81 880.0 75.5Q874 70 866 67Q860 65 810.5 64.5Q761 64 549 64Q333 65 286.0 65.5Q239 66 235 68Q229 72 223.5 77.5Q218 83 215 89V90Q213 95 212.5 136.0Q212 177 212 379V661H297V604Z"/>
+    <!-- the same silhouette as Triumph's icon-shopping-bag, drawn as a 1.25px stroke:
+         the icomoon glyph is a filled shape, so a thinner mark had to be drawn rather
+         than restyled (Amelie, 2026-09-14) -->
+    <svg class="empty__icon" width="52" height="56" viewBox="0 0 40 44" fill="none"
+         stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+      <path d="M2.6 11.6h34.8v28.2a2.6 2.6 0 0 1-2.6 2.6H5.2a2.6 2.6 0 0 1-2.6-2.6V11.6Z"/>
+      <path d="M13.2 16.4v-7.2a6.8 6.8 0 0 1 13.6 0v7.2"/>
     </svg>
     <h1 class="t-title-l">Your bag is empty</h1>
     <p class="t-body-m">Nothing chosen yet. Start with the bestsellers — or find your fit with the bra size calculator.</p>
@@ -995,24 +1003,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
      </div><!-- /.cart__left -->
 
      <div class="cart__right">
-      <!-- ------------ express payment ------------ -->
-      <!-- Above the summary on desktop, and first thing on the page on a phone: someone
-           paying with a wallet should not have to read the summary to find it. -->
-      <div class="cart__express">
-        <p class="or t-label-m">express checkout</p>
-        <div class="express">
-            <button class="xbtn xbtn--paypal" type="button" aria-label="Pay with PayPal">
-              <svg width="47" height="15" viewBox="0 1 46.6 15" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="26" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
-            </button>
-            <button class="xbtn xbtn--apple" type="button" aria-label="Pay with Apple Pay">
-              <svg width="37" height="15" viewBox="3.1 1.7 41 16.7" aria-hidden="true"><path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/><text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text></svg>
-            </button>
-            <button class="xbtn xbtn--klarna" type="button" aria-label="Pay with Klarna">
-              <svg width="37" height="14" viewBox="0 2 37.4 14" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="12" font-weight="bold" fill="#0B051D">Klarna</text></svg>
-            </button>
-        </div>
-      </div>
-
       <!-- ------------ summary ------------ -->
       <aside class="sum" aria-label="Summary">
         <h2 class="t-title-m" style="margin-bottom:var(--space-16)">Summary</h2>
@@ -1046,18 +1036,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
           </span>
         </p>
 
-        <div class="trow trow--grand">
-          <span class="t-title-m">Total</span>
-          <span class="grand__num" data-total>€0.00</span>
-        </div>
-
-        <div class="sum__cta">
-          <a class="btn btn--wide" href="./checkout.html">Checkout</a>
-        </div>
-
-        <!-- straight under the Checkout button, then the secure-payment line, then the
-             payment marks (Amelie, 2026-09-11); the code it applies is stated up under
-             the subtotal -->
+        <!-- above the total it changes, as the checkout's summary has it (Amelie,
+             2026-09-14) -->
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
@@ -1077,6 +1057,32 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
         <!-- VAT and the returns promise are gone from here (Amelie, 2026-09-10); the
              delivery date moved to the top of the order -->
+        <div class="trow trow--grand">
+          <span class="t-title-m">Total</span>
+          <span class="grand__num" data-total>€0.00</span>
+        </div>
+
+        <div class="sum__cta">
+          <a class="btn btn--wide" href="./checkout.html">Checkout</a>
+        </div>
+
+        <!-- the wallets sit under the button they are an alternative to (Amelie,
+             2026-09-14) -->
+      <div class="cart__express">
+        <p class="or t-label-m">express checkout</p>
+        <div class="express">
+            <button class="xbtn xbtn--paypal" type="button" aria-label="Pay with PayPal">
+              <svg width="47" height="15" viewBox="0 1 46.6 15" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="26" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
+            </button>
+            <button class="xbtn xbtn--apple" type="button" aria-label="Pay with Apple Pay">
+              <svg width="37" height="15" viewBox="3.1 1.7 41 16.7" aria-hidden="true"><path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/><text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text></svg>
+            </button>
+            <button class="xbtn xbtn--klarna" type="button" aria-label="Pay with Klarna">
+              <svg width="37" height="14" viewBox="0 2 37.4 14" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="12" font-weight="bold" fill="#0B051D">Klarna</text></svg>
+            </button>
+        </div>
+      </div>
+
         <!-- no icon, set in caps like the PDP's benefits line (Amelie, 2026-09-14) -->
         <div class="trust">
           <span>Secure, encrypted payment</span>
@@ -1152,6 +1158,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 </div>
 
 <div class="dash" id="dash">
+  <div class="dash__grab" id="dashGrab" title="Drag to move">
+    <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">drag</span>
+  </div>
   <h4>Prototype · Bag</h4>
   <div class="dash__row">
     <button data-cart-set="filled" aria-pressed="true">Sample bag</button>
@@ -1503,7 +1512,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#shipCard').classList.toggle('is-member', bag.member);
     $('#shipMsg').innerHTML = t.gap > 0
       ? '<strong style="font-weight:400">' + eur(t.gap) + '</strong> away from free shipping.'
-      : ICON_TICK + '<span><strong style="font-weight:400">Free shipping</strong> — unlocked.</span>';
+      : '<span><strong style="font-weight:400">Free shipping</strong> — unlocked.</span>' + ICON_TICK;
 
     syncDash();
   }
@@ -1886,6 +1895,50 @@ h1,h2,h3,p{margin:0;font-weight:400}
   Shop.onChange(render);
   render();
 })();
+
+  /* ---------- the switcher can be dragged ----------
+     It is a prototype device that sits over the page, so it has to be movable when it
+     covers the thing being looked at (Amelie, 2026-09-14). */
+  (function dragDash(){
+    const dash = document.getElementById('dash');
+    const grab = document.getElementById('dashGrab');
+    if (!dash || !grab) return;
+    let dx = 0, dy = 0;
+    const place = (x, y) => {
+      const w = dash.offsetWidth, h = dash.offsetHeight;
+      x = Math.min(Math.max(8, x), innerWidth - w - 8);
+      y = Math.min(Math.max(8, y), innerHeight - h - 8);
+      dash.style.left = x + 'px';
+      dash.style.top = y + 'px';
+      dash.style.right = 'auto';
+      dash.style.bottom = 'auto';
+    };
+    const move = e => {
+      const p = e.touches ? e.touches[0] : e;
+      place(p.clientX - dx, p.clientY - dy);
+      if (e.cancelable) e.preventDefault();
+    };
+    const up = () => {
+      dash.classList.remove('is-dragging');
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', up);
+    };
+    const down = e => {
+      const p = e.touches ? e.touches[0] : e;
+      const r = dash.getBoundingClientRect();
+      dx = p.clientX - r.left; dy = p.clientY - r.top;
+      place(r.left, r.top);                 // pin it before switching to left/top
+      dash.classList.add('is-dragging');
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+      document.addEventListener('touchmove', move, { passive:false });
+      document.addEventListener('touchend', up);
+    };
+    grab.addEventListener('mousedown', down);
+    grab.addEventListener('touchstart', down, { passive:true });
+  })();
 </script>
 </body>
 </html>
