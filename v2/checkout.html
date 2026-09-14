@@ -435,9 +435,11 @@ body[data-mode="onepage"] .ck__rail .promise{order:2}
 body[data-mode="onepage"] .ck__rail .totals{order:3}
 /* the opt-in lands between the total and the button in the ordered rail — without an
    order of its own it would sit at 0, above the heading (Amelie, 2026-09-14) */
-body[data-mode="onepage"] .ck__rail .review__news{order:4}
+/* the three assurances belong to the button they sit above; the opt-in is the one
+   optional thing here, so it goes under it (Amelie, 2026-09-14) */
+body[data-mode="onepage"] .ck__rail .trust{order:4;margin-top:var(--space-24)}
 body[data-mode="onepage"] .ck__rail .place{order:5}
-body[data-mode="onepage"] .ck__rail .trust{order:6;margin-top:var(--space-24)}
+body[data-mode="onepage"] .ck__rail .review__news{order:6}
 /* the same block shape as Order summary above it: the heading, 32px, then the rule the
    content starts under — the stroke above it was separating the heading from nothing
    (Amelie, 2026-09-14) */
@@ -659,9 +661,8 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review__news{margin-top:var(--space-24)}
 /* in the rail it is a row of the summary, not a line of the form */
 .ck__rail .review__news{margin:var(--space-24) 0 0}
-/* the opt-in is the last thing agreed to before the button, so it sits against it
-   rather than 48px away (Amelie, 2026-09-14) */
-.ck__rail .review__news + .place{margin-top:var(--space-16)}
+.ck__rail .trust + .place{margin-top:var(--space-24)}
+
 .review__items{margin-top:var(--space-64)}
 .review__items .sec__head{margin-bottom:var(--space-24);
   padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair)}
@@ -2422,6 +2423,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
   const RAIL_ITEMS = RAIL && $('#railItems', RAIL);
   const PLACE_EL = $('.place');
   const NEWS_EL = $('.review__news');
+  /* scoped to the real rail for the same reason the list is: the drawer's clone carries
+     the same classes and sits earlier in the DOM */
+  const TRUST_EL = RAIL && $('.trust', RAIL);
   const STORE_NAME = $('#storeName');
 
   /* ---------- collect in store ----------
@@ -2494,14 +2498,18 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const items = RAIL_ITEMS, place = PLACE_EL, news = NEWS_EL;
     const box = $('#reviewItems'), rail = RAIL, totals = RAIL && $('.totals', RAIL);
     if (!items || !box || !rail) return;
-    park(items); park(place); park(news); park(box);
+    park(items); park(place); park(news); park(box); park(TRUST_EL);
     if (on) {
       box.hidden = false;
       box.appendChild(items);
       reveal(items, '.li');
       /* the opt-in is the last thing agreed to before the order is placed, so it sits
          immediately above the button (Amelie, 2026-09-14) */
-      if (place && totals) { totals.after(place); if (news) place.before(news); }
+      if (place && totals) {
+        totals.after(place);
+        if (TRUST_EL) place.before(TRUST_EL);
+        if (news) place.after(news);
+      }
       /* On one column the figures come first and the list that explains them second —
          the other way round the summary read as a second, unrelated block (Amelie,
          2026-09-14). On two columns the list stays in its own column. */
@@ -2513,6 +2521,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       goHome(place);
       goHome(news);
       goHome(box);
+      goHome(TRUST_EL);
     }
   }
   /* the two columns become one and back again as the window is resized */
