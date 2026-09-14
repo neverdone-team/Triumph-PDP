@@ -155,7 +155,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
    link in white inside it. It sits in the summary, under Shipping, where the figure it
    would change is (Amelie, 2026-09-10). */
-.joinrow{margin:var(--space-16) 0 0}
+/* tight to the Shipping row it changes, and well clear of the total's rule below
+   (Amelie, 2026-09-14) */
+.joinrow{margin:var(--space-6) 0 var(--space-24)}
 /* a full-width flag with its text centred, and Regular throughout — it is an offer, not
    a footnote (Amelie, 2026-09-10) */
 .joinbadge{display:flex;width:100%;align-items:center;justify-content:center;gap:var(--space-8);
@@ -354,9 +356,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the applied code: name and rate on one line, the remove link under them, the figure
    in green on the right */
 .trow--code{align-items:flex-start}
-.dcode{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
-.dcode__line{display:flex;align-items:baseline;gap:var(--space-8);flex-wrap:wrap}
-.dcode__x{color:var(--c-ink-soft);align-self:flex-start}
+.dcode{display:flex;align-items:baseline;gap:var(--space-12);flex-wrap:wrap;min-width:0}
+.dcode__line{display:flex;align-items:baseline;gap:var(--space-8)}
+.dcode__x{color:var(--c-ink-soft)}
 .dcode__x:hover{color:var(--c-ink)}
 .trow--code .t-price{color:var(--color-green)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
@@ -525,6 +527,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .qs__info .t-title-m{margin:0}
 .qs__label{margin:var(--space-16) 0 0;color:var(--c-grey-medium)}
 /* two bands, each on its own line: an underbust and a cup are two decisions */
+#qsColour{display:block;margin:var(--space-12) 0 0}
+.qs__colours{position:static;display:flex;flex-wrap:wrap;gap:var(--space-6);
+  padding:0;background:none;border:0;box-shadow:none;width:auto;max-width:none;margin-top:var(--space-6)}
 .qs__band{margin:var(--space-12) 0 0}
 .qs__bandlabel{display:block;color:var(--c-grey-medium);margin-bottom:var(--space-6)}
 .qs__sizes{display:flex;flex-wrap:wrap;gap:var(--space-8);margin:0 0 var(--space-8)}
@@ -1079,37 +1084,22 @@ h1,h2,h3,p{margin:0;font-weight:400}
     /* Colour is a name plus a Change link; the options only appear when asked for, the
        way the PLP reveals its colour row (Amelie, 2026-09-10). The swatch packshot is
        gone — a name and a chip say it without a second image beside the product's own. */
+    /* Colour and size are one statement on one line, and one Change opens the overlay
+       where either can be changed — the same dialog the cross-sell + uses (Amelie,
+       2026-09-14). */
     const attrs = [];
-    if (l.colour) attrs.push(
+    if (l.colour || l.size) attrs.push(
       '<span class="attr-colour">'+
-        '<span class="t-body-s">Colour: '+esc(l.colour)+'</span>'+
-        '<button class="t-link-s" type="button" data-colour-toggle aria-expanded="false">Change</button>'+
-        /* the PLP's panel exactly: the worn colour first as a crop of the product itself,
-             then the other colourways as fabric swatches, 6px apart, the chosen one
-             underlined (Amelie, 2026-09-14) */
-      '<span class="colours" hidden>'+
-          '<button class="cthumb cthumb--current" type="button" data-colour="'+esc(l.colour)+'"'+
-            ' title="'+esc(l.colour)+'" aria-label="'+esc(l.colour)+'" data-sel="true">'+
-            '<img src="'+esc(l.img || '')+'" alt="" />'+
-          '</button>'+
-          COLOURWAYS.filter(c => c.name !== l.colour).map(c =>
-            '<button class="cthumb" type="button" data-colour="'+esc(c.name)+'" title="'+esc(c.name)+'"'+
-              ' aria-label="'+esc(c.name)+'">'+
-              '<img src="'+esc(c.sw)+'" alt="" />'+
-            '</button>').join('')+
+        '<span class="t-body-s">'+
+          [l.colour ? 'Colour: '+esc(l.colour) : '', l.size ? esc(l.size) : '']
+            .filter(Boolean).join(' &middot; ')+
         '</span>'+
+        '<button class="t-link-s" type="button" data-size-open aria-label="Change colour or size">Change</button>'+
       '</span>');
 
     // Size is changeable in the bag rather than a trip back to the PDP, and it sits with
     // the quantity stepper because both change what is being bought.
-    /* No box and no dropdown: the size is stated, and changing it opens the same overlay
-       the cross-sell + uses, where the bands are a grid (Amelie, 2026-09-14). */
-    const sizeCtl = l.size
-      ? '<button class="sizebtn" type="button" data-size-open aria-label="Change size">'+
-          '<span class="t-body-m">'+esc(l.size)+'</span>'+
-          '<span class="t-link-s sizebtn__cta">Change</span>'+
-        '</button>'
-      : '';
+    const sizeCtl = '';   // colour and size are stated together, above the controls
 
     /* A member is charged the member price, so that is the only figure the line shows.
        A standard customer sees the standard one. Neither is ever struck through — but a
@@ -1128,10 +1118,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
        label or the saving, never both. */
     const price =
       '<span class="pricepair'+(isMember ? ' pricepair--member' : '')+'">'+
-        /* the former price comes first, so the eye reads the drop left to right
-           (Amelie, 2026-09-14) */
+        /* the charged figure leads and the former price follows it (Amelie, 2026-09-14) */
         '<span class="priceline">'+
-          wasTag + '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+
+          '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +
         '</span>'+
         (isMember ? '<span class="pricepair__member t-price-s">Member price</span>' : saveTag)+
       '</span>';
@@ -1372,7 +1361,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* ---------------- cross-sell → quick shop ----------------
      The + no longer adds blind: it opens quick shop, a size is chosen there, and the
      card only leaves the strip once the product is really in the bag. */
-  let qsCard = null, qsData = null, qsSize = null, qsMode = 'add', qsSku = null;
+  let qsCard = null, qsData = null, qsSize = null, qsMode = 'add', qsSku = null, qsColour = null;
   const OUT_OF_STOCK = { '70A':1, '85D':1, 'XXL':1 };   // a couple of gaps, so the state shows
 
   /* A bra size is two decisions, so it is shown as two bands rather than a 49-item list —
@@ -1415,15 +1404,23 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   function openQuickShop(opts){
     qsMode = opts.mode; qsCard = opts.card || null; qsSku = opts.sku || null;
-    qsData = opts.data; qsSize = opts.size || null;
+    qsData = opts.data; qsSize = opts.size || null; qsColour = opts.data.colour || null;
 
     $('#qsImg').src = qsData.img || ''; $('#qsImg').alt = qsData.name;
     $('#qsSeries').textContent = qsData.series;
     $('#qsName').textContent = qsData.name;
     $('#qsPrice').textContent = eur(Number(qsData.price));
-    $('#qsColour').textContent = 'Colour: ' + qsData.colour;
+    /* the colourways live in the dialog now, so Change covers colour as well as size */
+    $('#qsColour').innerHTML = '<span class="qs__bandlabel t-label-s">Colour</span>'+
+      '<span class="colours qs__colours">'+
+        '<button class="cthumb cthumb--current" type="button" data-qs-colour="'+esc(qsData.colour)+'"'+
+          ' title="'+esc(qsData.colour)+'" data-sel="true"><img src="'+esc(qsData.img || '')+'" alt="" /></button>'+
+        COLOURWAYS.filter(c => c.name !== qsData.colour).map(c =>
+          '<button class="cthumb" type="button" data-qs-colour="'+esc(c.name)+'" title="'+esc(c.name)+'">'+
+            '<img src="'+esc(c.sw)+'" alt="" /></button>').join('')+
+      '</span>';
     $('#qsSizeLabel').textContent = qsMode === 'size' ? 'Change size' : 'Select your size';
-    $('#qsAdd').textContent = qsMode === 'size' ? 'Update size' : 'Add to bag';
+    $('#qsAdd').textContent = qsMode === 'size' ? 'Update' : 'Add to bag';
     paintQsGrid();
     $('#qsHint').hidden = true;
 
@@ -1445,6 +1442,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
       openQuickShop({ mode:'add', card, data:{ ...btn.dataset }, size:null }));
   });
 
+  $('#qsColour').addEventListener('click', e => {
+    const c = e.target.closest('[data-qs-colour]');
+    if (!c) return;
+    qsColour = c.dataset.qsColour;
+    $$('#qsColour .cthumb').forEach(o => { if (o === c) o.dataset.sel = 'true'; else delete o.dataset.sel; });
+  });
+
   $('#qsSizes').addEventListener('click', e => {
     const b = e.target.closest('[data-qs-size],[data-qs-band],[data-qs-cup]');
     if (!b || b.disabled) return;
@@ -1458,7 +1462,18 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   $('#qsAdd').addEventListener('click', () => {
     if (!qsSize) { $('#qsHint').hidden = false; return; }
-    if (qsMode === 'size') { Shop.setSize(qsSku, qsSize); closeQuickShop(); return; }
+    if (qsMode === 'size') {
+      // colour first: it re-keys the line, and the size then applies to the new sku
+      let sku = qsSku;
+      if (qsColour && qsColour !== qsData.colour) {
+        Shop.setColour(sku, qsColour);
+        const hit = Shop.read().lines.filter(l => l.colour === qsColour && l.name === qsData.name)[0];
+        if (hit) sku = hit.sku;
+      }
+      if (qsSize) Shop.setSize(sku, qsSize);
+      closeQuickShop();
+      return;
+    }
     const bra = /^\d/.test(qsData.size);
     Shop.add({
       sku: qsData.sku.replace(/-[^-]+$/, '') + '-' + qsSize.toLowerCase(),
