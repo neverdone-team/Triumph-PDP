@@ -242,6 +242,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 @media (prefers-reduced-motion: reduce){ .item__fav.is-on svg{animation:none} }
 .item__sub{display:block;color:var(--c-ink)}   /* the series is ink, not grey */
 .item__name{display:block;margin-top:var(--space-8)}
+.item__qty{font-weight:inherit}
 .item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
 /* Size is editable in the bag — a native select styled as the chip it replaces. */
 /* the size is text with a Change link, not a control in a box */
@@ -1260,7 +1261,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
           ' aria-pressed="'+(WISHED.has(l.sku) ? 'true' : 'false')+'"'+
           ' aria-label="Add to wishlist">'+ICON_FAV+'</button>'+
       '</div>'+
-      '<span class="item__name t-title-m">'+esc(l.name)+'</span>'+
+      /* a line holding more than one says so after its name, as the checkout's lists do
+         (Amelie, 2026-09-14) */
+      '<span class="item__name t-title-m">'+esc(l.name)+
+        (l.qty > 1 ? '<span class="item__qty"> ('+l.qty+')</span>' : '')+'</span>'+
       '<span class="item__sub t-body-s">'+esc(l.series||'')+'</span>'+
       '<div class="item__side">'+
         price+

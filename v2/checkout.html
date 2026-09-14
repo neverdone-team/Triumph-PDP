@@ -443,9 +443,8 @@ body[data-mode="onepage"] .ck__rail .review__news{order:6}
 /* the same block shape as Order summary above it: the heading, 32px, then the rule the
    content starts under — the stroke above it was separating the heading from nothing
    (Amelie, 2026-09-14) */
-body[data-mode="onepage"] .ck__rail .rail__dhead{order:7;display:block;
-  margin-top:var(--space-48);
-  padding-bottom:var(--space-32);border-bottom:1px solid var(--c-hair)}
+/* the list has left the rail for the foot of the page, and its heading with it */
+body[data-mode="onepage"] .ck__rail .rail__dhead{display:none}
 /* the date belongs with the order it describes, not with the figures (Amelie, 2026-09-14) */
 /* the rail states no date at all now: the delivery method carries it, and repeating it
    over the order list only split the two (Amelie, 2026-09-14) */
@@ -683,6 +682,21 @@ body[data-mode="steps"] .place.is-last{display:block}
    padding each side left 64px of nothing between them (Amelie, 2026-09-14) */
 .review__items .li{padding:var(--space-16) 0}
 .review__items .li:first-of-type{padding-top:0}
+/* On a phone there is no room for a price column beside the text: the row takes the
+   rail's shape instead, everything under everything else, and the charged figure leads
+   again because the column is left-aligned (Amelie, 2026-09-14). */
+@media (max-width:767px){
+  /* 80x107, not the desktop crop: the packshot and the two stacked rows beside it come
+     out the same height, so the grid has no slack to hand back as a gap */
+  .review__items .li{grid-template-columns:80px minmax(0,1fr);column-gap:var(--space-16)}
+  .review__items .li__imgwrap{width:80px;grid-row:1 / span 2}
+  .review__items .li__img{width:80px;height:107px}
+  .review__items .li__body{grid-row:1;align-self:start}
+  .review__items .li__price{grid-column:2;grid-row:2;align-self:start;
+    text-align:left;align-items:flex-start;padding-left:0;margin-top:var(--space-6)}
+  /* left-aligned again, so the charged figure leads as it does in the rail */
+  .review__items .li .li__pricerow{flex-direction:row}
+}
 /* the delivery and payment rows carry the same marks the options did */
 /* the answers column is pre-line so an address keeps its line breaks — which turned the
    whitespace between two copied brand marks into a line break of its own, and dropped the
@@ -1061,14 +1075,19 @@ body[data-mode="steps"] .place.is-last{display:block}
   body[data-mode="onepage"]:not([data-step="0"]) .ck{display:flex;flex-direction:column}
   body[data-mode="onepage"] .ck__form{order:1}
   /* moved out of the form column on one screen, the list needs an order of its own or
-     it falls to 0 and lands above everything (Amelie, 2026-09-14) */
-  .ck > .review__items{order:3}
+     it falls to 0 and lands above everything — and the gutters and the clearance the
+     column used to give it (Amelie, 2026-09-14) */
+  .ck > .review__items{order:3;padding:0 var(--space-16)
+    calc(120px + env(safe-area-inset-bottom))}
+  /* the rail is no longer the last thing on the page: the order list under it carries
+     the sticky bar's clearance instead */
+  body[data-step="4"] .ck__rail{padding-bottom:var(--space-32)}
   body[data-mode="onepage"]:not([data-step="0"]) .ck__railcol{display:block;order:2;
     border-left:0;border-top:1px solid var(--c-hair)}
   /* the rail is the last thing on the page now, so it carries the clearance the form
      column used to — or the sticky bar sits on top of the total */
 body[data-mode="onepage"] .ck__rail{position:static;
-    padding:var(--space-32) var(--space-16) calc(120px + env(safe-area-inset-bottom))}
+    padding:var(--space-32) var(--space-16)}
   body[data-mode="onepage"] .ck__form{padding-bottom:var(--space-32)}
   body[data-mode="onepage"] .msum{display:none!important}
   .paybar__legal{margin-top:var(--space-8);color:var(--c-ink-soft);text-align:center}
@@ -2509,15 +2528,38 @@ body[data-mode="onepage"] .ck__rail{position:static;
     clearTimeout(el._rollT);
     el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 760);
   }
-  function layoutReview(on){
-    const items = RAIL_ITEMS, place = PLACE_EL, news = NEWS_EL;
-    const box = $('#reviewItems'), rail = RAIL, totals = RAIL && $('.totals', RAIL);
+  /* The order list is a block of the page, not a column of the rail: in the one-pager it
+     sits under everything from the first step onwards, and in the stepped flow it appears
+     on the review (Amelie, 2026-09-14). */
+  function layoutList(on, isReview){
+    const items = RAIL_ITEMS, box = $('#reviewItems'), rail = RAIL, form = $('.ck__form');
     if (!items || !box || !rail) return;
-    park(items); park(place); park(news); park(box); park(TRUST_EL);
+    park(items); park(box);
     if (on) {
       box.hidden = false;
       box.appendChild(items);
       reveal(items, '.li');
+      const railcol = rail.closest('.ck__railcol');
+      /* On one column the summary comes first and the list that explains it second. On
+         two, it is the last block of the form column — its own home is inside the review
+         section, which is hidden until the review, so before then it is appended to the
+         column instead (Amelie, 2026-09-14). */
+      if (NARROW.matches && railcol) railcol.after(box);
+      else if (isReview || !form) goHome(box);
+      else form.appendChild(box);
+    } else {
+      box.hidden = true;
+      goHome(items);
+      goHome(box);
+    }
+  }
+
+  function layoutReview(on){
+    const place = PLACE_EL, news = NEWS_EL;
+    const rail = RAIL, totals = RAIL && $('.totals', RAIL);
+    if (!rail) return;
+    park(place); park(news); park(TRUST_EL);
+    if (on) {
       /* the opt-in is the last thing agreed to before the order is placed, so it sits
          immediately above the button (Amelie, 2026-09-14) */
       if (place && totals) {
@@ -2525,23 +2567,17 @@ body[data-mode="onepage"] .ck__rail{position:static;
         if (TRUST_EL) place.before(TRUST_EL);
         if (news) place.after(news);
       }
-      /* On one column the figures come first and the list that explains them second —
-         the other way round the summary read as a second, unrelated block (Amelie,
-         2026-09-14). On two columns the list stays in its own column. */
-      const railcol = rail.closest('.ck__railcol');
-      if (NARROW.matches && railcol) railcol.after(box); else goHome(box);
     } else {
-      box.hidden = true;
-      goHome(items);
       goHome(place);
       goHome(news);
-      goHome(box);
       goHome(TRUST_EL);
     }
   }
   /* the two columns become one and back again as the window is resized */
   NARROW.addEventListener('change', () => {
-    if (document.body.dataset.step === String(LAST_STEP)) layoutReview(true);
+    const step = Number(document.body.dataset.step);
+    layoutList((document.body.dataset.mode === 'onepage' && step >= 1) || step === LAST_STEP,
+               step === LAST_STEP);
   });
 
   function applyStep(n) {
@@ -2578,6 +2614,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
        the mobile rules key off .is-last while the desktop ones read [hidden]. */
     $('.place').hidden = step !== LAST_STEP;
     $('.place').classList.toggle('is-last', step === LAST_STEP);
+    /* the one-pager shows what is being bought from the moment there is a form to fill;
+       the stepped flow keeps it for the review (Amelie, 2026-09-14) */
+    layoutList((mode === 'onepage' && step >= 1) || step === LAST_STEP, step === LAST_STEP);
     layoutReview(step === LAST_STEP);
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it

@@ -285,10 +285,12 @@ window.Shop = (function () {
           /* collection first in normal caps and Light, then the product in caps and
              Regular — the same shape the bag and the rail use (Amelie, 2026-09-11) */
           (l.series ? '<span class="mc__series">' + l.series + '</span>' : '') +
-          '<span class="mc__name">' + l.name + '</span>' +
+          /* the count sits after the name here too, so every list in the flow reads the
+             same way (Amelie, 2026-09-14) */
+          '<span class="mc__name">' + l.name +
+            (l.qty > 1 ? ' (' + l.qty + ')' : '') + '</span>' +
           (l.colour ? '<span class="mc__meta">Colour: ' + l.colour + '</span>' : '') +
           (l.size ? '<span class="mc__meta">Size: ' + l.size + '</span>' : '') +
-          (l.qty > 1 ? '<span class="mc__meta">Quantity: ' + l.qty + '</span>' : '') +
           '<span class="mc__num">' + money(l.unit * l.qty) + '</span>' +
         '</span>' +
       '</div>';
