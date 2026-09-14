@@ -560,9 +560,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .paylogos{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-20);
   align-items:center;justify-content:center}
 .paylogos img,.paylogos svg{height:20px;width:auto;opacity:.8}
-.trust{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);
+.trust{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;
+  font-size:10px;line-height:14px;letter-spacing:.12em;text-transform:uppercase;
   margin-top:var(--space-20);color:var(--c-grey-medium)}
-.trust span{display:inline-flex;align-items:center;gap:var(--space-8)}
+.trust span{display:inline-flex;align-items:center}
+.trust span + span::before{content:"";flex:none;width:3px;height:3px;
+  background:currentColor;margin:0 var(--space-14,14px)}
 
 .alert{display:flex;gap:var(--space-10);padding:var(--space-12);margin-bottom:var(--space-16)}
 .alert--info{background:var(--color-info-tint);color:var(--color-darkCerulean)}
@@ -1064,8 +1067,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
         <!-- VAT and the returns promise are gone from here (Amelie, 2026-09-10); the
              delivery date moved to the top of the order -->
-        <div class="trust t-body-s">
-          <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 6V4a4 4 0 018 0v2" stroke="currentColor" stroke-width="1"/><rect x="1.5" y="6" width="11" height="7" stroke="currentColor" stroke-width="1"/></svg> Secure, encrypted payment</span>
+        <!-- no icon, set in caps like the PDP's benefits line (Amelie, 2026-09-14) -->
+        <div class="trust">
+          <span>Secure, encrypted payment</span>
         </div>
 
         <div class="paylogos">

@@ -439,7 +439,6 @@ body[data-mode="onepage"] .ck__rail .totals{order:3}
    optional thing here, so it goes under it (Amelie, 2026-09-14) */
 body[data-mode="onepage"] .ck__rail .trust{order:4;margin-top:var(--space-24)}
 body[data-mode="onepage"] .ck__rail .place{order:5}
-body[data-mode="onepage"] .ck__rail .review__news{order:6}
 /* the same block shape as Order summary above it: the heading, 32px, then the rule the
    content starts under — the stroke above it was separating the heading from nothing
    (Amelie, 2026-09-14) */
@@ -664,7 +663,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review dd{margin:0;white-space:pre-line;grid-column:1 / -1;grid-row:2}
 .review__news{margin-top:var(--space-24)}
 /* in the rail it is a row of the summary, not a line of the form */
-.ck__rail .review__news{margin:var(--space-24) 0 0}
+.review .review__news{margin:0 0 var(--space-8);padding-left:0}
 .ck__rail .trust + .place{margin-top:var(--space-24)}
 
 .review__items{margin-top:var(--space-64)}
@@ -878,12 +877,14 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* the icon is exactly one line box tall, so the row's text sits on the same top edge as
    any plain 14/20 line beside it */
 .promise span{line-height:20px}
-/* centred under the button, as in the bag: three short assurances hung on the left edge
-   read as a list rather than a footer (Amelie, 2026-09-14) */
-.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-20);
-  margin-top:var(--space-32);color:var(--c-ink)}
-.trust span{display:inline-flex;align-items:center;gap:var(--space-6)}
-.trust svg{flex:none}
+/* centred under the button, in caps, with a small mark between each — no icons: at this
+   size they added texture rather than meaning (Amelie, 2026-09-14) */
+.trust{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;
+  margin-top:var(--space-32);color:var(--c-ink);
+  font-size:10px;line-height:14px;letter-spacing:.12em;text-transform:uppercase}
+.trust span{display:inline-flex;align-items:center}
+.trust span + span::before{content:"";flex:none;width:3px;height:3px;
+  background:currentColor;margin:0 var(--space-14,14px)}
 
 /* ============================================================
    MOTION — the two moves chosen in the motion lab (Amelie, 2026-09-14).
@@ -1809,12 +1810,12 @@ body[data-mode="onepage"] .ck__rail{position:static;
       </div>
     </div>
 
-    <!-- a padlock, a u-turn and Triumph's own van: the plus and the bare circle said
-         nothing about returns or shipping (Amelie, 2026-09-14) -->
-    <div class="trust t-body-xs">
-      <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2.5" y="6.2" width="9" height="6.3" stroke="currentColor" stroke-width="1"/><path d="M4.6 6.2V4.4a2.4 2.4 0 014.8 0v1.8" stroke="currentColor" stroke-width="1"/></svg> Secure payment</span>
-      <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 4.8h5.2a3 3 0 010 6H4.6" stroke="currentColor" stroke-width="1"/><path d="M5.2 2.5 2.6 4.8l2.6 2.3" stroke="currentColor" stroke-width="1"/></svg> 30-day returns</span>
-      <span><svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#i-truck"/></svg> Shipped by DHL</span>
+    <!-- no icons: three short statements set in caps and separated by a mark, the way
+         the PDP sets its own benefits line (Amelie, 2026-09-14) -->
+    <div class="trust">
+      <span>Secure payment</span>
+      <span>30-day returns</span>
+      <span>Shipped by DHL</span>
     </div>
   </aside>
   </div>
@@ -2461,6 +2462,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   const RAIL_ITEMS = RAIL && $('#railItems', RAIL);
   const PLACE_EL = $('.place');
   const NEWS_EL = $('.review__news');
+  const EMAIL_ROW = $('.review .review__row');   // the email row leads the review
   /* scoped to the real rail for the same reason the list is: the drawer's clone carries
      the same classes and sits earlier in the DOM */
   const TRUST_EL = RAIL && $('.trust', RAIL);
@@ -2564,13 +2566,13 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (!rail) return;
     park(place); park(news); park(TRUST_EL);
     if (on) {
-      /* the opt-in is the last thing agreed to before the order is placed, so it sits
-         immediately above the button (Amelie, 2026-09-14) */
-      if (place && totals) {
+            if (place && totals) {
         totals.after(place);
         if (TRUST_EL) place.before(TRUST_EL);
-        if (news) place.after(news);
       }
+      /* the opt-in sits under the address it would be sent to, not beside the button
+         (Amelie, 2026-09-14) */
+      if (news && EMAIL_ROW) EMAIL_ROW.after(news);
     } else {
       goHome(place);
       goHome(news);
