@@ -92,7 +92,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* ---------------- page ---------------- */
 .wrap{max-width:1400px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
 .pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
-/* the count is part of the title, so it is ink (Amelie, 2026-09-10) */
+/* the count is part of the title, in brackets after it (Amelie, 2026-09-14) */
+.pagehead__n{font-weight:inherit}
 
 /* Two columns, separated by a hairline and with a sticky summary — the same relationship
    the one-page checkout has between its form column and its order rail (Amelie,
@@ -605,16 +606,26 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .qs__band{margin:var(--space-24) 0 0}
 /* the colour block leads, so it carries no top margin; every band after it does */
 #qsColour .qs__band{margin-top:0}
-.qs__bandlabel{display:block;color:var(--c-ink);margin-bottom:var(--space-8)}
+.qs__bandlabel{display:block;color:var(--c-ink);margin-bottom:var(--space-10);
+  font-size:12px;font-weight:400;line-height:14px;letter-spacing:-.02em;text-transform:uppercase}
 /* five to a row, equal width — the PDP's grid, not a wrapping row of chips */
-.qs__sizes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-8)}
-.qs__sizes button{height:var(--control-40);width:100%;padding:0 var(--space-6);
-  box-shadow:inset 0 0 0 1px var(--c-edge);background:var(--c-bg);
-  font-weight:300;font-size:13px;line-height:18px;letter-spacing:.04em;
-  transition:box-shadow .12s var(--ease-out), background .12s var(--ease-out)}
-.qs__sizes button:hover{box-shadow:inset 0 0 0 1px var(--c-ink)}
-.qs__sizes button[data-on="true"]{background:var(--c-ink);color:var(--c-on-dark);box-shadow:none}
-.qs__sizes button[disabled]{opacity:.35;text-decoration:line-through;pointer-events:none}
+/* the live site's own chip, to the pixel: a 30px cell with a half-pixel #ddd edge, five
+   to a row, black when chosen and struck through by a rule across its middle when it is
+   not available (de.triumph.com, .pdp__size / .pdp__size--selector) */
+.qs__sizes{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-8);
+  margin:0 0 var(--space-20)}
+.qs__sizes:last-of-type{margin-bottom:var(--space-24)}
+.qs__sizes button{position:relative;display:flex;align-items:center;justify-content:center;
+  height:30px;width:100%;padding:7px 5px;
+  border:.5px solid #ddd;background:var(--c-bg);color:var(--c-ink);
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;
+  transition:border-color .25s var(--ease-out), background-color .25s var(--ease-out)}
+.qs__sizes button:hover{border-color:var(--c-ink)}
+.qs__sizes button[data-on="true"]{background:var(--c-ink);border:0;color:var(--c-on-dark)}
+.qs__sizes button[disabled]{border-color:rgba(0,0,0,.05);color:var(--c-grey-medium);
+  pointer-events:none;text-decoration:none}
+.qs__sizes button[disabled]::after{content:"";position:absolute;left:25%;top:50%;
+  width:50%;height:1px;background:rgba(0,0,0,.5)}
 .qs__hint{color:var(--color-error);margin-top:var(--space-12)}
 .qs__cta{margin-top:var(--space-32)}
 
@@ -854,8 +865,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   <!-- ======================= FILLED CART ======================= -->
   <div id="filledCart">
     <div class="pagehead">
-      <h1 class="t-title-xl">Shopping bag</h1>
-      <span class="t-title-m" data-count>0 items</span>
+      <h1 class="t-title-xl">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
     </div>
 
     <div class="cart">
@@ -1425,7 +1435,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
     $$('[data-total]').forEach(n => roll(n, eur(t.total)));
-    $$('[data-count]').forEach(n => n.textContent = t.count + (t.count === 1 ? ' item' : ' items'));
+    $$('[data-count]').forEach(n => n.textContent = '(' + t.count + ')');
 
     /* The count rides in the header so a collapsed section still says a code is on the
        order; the panel does NOT reopen itself here, or it would fight the customer
@@ -1550,7 +1560,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   /* the colour popover closes on a click outside it and on Escape, like any popover */
   function closeColours(){
-    $$('.colours').forEach(c => { c.hidden = true; });
+    /* only the line's own popover — the dialog's swatch row carries the same class and
+       was being hidden the moment a colour was clicked (Amelie, 2026-09-14) */
+    $$('.item .colours').forEach(c => { c.hidden = true; });
     $$('[data-colour-toggle]').forEach(b => { b.setAttribute('aria-expanded','false'); b.textContent = 'Change'; });
   }
   document.addEventListener('mousedown', e => {
