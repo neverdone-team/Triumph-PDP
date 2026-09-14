@@ -801,8 +801,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   <!-- ======================= EMPTY STATE ======================= -->
   <section class="empty" id="emptyState" hidden>
-    <svg class="empty__icon" width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-      <path d="M12 16h32l-3 30H15L12 16zM21 16a7 7 0 0114 0" stroke="currentColor" stroke-width="1"/>
+    <!-- Triumph's own shopping-bag mark, lifted from the live site's icon font
+         (icon-shopping-bag, U+E908). The glyph is drawn y-up, so it is flipped —
+         the same treatment the checkout's van and crown get (Amelie, 2026-09-14). -->
+    <svg class="empty__icon" width="56" height="56" viewBox="0 -960 980 1024"
+         fill="currentColor" aria-hidden="true">
+      <path transform="scale(1,-1)" d="M511 938Q440 925 386.5 879.0Q333 833 311 767L310 766L304 748L126 747V418Q126 211 126.5 148.0Q127 85 129 78Q136 46 160.5 20.0Q185 -6 217 -16L230 -20H876L890 -16Q905 -10 917.0 -3.0Q929 4 941 16Q955 30 965.0 48.5Q975 67 978 88Q978 91 978 116Q979 140 979.0 183.0Q979 226 979 287Q980 348 980 424V747H801L795 765Q773 833 717.5 880.0Q662 927 591 938Q576 940 550.5 940.0Q525 940 511 938ZM597 850Q632 840 660.0 817.0Q688 794 704 762L711 748L553 747Q488 747 441.5 747.0Q395 747 395 747Q394 748 399.5 759.5Q405 771 411 780Q428 804 451.5 822.0Q475 840 504 848L505 849Q520 853 527.0 854.0Q534 855 557 854Q573 854 581.0 853.0Q589 852 597 850ZM297 604Q297 578 297.5 560.5Q298 543 299 540Q302 528 312.5 521.5Q323 515 338 515Q349 515 357.0 517.5Q365 520 370 525Q378 533 379.5 543.0Q381 553 382 602V661H724V604Q724 579 724.5 561.0Q725 543 725 540Q729 528 739.0 521.5Q749 515 764 515Q776 515 783.5 517.5Q791 520 797 525Q805 533 806.5 543.0Q808 553 809 602V661H894V379Q893 168 892.5 131.5Q892 95 890 89Q886 81 880.0 75.5Q874 70 866 67Q860 65 810.5 64.5Q761 64 549 64Q333 65 286.0 65.5Q239 66 235 68Q229 72 223.5 77.5Q218 83 215 89V90Q213 95 212.5 136.0Q212 177 212 379V661H297V604Z"/>
     </svg>
     <h1 class="t-title-l">Your bag is empty</h1>
     <p class="t-body-m">Nothing chosen yet. Start with the bestsellers — or find your fit with the bra size calculator.</p>
