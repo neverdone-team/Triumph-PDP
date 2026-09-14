@@ -476,7 +476,10 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 @media (max-width:991px){
   /* only the bottom clearance here — the top is the base rule's job, or the gate loses
      the air it needs under the header. The desktop rule's 64 is too much on a phone. */
-  body[data-mode="steps"]:not([data-step="4"]) .ck__form{padding-bottom:120px}
+  /* the desktop rule's 40px sides survived into the phone layout, so the stepped flow
+     sat narrower than the one-pager on the same screen (Amelie, 2026-09-14) */
+  body[data-mode="steps"]:not([data-step="4"]) .ck__form{padding-bottom:120px;
+    padding-left:var(--space-16);padding-right:var(--space-16)}
   body[data-mode="steps"][data-step="0"] .ck__form{padding-top:var(--space-32)}
   .gate__box{grid-template-columns:minmax(0,1fr);gap:var(--space-40)}
   .gate__col--new{border-left:0;padding-left:0;border-top:1px solid var(--c-hair);padding-top:var(--space-32)}
@@ -502,6 +505,15 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* a phone has no width to give away: the fields run to the left edge, flush with the
    radio above them (Amelie, 2026-09-11) */
 @media (max-width:575px){ #payList .opt__panel{padding-left:0} }
+/* on a phone the rail has the page's full width, so the packshot can be the size it is
+   in the bag, and the list sits straight under the date (Amelie, 2026-09-14) */
+@media (max-width:575px){
+  .ck__rail .li{grid-template-columns:104px minmax(0,1fr)}
+  .ck__rail .li__imgwrap{width:104px}
+  .ck__rail .li__img{width:104px;height:139px}
+  body[data-mode="onepage"] .ck__rail .promise{margin-top:var(--space-12)}
+  body[data-mode="onepage"] .ck__rail #railItems{padding-top:var(--space-8)}
+}
 #payList .opt__body{order:0}
 
 /* the review is a read-out, so the rail's lines drop their Remove there */
@@ -1477,7 +1489,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
         </div>
       </div>
 
-      <label class="check review__news" data-account-only="guest new">
+      <!-- the opt-in is part of the last step in both flows, and a signed-in customer
+           can subscribe just as a guest can (Amelie, 2026-09-14) -->
+      <label class="check review__news">
         <input type="checkbox" id="newsOptIn" checked />
         <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
         <span class="t-body-s">Email me Triumph news and offers</span>

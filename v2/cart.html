@@ -147,6 +147,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .statusbox.is-free .ship-progress{margin:0;padding:0;border-top:0}
 .statusbox.is-free .ship-progress__bar{display:none}
 .statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
+/* grey on peppermint is the one place the label loses its contrast, so there it is ink
+   (Amelie, 2026-09-14) */
+.statusbox.is-free .promise__label,
+.statusbox.is-member .promise__label{color:var(--c-ink)}
 .statusbox.is-free #shipMsg svg{flex:none}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
   color:var(--color-green);margin:0}
@@ -234,6 +238,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
    tile, 44px image top-aligned, 2px ink underline on the chosen one. Values lifted from
    pdp.html .swatch so cart and PDP read as the same component. */
 .attr-colour{display:inline-flex;align-items:baseline;gap:var(--space-12)}
+/* colour and size read as one statement on a wide row, separated by a middot; on a phone
+   the row is too narrow for that and they stack, with Change under them rather than
+   squeezed against the wrap (Amelie, 2026-09-14) */
+.attr-vals{display:inline-flex;flex-wrap:wrap;gap:var(--space-8)}
+.attr-val + .attr-val::before{content:"\00B7";margin-right:var(--space-8)}
+@media (max-width:575px){
+  .attr-colour{flex-direction:column;align-items:flex-start;gap:var(--space-8)}
+  .attr-vals{flex-direction:column;gap:var(--space-2)}
+  .attr-val + .attr-val::before{content:none}
+}
 /* the colour options, revealed by Change — the PLP's thumbnails and its 1px rule under
    the chosen one */
 /* A popover, not a block in the flow: opening it used to push the whole line — and
@@ -266,10 +280,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__side{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;
   gap:var(--space-8);text-align:left;margin-top:var(--space-12)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
-/* The per-unit figure sits on its own line under the price being charged. It keeps that
-   line at every quantity — hidden, not removed, at one — so the row never grows or
-   shrinks as the stepper crosses 1 (Amelie, 2026-09-14). */
-.item__unit{flex:1 0 100%;margin:var(--space-2) 0 0;white-space:nowrap;color:var(--c-ink-soft)}
+/* The per-unit figure closes the price line. It keeps its place at every quantity —
+   hidden, not removed, at one — so the row never grows or shrinks as the stepper
+   crosses 1 (Amelie, 2026-09-14). */
+.item__unit{margin-left:var(--space-8);white-space:nowrap;color:var(--c-ink-soft)}
 /* at quantity 1 it says nothing new, but it keeps its place: hiding it outright made the
    row grow and shrink wherever the price line wraps */
 .item__unit.is-blank{visibility:hidden}
@@ -324,7 +338,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 }
 
 /* member price pair — never a strike-through against the standard price */
-.pricepair{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;gap:var(--space-8)}
+/* the charged figure, the former price and the per-unit figure are all prices, so they
+   share the line; the saving is a statement about them and sits under it (Amelie,
+   2026-09-14) */
+.pricepair{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2)}
 /* the charged figure and the former price share one line; the note sits under them */
 .priceline{display:flex;align-items:baseline;gap:var(--space-8)}
 .pricepair__member{color:var(--c-burgundy)}
@@ -648,7 +665,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* the row order and the price layout are the base now; a phone only needs the name a
      rung smaller, tighter under the collection, and the shot pinned to the top */
   .item__name{font-size:14px;line-height:20px;margin-top:var(--space-2)}
-  .item__unit{white-space:nowrap;margin-left:0}
+  .item__unit{white-space:nowrap}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   /* no room beside a 112px stepper at this width: the size takes its own line */
@@ -1100,9 +1117,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const attrs = [];
     if (l.colour || l.size) attrs.push(
       '<span class="attr-colour">'+
-        '<span class="t-body-m">'+
-          [l.colour ? 'Colour: '+esc(l.colour) : '', l.size ? 'Size: '+esc(l.size) : '']
-            .filter(Boolean).join(' &middot; ')+
+        '<span class="attr-vals t-body-s">'+
+          (l.colour ? '<span class="attr-val">Colour: '+esc(l.colour)+'</span>' : '')+
+          (l.size   ? '<span class="attr-val">Size: '+esc(l.size)+'</span>' : '')+
         '</span>'+
         '<button class="t-link-s" type="button" data-size-open aria-label="Change colour or size">Change</button>'+
       '</span>');
@@ -1131,6 +1148,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
         /* the charged figure leads and the former price follows it (Amelie, 2026-09-14) */
         '<span class="priceline">'+
           '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +
+          '<span class="item__unit t-price-note'+(l.qty>1?'':' is-blank')+'">'+eur(pay)+' each</span>'+
         '</span>'+
         (isMember ? '<span class="pricepair__member t-price-s">Member price</span>' : saveTag)+
       '</span>';
@@ -1149,7 +1167,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
       '<span class="item__sub t-body-s">'+esc(l.series||'')+'</span>'+
       '<div class="item__side">'+
         price+
-        '<span class="item__unit t-price-note'+(l.qty>1?'':' is-blank')+'">'+eur(pay)+' each</span>'+
       '</div>'+
       '<div class="item__attrs">'+attrs.join('')+'</div>'+
       '<div class="item__row">'+
