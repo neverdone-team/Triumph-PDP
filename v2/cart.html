@@ -246,9 +246,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__side{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;
   gap:var(--space-8);text-align:left;margin-top:var(--space-12)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
-/* the per-unit figure is a footnote to the line total, so it sits under it, not beside
-   the member label (Amelie, 2026-09-11) */
-.item__unit{flex-basis:100%;color:var(--c-ink-soft)}
+/* The per-unit figure shares the price line but sits at its right edge, away from the
+   member label. On its own line it made the row grow and shrink as the quantity crossed
+   1, which is the jump (Amelie, 2026-09-14). */
+.item__unit{margin-left:auto;white-space:nowrap;color:var(--c-ink-soft)}
+/* at quantity 1 it says nothing new, but it keeps its place: hiding it outright made the
+   row grow and shrink wherever the price line wraps */
+.item__unit.is-blank{visibility:hidden}
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--c-edge);height:var(--control-36)}
 .stepper button{width:var(--control-36);height:100%;display:grid;place-items:center}
@@ -1118,7 +1122,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
       '<span class="item__sub t-body-s">'+esc(l.series||'')+'</span>'+
       '<div class="item__side">'+
         price+
-        '<span class="item__unit t-price-note"'+(l.qty>1?'':' hidden')+'>'+eur(pay)+' each</span>'+
+        '<span class="item__unit t-price-note'+(l.qty>1?'':' is-blank')+'">'+eur(pay)+' each</span>'+
       '</div>'+
       '<div class="item__attrs">'+attrs.join('')+'</div>'+
       '<div class="item__row">'+
