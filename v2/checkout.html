@@ -928,23 +928,36 @@ body[data-mode="steps"] .place.is-last{display:block}
   .done__in > *,.donerec{animation:none}
 }
 
-/* what to look at next, once there is nothing left to do on this page */
-.donerec{max-width:1080px;margin:var(--space-64) auto 0;padding:var(--space-40) var(--space-24) 0;
-  border-top:1px solid var(--c-hair)}
-.donerec__head{margin:0 0 var(--space-24)}
-.donerec__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-32)}
-.donerec__card{display:flex;flex-direction:column;min-width:0;text-decoration:none;color:inherit}
-.donerec__img{width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--c-grey-light)}
-.donerec__img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
+/* What to look at next, once there is nothing left to do on this page — the PDP's own
+   You Might Like grid and card, four wide (Amelie, 2026-09-14). */
+.donerec{max-width:1200px;margin:var(--space-64) auto 0;
+  padding:var(--space-48) var(--space-24) 0;border-top:1px solid var(--c-hair)}
+.donerec__head{font-size:12px;font-weight:300;line-height:16px;letter-spacing:.04em;
+  text-transform:uppercase;margin:0 0 var(--space-40)}
+.donerec__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  column-gap:60px;row-gap:80px}
+.donerec__card{position:relative;text-decoration:none;color:inherit;display:block}
+.donerec__img{position:relative;aspect-ratio:275 / 362;overflow:hidden;
+  background:var(--c-grey-light);display:block}
+.donerec__img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .9s var(--ease-out), opacity .38s var(--ease-out)}
+/* the alternate photo crossfades away on hover, as on the PDP */
+.donerec__img .alt{opacity:1}
+.donerec__card:hover .donerec__img .alt{opacity:0}
 .donerec__card:hover .donerec__img img{transform:scale(1.04)}
-.donerec__series{display:block;color:var(--c-ink);margin-top:var(--space-12)}
-.donerec__nm{display:block;margin-top:var(--space-2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.donerec__pr{display:block;margin-top:var(--space-6)}
+.donerec__info{padding-top:var(--space-16);display:flex;flex-direction:column;
+  align-items:flex-start;gap:var(--space-4)}
+.donerec__nm{width:100%;font-size:12px;font-weight:400;line-height:20px;letter-spacing:.04em;
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.donerec__pr{font-size:12px;font-weight:400;line-height:14px}
 @media (max-width:767px){
-  .donerec{padding-left:var(--space-16);padding-right:var(--space-16);margin-top:var(--space-40)}
-  .donerec__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-20)}
-  .donerec__card:nth-child(3){display:none}
+  .donerec{padding:var(--space-40) var(--space-16) 0;margin-top:var(--space-40)}
+  .donerec__head{margin-bottom:var(--space-32)}
+  .donerec__grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px;row-gap:32px}
+  .donerec__img{aspect-ratio:155.5 / 204.6}
+  .donerec__info{padding-top:var(--space-12)}
+  .donerec__nm{font-size:11px;line-height:16px}
+  .donerec__pr{font-size:10px}
 }
 /* what happens next, in the customer's own reading width */
 .done__next{max-width:46ch;margin:var(--space-24) auto 0;color:var(--c-ink)}
@@ -1795,25 +1808,47 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
   <!-- the order is done, so this is the only thing left to offer (Amelie, 2026-09-14) -->
   <div class="donerec">
-    <h2 class="donerec__head t-title-s">You might also like</h2>
+    <h2 class="donerec__head">You might also like</h2>
     <div class="donerec__grid">
       <a class="donerec__card" href="./pdp.html">
-        <span class="donerec__img"><img src="./Assets/10215855-0004_1.webp" alt="Amourette String" loading="lazy" /></span>
-        <span class="donerec__series t-body-s">Amourette</span>
-        <span class="donerec__nm t-title-xs">String</span>
-        <span class="donerec__pr t-price">&euro;22.95</span>
+        <span class="donerec__img">
+          <img src="./Assets/pdp/rec-base.jpg" alt="" loading="lazy" />
+          <img class="alt" src="./Assets/pdp/rec-3.jpg" alt="Balconette bra" loading="lazy" />
+        </span>
+        <span class="donerec__info">
+          <span class="donerec__nm">Balconette bra</span>
+          <span class="donerec__pr">€54.95</span>
+        </span>
       </a>
       <a class="donerec__card" href="./pdp.html">
-        <span class="donerec__img"><img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Bra" loading="lazy" /></span>
-        <span class="donerec__series t-body-s">Aura Spotlight</span>
-        <span class="donerec__nm t-title-xs">Aura Spotlight Bra</span>
-        <span class="donerec__pr t-price">&euro;54.95</span>
+        <span class="donerec__img">
+          <img src="./Assets/pdp/rec-base.jpg" alt="" loading="lazy" />
+          <img class="alt" src="./Assets/pdp/rec-1.jpg" alt="Jersey top extra soft" loading="lazy" />
+        </span>
+        <span class="donerec__info">
+          <span class="donerec__nm">Jersey top extra soft</span>
+          <span class="donerec__pr">€39.95</span>
+        </span>
       </a>
       <a class="donerec__card" href="./pdp.html">
-        <span class="donerec__img"><img src="./Assets/ck-brief.webp" alt="Amourette Tai" loading="lazy" /></span>
-        <span class="donerec__series t-body-s">Amourette</span>
-        <span class="donerec__nm t-title-xs">Tai</span>
-        <span class="donerec__pr t-price">&euro;24.95</span>
+        <span class="donerec__img">
+          <img src="./Assets/pdp/rec-base.jpg" alt="" loading="lazy" />
+          <img class="alt" src="./Assets/pdp/rec-4.jpg" alt="Lacey bra" loading="lazy" />
+        </span>
+        <span class="donerec__info">
+          <span class="donerec__nm">Lacey bra</span>
+          <span class="donerec__pr">€59.95</span>
+        </span>
+      </a>
+      <a class="donerec__card" href="./pdp.html">
+        <span class="donerec__img">
+          <img src="./Assets/pdp/rec-base.jpg" alt="" loading="lazy" />
+          <img class="alt" src="./Assets/pdp/rec-6.jpg" alt="Jersey" loading="lazy" />
+        </span>
+        <span class="donerec__info">
+          <span class="donerec__nm">Jersey</span>
+          <span class="donerec__pr">€49.95</span>
+        </span>
       </a>
     </div>
   </div>
