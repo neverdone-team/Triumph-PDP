@@ -629,6 +629,25 @@ h1,h2,h3,p{margin:0;font-weight:400}
 }
 
 /* ============================================================
+   MOTION — row reveal (motion lab A): the PLP's card entrance at row scale.
+   The products arrive one after the next, and the cross-sell cards do the
+   same as they come into view (Amelie, 2026-09-14).
+   ============================================================ */
+.rvl{animation:rowReveal .7s var(--ease-reveal) backwards;
+  animation-delay:calc(var(--i, 0) * 55ms)}
+@keyframes rowReveal{
+  from{opacity:0;transform:translateY(28px);filter:blur(3px)}
+  to{opacity:1;transform:none;filter:none}
+}
+/* backwards, not both: a forwards fill would pin transform to none and the swipe-to-
+   delete would have nothing left to move (Amelie, 2026-09-14). The end state is the
+   element's own, so nothing is lost by letting it revert. */
+/* only set by script, so a page without it — or one that asks for less motion —
+   shows the cards outright */
+.rvl-pre{opacity:0}
+@media (prefers-reduced-motion: reduce){ .rvl,.rvl-pre{animation:none;opacity:1} }
+
+/* ============================================================
    MOTION — figure roll (motion lab D, Amelie 2026-09-14): a figure that
    changes is seen changing. The box is held while the two values pass
    through it, so nothing around the figure moves.
@@ -1283,6 +1302,40 @@ h1,h2,h3,p{margin:0;font-weight:400}
     el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
   }
 
+  /* A line only makes its entrance once. The list is rebuilt on every change, so the
+     test is the sku, not the node — otherwise every quantity click would replay the
+     whole list (Amelie, 2026-09-14). */
+  const REVEALED = new Set();
+  function revealItems(){
+    const rows = $$('.item', $('#cartItems'));
+    if (!REDUCED.matches) {
+      rows.filter(n => !REVEALED.has(n.dataset.sku)).slice(0, 8).forEach((n, i) => {
+        n.style.setProperty('--i', i);
+        n.classList.add('rvl');
+      });
+    }
+    rows.forEach(n => REVEALED.add(n.dataset.sku));
+  }
+
+  /* the cross-sell cards wait until they are scrolled to, the same trigger and the same
+     threshold the PLP uses for its grid */
+  (function revealAddons(){
+    if (REDUCED.matches) return;
+    const cards = $$('.acard');
+    if (!cards.length || !('IntersectionObserver' in window)) return;
+    cards.forEach(c => c.classList.add('rvl-pre'));
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        en.target.style.setProperty('--i', cards.indexOf(en.target));
+        en.target.classList.remove('rvl-pre');
+        en.target.classList.add('rvl');
+        io.unobserve(en.target);
+      });
+    }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
+    cards.forEach(c => io.observe(c));
+  })();
+
   /* ---------------- render ---------------- */
   function render(){
     const bag = Shop.read();
@@ -1308,6 +1361,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
     $('#cartItems').innerHTML = bag.lines
       .map((l, i) => lineHTML(l, bag.member, stockOf(l, i, bag.lines))).join('');
+    revealItems();
     $$('[data-member-only]').forEach(el => { el.hidden = el.dataset.memberOnly !== String(bag.member); });
 
     const t = Shop.totals();
