@@ -528,6 +528,9 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
    gap, which left the label crowded under them (Amelie, 2026-09-14). */
 #payList .opt__logo{order:-1;width:86px;justify-content:flex-start;gap:var(--space-6);
   align-self:center}
+/* the wordmarks read from their left edge; a single square icon in the same 86px column
+   only looks placed if it is centred in it (Amelie, 2026-09-14) */
+#payList .opt[data-pay="gift"] .opt__logo{justify-content:center}
 #payList .opt__body{display:flex;flex-direction:column;justify-content:center}
 /* the brand marks carry width/height attributes, so max-height cannot grow them —
    an explicit height with width:auto does (Amelie, 2026-09-10) */
@@ -761,6 +764,9 @@ body[data-mode="steps"] .place.is-last{display:block}
 .li__price{text-align:right;display:flex;flex-direction:column;align-items:flex-end;
   gap:var(--space-2);padding-left:var(--space-32)}
 .li__pricerow{display:flex;align-items:baseline;gap:var(--space-8)}
+/* the count belongs where there is no stepper to state it — the review, not the rail */
+.li__qty{display:none}
+.review__items .li__qty{display:inline}
 .li__unit{white-space:nowrap}
 
 /* In the rail the row is barely 390px across, and three columns put both the product
@@ -1932,7 +1938,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
           /* collection first in normal caps and Light, then the product in caps and
              Regular — one shape everywhere (Amelie, 2026-09-11) */
           (l.series ? '<span class="li__series t-body-s">' + esc(l.series) + '</span>' : '') +
-          '<span class="li__name t-title-xs">' + esc(l.name) + '</span>' +
+          '<span class="li__name t-title-xs">' + esc(l.name) +
+            (l.qty > 1 ? '<span class="li__qty"> (' + l.qty + ')</span>' : '') + '</span>' +
           (meta ? '<span class="li__meta t-body-s">' + esc(meta) + '</span>' : '') +
         '</span>' +
         '<span class="li__price' + (member && l.member ? ' li__price--member' : '') + '">' +
@@ -2583,9 +2590,13 @@ body[data-mode="onepage"] .ck__rail{position:static;
        moves; the ones already answered stay where they are. */
     const live = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null).pop();
     if (live) {
-      const ROWS = '.opt, .review__row, .field, .gate__col, .sec__next, .check';
+      const ROWS = '.opt, .review__row, .field, .gate__col, .check';
       let moved = reveal(live, ROWS);
       if (!moved) moved = reveal(live, ':scope > *');
+      /* the section's own Continue comes after its rows — revealed on its own rather than
+         with them, or an eight-field address step would cap it out (Amelie, 2026-09-14) */
+      const next = $('.sec__next', live);
+      if (next) revealNode(next, Math.min(moved, 5));
       /* the stepped flow's button lives outside the section it belongs to, so it is not
          picked up by the rows above — it comes in last, behind them (Amelie,
          2026-09-14) */
