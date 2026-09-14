@@ -55,6 +55,7 @@
   --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
   --header-h:80px;
   --ease-out:cubic-bezier(.22,.61,.36,1);
+  --ease-reveal:cubic-bezier(.22,1,.36,1);
   /* half-weight strokes: a 0.5px stroke drawn as 1px at half alpha (see .field__frame) */
   --hair-ink:color-mix(in srgb, var(--c-ink) 50%, transparent);
   --hair-edge:color-mix(in srgb, var(--c-edge) 50%, transparent);
@@ -440,9 +441,9 @@ body[data-mode="onepage"] .ck__rail .trust{order:6;margin-top:var(--space-24)}
 body[data-mode="onepage"] .ck__rail .rail__dhead{order:7;display:block;
   margin-top:var(--space-48);padding-top:var(--space-24);border-top:1px solid var(--c-hair)}
 /* the date belongs with the order it describes, not with the figures (Amelie, 2026-09-14) */
-/* the date introduces the list, so it sits against it — the base rule's 32px bottom
-   margin left a hole between them (Amelie, 2026-09-14) */
-body[data-mode="onepage"] .ck__rail .promise{order:8;margin:var(--space-12) 0 var(--space-16)}
+/* the rail states no date at all now: the delivery method carries it, and repeating it
+   over the order list only split the two (Amelie, 2026-09-14) */
+body[data-mode="onepage"] .ck__rail .promise{display:none}
 body[data-mode="onepage"] .ck__rail #railItems{order:9;padding-top:var(--space-8);padding-bottom:0}
 /* the list is a read-back of the bag, so it takes a heading of its own and stands well
    clear of the figures above it; the three assurances belong with the total they are
@@ -500,6 +501,11 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 
 /* the chosen store, with the way to change it right beside it */
 .storepick{display:flex;align-items:baseline;gap:var(--space-12);margin-top:var(--space-6)}
+/* the option's text column is narrow on a phone, and the link was breaking across two
+   lines beside the store name (Amelie, 2026-09-14) */
+@media (max-width:575px){
+  .storepick{flex-direction:column;align-items:flex-start;gap:var(--space-4)}
+}
 .storelist{display:grid;gap:1px;background:var(--c-hair);
   margin:0 0 var(--space-4) calc(24px + var(--space-16) + 20px + var(--space-16))}
 .storelist__it{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);
@@ -653,7 +659,8 @@ body[data-mode="steps"] .place.is-last{display:block}
    rather than 48px away (Amelie, 2026-09-14) */
 .ck__rail .review__news + .place{margin-top:var(--space-16)}
 .review__items{margin-top:var(--space-64)}
-.review__items .sec__head{margin-bottom:var(--space-32)}
+.review__items .sec__head{margin-bottom:var(--space-24);
+  padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair)}
 /* with the steppers gone the second row is empty, so the text hung at the top of a
    107px packshot: both columns span the rows and centre (Amelie, 2026-09-14) */
 .review__items .li__body,
@@ -756,8 +763,9 @@ body[data-mode="steps"] .place.is-last{display:block}
 .ck__rail .li__img{width:104px;height:139px}
 .ck__rail .li__imgwrap{grid-row:1 / span 3}
 .ck__rail .li__price{grid-column:2;text-align:left;align-items:flex-start;
-  padding-left:0;margin-top:var(--space-8)}
+  padding-left:0;margin-top:var(--space-12)}
 .ck__rail .li__acts{grid-column:2;margin-top:var(--space-12)}
+.ck__rail .li__meta{margin-top:var(--space-4)}
 /* on a phone the rail has the page's full width, so the packshot can be the size it is
    in the bag, and the list sits straight under the date (Amelie, 2026-09-14) */
 @media (max-width:991px){
@@ -767,9 +775,8 @@ body[data-mode="steps"] .place.is-last{display:block}
   .ck__rail .li__imgwrap{width:144px}
   .ck__rail .li__img{width:144px;height:192px}
   .ck__rail .li__price{margin-top:var(--space-12)}
-  .ck__rail .li__acts{margin-top:var(--space-16)}
+  .ck__rail .li__acts{margin-top:var(--space-12)}
   body[data-mode="onepage"] .ck__rail{padding-top:var(--space-24)}
-  body[data-mode="onepage"] .ck__rail .promise{margin:var(--space-8) 0 var(--space-12)}
   body[data-mode="onepage"] .ck__rail #railItems{padding-top:0}
   body[data-mode="onepage"] .ck__rail .rail__dhead{margin-top:var(--space-32)}
 }
@@ -778,6 +785,7 @@ body[data-mode="steps"] .place.is-last{display:block}
    overflowing an 80px column onto the text (Amelie, 2026-09-14) */
 /* the member price is the brand's own offer, so it is stated in the brand's colour, as
    it is in the bag (Amelie, 2026-09-14) */
+.li__price--member .t-price{color:var(--c-burgundy)}
 .li__member{color:var(--c-burgundy);font-size:10px;line-height:14px;letter-spacing:.14em;text-transform:uppercase}
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--c-edge);height:var(--control-28)}
@@ -835,6 +843,32 @@ body[data-mode="steps"] .place.is-last{display:block}
 .trust{display:flex;flex-wrap:wrap;gap:var(--space-20);margin-top:var(--space-32);color:var(--c-ink)}
 .trust span{display:inline-flex;align-items:center;gap:var(--space-6)}
 .trust svg{flex:none}
+
+/* ============================================================
+   MOTION — the two moves chosen in the motion lab (Amelie, 2026-09-14).
+   A · row reveal: the PLP's card entrance at row scale, staggered.
+   D · figure roll: a changed figure is seen changing, with one beat of
+       peppermint on the row it sits in.
+   ============================================================ */
+.rvl{animation:rowReveal 1.4s var(--ease-reveal) both;
+  animation-delay:calc(var(--i, 0) * 90ms)}
+@keyframes rowReveal{
+  from{opacity:0;transform:translateY(28px);filter:blur(3px)}
+  to{opacity:1;transform:none;filter:none}
+}
+/* the figure keeps its own box while the two values pass through it, so nothing
+   around it moves */
+.fig{display:inline-grid;overflow:hidden;justify-items:end}
+.fig > span{grid-area:1/1;white-space:nowrap}
+.fig__out{animation:figOut .26s var(--ease-out) both}
+.fig__in{animation:figIn .34s var(--ease-reveal) .1s both}
+@keyframes figOut{to{opacity:0;transform:translateY(-90%)}}
+@keyframes figIn{from{opacity:0;transform:translateY(90%)}to{opacity:1;transform:none}}
+.is-flash{animation:rowFlash 1.1s var(--ease-out) both}
+@keyframes rowFlash{0%,100%{background:transparent}18%{background:var(--color-peppermint)}}
+@media (prefers-reduced-motion: reduce){
+  .rvl,.fig__out,.fig__in,.is-flash{animation:none}
+}
 
 /* alerts (DS Inline Alert) */
 .alert{display:flex;gap:var(--space-12);padding:var(--space-16);margin-bottom:var(--space-20);border:1px solid var(--c-hair)}
@@ -969,6 +1003,9 @@ body[data-mode="steps"] .place.is-last{display:block}
   /* the summary sits at the foot of the page, open, instead of collapsed at the top */
   body[data-mode="onepage"]:not([data-step="0"]) .ck{display:flex;flex-direction:column}
   body[data-mode="onepage"] .ck__form{order:1}
+  /* moved out of the form column on one screen, the list needs an order of its own or
+     it falls to 0 and lands above everything (Amelie, 2026-09-14) */
+  .ck > .review__items{order:3}
   body[data-mode="onepage"]:not([data-step="0"]) .ck__railcol{display:block;order:2;
     border-left:0;border-top:1px solid var(--c-hair)}
   /* the rail is the last thing on the page now, so it carries the clearance the form
@@ -1829,7 +1866,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
           '<span class="li__name t-title-xs">' + esc(l.name) + '</span>' +
           (meta ? '<span class="li__meta t-body-s">' + esc(meta) + '</span>' : '') +
         '</span>' +
-        '<span class="li__price">' +
+        '<span class="li__price' + (member && l.member ? ' li__price--member' : '') + '">' +
           '<span class="t-price">' + eur(charged * l.qty) + '</span>' +
           // a member is charged the member price, so that IS the price — showing the
           // standard one beside it would only be noise at this point in the flow
@@ -1864,23 +1901,25 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const t = Shop.totals({ member: state.member, ship: state.ship });
 
     // the list may be living in the review column by now, so it is addressed by reference
-    (RAIL_ITEMS || r('#railItems')).innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
+    const listEl = RAIL_ITEMS || r('#railItems');
+    listEl.innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
+    reveal(listEl, '.li');
     r('#railEmpty').hidden = t.lines.length > 0;
     $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
 
-    r('[data-subtotal]').textContent = eur(t.sub);
+    roll(r('[data-subtotal]'), eur(t.sub));
     r('#discountRow').hidden = !t.voucher;
     /* A code entered on the bag page is already stated in the summary row above, so the
        gift-card section stays folded — it does not need to open to prove it. */
     if (t.voucher && $('#voucher') && !$('#voucher').value) $('#voucher').value = t.voucher;
-    r('[data-discount]').textContent = '−' + eur(t.discount);
+    roll(r('[data-discount]'), '−' + eur(t.discount));
     $$('[data-voucher-count]').forEach(n => { n.textContent = t.voucher ? ' (1)' : ''; });
     if (t.voucher) $$('[data-voucher-name]').forEach(n => { n.textContent = t.voucher; });
     const shipCell = r('[data-shipping]');
-    shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
+    roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
-    r('[data-vat]').textContent = eur(t.vat);
-    $$('[data-total]').forEach(n => (n.textContent = eur(t.total)));
+    roll(r('[data-vat]'), eur(t.vat));
+    $$('[data-total]').forEach(n => roll(n, eur(t.total)));
     r('[data-promise]').innerHTML = PROMISE[state.ship];
 
     // the standard-shipping price cell reflects membership / the free-shipping threshold
@@ -2343,24 +2382,68 @@ body[data-mode="onepage"] .ck__rail{position:static;
     mark();
   })();
 
+  const NARROW  = window.matchMedia('(max-width:991px)');
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* ---------------- motion (motion lab A and D) ----------------
+     `reveal` restarts the animation by taking the class off, forcing a reflow and
+     putting it back — without the reflow a second call does nothing at all. */
+  function reveal(root, sel){
+    if (REDUCED.matches || !root) return;
+    $$(sel, root).slice(0, 8).forEach((n, i) => {
+      n.style.setProperty('--i', i);
+      n.classList.remove('rvl');
+      void n.offsetWidth;
+      n.classList.add('rvl');
+    });
+  }
+  /* the first paint of a figure is not a change, so it is written straight in; every
+     later one rolls, and the row it lives in takes one beat of peppermint */
+  function roll(el, next){
+    if (!el) return;
+    next = String(next);
+    const first = el.dataset.fig == null;
+    if (first || REDUCED.matches || el.dataset.fig === next) {
+      el.classList.remove('fig'); el.textContent = next; el.dataset.fig = next; return;
+    }
+    const prev = el.dataset.fig;
+    el.dataset.fig = next;
+    el.classList.add('fig');
+    el.innerHTML = '<span class="fig__out">' + esc(prev) + '</span>' +
+                   '<span class="fig__in">'  + esc(next) + '</span>';
+    const row = el.closest('.trow');
+    if (row) { row.classList.remove('is-flash'); void row.offsetWidth; row.classList.add('is-flash'); }
+    clearTimeout(el._rollT);
+    el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
+  }
   function layoutReview(on){
     const items = RAIL_ITEMS, place = PLACE_EL, news = NEWS_EL;
     const box = $('#reviewItems'), rail = RAIL, totals = RAIL && $('.totals', RAIL);
     if (!items || !box || !rail) return;
-    park(items); park(place); park(news);
+    park(items); park(place); park(news); park(box);
     if (on) {
       box.hidden = false;
       box.appendChild(items);
       /* the opt-in is the last thing agreed to before the order is placed, so it sits
          immediately above the button (Amelie, 2026-09-14) */
       if (place && totals) { totals.after(place); if (news) place.before(news); }
+      /* On one column the figures come first and the list that explains them second —
+         the other way round the summary read as a second, unrelated block (Amelie,
+         2026-09-14). On two columns the list stays in its own column. */
+      const railcol = rail.closest('.ck__railcol');
+      if (NARROW.matches && railcol) railcol.after(box); else goHome(box);
     } else {
       box.hidden = true;
       goHome(items);
       goHome(place);
       goHome(news);
+      goHome(box);
     }
   }
+  /* the two columns become one and back again as the window is resized */
+  NARROW.addEventListener('change', () => {
+    if (document.body.dataset.step === String(LAST_STEP)) layoutReview(true);
+  });
 
   function applyStep(n) {
     step = Math.min(LAST_STEP, Math.max(0, n));
@@ -2407,6 +2490,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
     $('.paybar').style.display = step === 0 ? 'none' : '';   // the gate has its own doors
     $('.place').classList.toggle('is-last', step === LAST_STEP);
     if (step === LAST_STEP) fillReview();
+    /* The step you have just arrived at comes in row by row — the same entrance the PLP
+       gives its cards (Amelie, 2026-09-14). Only the section actually being worked on
+       moves; the ones already answered stay where they are. */
+    const live = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null).pop();
+    if (live) {
+      reveal(live, '.opt, .review__row, .field, .gate__col');
+      if (!$$('.opt, .review__row, .field, .gate__col', live).length) reveal(live, ':scope > *');
+    }
     // the mobile pay bar carries the same call to action as the desktop column
     const payBtn = $('.paybar .btn');
     if (payBtn) {

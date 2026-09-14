@@ -42,6 +42,7 @@
   --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
   --header-h:72px;
   --ease-out:cubic-bezier(.22,.61,.36,1);
+  --ease-reveal:cubic-bezier(.22,1,.36,1);
   /* half-weight strokes: a 0.5px stroke drawn as 1px at half alpha (see .field__frame) */
   --hair-ink:color-mix(in srgb, var(--c-ink) 50%, transparent);
   --hair-edge:color-mix(in srgb, var(--c-edge) 50%, transparent);
@@ -625,6 +626,24 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .undobar{left:var(--space-16);right:var(--space-16);
     top:calc(var(--header-h) + var(--space-12));transform:translateY(-12px);max-width:none}
   .undobar[data-show="true"]{transform:translateY(0)}
+}
+
+/* ============================================================
+   MOTION — figure roll (motion lab D, Amelie 2026-09-14): a figure that
+   changes is seen changing, and the row it sits in takes one beat of
+   peppermint. The box is held while the two values pass through it, so
+   nothing around the figure moves.
+   ============================================================ */
+.fig{display:inline-grid;overflow:hidden;justify-items:end}
+.fig > span{grid-area:1/1;white-space:nowrap}
+.fig__out{animation:figOut .26s var(--ease-out) both}
+.fig__in{animation:figIn .34s var(--ease-reveal) .1s both}
+@keyframes figOut{to{opacity:0;transform:translateY(-90%)}}
+@keyframes figIn{from{opacity:0;transform:translateY(90%)}to{opacity:1;transform:none}}
+.is-flash{animation:rowFlash 1.1s var(--ease-out) both}
+@keyframes rowFlash{0%,100%{background:transparent}18%{background:var(--color-peppermint)}}
+@media (prefers-reduced-motion: reduce){
+  .fig__out,.fig__in,.is-flash{animation:none}
 }
 
 /* ---------------- empty state ---------------- */
@@ -1246,6 +1265,28 @@ h1,h2,h3,p{margin:0;font-weight:400}
     '</article>';
   }
 
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
+  /* The first paint of a figure is not a change, so it is written straight in; every
+     later one rolls out upward while the new value arrives from below, and the row it
+     lives in takes one beat of peppermint (motion lab D, Amelie 2026-09-14). */
+  function roll(el, next){
+    if (!el) return;
+    next = String(next);
+    const first = el.dataset.fig == null;
+    if (first || REDUCED.matches || el.dataset.fig === next) {
+      el.classList.remove('fig'); el.textContent = next; el.dataset.fig = next; return;
+    }
+    const prev = el.dataset.fig;
+    el.dataset.fig = next;
+    el.classList.add('fig');
+    el.innerHTML = '<span class="fig__out">' + esc(prev) + '</span>' +
+                   '<span class="fig__in">'  + esc(next) + '</span>';
+    const row = el.closest('.trow');
+    if (row) { row.classList.remove('is-flash'); void row.offsetWidth; row.classList.add('is-flash'); }
+    clearTimeout(el._rollT);
+    el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
+  }
+
   /* ---------------- render ---------------- */
   function render(){
     const bag = Shop.read();
@@ -1274,14 +1315,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $$('[data-member-only]').forEach(el => { el.hidden = el.dataset.memberOnly !== String(bag.member); });
 
     const t = Shop.totals();
-    $('[data-subtotal]').textContent = eur(t.sub);
+    roll($('[data-subtotal]'), eur(t.sub));
     $('#discountRow').hidden = !t.voucher;
-    $('[data-discount]').textContent = '−' + eur(t.discount);
+    roll($('[data-discount]'), '−' + eur(t.discount));
     if (t.voucher) $('[data-voucher-name]').textContent = t.voucher;
     const shipCell = $('[data-shipping]');
-    shipCell.textContent = t.shipCost === 0 ? 'Free' : eur(t.shipCost);
+    roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
-    $$('[data-total]').forEach(n => n.textContent = eur(t.total));
+    $$('[data-total]').forEach(n => roll(n, eur(t.total)));
     $$('[data-count]').forEach(n => n.textContent = t.count + (t.count === 1 ? ' item' : ' items'));
 
     /* The count rides in the header so a collapsed section still says a code is on the
@@ -1295,7 +1336,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const saved = bag.member ? 0 : bag.lines.reduce((sum, l) =>
       sum + (was(l) - charged(l, bag.member)) * l.qty, 0);
     $('#saveRow').hidden = saved < 0.01;
-    $('[data-saved]').textContent = eur(saved);
+    roll($('[data-saved]'), eur(saved));
 
     $('#shipFill').style.width = Math.min(100, (t.base / t.freeAt) * 100) + '%';
     $('#shipCard').classList.toggle('is-free', t.gap === 0);
