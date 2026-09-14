@@ -1624,7 +1624,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <span class="opt__radio"></span>
           <span class="opt__body"><span class="opt__title t-body-m">Digital gift card</span></span>
           <span class="opt__logo">
-            <svg width="30" height="20" viewBox="0 0 30 20" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="29" height="19" stroke="rgba(0,0,0,.3)"/><path d="M0 7h30M12 7v13M9 4a3 3 0 013-3 3 3 0 013 3M18 4a3 3 0 00-3-3" stroke="rgba(0,0,0,.3)"/></svg>
+            <svg width="30" height="20" viewBox="0 0 30 20" fill="none" aria-hidden="true" stroke="currentColor" stroke-width="1"><rect x=".5" y="4.5" width="29" height="15"/><path d="M15 4.5v15"/><path d="M15 4.5C12.8 4.5 10.8 3.8 10.8 2.4 10.8 1.3 12 .8 13.1 1.4 14.1 1.9 14.7 3.1 15 4.5Z"/><path d="M15 4.5c2.2 0 4.2-.7 4.2-2.1 0-1.1-1.2-1.6-2.3-1-1 .5-1.6 1.7-1.9 3.1Z"/></svg>
           </span>
         </label>
         <div class="opt__panel" data-panel="gift">
@@ -1972,6 +1972,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
        (Amelie, 2026-09-14). Only the section being worked on reveals. */
     const listEl = RAIL_ITEMS || r('#railItems');
     listEl.innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
+    /* ...except on the review, where the list has moved into the left column and is part
+       of what is being read rather than the reference beside it (Amelie, 2026-09-14) */
+    if (listEl.closest('.review__items')) reveal(listEl, '.li');
     r('#railEmpty').hidden = t.lines.length > 0;
     $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
 
@@ -2490,6 +2493,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (on) {
       box.hidden = false;
       box.appendChild(items);
+      reveal(items, '.li');
       /* the opt-in is the last thing agreed to before the order is placed, so it sits
          immediately above the button (Amelie, 2026-09-14) */
       if (place && totals) { totals.after(place); if (news) place.before(news); }
@@ -2561,8 +2565,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
        moves; the ones already answered stay where they are. */
     const live = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null).pop();
     if (live) {
-      reveal(live, '.opt, .review__row, .field, .gate__col');
-      if (!$$('.opt, .review__row, .field, .gate__col', live).length) reveal(live, ':scope > *');
+      const ROWS = '.opt, .review__row, .field, .gate__col, .sec__next, .check';
+      reveal(live, ROWS);
+      if (!$$(ROWS, live).length) reveal(live, ':scope > *');
     }
     // the mobile pay bar carries the same call to action as the desktop column
     const payBtn = $('.paybar .btn');
