@@ -121,9 +121,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
    (Amelie, 2026-09-10). */
 /* start, not baseline: the promise carries a 20px icon, which drags its baseline down
    and left the two facts looking a line apart (Amelie, 2026-09-11) */
-.statusbox{border:1px solid var(--c-edge);padding:var(--space-16);
+/* A plane, not a box (Amelie, 2026-09-14): a flat wash with no outline at all, so the
+   block recedes as a surface instead of announcing itself as a card — and the track
+   inverts with it, unfilled in white rather than grey, which leaves no grey line
+   anywhere in the component. */
+.statusbox{background:var(--c-wash);border:0;padding:var(--space-20);
   display:grid;grid-template-columns:minmax(0,1fr) auto;
-  gap:var(--space-12) var(--space-24);align-items:start}
+  gap:var(--space-16) var(--space-24);align-items:start}
 #shipMsg{grid-column:1;grid-row:1}
 .promise{grid-column:2;grid-row:1;justify-self:end;
   display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
@@ -132,13 +136,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the icon is exactly one line box tall, so the text sits on the same top edge as the
    plain 14/20 line in the other column */
 .promise span{line-height:20px}
-.ship-progress__bar{grid-column:1 / -1;height:4px;background:var(--c-grey-light);overflow:hidden}
-.ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;transition:width .3s var(--ease-out)}
+.ship-progress__bar{grid-column:1 / -1;height:2px;background:var(--c-bg);overflow:hidden}
+.ship-progress__fill{display:block;height:100%;background:var(--c-ink);width:60%;
+  transition:width .45s cubic-bezier(.22,1,.36,1)}
 /* Reaching the threshold ends the progress: the box becomes the same peppermint one-liner
    a member sees, tick and all, because there is nothing left to track (Amelie,
    2026-09-11). The bar goes with it. */
 .statusbox.is-free{background:var(--color-peppermint);border-color:transparent;
-  padding:var(--space-12) var(--space-16)}
+  padding:var(--space-16) var(--space-20)}
 .statusbox.is-free .ship-progress{margin:0;padding:0;border-top:0}
 .statusbox.is-free .ship-progress__bar{display:none}
 .statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
@@ -149,7 +154,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
    one line, and no taller than that line. The tint IS the box, so it carries no stroke
    (Amelie, 2026-09-10). */
 .statusbox.is-member{background:var(--color-peppermint);border-color:transparent;
-  padding:var(--space-12) var(--space-16)}
+  padding:var(--space-16) var(--space-20)}
 .shipfree svg{flex:none}
 
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
@@ -170,7 +175,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* a row on its way out: it collapses and fades, and the bag is told once it has gone */
 .item.is-going{height:0!important;opacity:0;padding-top:0;padding-bottom:0;overflow:hidden;
   pointer-events:none;
-  transition:height .3s var(--ease-out), opacity .22s var(--ease-out), padding .3s var(--ease-out)}
+  /* the row fades first and only then folds away, both on a long decelerating curve —
+     a 300ms snap read as the list being yanked shut (Amelie, 2026-09-14) */
+  transition:opacity .3s ease,
+             height .52s cubic-bezier(.32,.72,0,1) .06s,
+             padding .52s cubic-bezier(.32,.72,0,1) .06s}
 
 /* No rules between products (Amelie, 2026-09-10) — the white space between rows does
    the separating, as it does between the checkout's sections. */
@@ -257,10 +266,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__side{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;
   gap:var(--space-8);text-align:left;margin-top:var(--space-12)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
-/* The per-unit figure shares the price line but sits at its right edge, away from the
-   member label. On its own line it made the row grow and shrink as the quantity crossed
-   1, which is the jump (Amelie, 2026-09-14). */
-.item__unit{margin-left:var(--space-16);white-space:nowrap;color:var(--c-ink-soft)}
+/* The per-unit figure sits on its own line under the price being charged. It keeps that
+   line at every quantity — hidden, not removed, at one — so the row never grows or
+   shrinks as the stepper crosses 1 (Amelie, 2026-09-14). */
+.item__unit{flex:1 0 100%;margin:var(--space-2) 0 0;white-space:nowrap;color:var(--c-ink-soft)}
 /* at quantity 1 it says nothing new, but it keeps its place: hiding it outright made the
    row grow and shrink wherever the price line wraps */
 .item__unit.is-blank{visibility:hidden}
@@ -549,9 +558,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 }
 
 /* ---------------- undo bar ----------------
-   Bottom centre on desktop, and above the sticky checkout bar on a phone. */
+   Top centre, just under the header: the row it refers to has just vanished from the
+   top of the list, so the offer to bring it back belongs there too (Amelie, 2026-09-14). */
 .undobar{
-  position:fixed;left:50%;bottom:var(--space-24);transform:translate(-50%,12px);
+  position:fixed;left:50%;top:calc(var(--header-h) + var(--space-12));transform:translate(-50%,-12px);
   z-index:120;display:flex;align-items:center;gap:var(--space-16);
   background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-12) var(--space-16);
   opacity:0;transition:opacity .22s var(--ease-out), transform .22s var(--ease-out);
@@ -562,8 +572,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .undobar__x{display:grid;place-items:center;width:var(--control-28);height:var(--control-28);color:inherit;opacity:.7}
 .undobar__x:hover{opacity:1}
 @media (max-width:991px){
-  .undobar{left:var(--space-16);right:var(--space-16);bottom:calc(var(--space-16) + 88px);
-    transform:translateY(12px);max-width:none}
+  .undobar{left:var(--space-16);right:var(--space-16);
+    top:calc(var(--header-h) + var(--space-12));transform:translateY(-12px);max-width:none}
   .undobar[data-show="true"]{transform:translateY(0)}
 }
 
@@ -638,7 +648,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* the row order and the price layout are the base now; a phone only needs the name a
      rung smaller, tighter under the collection, and the shot pinned to the top */
   .item__name{font-size:14px;line-height:20px;margin-top:var(--space-2)}
-  .item__unit{white-space:nowrap}
+  .item__unit{white-space:nowrap;margin-left:0}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   /* no room beside a 112px stepper at this width: the size takes its own line */
@@ -1090,8 +1100,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const attrs = [];
     if (l.colour || l.size) attrs.push(
       '<span class="attr-colour">'+
-        '<span class="t-body-s">'+
-          [l.colour ? 'Colour: '+esc(l.colour) : '', l.size ? esc(l.size) : '']
+        '<span class="t-body-m">'+
+          [l.colour ? 'Colour: '+esc(l.colour) : '', l.size ? 'Size: '+esc(l.size) : '']
             .filter(Boolean).join(' &middot; ')+
         '</span>'+
         '<button class="t-link-s" type="button" data-size-open aria-label="Change colour or size">Change</button>'+
@@ -1263,7 +1273,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
       item.style.height = item.getBoundingClientRect().height + 'px';
       void item.offsetHeight;
       item.classList.add('is-going');
-      setTimeout(() => { Shop.remove(sku); toast(name + ' removed from your bag'); }, 320);
+      setTimeout(() => { Shop.remove(sku); toast(name + ' removed from your bag'); }, 600);
       return;
     }
 
