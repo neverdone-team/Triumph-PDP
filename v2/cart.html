@@ -125,14 +125,19 @@ h1,h2,h3,p{margin:0;font-weight:400}
    block recedes as a surface instead of announcing itself as a card — and the track
    inverts with it, unfilled in white rather than grey, which leaves no grey line
    anywhere in the component. */
-.statusbox{background:var(--c-wash);border:0;padding:var(--space-20);
+/* 80 is the height the default state builds from its own parts — a line of type, the
+   gap and the 2px track. It is held as a floor so the member state, whose one line is a
+   couple of pixels shorter, does not sit a nudge below the others (Amelie, 2026-09-14). */
+.statusbox{background:var(--c-wash);border:0;padding:var(--space-20);min-height:80px;
   display:grid;grid-template-columns:minmax(0,1fr) auto;
   gap:var(--space-16) var(--space-24);align-items:start}
 #shipMsg{grid-column:1;grid-row:1}
 .promise{grid-column:2;grid-row:1;justify-self:end;
   display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
 /* no delivery icon: the words carry it (Amelie, 2026-09-14) */
-.promise__label{color:var(--c-grey-medium)}
+/* the label is ink, not grey: on the tinted box it lost contrast, and on the plane it
+   read as an afterthought next to the date it introduces (Amelie, 2026-09-14) */
+.promise__label{color:var(--c-ink)}
 /* the icon is exactly one line box tall, so the text sits on the same top edge as the
    plain 14/20 line in the other column */
 .promise span{line-height:20px}
@@ -142,23 +147,21 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* Reaching the threshold ends the progress: the box becomes the same peppermint one-liner
    a member sees, tick and all, because there is nothing left to track (Amelie,
    2026-09-11). The bar goes with it. */
-.statusbox.is-free{background:var(--color-peppermint);border-color:transparent;
-  padding:var(--space-16) var(--space-20)}
+.statusbox.is-free{background:var(--color-peppermint);border-color:transparent}
 .statusbox.is-free .ship-progress{margin:0;padding:0;border-top:0}
-.statusbox.is-free .ship-progress__bar{display:none}
+/* One height in every state (Amelie, 2026-09-14): the unlocked and member states have
+   no progress left to draw, but the bar keeps its row — hidden, not removed — so the box
+   does not shrink by a row and a gap the moment the threshold is crossed. */
+.statusbox.is-free .ship-progress__bar,
+.statusbox.is-member .ship-progress__bar{visibility:hidden}
 .statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
-/* grey on peppermint is the one place the label loses its contrast, so there it is ink
-   (Amelie, 2026-09-14) */
-.statusbox.is-free .promise__label,
-.statusbox.is-member .promise__label{color:var(--c-ink)}
 .statusbox.is-free #shipMsg svg{flex:none}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
   color:var(--color-green);margin:0}
 /* A member has one fact here and it is good news, so the box says so: tinted green,
    one line, and no taller than that line. The tint IS the box, so it carries no stroke
    (Amelie, 2026-09-10). */
-.statusbox.is-member{background:var(--color-peppermint);border-color:transparent;
-  padding:var(--space-16) var(--space-20)}
+.statusbox.is-member{background:var(--color-peppermint);border-color:transparent}
 .shipfree svg{flex:none}
 
 /* the MyTriumph invitation is an offer, so it reads as one: a burgundy badge with the
@@ -359,7 +362,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .acard:hover .acard__img img{transform:scale(1.04)}
 .acard__info{display:flex;flex-direction:column;gap:var(--space-2);min-width:0;padding-top:var(--space-12)}
 .acard__series{display:block;color:var(--c-ink)}
-.acard__nm{display:block;margin-top:var(--space-2)}
+/* one line, clipped: a two-line name pushed the price and the + out of step with the
+   cards beside it (Amelie, 2026-09-14) */
+.acard__nm{display:block;margin-top:var(--space-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* the price and the add control share the last line, with the + pushed to the card's
    right edge (Amelie, 2026-09-10) */
 .acard__buy{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);
@@ -384,8 +390,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .trow--code{align-items:flex-start}
 .dcode{display:flex;align-items:baseline;gap:var(--space-12);flex-wrap:wrap;min-width:0}
 .dcode__line{display:flex;align-items:baseline;gap:var(--space-8)}
-.dcode__x{color:var(--c-ink-soft)}
-.dcode__x:hover{color:var(--c-ink)}
+/* the remove link follows the discount it undoes, on the same line and in ink — under
+   it, in grey, it read as a second row of the summary (Amelie, 2026-09-14) */
+.dcode__x{color:var(--c-ink)}
+.dcode__x:hover{opacity:.6}
 .trow--code .t-price{color:var(--color-green)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
 .linesave{color:var(--color-green)}
@@ -755,8 +763,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
                  and the date as well as after the icon -->
             <span class="t-body-m"><span class="promise__label">Delivery</span> Fri 11 – Sat 12 Sep</span>
           </p>
-          <div class="ship-progress__bar" data-member-only="false"><span class="ship-progress__fill" id="shipFill"></span></div>
-          <p class="shipfree t-body-s" data-member-only="true">
+          <div class="ship-progress__bar"><span class="ship-progress__fill" id="shipFill"></span></div>
+          <p class="shipfree t-body-m" data-member-only="true">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>
             As a MyTriumph member you ship free.
           </p>
@@ -867,8 +875,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
             <span class="dcode__line">
               <span class="t-body-m" data-voucher-name>CODE</span>
               <span class="muted t-body-s">10% off</span>
+              <button class="t-link-s dcode__x" type="button" id="voucherClear">remove</button>
             </span>
-            <button class="t-link-s dcode__x" type="button" id="voucherClear">remove</button>
           </span>
           <span class="t-price" data-discount>−€0.00</span>
         </div>
