@@ -577,32 +577,49 @@ h1,h2,h3,p{margin:0;font-weight:400}
   transition:opacity .24s var(--ease-out)}
 .qs[data-open="true"] .qs__scrim{opacity:1}
 .qs__panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);
-  width:min(880px,calc(100vw - 48px));max-height:min(88vh,760px);overflow:auto;
-  background:var(--c-bg);padding:var(--space-24) var(--space-32) var(--space-32);
+  width:min(1140px,calc(100vw - 64px));max-height:min(88vh,820px);overflow:auto;
+  background:var(--c-bg);padding:var(--space-32) var(--space-48) var(--space-48);
   opacity:0;transition:opacity .24s var(--ease-out), transform .24s var(--ease-out)}
 .qs[data-open="true"] .qs__panel{opacity:1;transform:translate(-50%,-50%)}
 .qs__grab{display:none}
+/* no rule under the title on the live dialog — the space does the separating */
 .qs__head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);
-  padding-bottom:var(--space-20);border-bottom:1px solid var(--c-hair);
   margin-bottom:var(--space-32)}
 .qs__title{margin:0}
 .qs__x{width:var(--control-32);height:var(--control-32);display:grid;place-items:center;
   flex:none;margin-right:calc(var(--space-8) * -1)}
 
 /* one image, and everything that can be chosen beside it */
-.qs__body{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);
-  column-gap:var(--space-40);row-gap:var(--space-24);align-items:start}
+/* min-content for the top row: the image spans both, and without this its extra height
+   is shared out and opens a hole between the price and the colourways */
+.qs__body{display:grid;grid-template-columns:minmax(0,460px) minmax(0,1fr);
+  grid-template-rows:min-content 1fr;
+  column-gap:var(--space-64);row-gap:var(--space-24);align-items:start}
 .qs__media{grid-column:1;grid-row:1 / span 2;aspect-ratio:3/4;background:var(--c-grey-light)}
 .qs__media img{width:100%;height:100%;object-fit:cover;display:block}
 .qs__meta{grid-column:2;grid-row:1;min-width:0}
-.qs__name{margin:var(--space-2) 0 var(--space-10)}
+/* the series in caps above the product, as the live dialog sets it */
+.qs__series{display:block;color:var(--c-ink)}
+.qs__name{margin:var(--space-10) 0 var(--space-20);
+  font-weight:400;font-size:16px;line-height:22px;letter-spacing:.10em;text-transform:uppercase}
 .qs__price{margin:0;display:flex;align-items:baseline;gap:var(--space-8)}
+/* the member price takes its own line under the standard one, in the brand's burgundy */
+.qs__member{margin:var(--space-4) 0 0;display:flex;align-items:baseline;gap:var(--space-8);
+  color:var(--c-burgundy)}
+.qs__member .t-price{color:var(--c-burgundy)}
+.qs__opts{margin-top:var(--space-12)}
 .qs__opts{grid-column:2;grid-row:2;min-width:0}
 
 /* the colourways carry the chosen colour's name as their label, as the PDP does */
 .qs__colours{position:static;display:flex;flex-wrap:wrap;gap:var(--space-8);
   padding:0;background:none;border:0;box-shadow:none;width:auto;max-width:none;
   margin-top:var(--space-8)}
+/* portrait tiles, not square thumbs, and the chosen one carries a rule under it */
+.qs__colours .cthumb{padding-bottom:var(--space-6);border-bottom:1px solid transparent}
+.qs__colours .cthumb img{width:52px;height:70px;border:0;object-fit:cover}
+/* the worn colour has no swatch of its own, so its tile is a crop of the product shot */
+.qs__colours .cthumb--current img{object-position:50% 30%}
+.qs__colours .cthumb[data-sel="true"]{border-bottom-color:var(--c-ink)}
 .qs__band{margin:var(--space-24) 0 0}
 /* the colour block leads, so it carries no top margin; every band after it does */
 #qsColour .qs__band{margin-top:0}
@@ -1083,11 +1100,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
     <div class="qs__body">
       <div class="qs__media"><img id="qsImg" src="" alt="" /></div>
       <div class="qs__meta">
-        <span class="t-body-s" id="qsSeries">Series</span>
-        <h3 class="qs__name t-title-m" id="qsName">Product</h3>
+        <span class="qs__series t-label-m" id="qsSeries">Series</span>
+        <h3 class="qs__name" id="qsName">Product</h3>
         <p class="qs__price">
           <span class="t-price" id="qsPrice">&euro;0.00</span>
-          <span class="qs__vat t-body-s muted">incl. VAT</span>
+          <span class="qs__rrp t-body-s muted">RRP</span>
+        </p>
+        <p class="qs__member" id="qsMember" hidden>
+          <span class="t-price" data-qs-member>&euro;0.00</span>
+          <span class="t-body-s">Member price</span>
         </p>
       </div>
       <div class="qs__opts">
@@ -1513,7 +1534,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     if (e.target.closest('[data-size-open]')) {
       const l = Shop.read().lines.filter(x => x.sku === sku)[0];
       if (l) openQuickShop({ mode:'size', sku:sku, size:l.size,
-        data:{ name:l.name, series:l.series, colour:l.colour, img:l.img, price:l.unit } });
+        data:{ name:l.name, series:l.series, colour:l.colour, img:l.img,
+               price:l.unit, member:l.member } });
       return;
     }
 
@@ -1650,6 +1672,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#qsSeries').textContent = qsData.series;
     $('#qsName').textContent = qsData.name;
     $('#qsPrice').textContent = eur(Number(qsData.price));
+    const mem = Number(qsData.member) || 0;
+    $('#qsMember').hidden = !mem || mem >= Number(qsData.price);
+    if (mem) $('[data-qs-member]').textContent = eur(mem);
     /* the colourways live in the dialog now, so Change covers colour as well as size */
     $('#qsColour').innerHTML = '<div class="qs__band">'+
       '<span class="qs__bandlabel t-label-s" id="qsColourName">'+esc(qsData.colour || 'Colour')+'</span>'+
