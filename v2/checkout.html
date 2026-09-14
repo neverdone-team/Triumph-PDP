@@ -327,6 +327,9 @@ body{background-image:none}
 .opt__body{flex:1;min-width:0}
 .opt__title{display:block}
 .opt__meta{display:block;color:var(--c-ink-soft);margin-top:var(--space-2)}
+/* the method names the row, but the date is the fact being chosen, so it keeps the ink
+   and the Regular weight (Amelie, 2026-09-14) */
+.opt__date{color:var(--c-ink);font-weight:400}
 .opt__price{flex:none;text-align:right}
 /* DS Option Row gives every payment mark the same 38×24 box, so the logos line up */
 .opt__logo{flex:none;display:flex;align-items:center;gap:var(--space-6)}
@@ -687,7 +690,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   margin:0 0 var(--space-32); padding:0;
   background:transparent;
 }
-.promise__icon{flex:none;position:relative;top:1px}
+/* no delivery icon: the words carry it (Amelie, 2026-09-14) */
 .promise__label{color:var(--c-grey-medium)}
 /* the icon is exactly one line box tall, so the row's text sits on the same top edge as
    any plain 14/20 line beside it */
@@ -1217,8 +1220,8 @@ body[data-mode="steps"] .place.is-last{display:block}
           <input type="radio" name="ship" value="std" checked />
           <span class="opt__radio"></span>
           <span class="opt__body">
-            <span class="opt__title t-body-m">Fri 11 – Sat 12 Sep 2026</span>
-            <span class="opt__meta t-body-s">Standard delivery · DHL</span>
+            <span class="opt__title t-body-m">Standard delivery · DHL</span>
+            <span class="opt__meta opt__date t-body-s">Fri 11 – Sat 12 Sep 2026</span>
           </span>
           <span class="opt__price t-price" data-ship-price="std">€4.99</span>
         </label>
@@ -1226,8 +1229,8 @@ body[data-mode="steps"] .place.is-last{display:block}
           <input type="radio" name="ship" value="express" />
           <span class="opt__radio"></span>
           <span class="opt__body">
-            <span class="opt__title t-body-m">Thu 10 Sep 2026</span>
-            <span class="opt__meta t-body-s">Express delivery · DHL — order by 12:00</span>
+            <span class="opt__title t-body-m">Express delivery · DHL</span>
+            <span class="opt__meta opt__date t-body-s">Thu 10 Sep 2026 — order by 12:00</span>
           </span>
           <span class="opt__price t-price" data-ship-price="express">€9.99</span>
         </label>
@@ -1235,8 +1238,8 @@ body[data-mode="steps"] .place.is-last{display:block}
           <input type="radio" name="ship" value="pickup" />
           <span class="opt__radio"></span>
           <span class="opt__body">
-            <span class="opt__title t-body-m">From Thu 10 Sep 2026</span>
-            <span class="opt__meta t-body-s">Collect in store · Triumph Berlin Ku'damm</span>
+            <span class="opt__title t-body-m">Collect in store · Triumph Berlin Ku'damm</span>
+            <span class="opt__meta opt__date t-body-s">From Thu 10 Sep 2026</span>
           </span>
           <span class="opt__price t-price is-free" data-ship-price="pickup">Free</span>
         </label>
@@ -1416,7 +1419,6 @@ body[data-mode="steps"] .place.is-last{display:block}
     </div>
 
     <div class="promise">
-      <svg class="promise__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M1.5 6.5h11.5v8.5H1.5z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><path d="M13 9.5h3.6l3.9 3.7V15H13z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><circle cx="6" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/><circle cx="16.4" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/></svg>
       <span class="t-body-m" data-promise><span class="promise__label">Delivery</span> Fri 11 – Sat 12 Sep 2026</span>
     </div>
 

@@ -127,8 +127,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 #shipMsg{grid-column:1;grid-row:1}
 .promise{grid-column:2;grid-row:1;justify-self:end;
   display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink);margin:0}
-/* the icon's optical centre sits a touch above the text's, so it drops 1px */
-.promise__icon{flex:none;position:relative;top:1px}
+/* no delivery icon: the words carry it (Amelie, 2026-09-14) */
 .promise__label{color:var(--c-grey-medium)}
 /* the icon is exactly one line box tall, so the text sits on the same top edge as the
    plain 14/20 line in the other column */
@@ -166,6 +165,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 /* ---------------- line items ---------------- */
 .items{}
+/* a row on its way out: it collapses and fades, and the bag is told once it has gone */
+.item.is-going{height:0!important;opacity:0;padding-top:0;padding-bottom:0;overflow:hidden;
+  pointer-events:none;
+  transition:height .3s var(--ease-out), opacity .22s var(--ease-out), padding .3s var(--ease-out)}
+
 /* No rules between products (Amelie, 2026-09-10) — the white space between rows does
    the separating, as it does between the checkout's sections. */
 /* Series above the name, and the text block centred against the packshot (Amelie,
@@ -214,8 +218,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
    tile, 44px image top-aligned, 2px ink underline on the chosen one. Values lifted from
    pdp.html .swatch so cart and PDP read as the same component. */
 .attr-colour{display:inline-flex;align-items:baseline;gap:var(--space-12)}
-/* the colour options, revealed by Change — the PLP's thumbnails, with the chosen one
-   marked by a 2px rule under it */
+/* the colour options, revealed by Change — the PLP's thumbnails and its 1px rule under
+   the chosen one */
 /* A popover, not a block in the flow: opening it used to push the whole line — and
    everything under it — down the page. It drops straight under the colour line and lies
    OVER the quantity and size fields, which are inert while a colour is being chosen
@@ -224,16 +228,18 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* width:max-content, or an absolutely positioned box shrinks to its containing block —
    the 150px colour line — and the five thumbs wrap into a tall column */
 .colours{position:absolute;top:calc(100% + var(--space-8));left:0;
-  z-index:5;display:flex;gap:var(--space-12);
+  z-index:5;display:flex;gap:var(--space-6);
   width:max-content;max-width:calc(100vw - var(--space-32));
   padding:var(--space-12);background:var(--c-bg);
   border:1px solid var(--c-hair);box-shadow:0 10px 24px rgba(0,0,0,.10)}
 /* on a phone the text column is narrower than the strip, so it opens leftwards instead */
 @media (max-width:575px){ .colours{left:auto;right:0} }
-.cthumb{border-bottom:2px solid transparent;padding-bottom:2px;flex:none;
+.cthumb{border-bottom:1px solid transparent;padding-bottom:2px;flex:none;
   transition:border-color .2s var(--ease-out)}
 .cthumb img{display:block;width:44px;height:44px;object-fit:cover;
-  border:1px solid var(--c-hair);background:var(--c-bg)}
+  border:1px solid rgba(0,0,0,.06);background:var(--c-bg)}
+/* the worn colour is a crop of the product photo, as on the PLP */
+.cthumb--current img{object-position:50% 22%}
 .cthumb:hover{border-bottom-color:var(--c-edge)}
 .cthumb[data-sel="true"]{border-bottom-color:var(--c-ink)}
 /* Size under quantity rather than beside it (Amelie, 2026-09-11) — the two controls
@@ -249,7 +255,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* The per-unit figure shares the price line but sits at its right edge, away from the
    member label. On its own line it made the row grow and shrink as the quantity crossed
    1, which is the jump (Amelie, 2026-09-14). */
-.item__unit{margin-left:auto;white-space:nowrap;color:var(--c-ink-soft)}
+.item__unit{margin-left:var(--space-16);white-space:nowrap;color:var(--c-ink-soft)}
 /* at quantity 1 it says nothing new, but it keeps its place: hiding it outright made the
    row grow and shrink wherever the price line wraps */
 .item__unit.is-blank{visibility:hidden}
@@ -350,7 +356,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .trow--code .t-price{color:var(--color-green)}
 .t-price-was{color:var(--c-ink-soft);text-decoration:line-through;text-decoration-thickness:1px}
 .linesave{color:var(--color-green)}
-.grand__num{font-weight:400;font-size:20px;line-height:26px;letter-spacing:0}
+/* the same figure the checkout's rail uses (Amelie, 2026-09-14) */
+.grand__num{font-weight:300;font-size:24px;line-height:28px;letter-spacing:.01em}
 .sum__cta{margin-top:var(--space-20)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
   height:var(--control-44);padding:0 var(--space-24);background:var(--c-ink);color:var(--c-on-dark);
@@ -660,9 +667,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
     </nav>
     <a class="hd__logo" href="./index.html" aria-label="Triumph"><img src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" /></a>
     <div class="hd__icons">
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M7.97004 4.04495L9.40824 2.54683C10.1273 1.82772 10.9663 1.40825 11.9251 1.40825C12.824 1.40825 13.7228 1.82772 14.382 2.4869C15.7603 3.9251 15.7603 6.26218 14.382 7.76031C13.3633 8.77904 8.02996 14.4719 8.02996 14.4719C8.02996 14.4719 2.6367 8.77904 1.6779 7.76031C0.299626 6.32211 0.299626 3.98503 1.6779 2.4869C2.27715 1.82772 3.17603 1.40825 4.07491 1.40825C4.97378 1.40825 5.87266 1.82772 6.53184 2.4869L7.97004 4.04495Z" stroke="currentColor"/></svg>
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="6" r="2.7" stroke="currentColor" stroke-width="1"/><path d="M3.5 15.5a5.5 5.5 0 0111 0" stroke="currentColor" stroke-width="1"/></svg>
-      <a class="hd__bag" href="./cart.html" aria-label="Shopping bag"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 5h10l-1 10H5L4 5zM7 5a2 2 0 014 0" stroke="currentColor" stroke-width="1"/></svg><span class="hd__count t-body-xs" data-cart-count>0</span></a>
+      <!-- wishlist, account and basket are gone from the bag's own header (Amelie,
+           2026-09-14): you are already in the bag, and the icons only led back to it.
+           No [data-cart-count] here either — lib/shop.js paints that node visible, so a
+           hidden one would have come back. -->
     </div>
   </div>
 </header>
@@ -702,7 +710,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
         <div class="statusbox" id="shipCard">
           <div class="t-body-m" id="shipMsg" data-member-only="false"><strong style="font-weight:400" data-gap>€20.15</strong> away from free shipping.</div>
           <p class="promise">
-            <svg class="promise__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M1.5 6.5h11.5v8.5H1.5z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><path d="M13 9.5h3.6l3.9 3.7V15H13z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><circle cx="6" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/><circle cx="16.4" cy="17.2" r="1.8" stroke="currentColor" stroke-width="1"/></svg>
             <!-- one span, not two flex items: the row's gap was falling between the word
                  and the date as well as after the icon -->
             <span class="t-body-m"><span class="promise__label">Delivery</span> Fri 11 – Sat 12 Sep</span>
@@ -990,8 +997,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
   const CHEV = '<svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>';
+  /* the same × the mini cart and the undo bar use, rather than a drawn bin */
   const ICON_TRASH = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
-    '<path d="M2.5 4h9M5.5 4V2.5h3V4M4 4l.6 8h4.8L10 4" stroke="currentColor" stroke-width="1"/></svg>';
+    '<path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1"/></svg>';
   const ICON_TICK = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
     '<path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg>';
   const ICON_OUT = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">'+
@@ -1067,10 +1075,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
       '<span class="attr-colour">'+
         '<span class="t-body-s">Colour: '+esc(l.colour)+'</span>'+
         '<button class="t-link-s" type="button" data-colour-toggle aria-expanded="false">Change</button>'+
-        '<span class="colours" hidden>'+
-          COLOURWAYS.map(c =>
+        /* the PLP's panel exactly: the worn colour first as a crop of the product itself,
+             then the other colourways as fabric swatches, 6px apart, the chosen one
+             underlined (Amelie, 2026-09-14) */
+      '<span class="colours" hidden>'+
+          '<button class="cthumb cthumb--current" type="button" data-colour="'+esc(l.colour)+'"'+
+            ' title="'+esc(l.colour)+'" aria-label="'+esc(l.colour)+'" data-sel="true">'+
+            '<img src="'+esc(l.img || '')+'" alt="" />'+
+          '</button>'+
+          COLOURWAYS.filter(c => c.name !== l.colour).map(c =>
             '<button class="cthumb" type="button" data-colour="'+esc(c.name)+'" title="'+esc(c.name)+'"'+
-              ' aria-label="'+esc(c.name)+'"'+(c.name === l.colour ? ' data-sel="true"' : '')+'>'+
+              ' aria-label="'+esc(c.name)+'">'+
               '<img src="'+esc(c.sw)+'" alt="" />'+
             '</button>').join('')+
         '</span>'+
@@ -1234,11 +1249,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
       return;
     }
 
-    // the stepper's trash at quantity 1, and the swiped-open red panel, both delete
+    // the stepper's × at quantity 1, and the swiped-open red panel, both delete
     if (e.target.closest('[data-remove]') || e.target.closest('[data-confirm-remove]')) {
       const name = (item.querySelector('.item__name') || {}).textContent || 'Product';
-      Shop.remove(sku);
-      toast(name + ' removed from your bag');
+      /* Collapse the row before it goes, rather than letting the list snap shut under the
+         cursor: pin the current height, then transition it to nothing (Amelie,
+         2026-09-14). The bag is only told once the row has left the screen. */
+      if (item.classList.contains('is-going')) return;      // one click is enough
+      item.style.height = item.getBoundingClientRect().height + 'px';
+      void item.offsetHeight;
+      item.classList.add('is-going');
+      setTimeout(() => { Shop.remove(sku); toast(name + ' removed from your bag'); }, 320);
       return;
     }
 
