@@ -847,11 +847,12 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* ============================================================
    MOTION — the two moves chosen in the motion lab (Amelie, 2026-09-14).
    A · row reveal: the PLP's card entrance at row scale, staggered.
-   D · figure roll: a changed figure is seen changing, with one beat of
-       peppermint on the row it sits in.
+   D · figure roll: a changed figure is seen changing. No tint on the row —
+       the movement is the signal, and green in the summary means free
+       (Amelie, 2026-09-14).
    ============================================================ */
-.rvl{animation:rowReveal 1.4s var(--ease-reveal) both;
-  animation-delay:calc(var(--i, 0) * 90ms)}
+.rvl{animation:rowReveal .7s var(--ease-reveal) both;
+  animation-delay:calc(var(--i, 0) * 55ms)}
 @keyframes rowReveal{
   from{opacity:0;transform:translateY(28px);filter:blur(3px)}
   to{opacity:1;transform:none;filter:none}
@@ -864,10 +865,8 @@ body[data-mode="steps"] .place.is-last{display:block}
 .fig__in{animation:figIn .34s var(--ease-reveal) .1s both}
 @keyframes figOut{to{opacity:0;transform:translateY(-90%)}}
 @keyframes figIn{from{opacity:0;transform:translateY(90%)}to{opacity:1;transform:none}}
-.is-flash{animation:rowFlash 1.1s var(--ease-out) both}
-@keyframes rowFlash{0%,100%{background:transparent}18%{background:var(--color-peppermint)}}
 @media (prefers-reduced-motion: reduce){
-  .rvl,.fig__out,.fig__in,.is-flash{animation:none}
+  .rvl,.fig__out,.fig__in{animation:none}
 }
 
 /* alerts (DS Inline Alert) */
@@ -2411,8 +2410,6 @@ body[data-mode="onepage"] .ck__rail{position:static;
     el.classList.add('fig');
     el.innerHTML = '<span class="fig__out">' + esc(prev) + '</span>' +
                    '<span class="fig__in">'  + esc(next) + '</span>';
-    const row = el.closest('.trow');
-    if (row) { row.classList.remove('is-flash'); void row.offsetWidth; row.classList.add('is-flash'); }
     clearTimeout(el._rollT);
     el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
   }

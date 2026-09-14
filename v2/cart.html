@@ -630,9 +630,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 /* ============================================================
    MOTION — figure roll (motion lab D, Amelie 2026-09-14): a figure that
-   changes is seen changing, and the row it sits in takes one beat of
-   peppermint. The box is held while the two values pass through it, so
-   nothing around the figure moves.
+   changes is seen changing. The box is held while the two values pass
+   through it, so nothing around the figure moves.
    ============================================================ */
 .fig{display:inline-grid;overflow:hidden;justify-items:end}
 .fig > span{grid-area:1/1;white-space:nowrap}
@@ -640,10 +639,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .fig__in{animation:figIn .34s var(--ease-reveal) .1s both}
 @keyframes figOut{to{opacity:0;transform:translateY(-90%)}}
 @keyframes figIn{from{opacity:0;transform:translateY(90%)}to{opacity:1;transform:none}}
-.is-flash{animation:rowFlash 1.1s var(--ease-out) both}
-@keyframes rowFlash{0%,100%{background:transparent}18%{background:var(--color-peppermint)}}
 @media (prefers-reduced-motion: reduce){
-  .fig__out,.fig__in,.is-flash{animation:none}
+  .fig__out,.fig__in{animation:none}
 }
 
 /* ---------------- empty state ---------------- */
@@ -1267,8 +1264,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
   /* The first paint of a figure is not a change, so it is written straight in; every
-     later one rolls out upward while the new value arrives from below, and the row it
-     lives in takes one beat of peppermint (motion lab D, Amelie 2026-09-14). */
+     later one rolls out upward while the new value arrives from below. No tint on the
+     row: the movement is the signal, and green in this summary means free (Amelie,
+     2026-09-14). */
   function roll(el, next){
     if (!el) return;
     next = String(next);
@@ -1281,8 +1279,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
     el.classList.add('fig');
     el.innerHTML = '<span class="fig__out">' + esc(prev) + '</span>' +
                    '<span class="fig__in">'  + esc(next) + '</span>';
-    const row = el.closest('.trow');
-    if (row) { row.classList.remove('is-flash'); void row.offsetWidth; row.classList.add('is-flash'); }
     clearTimeout(el._rollT);
     el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
   }

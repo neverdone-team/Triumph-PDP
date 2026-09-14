@@ -99,8 +99,8 @@ button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:
    A · ROW REVEAL — the PLP's card entrance, at line scale
    ============================================================ */
 .revl{opacity:0;transform:translateY(28px);filter:blur(3px)}
-.is-play .revl{animation:revealIn calc(1.4s * var(--t)) var(--ease-reveal) both;
-  animation-delay:calc(var(--i, 0) * 90ms * var(--t))}
+.is-play .revl{animation:revealIn calc(.7s * var(--t)) var(--ease-reveal) both;
+  animation-delay:calc(var(--i, 0) * 55ms * var(--t))}
 @keyframes revealIn{
   from{opacity:0;transform:translateY(28px);filter:blur(3px)}
   to{opacity:1;transform:none;filter:none}
@@ -204,7 +204,7 @@ button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:
       was slow.</p>
       <dl class="spec">
         <dt>Move</dt><dd>28px rise · blur 3 → 0 · opacity 0 → 1</dd>
-        <dt>Time</dt><dd>1.4s, 90ms apart</dd>
+        <dt>Time</dt><dd>700ms, 55ms apart</dd>
         <dt>Curve</dt><dd>ease-reveal</dd>
         <dt>Where</dt><dd>The bag's product list, and the rail's order details</dd>
       </dl>
@@ -319,14 +319,13 @@ button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:
       <dl class="spec">
         <dt>Out</dt><dd>260ms up and away</dd>
         <dt>In</dt><dd>340ms from below, 100ms behind</dd>
-        <dt>Row</dt><dd>One peppermint beat, 1.1s</dd>
         <dt>Where</dt><dd>Subtotal, You save and Total after a quantity or a code changes</dd>
       </dl>
       <button class="demo__go" type="button" data-play="d">Replay</button>
     </div>
     <div class="stage" data-demo="d">
       <div class="rows">
-        <div class="row flash"><span>Subtotal</span>
+        <div class="row"><span>Subtotal</span>
           <span class="roll t-price"><span class="roll__old">€101.85</span><span class="roll__new">€155.80</span></span></div>
         <div class="row"><span>Shipping</span><span class="t-price" style="color:var(--color-green)">Free</span></div>
         <div class="row row--grand"><span class="t-title-s">Total</span>
