@@ -1117,8 +1117,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
        label or the saving, never both. */
     const price =
       '<span class="pricepair'+(isMember ? ' pricepair--member' : '')+'">'+
+        /* the former price comes first, so the eye reads the drop left to right
+           (Amelie, 2026-09-14) */
         '<span class="priceline">'+
-          '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +
+          wasTag + '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+
         '</span>'+
         (isMember ? '<span class="pricepair__member t-price-s">Member price</span>' : saveTag)+
       '</span>';
