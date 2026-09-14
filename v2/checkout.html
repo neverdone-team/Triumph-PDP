@@ -2459,14 +2459,19 @@ body[data-mode="onepage"] .ck__rail{position:static;
   /* ---------------- motion (motion lab A and D) ----------------
      `reveal` restarts the animation by taking the class off, forcing a reflow and
      putting it back — without the reflow a second call does nothing at all. */
-  function reveal(root, sel){
-    if (REDUCED.matches || !root) return;
-    $$(sel, root).slice(0, 8).forEach((n, i) => {
-      n.style.setProperty('--i', i);
-      n.classList.remove('rvl');
-      void n.offsetWidth;
-      n.classList.add('rvl');
-    });
+  function revealNode(n, i){
+    if (REDUCED.matches || !n) return;
+    n.style.setProperty('--i', i);
+    n.classList.remove('rvl');
+    void n.offsetWidth;
+    n.classList.add('rvl');
+  }
+  /* returns how many rows it moved, so whatever follows them can carry on the stagger */
+  function reveal(root, sel, start){
+    if (REDUCED.matches || !root) return 0;
+    const rows = $$(sel, root).slice(0, 8);
+    rows.forEach((n, i) => revealNode(n, (start || 0) + i));
+    return rows.length;
   }
   /* the first paint of a figure is not a change, so it is written straight in; every
      later one rolls, and the row it lives in takes one beat of peppermint */
@@ -2566,8 +2571,13 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const live = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null).pop();
     if (live) {
       const ROWS = '.opt, .review__row, .field, .gate__col, .sec__next, .check';
-      reveal(live, ROWS);
-      if (!$$(ROWS, live).length) reveal(live, ':scope > *');
+      let moved = reveal(live, ROWS);
+      if (!moved) moved = reveal(live, ':scope > *');
+      /* the stepped flow's button lives outside the section it belongs to, so it is not
+         picked up by the rows above — it comes in last, behind them (Amelie,
+         2026-09-14) */
+      const nav = $('#stepnav');
+      if (nav && nav.style.display !== 'none') revealNode(nav, Math.min(moved, 5));
     }
     // the mobile pay bar carries the same call to action as the desktop column
     const payBtn = $('.paybar .btn');
