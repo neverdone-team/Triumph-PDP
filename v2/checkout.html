@@ -542,6 +542,12 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* a phone has no width to give away: the fields run to the left edge, flush with the
    radio above them (Amelie, 2026-09-11) */
 @media (max-width:575px){ #payList .opt__panel{padding-left:0} }
+/* the tiles come down on a phone, where the row has a third of the width to give
+   (Amelie, 2026-09-14) */
+@media (max-width:575px){
+  #payList .opt__logo{width:112px;gap:var(--space-4)}
+  #payList .opt__logo svg{width:54px;height:32px;padding:5px 7px}
+}
 /* On a phone the control comes down to 48 and the reserved supporting-text band goes:
    the fields jump a little when an error appears, which Amelie prefers to carrying the
    band's air down the whole column (Amelie, 2026-09-14). */
