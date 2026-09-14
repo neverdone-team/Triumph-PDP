@@ -149,11 +149,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
    2026-09-11). The bar goes with it. */
 .statusbox.is-free{background:var(--color-peppermint);border-color:transparent}
 .statusbox.is-free .ship-progress{margin:0;padding:0;border-top:0}
-/* One height in every state (Amelie, 2026-09-14): the unlocked and member states have
-   no progress left to draw, but the bar keeps its row — hidden, not removed — so the box
-   does not shrink by a row and a gap the moment the threshold is crossed. */
+/* One height in every state (Amelie, 2026-09-14): the unlocked and member states have no
+   progress left to draw, so the bar goes — and the line that is left centres in the
+   height the box keeps, rather than sitting at the top of it. */
 .statusbox.is-free .ship-progress__bar,
-.statusbox.is-member .ship-progress__bar{visibility:hidden}
+.statusbox.is-member .ship-progress__bar{display:none}
+.statusbox.is-free,.statusbox.is-member{align-content:center}
 .statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
 .statusbox.is-free #shipMsg svg{flex:none}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
@@ -588,12 +589,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .undobar{
   position:fixed;left:50%;top:calc(var(--header-h) + var(--space-12));transform:translate(-50%,-12px);
   z-index:120;display:flex;align-items:center;gap:var(--space-16);
-  background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-12) var(--space-16);
+  /* white, not ink: it appears over a white page and a black slab read as an alert
+     rather than a message. Regular carries it instead (Amelie, 2026-09-14). */
+  background:var(--c-bg);color:var(--c-ink);font-weight:400;
+  border:1px solid var(--c-hair);box-shadow:0 8px 24px rgba(0,0,0,.10);
+  padding:var(--space-12) var(--space-16);
   opacity:0;transition:opacity .22s var(--ease-out), transform .22s var(--ease-out);
   max-width:calc(100vw - 32px);
 }
 .undobar[data-show="true"]{opacity:1;transform:translate(-50%,0)}
-.undobar .t-link-s{color:var(--c-on-dark)}
+.undobar .t-body-s,.undobar .t-link-s{font-weight:400}
+.undobar .t-link-s{color:var(--c-ink)}
 .undobar__x{display:grid;place-items:center;width:var(--control-28);height:var(--control-28);color:inherit;opacity:.7}
 .undobar__x:hover{opacity:1}
 @media (max-width:991px){
