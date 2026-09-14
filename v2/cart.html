@@ -147,7 +147,21 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* Reaching the threshold ends the progress: the box becomes the same peppermint one-liner
    a member sees, tick and all, because there is nothing left to track (Amelie,
    2026-09-11). The bar goes with it. */
+/* nothing is being tracked any more, so the box stops being a full-width meter and
+   shrinks to the two facts it carries (Amelie, 2026-09-14) */
+.statusbox.is-free,.statusbox.is-member{width:max-content;max-width:100%;
+  grid-template-columns:auto auto;gap:var(--space-16) var(--space-40)}
 .statusbox.is-free{background:var(--color-peppermint);border-color:transparent}
+/* the tick draws itself on the stroke it already has */
+.statusbox.is-free #shipMsg svg path,
+.statusbox.is-member .shipfree svg path{
+  stroke-dasharray:15;stroke-dashoffset:15;
+  animation:tickdraw .45s .06s forwards cubic-bezier(.22,1,.36,1)}
+@keyframes tickdraw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: reduce){
+  .statusbox.is-free #shipMsg svg path,
+  .statusbox.is-member .shipfree svg path{animation:none;stroke-dashoffset:0}
+}
 .statusbox.is-free .ship-progress{margin:0;padding:0;border-top:0}
 /* One height in every state (Amelie, 2026-09-14): the unlocked and member states have no
    progress left to draw, so the bar goes — and the line that is left centres in the
@@ -216,7 +230,14 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__media{position:relative;align-self:start;aspect-ratio:3/4}
 .item__img{width:100%;height:100%;object-fit:cover;background:var(--c-grey-light)}
 .item__fav{position:absolute;top:var(--space-8);right:var(--space-8);width:var(--control-28);height:var(--control-28);
-  display:grid;place-items:center}
+  display:grid;place-items:center;cursor:pointer;color:var(--c-ink)}
+/* wished for: the outline fills with ink and the mark gives a short beat (Amelie,
+   2026-09-14) */
+.item__fav svg{transition:transform .18s var(--ease-out)}
+.item__fav:hover svg{transform:scale(1.08)}
+.item__fav.is-on svg{fill:var(--c-ink);animation:favpop .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes favpop{0%{transform:scale(.8)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .item__fav.is-on svg{animation:none} }
 .item__sub{display:block;color:var(--c-ink)}   /* the series is ink, not grey */
 .item__name{display:block;margin-top:var(--space-8)}
 .item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
@@ -416,6 +437,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
    the outlined variant each provider permits, and no coloured blocks in a monochrome page. */
 /* the secondary button's clothes — 1px ink, 56 tall — with the brand mark inside
    (Amelie, 2026-09-11) */
+/* every mark is cropped to its own ink, so the button centres what you can see rather
+   than a box with slack on one side (Amelie, 2026-09-14) */
 .xbtn{height:var(--control-44);display:flex;align-items:center;justify-content:center;
   border:1px solid var(--c-ink);background:var(--c-bg);
   transition:background .15s var(--ease-out)}
@@ -854,13 +877,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
         <p class="or t-label-m">express checkout</p>
         <div class="express">
             <button class="xbtn xbtn--paypal" type="button" aria-label="Pay with PayPal">
-              <svg width="58" height="16" viewBox="0 0 58 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="26" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
+              <svg width="47" height="15" viewBox="0 1 46.6 15" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="26" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
             </button>
             <button class="xbtn xbtn--apple" type="button" aria-label="Pay with Apple Pay">
-              <svg width="56" height="18" viewBox="0 0 62 20" aria-hidden="true"><path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/><text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text></svg>
+              <svg width="37" height="15" viewBox="3.1 1.7 41 16.7" aria-hidden="true"><path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/><text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text></svg>
             </button>
             <button class="xbtn xbtn--klarna" type="button" aria-label="Pay with Klarna">
-              <svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="12" font-weight="bold" fill="#0B051D">Klarna</text></svg>
+              <svg width="37" height="14" viewBox="0 2 37.4 14" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="12" font-weight="bold" fill="#0B051D">Klarna</text></svg>
             </button>
         </div>
       </div>
@@ -1041,6 +1064,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
      the fact that a member sees BOTH prices side by side (never a
      strike-through — see the member price display rule). */
 
+  /* the list is re-rendered on every change to the bag, so what is wished for is held
+     here rather than on the button that gets thrown away (Amelie, 2026-09-14) */
+  const WISHED = new Set();
   const ICON_FAV  = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M7.97004 4.04495L9.40824 2.54683C10.1273 1.82772 10.9663 1.40825 11.9251 1.40825C12.824 1.40825 13.7228 1.82772 14.382 2.4869C15.7603 3.9251 15.7603 6.26218 14.382 7.76031C13.3633 8.77904 8.02996 14.4719 8.02996 14.4719C8.02996 14.4719 2.6367 8.77904 1.6779 7.76031C0.299626 6.32211 0.299626 3.98503 1.6779 2.4869C2.27715 1.82772 3.17603 1.40825 4.07491 1.40825C4.97378 1.40825 5.87266 1.82772 6.53184 2.4869L7.97004 4.04495Z" stroke="currentColor"/></svg>';
   const ICON_MINUS= '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8" stroke="currentColor" stroke-width="1"/></svg>';
   const ICON_PLUS = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1"/></svg>';
@@ -1175,7 +1201,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
         ICON_TRASH+'<span class="t-label-s">Delete</span></button>'+
       '<div class="item__media">'+
         '<img class="item__img" src="'+esc(l.img||'')+'" alt="'+esc(l.series+' '+l.name)+'" />'+
-        '<button class="item__fav" type="button" aria-label="Add to wishlist">'+ICON_FAV+'</button>'+
+        '<button class="item__fav'+(WISHED.has(l.sku) ? ' is-on' : '')+'" type="button"'+
+          ' aria-pressed="'+(WISHED.has(l.sku) ? 'true' : 'false')+'"'+
+          ' aria-label="Add to wishlist">'+ICON_FAV+'</button>'+
       '</div>'+
       '<span class="item__name t-title-m">'+esc(l.name)+'</span>'+
       '<span class="item__sub t-body-s">'+esc(l.series||'')+'</span>'+
@@ -1328,7 +1356,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
     }
 
     const fav = e.target.closest('.item__fav');
-    if (fav) fav.classList.toggle('is-on');
+    if (fav) {
+      const on = !WISHED.has(sku);
+      if (on) WISHED.add(sku); else WISHED.delete(sku);
+      fav.classList.toggle('is-on', on);
+      fav.setAttribute('aria-pressed', String(on));
+      return;
+    }
   });
 
   /* ---------------- swipe to delete, phones only ----------------

@@ -438,8 +438,10 @@ body[data-mode="onepage"] .ck__rail .trust{order:6;margin-top:var(--space-24)}
 body[data-mode="onepage"] .ck__rail .rail__dhead{order:7;display:block;
   margin-top:var(--space-48);padding-top:var(--space-24);border-top:1px solid var(--c-hair)}
 /* the date belongs with the order it describes, not with the figures (Amelie, 2026-09-14) */
-body[data-mode="onepage"] .ck__rail .promise{order:8;margin-top:var(--space-16)}
-body[data-mode="onepage"] .ck__rail #railItems{order:9;padding-top:var(--space-20);padding-bottom:0}
+/* the date introduces the list, so it sits against it — the base rule's 32px bottom
+   margin left a hole between them (Amelie, 2026-09-14) */
+body[data-mode="onepage"] .ck__rail .promise{order:8;margin:var(--space-12) 0 var(--space-16)}
+body[data-mode="onepage"] .ck__rail #railItems{order:9;padding-top:var(--space-8);padding-bottom:0}
 /* the list is a read-back of the bag, so it takes a heading of its own and stands well
    clear of the figures above it; the three assurances belong with the total they are
    about (Amelie, 2026-09-14) */
@@ -566,7 +568,23 @@ body[data-mode="steps"] .steps{display:flex;gap:0}
   border:1px solid currentColor;display:grid;place-items:center;
   font-size:10px;line-height:1;letter-spacing:0;
 }
-.steps__item[data-done="true"] .steps__no{background:var(--c-ink);border-color:var(--c-ink);color:var(--c-on-dark)}
+/* a completed step is a tick, not a number — it arrives with a short pop and the tick
+   draws itself in from the left (Amelie, 2026-09-14) */
+.steps__no{transition:background .2s var(--ease-out), border-color .2s var(--ease-out), color .2s var(--ease-out)}
+.steps__item[data-done="true"] .steps__no{
+  background:var(--c-ink);border-color:var(--c-ink);color:transparent;font-size:0;
+  animation:stepPop .34s cubic-bezier(.34,1.56,.64,1)}
+.steps__item[data-done="true"] .steps__no::after{
+  content:"";display:block;width:8px;height:4px;margin-top:-2px;
+  border-left:1.5px solid var(--c-on-dark);border-bottom:1.5px solid var(--c-on-dark);
+  transform:rotate(-45deg);
+  animation:tickDraw .3s .06s both cubic-bezier(.22,1,.36,1)}
+@keyframes stepPop{0%{transform:scale(.82)}60%{transform:scale(1.09)}100%{transform:scale(1)}}
+@keyframes tickDraw{from{clip-path:inset(0 100% 0 0);opacity:0}to{clip-path:inset(0 0 0 0);opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  .steps__item[data-done="true"] .steps__no,
+  .steps__item[data-done="true"] .steps__no::after{animation:none}
+}
 /* .is-current drives the reveal in both modes: the stepped flow marks one section, the
    one-pager marks every section up to where you have got to (Amelie, 2026-09-11) */
 .sec[data-step]{display:none}
@@ -625,7 +643,10 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review dd{margin:0;white-space:pre-line;grid-column:1 / -1;grid-row:2}
 .review__news{margin-top:var(--space-24)}
 /* in the rail it is a row of the summary, not a line of the form */
-.ck__rail .review__news{margin:var(--space-24) 0 var(--space-16)}
+.ck__rail .review__news{margin:var(--space-24) 0 0}
+/* the opt-in is the last thing agreed to before the button, so it sits against it
+   rather than 48px away (Amelie, 2026-09-14) */
+.ck__rail .review__news + .place{margin-top:var(--space-16)}
 .review__items{margin-top:var(--space-64)}
 .review__items .sec__head{margin-bottom:var(--space-32)}
 /* with the steppers gone the second row is empty, so the text hung at the top of a
@@ -723,20 +744,29 @@ body[data-mode="steps"] .place.is-last{display:block}
    name and the figure onto two lines each. There — and only there — everything sits
    below everything else, with the packshot spanning the lot (Amelie, 2026-09-14). The
    review keeps the wide row, where the price has somewhere to be. */
-.ck__rail .li{grid-template-columns:80px minmax(0,1fr);row-gap:0;
-  align-items:center;padding:var(--space-24) 0}
+.ck__rail .li{grid-template-columns:104px minmax(0,1fr);row-gap:0;
+  align-items:center;padding:var(--space-20) 0}
+.ck__rail .li:first-of-type{padding-top:0}
+.ck__rail .li__imgwrap{width:104px}
+.ck__rail .li__img{width:104px;height:139px}
 .ck__rail .li__imgwrap{grid-row:1 / span 3}
 .ck__rail .li__price{grid-column:2;text-align:left;align-items:flex-start;
   padding-left:0;margin-top:var(--space-8)}
 .ck__rail .li__acts{grid-column:2;margin-top:var(--space-12)}
 /* on a phone the rail has the page's full width, so the packshot can be the size it is
    in the bag, and the list sits straight under the date (Amelie, 2026-09-14) */
-@media (max-width:575px){
-  .ck__rail .li{grid-template-columns:128px minmax(0,1fr);padding:var(--space-16) 0}
-  .ck__rail .li__imgwrap{width:128px}
-  .ck__rail .li__img{width:128px;height:171px}
-  body[data-mode="onepage"] .ck__rail .promise{margin-top:var(--space-8)}
+@media (max-width:991px){
+  .ck__rail .li{grid-template-columns:144px minmax(0,1fr);
+    column-gap:var(--space-20);padding:var(--space-20) 0}
+  .ck__rail .li:first-of-type{padding-top:0}
+  .ck__rail .li__imgwrap{width:144px}
+  .ck__rail .li__img{width:144px;height:192px}
+  .ck__rail .li__price{margin-top:var(--space-12)}
+  .ck__rail .li__acts{margin-top:var(--space-16)}
+  body[data-mode="onepage"] .ck__rail{padding-top:var(--space-24)}
+  body[data-mode="onepage"] .ck__rail .promise{margin:var(--space-8) 0 var(--space-12)}
   body[data-mode="onepage"] .ck__rail #railItems{padding-top:0}
+  body[data-mode="onepage"] .ck__rail .rail__dhead{margin-top:var(--space-32)}
 }
 /* the block above has to follow the .ck__rail rules it overrides: at equal specificity
    the later rule wins whatever the media query says, and the 128px packshot was
@@ -817,6 +847,35 @@ body[data-mode="steps"] .place.is-last{display:block}
 .done{padding:var(--space-64) var(--space-24) 120px}
 .done__in{max-width:520px;margin:0 auto;text-align:center;display:grid;gap:var(--space-16);justify-items:center}
 .done__tick{color:var(--c-ink);margin-bottom:var(--space-8)}
+/* the ring closes, then the tick is struck inside it (Amelie, 2026-09-14) */
+.done__tick circle{stroke-dasharray:120;stroke-dashoffset:120;transform:rotate(-90deg);
+  transform-origin:50% 50%;animation:ringdraw .62s cubic-bezier(.22,1,.36,1) forwards}
+.done__tick path{stroke-dasharray:24;stroke-dashoffset:24;
+  animation:donetick .36s .44s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes ringdraw{to{stroke-dashoffset:0}}
+@keyframes donetick{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: reduce){
+  .done__tick circle,.done__tick path{animation:none;stroke-dashoffset:0}
+}
+
+/* what to look at next, once there is nothing left to do on this page */
+.donerec{max-width:1080px;margin:var(--space-64) auto 0;padding:var(--space-40) var(--space-24) 0;
+  border-top:1px solid var(--c-hair)}
+.donerec__head{margin:0 0 var(--space-24)}
+.donerec__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-32)}
+.donerec__card{display:flex;flex-direction:column;min-width:0}
+.donerec__img{width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--c-grey-light)}
+.donerec__img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
+.donerec__card:hover .donerec__img img{transform:scale(1.04)}
+.donerec__series{display:block;color:var(--c-ink);margin-top:var(--space-12)}
+.donerec__nm{display:block;margin-top:var(--space-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.donerec__pr{display:block;margin-top:var(--space-6)}
+@media (max-width:767px){
+  .donerec{padding-left:var(--space-16);padding-right:var(--space-16);margin-top:var(--space-40)}
+  .donerec__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-20)}
+  .donerec__card:nth-child(3){display:none}
+}
 /* what happens next, in the customer's own reading width */
 .done__next{max-width:46ch;margin:var(--space-24) auto 0;color:var(--c-ink)}
 .done__facts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-24);
@@ -1659,6 +1718,31 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <div><dt class="t-label-s muted">Delivery</dt><dd class="t-body-m" id="doneShip">—</dd></div>
     </dl>
     <a class="btn btn--wide" href="./pdp.html">Continue shopping</a>
+  </div>
+
+  <!-- the order is done, so this is the only thing left to offer (Amelie, 2026-09-14) -->
+  <div class="donerec">
+    <h2 class="donerec__head t-title-s">You might also like</h2>
+    <div class="donerec__grid">
+      <a class="donerec__card" href="./pdp.html">
+        <span class="donerec__img"><img src="./Assets/10215855-0004_1.webp" alt="Amourette String" loading="lazy" /></span>
+        <span class="donerec__series t-body-s">Amourette</span>
+        <span class="donerec__nm t-title-xs">String</span>
+        <span class="donerec__pr t-price">&euro;22.95</span>
+      </a>
+      <a class="donerec__card" href="./pdp.html">
+        <span class="donerec__img"><img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Bra" loading="lazy" /></span>
+        <span class="donerec__series t-body-s">Aura Spotlight</span>
+        <span class="donerec__nm t-title-xs">Aura Spotlight Bra</span>
+        <span class="donerec__pr t-price">&euro;54.95</span>
+      </a>
+      <a class="donerec__card" href="./pdp.html">
+        <span class="donerec__img"><img src="./Assets/ck-brief.webp" alt="Amourette Tai" loading="lazy" /></span>
+        <span class="donerec__series t-body-s">Amourette</span>
+        <span class="donerec__nm t-title-xs">Tai</span>
+        <span class="donerec__pr t-price">&euro;24.95</span>
+      </a>
+    </div>
   </div>
 </section>
 
