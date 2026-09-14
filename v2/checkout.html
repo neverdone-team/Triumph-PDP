@@ -542,6 +542,16 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* a phone has no width to give away: the fields run to the left edge, flush with the
    radio above them (Amelie, 2026-09-11) */
 @media (max-width:575px){ #payList .opt__panel{padding-left:0} }
+/* On a phone the control comes down to 48 and the reserved supporting-text band goes:
+   the fields jump a little when an error appears, which Amelie prefers to carrying the
+   band's air down the whole column (Amelie, 2026-09-14). */
+@media (max-width:575px){
+  .field{--ctl:var(--control-48)}
+  #gateReg .field,#addrForm .field,#billing .field{padding-bottom:0}
+  #gateReg .grid,#addrForm,#addrForm .grid,#billing .grid{row-gap:var(--space-12)}
+  #addrForm > .t-link-s{margin-bottom:var(--space-4)}
+  .sec{padding-top:var(--space-32)}
+}
 #payList .opt__body{order:0}
 
 /* the review is a read-out, so the rail's lines drop their Remove there */
@@ -558,6 +568,8 @@ body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
 #gateReg .grid,#addrForm,#addrForm .grid,#billing .grid{row-gap:var(--space-4);column-gap:var(--space-12)}
 /* the "add address line 2" link needs room under it, or the next field crowds it */
 #addrForm > .t-link-s{margin-bottom:var(--space-12)}
+.addrsave{margin:var(--space-8) 0 var(--space-24)}
+.addrsave .btn{min-width:200px}
 
 .field--dob{max-width:none}      /* the mask is short, the field is not (Amelie, 2026-09-10) */
 .field--half{max-width:50%}
@@ -664,13 +676,23 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review dd{margin:0;white-space:pre-line;grid-column:1 / -1;grid-row:2}
 .review__news{margin-top:var(--space-24)}
 /* in the rail it is a row of the summary, not a line of the form */
-/* inside the email row, under the address and above the rule that closes it */
-.review .review__news{grid-column:1 / -1;grid-row:3;margin:var(--space-12) 0 0;padding-left:0}
+/* under the reviewed facts, not among them */
+.review + .review__news{margin:var(--space-24) 0 0}
 .ck__rail .trust + .place{margin-top:var(--space-24)}
 
 .review__items{margin-top:var(--space-64)}
+.review__items-n{color:var(--c-ink-soft)}
+.review__items.is-folded #railItems{display:none}
+.review__items.is-folded .sec__head{margin-bottom:0;border-bottom:0;padding-bottom:0}
+.review__items .sec__head{display:flex;align-items:baseline;gap:var(--space-16)}
+.review__items .sec__head h3{flex:1;min-width:0}
+
+/* the same heading and rule the summary uses, so the list reads as part of it rather
+   than as a section of its own (Amelie, 2026-09-14) */
 .review__items .sec__head{margin-bottom:var(--space-24);
-  padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair)}
+  padding-bottom:var(--space-24);border-bottom:1px solid var(--c-hair)}
+.review__items .sec__head h3{font-weight:400;font-size:13px;line-height:18px;
+  letter-spacing:.16em;text-transform:uppercase}
 /* with the steppers gone the second row is empty, so the text hung at the top of a
    107px packshot: both columns span the rows and centre (Amelie, 2026-09-14) */
 .review__items .li__body,
@@ -915,6 +937,12 @@ body[data-mode="steps"] .place.is-last{display:block}
   .rvl,.fig__out,.fig__in{animation:none}
 }
 
+/* the sticky bar's own summary, last step only */
+.paybar__sum{display:grid;gap:var(--space-4);padding-bottom:var(--space-10);
+  border-bottom:1px solid var(--c-hair);margin-bottom:var(--space-10)}
+.paybar__row{display:flex;justify-content:space-between;gap:var(--space-16);align-items:baseline}
+.paybar__row--total .t-price{font-size:16px;line-height:22px}
+
 /* alerts (DS Inline Alert) */
 .alert{display:flex;gap:var(--space-12);padding:var(--space-16);margin-bottom:var(--space-20);border:1px solid var(--c-hair)}
 .alert--info{background:transparent;color:var(--c-ink)}
@@ -964,7 +992,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* What to look at next, once there is nothing left to do on this page — the PDP's own
    You Might Like grid and card, four wide (Amelie, 2026-09-14). */
 .donerec{max-width:1200px;margin:var(--space-64) auto 0;
-  padding:var(--space-48) var(--space-24) 0;border-top:1px solid var(--c-hair)}
+  padding:var(--space-48) var(--space-24) 0}
 .donerec__head{font-size:12px;font-weight:300;line-height:16px;letter-spacing:.04em;
   text-transform:uppercase;margin:0 0 var(--space-40)}
 .donerec__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
@@ -1084,8 +1112,12 @@ body[data-mode="steps"] .place.is-last{display:block}
   /* the summary ends with its three assurances, and the order list is a new block
      under it: it needs real air between them, not the rail's own bottom padding
      (Amelie, 2026-09-14) */
-  .ck > .review__items{order:3;padding:var(--space-48) var(--space-16)
-    calc(120px + env(safe-area-inset-bottom))}
+  .ck > .review__items{order:3;padding:var(--space-32) var(--space-16)
+    calc(150px + env(safe-area-inset-bottom))}
+  /* on the review the figures are in the sticky bar, so what was bought leads and the
+     summary follows it (Amelie, 2026-09-14) */
+  body[data-step="4"] .ck > .review__items{order:1;padding-bottom:var(--space-32)}
+  body[data-step="4"] .ck__railcol{order:2}
   /* the rail is no longer the last thing on the page: the order list under it carries
      the sticky bar's clearance instead */
   body[data-step="4"] .ck__rail{padding-bottom:var(--space-32)}
@@ -1356,6 +1388,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
         <span class="t-body-s">Editing your saved address</span>
         <button class="t-link-s" type="button" id="addrEditCancel">Cancel</button>
       </p>
+      <!-- an edit you can keep: without this the only way out of the form was Cancel
+           (Amelie, 2026-09-14) -->
+      <div class="addrsave" id="addrSave" hidden>
+        <button class="btn btn--ghost" type="button" id="addrSaveBtn">Save address</button>
+      </div>
 
       <div class="grid" id="addrForm" data-address-group data-account-only="guest new">
         <label class="field">
@@ -1685,11 +1722,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
            step that owns that fact — address to 1, delivery to 2, payment to 3 (Amelie,
            2026-09-10). A billing address only appears when one was actually entered. -->
       <dl class="review">
-        <div class="review__row">
-          <dt class="t-label-m">Email address</dt>
-          <dd class="t-body-m" data-review="contact">—</dd>
-          <button class="t-link-s" type="button" data-review-edit="1">Edit</button>
-        </div>
+        <!-- the address the confirmation goes to is not a decision to review, and it is
+             already on the account: the row is gone (Amelie, 2026-09-14) -->
         <div class="review__row">
           <dt class="t-label-m">Delivery address</dt>
           <dd class="t-body-m" data-review="address">—</dd>
@@ -1718,7 +1752,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
            column carries what was ordered, the rail keeps the date and the figures -->
       <div class="review__items" id="reviewItems" hidden>
         <div class="sec__head">
-          <h3 class="t-title-s">Your items</h3>
+          <h3 class="t-title-s">Your items <span class="review__items-n" data-items-count></span></h3>
+          <!-- before the review the list can be folded away; on the review it is the
+               point of the page and is always open (Amelie, 2026-09-14) -->
+          <button class="t-link-s" type="button" id="itemsFold" hidden aria-expanded="true">Hide</button>
           <a class="t-link-s" href="./cart.html">Edit</a>
         </div>
       </div>
@@ -1897,6 +1934,12 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
 <!-- ---------- MOBILE STICKY PAY BAR ---------- -->
 <div class="paybar">
+  <!-- on the last step the figures ride with the button, so the page above it does not
+       have to be scrolled back to check them (Amelie, 2026-09-14) -->
+  <div class="paybar__sum" id="paybarSum" hidden>
+    <span class="paybar__row"><span class="t-body-s">Shipping</span><span class="t-body-s" data-paybar-ship>&euro;4.99</span></span>
+    <span class="paybar__row paybar__row--total"><span class="t-title-s">Total</span><span class="t-price" data-total>&euro;114.84</span></span>
+  </div>
   <button class="btn btn--wide" type="button">Place order · <span data-total>€114.84</span></button>
   <p class="paybar__legal t-body-xs">By placing your order you accept our
     <a href="#">Terms &amp; Conditions</a>, our <a href="#">Cancellation Policy</a> and our
@@ -1915,6 +1958,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
     <button data-account-set="guest" aria-pressed="true">Guest</button>
     <button data-account-set="member" aria-pressed="false">Signed in</button>
     <button data-account-set="new" aria-pressed="false">New + account</button>
+  </div>
+  <h4>Items in steps</h4>
+  <div class="dash__row" data-group="items">
+    <button data-items-set="collapsed" aria-pressed="true">Collapsed</button>
+    <button data-items-set="hidden" aria-pressed="false">Hidden</button>
   </div>
   <h4>MyTriumph</h4>
   <div class="dash__row" data-group="member">
@@ -2017,6 +2065,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     /* ...except on the review, where the list has moved into the left column and is part
        of what is being read rather than the reference beside it (Amelie, 2026-09-14) */
     if (listEl.closest('.review__items')) reveal(listEl, '.li');
+    $$('[data-items-count]').forEach(n => { n.textContent = t.count ? '(' + t.count + ')' : ''; });
     r('#railEmpty').hidden = t.lines.length > 0;
     $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
 
@@ -2030,6 +2079,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (t.voucher) $$('[data-voucher-name]').forEach(n => { n.textContent = t.voucher; });
     const shipCell = r('[data-shipping]');
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
+    $$('[data-paybar-ship]').forEach(n => roll(n, t.shipCost === 0 ? 'Free' : eur(t.shipCost)));
     r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
     roll(r('[data-vat]'), eur(t.vat));
     $$('[data-total]').forEach(n => roll(n, eur(t.total)));
@@ -2186,9 +2236,17 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (!form) return;
     const picked = $('input[name="savedaddr"]:checked');
     const wantsNew = !!picked && picked.value === 'new';
-    if (state.account === 'member') form.hidden = !(wantsNew || editingSaved);
+    if (state.account === 'member') {
+      const was = form.hidden;
+      form.hidden = !(wantsNew || editingSaved);
+      /* it used to appear outright; now it comes in the way every other row does
+         (Amelie, 2026-09-14) */
+      if (was && !form.hidden) reveal(form, '.field');
+    }
     const note = $('#addrEditNote');
     if (note) note.hidden = !(editingSaved && state.account === 'member');
+    const save = $('#addrSave');
+    if (save) save.hidden = !(editingSaved && state.account === 'member');
     const picker = $('.savedaddr');
     if (picker) picker.hidden = editingSaved && state.account === 'member';
     $$('input[name="savedaddr"]').forEach(r => r.closest('.opt').classList.toggle('is-on', r.checked));
@@ -2206,6 +2264,20 @@ body[data-mode="onepage"] .ck__rail{position:static;
     syncAddrChoice();
     const fn = $('#fn'); if (fn) fn.focus({ preventScroll:true });
   });
+  const addrSaveBtn = $('#addrSaveBtn');
+  if (addrSaveBtn) addrSaveBtn.addEventListener('click', () => {
+    Object.keys(SAVED_ADDR).forEach(k => { const el = $('#' + k); if (el && el.value.trim()) SAVED_ADDR[k] = el.value.trim(); });
+    const row = $('.savedaddr .opt');
+    if (row) {
+      const t = $('.opt__title', row), l = $('.addr__lines', row);
+      if (t) t.textContent = SAVED_ADDR.fn + ' ' + SAVED_ADDR.ln;
+      if (l) l.innerHTML = esc(SAVED_ADDR.street + ' ' + SAVED_ADDR.hno) + '<br />' +
+                           esc(SAVED_ADDR.zip + ' ' + SAVED_ADDR.city + ', Germany');
+    }
+    editingSaved = false;
+    syncAddrChoice();
+  });
+
   const addrEditCancel = $('#addrEditCancel');
   if (addrEditCancel) addrEditCancel.addEventListener('click', () => {
     editingSaved = false;
@@ -2438,7 +2510,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   try { mode = localStorage.getItem(MODE_KEY) || 'onepage'; } catch (e) {}
 
   /* 0 is the gate — it is not a step, it is what happens before the flow starts */
-  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment', 3: 'Review your order' };
+  const STEP_CTA = { 1: 'Continue to delivery', 2: 'Continue to payment', 3: 'Continue to overview' };
   const LAST_STEP = 4;
 
   function applyMode() {
@@ -2464,7 +2536,16 @@ body[data-mode="onepage"] .ck__rail{position:static;
   const RAIL_ITEMS = RAIL && $('#railItems', RAIL);
   const PLACE_EL = $('.place');
   const NEWS_EL = $('.review__news');
-  const EMAIL_ROW = $('.review .review__row');   // the email row leads the review
+  const REVIEW_DL = $('.review');
+  /* Two answers to "what do the products do before the review": fold them away behind
+     their heading, or leave them out until the review entirely. The switcher picks
+     (Amelie, 2026-09-14). */
+  let itemsMode = 'collapsed';
+  $$('[data-items-set]').forEach(b => b.addEventListener('click', () => {
+    itemsMode = b.dataset.itemsSet;
+    $$('[data-items-set]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    applyStep(step);
+  }));
   /* scoped to the real rail for the same reason the list is: the drawer's clone carries
      the same classes and sits earlier in the DOM */
   const TRUST_EL = RAIL && $('.trust', RAIL);
@@ -2574,7 +2655,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
       }
       /* the opt-in sits under the address it would be sent to, not beside the button
          (Amelie, 2026-09-14) */
-      if (news && EMAIL_ROW) EMAIL_ROW.appendChild(news);
+      /* the opt-in closes the review rather than sitting among the facts (Amelie,
+         2026-09-14) */
+      if (news && REVIEW_DL) REVIEW_DL.after(news);
     } else {
       goHome(place);
       goHome(news);
@@ -2582,6 +2665,16 @@ body[data-mode="onepage"] .ck__rail{position:static;
     }
   }
   /* the two columns become one and back again as the window is resized */
+  const itemsFold = $('#itemsFold');
+  if (itemsFold) itemsFold.addEventListener('click', () => {
+    const box = $('#reviewItems');
+    const open = box.classList.contains('is-folded');
+    box.dataset.open = open ? 'true' : 'false';
+    box.classList.toggle('is-folded', !open);
+    itemsFold.textContent = open ? 'Hide' : 'Show';
+    itemsFold.setAttribute('aria-expanded', String(open));
+  });
+
   NARROW.addEventListener('change', () => {
     const step = Number(document.body.dataset.step);
     layoutList((document.body.dataset.mode === 'onepage' && step >= 1) || step === LAST_STEP,
@@ -2624,7 +2717,12 @@ body[data-mode="onepage"] .ck__rail{position:static;
     $('.place').classList.toggle('is-last', step === LAST_STEP);
     /* the one-pager shows what is being bought from the moment there is a form to fill;
        the stepped flow keeps it for the review (Amelie, 2026-09-14) */
-    layoutList((mode === 'onepage' && step >= 1) || step === LAST_STEP, step === LAST_STEP);
+    const onReview = step === LAST_STEP;
+    const showList = onReview || (mode === 'onepage' && step >= 1 && itemsMode !== 'hidden');
+    layoutList(showList, onReview);
+    const box = $('#reviewItems'), fold = $('#itemsFold');
+    if (box) box.classList.toggle('is-folded', showList && !onReview && itemsMode === 'collapsed' && box.dataset.open !== 'true');
+    if (fold) fold.hidden = onReview || !showList || itemsMode !== 'collapsed';
     layoutReview(step === LAST_STEP);
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it
@@ -2658,6 +2756,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const payBtn = $('.paybar .btn');
     if (payBtn) {
       payBtn.dataset.step = String(step);
+      const psum = $('#paybarSum');
+      if (psum) psum.hidden = step !== LAST_STEP;
       payBtn.innerHTML = step === LAST_STEP
         ? 'Place order · <span data-total>' + eur(Shop.totals({ member: state.member, ship: state.ship }).total) + '</span>'
         : STEP_CTA[step];

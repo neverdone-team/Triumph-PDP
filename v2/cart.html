@@ -93,7 +93,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .wrap{max-width:1400px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
 .pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
 /* the count is part of the title, in brackets after it (Amelie, 2026-09-14) */
-.pagehead__n{font-weight:inherit}
+.pagehead__n{font-weight:inherit;color:var(--c-ink-soft)}
 
 /* Two columns, separated by a hairline and with a sticky summary — the same relationship
    the one-page checkout has between its form column and its order rail (Amelie,
@@ -362,8 +362,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
     position:absolute;top:0;bottom:0;left:100%;width:96px;
     background:var(--color-error);color:var(--c-on-dark);
   }
-  .swipehint{display:flex;align-items:center;gap:var(--space-8);color:var(--c-ink-soft);
-    margin-bottom:var(--space-16)}
+  /* Rather than a line of copy telling you to swipe, the first row shows it: it slides
+     far enough to reveal the panel behind it and settles back, once per visit (Amelie,
+     2026-09-14). */
+  .item.is-demo{animation:swipedemo 1.9s .7s var(--ease-out) both}
+  @keyframes swipedemo{
+    0%{transform:translateX(0)}
+    22%{transform:translateX(-72px)}
+    52%{transform:translateX(-72px)}
+    100%{transform:translateX(0)}
+  }
+  @media (prefers-reduced-motion: reduce){ .item.is-demo{animation:none} }
 }
 
 /* member price pair — never a strike-through against the standard price */
@@ -801,8 +810,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .hd__links{display:none}
   .hd__in{display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-16)}
   .hd__logo img{width:132px;height:auto}
-  .wrap{padding:var(--space-24) var(--space-16) 120px}
-  .t-title-xl{font-size:20px;line-height:26px}
+  .wrap{padding:var(--space-16) var(--space-16) 120px}
+  .t-title-xl{font-size:16px;line-height:22px}
+  .pagehead{margin-bottom:var(--space-4)}
+  /* the phone gets a tighter rhythm throughout: the page is one column, so the air
+     between its blocks can come down (Amelie, 2026-09-14) */
+  .cart{gap:var(--space-16)}
+  .item{padding:var(--space-20) 0}
   /* one text column beside the shot, with the price sitting between the series and the
      colour — and controls at 44px so they are actually tappable */
   /* a bigger packshot on a phone (Amelie, 2026-09-10): 96 was a thumbnail next to
@@ -917,10 +931,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
       <!-- ------------ items ------------ -->
       <div class="cart__main">
-        <p class="swipehint t-body-s" hidden id="swipeHint">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1"/></svg>
-          Swipe a product left to delete it
-        </p>
         <div class="items" id="cartItems"></div>
 
         <!-- cross-sell strip: the upsell lives IN the cart, it never blocks the way out -->
@@ -1389,6 +1399,18 @@ h1,h2,h3,p{margin:0;font-weight:400}
     el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 760);
   }
 
+  /* the swipe is demonstrated once per visit, and only where it works */
+  let swipeShown = false;
+  function demoSwipe(){
+    if (swipeShown || REDUCED.matches) return;
+    if (!window.matchMedia('(max-width:991px)').matches) return;
+    const row = $('.item', $('#cartItems'));
+    if (!row) return;
+    swipeShown = true;
+    row.classList.add('is-demo');
+    setTimeout(() => row.classList.remove('is-demo'), 2800);
+  }
+
   /* A line only makes its entrance once. The list is rebuilt on every change, so the
      test is the sku, not the node — otherwise every quantity click would replay the
      whole list (Amelie, 2026-09-14). */
@@ -1449,6 +1471,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#cartItems').innerHTML = bag.lines
       .map((l, i) => lineHTML(l, bag.member, stockOf(l, i, bag.lines))).join('');
     revealItems();
+    demoSwipe();
     $$('[data-member-only]').forEach(el => { el.hidden = el.dataset.memberOnly !== String(bag.member); });
 
     const t = Shop.totals();
@@ -1481,9 +1504,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $('#shipMsg').innerHTML = t.gap > 0
       ? '<strong style="font-weight:400">' + eur(t.gap) + '</strong> away from free shipping.'
       : ICON_TICK + '<span><strong style="font-weight:400">Free shipping</strong> — unlocked.</span>';
-
-    const hint = $('#swipeHint');
-    if (hint) hint.hidden = !window.matchMedia('(max-width:991px)').matches;
 
     syncDash();
   }
