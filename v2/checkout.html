@@ -671,6 +671,10 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* a read-out, not a control: quantities and Remove are edited in the bag, which is where
    the Edit link goes (Amelie, 2026-09-14) */
 .review__items .li__acts{display:none}
+/* with no controls under them the rows only carry their own text, so the list's 32px of
+   padding each side left 64px of nothing between them (Amelie, 2026-09-14) */
+.review__items .li{padding:var(--space-16) 0}
+.review__items .li:first-of-type{padding-top:0}
 /* the delivery and payment rows carry the same marks the options did */
 /* the answers column is pre-line so an address keeps its line breaks — which turned the
    whitespace between two copied brand marks into a line break of its own, and dropped the
@@ -840,7 +844,10 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* the icon is exactly one line box tall, so the row's text sits on the same top edge as
    any plain 14/20 line beside it */
 .promise span{line-height:20px}
-.trust{display:flex;flex-wrap:wrap;gap:var(--space-20);margin-top:var(--space-32);color:var(--c-ink)}
+/* centred under the button, as in the bag: three short assurances hung on the left edge
+   read as a list rather than a footer (Amelie, 2026-09-14) */
+.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-20);
+  margin-top:var(--space-32);color:var(--c-ink)}
 .trust span{display:inline-flex;align-items:center;gap:var(--space-6)}
 .trust svg{flex:none}
 
