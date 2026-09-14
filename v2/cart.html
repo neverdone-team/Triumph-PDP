@@ -127,8 +127,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
    inverts with it, unfilled in white rather than grey, which leaves no grey line
    anywhere in the component. */
 /* 80 is the height the default state builds from its own parts — a line of type, the
-   gap and the 2px track. It is held as a floor so the member state, whose one line is a
-   couple of pixels shorter, does not sit a nudge below the others (Amelie, 2026-09-14). */
+   gap and the 2px track. The tinted states drop the floor and size to their one line:
+   there is nothing left to track, so the box has no reason to hold the bar's room
+   (Amelie, 2026-09-14). */
 .statusbox{background:var(--c-wash);border:0;padding:var(--space-20);min-height:80px;
   display:grid;grid-template-columns:minmax(0,1fr) auto;
   gap:var(--space-16) var(--space-24);align-items:start}
@@ -165,7 +166,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
    height the box keeps, rather than sitting at the top of it. */
 .statusbox.is-free .ship-progress__bar,
 .statusbox.is-member .ship-progress__bar{display:none}
-.statusbox.is-free,.statusbox.is-member{align-content:center}
+/* 54 rather than the default's 80: with the bar gone there is nothing to give room to.
+   Both tinted states share the figure so the box does not change height between them
+   (Amelie, 2026-09-14). */
+.statusbox.is-free,.statusbox.is-member{align-content:center;min-height:54px;
+  padding:var(--space-16) var(--space-20)}
 .statusbox.is-free #shipMsg{color:var(--color-green);display:flex;align-items:center;gap:var(--space-8)}
 .statusbox.is-free #shipMsg svg{flex:none}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
@@ -654,10 +659,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
    ============================================================ */
 .fig{display:inline-grid;overflow:hidden;justify-items:end}
 .fig > span{grid-area:1/1;white-space:nowrap}
-.fig__out{animation:figOut .26s var(--ease-out) both}
-.fig__in{animation:figIn .34s var(--ease-reveal) .1s both}
-@keyframes figOut{to{opacity:0;transform:translateY(-90%)}}
-@keyframes figIn{from{opacity:0;transform:translateY(90%)}to{opacity:1;transform:none}}
+/* slower and shorter-travelled than the first cut: at 260/340 and a full 90% the swap
+   read as a flick rather than one value giving way to the next (Amelie, 2026-09-14) */
+.fig__out{animation:figOut .42s var(--ease-out) both}
+.fig__in{animation:figIn .55s var(--ease-reveal) .16s both}
+@keyframes figOut{to{opacity:0;transform:translateY(-60%)}}
+@keyframes figIn{from{opacity:0;transform:translateY(60%)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){
   .fig__out,.fig__in{animation:none}
 }
@@ -1303,7 +1310,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     el.innerHTML = '<span class="fig__out">' + esc(prev) + '</span>' +
                    '<span class="fig__in">'  + esc(next) + '</span>';
     clearTimeout(el._rollT);
-    el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
+    el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 760);
   }
 
   /* A line only makes its entrance once. The list is rebuilt on every change, so the

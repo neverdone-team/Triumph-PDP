@@ -874,10 +874,12 @@ body[data-mode="steps"] .place.is-last{display:block}
    around it moves */
 .fig{display:inline-grid;overflow:hidden;justify-items:end}
 .fig > span{grid-area:1/1;white-space:nowrap}
-.fig__out{animation:figOut .26s var(--ease-out) both}
-.fig__in{animation:figIn .34s var(--ease-reveal) .1s both}
-@keyframes figOut{to{opacity:0;transform:translateY(-90%)}}
-@keyframes figIn{from{opacity:0;transform:translateY(90%)}to{opacity:1;transform:none}}
+/* slower and shorter-travelled than the first cut: at 260/340 and a full 90% the swap
+   read as a flick rather than one value giving way to the next (Amelie, 2026-09-14) */
+.fig__out{animation:figOut .42s var(--ease-out) both}
+.fig__in{animation:figIn .55s var(--ease-reveal) .16s both}
+@keyframes figOut{to{opacity:0;transform:translateY(-60%)}}
+@keyframes figIn{from{opacity:0;transform:translateY(60%)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){
   .rvl,.fig__out,.fig__in{animation:none}
 }
@@ -2478,7 +2480,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     el.innerHTML = '<span class="fig__out">' + esc(prev) + '</span>' +
                    '<span class="fig__in">'  + esc(next) + '</span>';
     clearTimeout(el._rollT);
-    el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 480);
+    el._rollT = setTimeout(() => { el.classList.remove('fig'); el.textContent = next; }, 760);
   }
   function layoutReview(on){
     const items = RAIL_ITEMS, place = PLACE_EL, news = NEWS_EL;
