@@ -578,6 +578,11 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review__row button{grid-column:2;grid-row:1;align-self:center}
 .review dd{margin:0;white-space:pre-line;grid-column:1 / -1;grid-row:2}
 .review__news{margin-top:var(--space-24)}
+.review__items{margin-top:var(--space-40)}
+.review__items .sec__head{margin-bottom:var(--space-16)}
+/* the moved list sits on the page, not in a rail: it keeps the rail's line shape but
+   loses the rail's width constraints */
+.review__items #railItems{padding-bottom:0}
 /* the delivery and payment rows carry the same marks the options did */
 .review__mark{display:inline-flex;align-items:center;gap:var(--space-8)}
 .review__mark svg{flex:none}
@@ -1186,7 +1191,7 @@ body[data-mode="steps"] .place.is-last{display:block}
       <!-- the one-pager reveals the next section on Continue rather than showing them all
            at once; the stepped mode has its own nav, so these are mode-only -->
       <div class="sec__next" data-mode-only="onepage" data-op-next="1">
-        <button class="btn btn--wide" type="button" data-op-go="2">Continue to delivery</button>
+        <button class="btn btn--ghost btn--wide" type="button" data-op-go="2">Continue to delivery</button>
       </div>
     </section>
 
@@ -1265,7 +1270,7 @@ body[data-mode="steps"] .place.is-last{display:block}
       </div>
 
       <div class="sec__next" data-mode-only="onepage" data-op-next="2">
-        <button class="btn btn--wide" type="button" data-op-go="3">Continue to payment</button>
+        <button class="btn btn--ghost btn--wide" type="button" data-op-go="3">Continue to payment</button>
       </div>
     </section>
 
@@ -1410,6 +1415,15 @@ body[data-mode="steps"] .place.is-last{display:block}
 
       <!-- the opt-in sits with the last decision, not with the address (Amelie,
            2026-09-14) -->
+      <!-- the bag itself moves in here on the review (Amelie, 2026-09-14): the left
+           column carries what was ordered, the rail keeps the date and the figures -->
+      <div class="review__items" id="reviewItems" hidden>
+        <div class="sec__head">
+          <h3 class="t-title-s">Your order</h3>
+          <a class="t-link-s" href="./cart.html">Edit</a>
+        </div>
+      </div>
+
       <label class="check review__news" data-account-only="guest new">
         <input type="checkbox" id="newsOptIn" checked />
         <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
@@ -1418,7 +1432,7 @@ body[data-mode="steps"] .place.is-last{display:block}
     </section>
 
     <div class="sec__next" data-mode-only="onepage" data-op-next="3">
-      <button class="btn btn--wide" type="button" data-op-go="4">Review your order</button>
+      <button class="btn btn--ghost btn--wide" type="button" data-op-go="4">Review your order</button>
     </div>
 
     <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
@@ -1634,7 +1648,8 @@ body[data-mode="steps"] .place.is-last{display:block}
     const r = s => $(s, rail);
     const t = Shop.totals({ member: state.member, ship: state.ship });
 
-    r('#railItems').innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
+    // the list may be living in the review column by now, so it is addressed by reference
+    (RAIL_ITEMS || r('#railItems')).innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
     r('#railEmpty').hidden = t.lines.length > 0;
     $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
 
@@ -2067,6 +2082,37 @@ body[data-mode="steps"] .place.is-last{display:block}
     syncMobileSummary();
   }
 
+  /* On the review the page is rearranged rather than rebuilt: the bag's lines move into
+     the left column under what was ordered, and Place order moves into the rail under the
+     total. Both remember where they came from, because Edit walks straight back into the
+     flow and the rail has to look like a rail again (Amelie, 2026-09-14). */
+  const homes = new Map();
+  function park(el){ if (el && !homes.has(el)) homes.set(el, [el.parentNode, el.nextSibling]); }
+  function goHome(el){ const h = homes.get(el); if (h && h[0]) h[0].insertBefore(el, h[1]); }
+
+  /* Captured now, before the mobile drawer's CLONE of the rail exists: that clone sits
+     earlier in the DOM and carries the same ids, so an unscoped lookup moves the copy and
+     leaves the real summary alone — which is exactly what happened first time. */
+  const RAIL = $('#rail');
+  const RAIL_ITEMS = RAIL && $('#railItems', RAIL);
+  const PLACE_EL = $('.place');
+
+  function layoutReview(on){
+    const items = RAIL_ITEMS, place = PLACE_EL;
+    const box = $('#reviewItems'), rail = RAIL, totals = RAIL && $('.totals', RAIL);
+    if (!items || !box || !rail) return;
+    park(items); park(place);
+    if (on) {
+      box.hidden = false;
+      box.appendChild(items);
+      if (place && totals) totals.after(place);
+    } else {
+      box.hidden = true;
+      goHome(items);
+      goHome(place);
+    }
+  }
+
   function applyStep(n) {
     step = Math.min(LAST_STEP, Math.max(0, n));
     document.body.dataset.step = String(step);   // step 1 drops the rail and the express row
@@ -2101,6 +2147,7 @@ body[data-mode="steps"] .place.is-last{display:block}
        the mobile rules key off .is-last while the desktop ones read [hidden]. */
     $('.place').hidden = step !== LAST_STEP;
     $('.place').classList.toggle('is-last', step === LAST_STEP);
+    layoutReview(step === LAST_STEP);
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it
     $('#stepnav').style.display = (step === 0 || step === LAST_STEP) ? 'none' : '';
