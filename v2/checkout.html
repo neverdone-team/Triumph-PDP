@@ -448,7 +448,7 @@ body[data-mode="onepage"] .ck__rail .rail__dhead{order:7;display:block;
 /* the rail states no date at all now: the delivery method carries it, and repeating it
    over the order list only split the two (Amelie, 2026-09-14) */
 body[data-mode="onepage"] .ck__rail .promise{display:none}
-body[data-mode="onepage"] .ck__rail #railItems{order:9;padding-top:0;padding-bottom:0}
+body[data-mode="onepage"] .ck__rail #railItems{order:9;padding-top:var(--space-24);padding-bottom:0}
 /* the list is a read-back of the bag, so it takes a heading of its own and stands well
    clear of the figures above it; the three assurances belong with the total they are
    about (Amelie, 2026-09-14) */
@@ -785,7 +785,7 @@ body[data-mode="steps"] .place.is-last{display:block}
   .ck__rail .li__price{margin-top:var(--space-12)}
   .ck__rail .li__acts{margin-top:var(--space-12)}
   body[data-mode="onepage"] .ck__rail{padding-top:var(--space-24)}
-  body[data-mode="onepage"] .ck__rail #railItems{padding-top:0}
+  body[data-mode="onepage"] .ck__rail #railItems{padding-top:var(--space-20)}
   body[data-mode="onepage"] .ck__rail .rail__dhead{margin-top:var(--space-32)}
 }
 /* the block above has to follow the .ck__rail rules it overrides: at equal specificity
@@ -1965,9 +1965,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const t = Shop.totals({ member: state.member, ship: state.ship });
 
     // the list may be living in the review column by now, so it is addressed by reference
+    /* The summary and the order list do not move: they are the reference the left column
+       is answered against, and a reference that re-enters on every change is noise
+       (Amelie, 2026-09-14). Only the section being worked on reveals. */
     const listEl = RAIL_ITEMS || r('#railItems');
     listEl.innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
-    reveal(listEl, '.li');
     r('#railEmpty').hidden = t.lines.length > 0;
     $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
 
