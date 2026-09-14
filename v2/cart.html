@@ -202,6 +202,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .item__name{display:block;margin-top:var(--space-8)}
 .item__attrs{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-20);margin-top:var(--space-20)}
 /* Size is editable in the bag — a native select styled as the chip it replaces. */
+/* the size is text with a Change link, not a control in a box */
+.sizebtn{display:inline-flex;align-items:baseline;gap:var(--space-8);padding:0;background:none}
+.sizebtn__cta{color:var(--c-ink-soft)}
+.sizebtn:hover .sizebtn__cta{color:var(--c-ink)}
+
 .sizesel{position:relative;display:inline-flex;align-items:center}
 .sizesel select{
   appearance:none;height:var(--control-36);padding:0 var(--space-28) 0 var(--space-12);
@@ -242,13 +247,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .cthumb--current img{object-position:50% 22%}
 .cthumb:hover{border-bottom-color:var(--c-edge)}
 .cthumb[data-sel="true"]{border-bottom-color:var(--c-ink)}
-/* Size under quantity rather than beside it (Amelie, 2026-09-11) — the two controls
-   change different things, and stacked they stop reading as one segmented control. They
-   share one width so the stack reads as a column, not a staircase. */
-.item__row{--rowctl:112px;display:flex;flex-direction:column;align-items:flex-start;
-  gap:var(--space-12);margin-top:var(--space-20)}
+/* On desktop the size sits in front of the quantity on one line; a phone stacks them,
+   where there is no room beside a 112px stepper (Amelie, 2026-09-14). */
+.item__row{--rowctl:112px;display:flex;align-items:center;gap:var(--space-20);
+  margin-top:var(--space-20)}
 .item__row .stepper{width:var(--rowctl);justify-content:space-between}
-.item__row .sizesel,.item__row .sizesel select{width:var(--rowctl)}
 .item__side{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;
   gap:var(--space-8);text-align:left;margin-top:var(--space-12)}
 .item__side del{color:var(--c-ink-soft);text-decoration:line-through}
@@ -286,8 +289,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
    the red note is what says it cannot be bought. */
 .item.is-out .item__img{opacity:.4}
 
-/* the line price is a supporting figure, not the headline the product name is */
-.item__side .t-price{font-size:13px;line-height:18px}
+/* the line price is a supporting figure, not the headline the product name is — and the
+   former price is set at the same size, so the pair reads as one statement (Amelie,
+   2026-09-14) */
+.item__side .t-price,.item__side .t-price-was{font-size:13px;line-height:18px}
 
 /* ---------------- swipe to delete (phones only) ----------------
    The row slides left to uncover a red panel, and deleting still takes a deliberate tap
@@ -519,7 +524,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .qs__info{display:flex;flex-direction:column;gap:var(--space-8);min-width:0}
 .qs__info .t-title-m{margin:0}
 .qs__label{margin:var(--space-16) 0 0;color:var(--c-grey-medium)}
-.qs__sizes{display:flex;flex-wrap:wrap;gap:var(--space-8);margin:var(--space-4) 0 var(--space-16)}
+/* two bands, each on its own line: an underbust and a cup are two decisions */
+.qs__band{margin:var(--space-12) 0 0}
+.qs__bandlabel{display:block;color:var(--c-grey-medium);margin-bottom:var(--space-6)}
+.qs__sizes{display:flex;flex-wrap:wrap;gap:var(--space-8);margin:0 0 var(--space-8)}
 .qs__sizes button{height:var(--control-40);min-width:var(--control-44);padding:0 var(--space-10);
   box-shadow:inset 0 0 0 1px var(--c-edge);background:var(--c-bg);
   font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
@@ -628,7 +636,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .item__unit{white-space:nowrap}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
-  .sizesel select{height:var(--control-44)}
+  /* no room beside a 112px stepper at this width: the size takes its own line */
+  .item__row{flex-direction:column;align-items:flex-start;gap:var(--space-12)}
   /* The cross-sell scrolls sideways instead of wrapping. It bleeds out to both screen
      edges and pads back in, so the first card still lines up with the text column while
      the card the edge lands on is clipped — that cut is the only affordance saying there
@@ -1093,11 +1102,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
     // Size is changeable in the bag rather than a trip back to the PDP, and it sits with
     // the quantity stepper because both change what is being bought.
+    /* No box and no dropdown: the size is stated, and changing it opens the same overlay
+       the cross-sell + uses, where the bands are a grid (Amelie, 2026-09-14). */
     const sizeCtl = l.size
-      ? '<span class="sizesel"><select data-size aria-label="Size">'+
-          (l.sizes && l.sizes.length ? l.sizes : [l.size])
-            .map(o => '<option'+(o === l.size ? ' selected' : '')+'>'+esc(o)+'</option>').join('')+
-        '</select>'+CHEV+'</span>'
+      ? '<button class="sizebtn" type="button" data-size-open aria-label="Change size">'+
+          '<span class="t-body-m">'+esc(l.size)+'</span>'+
+          '<span class="t-link-s sizebtn__cta">Change</span>'+
+        '</button>'
       : '';
 
     /* A member is charged the member price, so that is the only figure the line shows.
@@ -1143,16 +1154,18 @@ h1,h2,h3,p{margin:0;font-weight:400}
       '</div>'+
       '<div class="item__attrs">'+attrs.join('')+'</div>'+
       '<div class="item__row">'+
+        sizeCtl+
         /* No Remove link any more: at one item the minus IS the delete, which is the
            only control the row needs (Amelie, 2026-09-10). */
         '<span class="stepper">'+
+          /* one control, one glyph: at a quantity of one the minus IS the delete, so it
+             keeps the minus and changes what it does (Amelie, 2026-09-14) */
           (l.qty > 1
             ? '<button type="button" data-step="-1" aria-label="Decrease quantity">'+ICON_MINUS+'</button>'
-            : '<button type="button" data-remove aria-label="Delete this product">'+ICON_TRASH+'</button>')+
+            : '<button type="button" data-remove aria-label="Remove this product">'+ICON_MINUS+'</button>')+
           '<span class="t-body-m" data-qty>'+l.qty+'</span>'+
           '<button type="button" data-step="1" aria-label="Increase quantity">'+ICON_PLUS+'</button>'+
         '</span>'+
-        sizeCtl+
       '</div>'+
       /* In stock is not news, so it is not shown: only a short count, a sold-out line or
          a quantity the stock cannot cover says anything worth the row. */
@@ -1277,6 +1290,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const pick = e.target.closest('[data-colour]');
     if (pick) { Shop.setColour(sku, pick.dataset.colour); return; }
 
+    if (e.target.closest('[data-size-open]')) {
+      const l = Shop.read().lines.filter(x => x.sku === sku)[0];
+      if (l) openQuickShop({ mode:'size', sku:sku, size:l.size,
+        data:{ name:l.name, series:l.series, colour:l.colour, img:l.img, price:l.unit } });
+      return;
+    }
+
     const fav = e.target.closest('.item__fav');
     if (fav) fav.classList.toggle('is-on');
   });
@@ -1352,23 +1372,59 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* ---------------- cross-sell → quick shop ----------------
      The + no longer adds blind: it opens quick shop, a size is chosen there, and the
      card only leaves the strip once the product is really in the bag. */
-  let qsCard = null, qsData = null, qsSize = null;
+  let qsCard = null, qsData = null, qsSize = null, qsMode = 'add', qsSku = null;
   const OUT_OF_STOCK = { '70A':1, '85D':1, 'XXL':1 };   // a couple of gaps, so the state shows
 
-  function openQuickShop(btn, card){
-    qsCard = card; qsData = { ...btn.dataset }; qsSize = null;
-    const bra = /^\d/.test(qsData.size);
-    const sizes = bra ? BRA_SIZES : BRIEF_SIZES;
+  /* A bra size is two decisions, so it is shown as two bands rather than a 49-item list —
+     the PDP asks for it the same way (Amelie, 2026-09-14). */
+  const BANDS = [70, 75, 80, 85, 90, 95, 100];
+  const CUPS  = ['A','B','C','D','E','F','G'];
+  const splitSize = sz => {
+    const m = /^(\d+)([A-H])$/.exec(sz || '');
+    return m ? { band: m[1], cup: m[2] } : null;
+  };
+  function sizeGrid(current){
+    const cur = splitSize(current);
+    if (!cur) {                                  // briefs: one band of letters
+      return '<div class="qs__band"><span class="qs__bandlabel t-label-s">Size</span>'+
+        '<div class="qs__sizes">'+ BRIEF_SIZES.map(sz =>
+          '<button type="button" data-qs-size="'+sz+'"'+(OUT_OF_STOCK[sz] ? ' disabled' : '')+
+            (sz === current ? ' data-on="true"' : '')+'>'+sz+'</button>').join('') +'</div></div>';
+    }
+    const band = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Underbust</span>'+
+      '<div class="qs__sizes">'+ BANDS.map(b =>
+        '<button type="button" data-qs-band="'+b+'"'+(String(b) === cur.band ? ' data-on="true"' : '')+
+          '>'+b+'</button>').join('') +'</div></div>';
+    const cups = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Cup</span>'+
+      '<div class="qs__sizes">'+ CUPS.map(c =>
+        '<button type="button" data-qs-cup="'+c+'"'+(c === cur.cup ? ' data-on="true"' : '')+
+          '>'+c+'</button>').join('') +'</div></div>';
+    return band + cups;
+  }
 
-    $('#qsImg').src = qsData.img; $('#qsImg').alt = qsData.name;
+  function paintQsGrid(){
+    $('#qsSizes').innerHTML = sizeGrid(qsSize);
+    const s = splitSize(qsSize);
+    $$('#qsSizes [data-qs-band]').forEach(b => { b.disabled = false; });
+    $$('#qsSizes [data-qs-size],#qsSizes [data-qs-band],#qsSizes [data-qs-cup]').forEach(b => {
+      const sz = b.dataset.qsSize || (b.dataset.qsBand && s ? b.dataset.qsBand + s.cup : null)
+               || (b.dataset.qsCup && s ? s.band + b.dataset.qsCup : null);
+      if (sz && OUT_OF_STOCK[sz]) b.disabled = true;
+    });
+  }
+
+  function openQuickShop(opts){
+    qsMode = opts.mode; qsCard = opts.card || null; qsSku = opts.sku || null;
+    qsData = opts.data; qsSize = opts.size || null;
+
+    $('#qsImg').src = qsData.img || ''; $('#qsImg').alt = qsData.name;
     $('#qsSeries').textContent = qsData.series;
     $('#qsName').textContent = qsData.name;
     $('#qsPrice').textContent = eur(Number(qsData.price));
     $('#qsColour').textContent = 'Colour: ' + qsData.colour;
-    $('#qsSizeLabel').textContent = bra ? 'Select your size' : 'Select a size';
-    $('#qsSizes').innerHTML = sizes.map(sz =>
-      '<button type="button" data-qs-size="'+sz+'"'+(OUT_OF_STOCK[sz] ? ' disabled' : '')+'>'+sz+'</button>'
-    ).join('');
+    $('#qsSizeLabel').textContent = qsMode === 'size' ? 'Change size' : 'Select your size';
+    $('#qsAdd').textContent = qsMode === 'size' ? 'Update size' : 'Add to bag';
+    paintQsGrid();
     $('#qsHint').hidden = true;
 
     const qs = $('#qs');
@@ -1385,19 +1441,24 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   $$('.acard').forEach(card => {
     const btn = $('.addon__btn', card);
-    if (btn) btn.addEventListener('click', () => openQuickShop(btn, card));
+    if (btn) btn.addEventListener('click', () =>
+      openQuickShop({ mode:'add', card, data:{ ...btn.dataset }, size:null }));
   });
 
   $('#qsSizes').addEventListener('click', e => {
-    const b = e.target.closest('[data-qs-size]');
-    if (!b) return;
-    qsSize = b.dataset.qsSize;
-    $$('#qsSizes button').forEach(o => o.dataset.on = String(o === b));
+    const b = e.target.closest('[data-qs-size],[data-qs-band],[data-qs-cup]');
+    if (!b || b.disabled) return;
+    const cur = splitSize(qsSize);
+    if (b.dataset.qsSize) qsSize = b.dataset.qsSize;
+    else if (b.dataset.qsBand) qsSize = b.dataset.qsBand + (cur ? cur.cup : 'B');
+    else if (b.dataset.qsCup)  qsSize = (cur ? cur.band : '75') + b.dataset.qsCup;
+    paintQsGrid();
     $('#qsHint').hidden = true;
   });
 
   $('#qsAdd').addEventListener('click', () => {
     if (!qsSize) { $('#qsHint').hidden = false; return; }
+    if (qsMode === 'size') { Shop.setSize(qsSku, qsSize); closeQuickShop(); return; }
     const bra = /^\d/.test(qsData.size);
     Shop.add({
       sku: qsData.sku.replace(/-[^-]+$/, '') + '-' + qsSize.toLowerCase(),
