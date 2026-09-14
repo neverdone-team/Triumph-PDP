@@ -330,6 +330,10 @@ body{background-image:none}
 /* the method names the row, but the date is the fact being chosen, so it keeps the ink
    and the Regular weight (Amelie, 2026-09-14) */
 .opt__date{color:var(--c-ink);font-weight:400}
+/* the delivery mark sits between the radio and the label, as the payment marks do */
+#s-shipping .opt__radio{order:-2}
+#s-shipping .opt__icon{order:-1;flex:none;display:block}
+#s-shipping .opt__body{order:0}
 .opt__price{flex:none;text-align:right}
 /* DS Option Row gives every payment mark the same 38×24 box, so the logos line up */
 .opt__logo{flex:none;display:flex;align-items:center;gap:var(--space-6)}
@@ -829,6 +833,14 @@ body[data-mode="steps"] .place.is-last{display:block}
 <body data-account="guest" data-member="false">
 
 <!-- ============================== HEADER ============================== -->
+<!-- Triumph's own delivery icons: the icomoon glyphs behind .icon-truck (U+E95A) and
+     .icon-stores (U+E9BF) on de.triumph.com, converted to paths so they need no font.
+     Font space is y-up from the baseline, hence the flip (Amelie, 2026-09-14). -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-truck" viewBox="0 -960 1024 1024"><path transform="scale(1,-1)" d="M115 771Q89 764 69.0 743.0Q49 722 44 696Q42 688 42.0 646.5Q42 605 42 459V234L47 228Q49 225 52.5 222.5Q56 220 59 218Q64 216 70.0 215.5Q76 215 102 215H137L140 205Q144 192 151.0 181.5Q158 171 170 158Q179 148 184.5 144.0Q190 140 200 136Q220 126 237.0 123.5Q254 121 274 124Q308 130 333.5 152.0Q359 174 369 205V206L372 215H568L571 205Q578 183 595.5 163.5Q613 144 636 133Q659 123 687.0 123.0Q715 123 737 135Q760 146 775.0 163.0Q790 180 798 202L802 214L882 215Q934 215 948.0 215.5Q962 216 965 218Q971 221 975.0 226.0Q979 231 981 236Q981 238 981.5 268.0Q982 298 982 345V449L948 530Q933 564 921.5 590.5Q910 617 908 621Q893 648 867.0 668.0Q841 688 811 696Q801 698 789.5 698.5Q778 699 734 700L672 701L670 707Q663 729 643.0 747.5Q623 766 598 771Q590 773 551.0 773.5Q512 774 357 774Q191 774 157.5 773.5Q124 773 115 771ZM590 713Q596 711 603.5 704.5Q611 698 614 692Q616 687 616.5 661.5Q617 636 617 514Q617 441 616.5 392.0Q616 343 615 343Q615 343 611.0 340.0Q607 337 603 332Q592 323 584.0 310.5Q576 298 572 287L568 276H373L368 289Q362 305 352.5 318.5Q343 332 330 342Q311 356 293.0 361.5Q275 367 250 367Q235 366 228.0 364.5Q221 363 202 355Q196 353 180.5 341.5Q165 330 165 328Q165 327 164.0 325.5Q163 324 163 324Q159 321 153.0 310.5Q147 300 143 290L138 276L102 275V475Q102 569 102.5 624.0Q103 679 104 683Q106 692 111.5 699.0Q117 706 124 710H125L133 715H359Q468 715 527.5 714.5Q587 714 590 713ZM796 637Q812 633 826.5 623.0Q841 613 850 600Q853 595 862.0 575.0Q871 555 884 526Q895 501 903.0 481.5Q911 462 911 461Q912 459 895.0 458.5Q878 458 794 458H676V639H732Q765 639 778.0 638.5Q791 638 796 637ZM921 344V276H802L801 280Q799 287 792.0 300.5Q785 314 779 321Q763 340 739.5 352.5Q716 365 695 365H686L685 376V387V376Q684 368 683.5 366.5Q683 365 680 365H676V413H921V344ZM281 299Q289 295 297.0 287.5Q305 280 309 272Q312 266 313.5 259.0Q315 252 315 245Q315 232 309.5 220.5Q304 209 295 200Q288 194 281.0 190.5Q274 187 263 186Q232 181 211.0 205.0Q190 229 198 260Q201 274 212.0 286.0Q223 298 237 302Q246 305 259.0 304.0Q272 303 281 299ZM710 299Q719 295 727.0 287.0Q735 279 740 270Q743 264 743.5 259.5Q744 255 744 245Q744 235 743.5 231.0Q743 227 740 221Q731 201 711.5 191.0Q692 181 672 186Q657 190 645.0 200.5Q633 211 629 225Q626 233 626.0 245.0Q626 257 629 265Q633 278 643.5 288.0Q654 298 667 302Q675 305 688.5 304.0Q702 303 710 299Z"/></symbol>
+  <symbol id="i-store" viewBox="0 -960 1024 1024"><path transform="scale(1,-1)" d="M947 610 886 721V869Q886 880 878.0 888.0Q870 896 859 896H154Q142 896 134.0 888.0Q126 880 126 869V721L65 611L64 608Q63 605 62.5 602.5Q62 600 62 598V529Q62 488 90.5 460.0Q119 432 159 432Q179 432 197.0 439.5Q215 447 228 461Q242 447 260.0 439.5Q278 432 298 432Q317 432 335.5 439.5Q354 447 367 461Q381 447 399.0 439.5Q417 432 437 432Q456 432 474.0 439.5Q492 447 506 461Q520 447 538.0 439.5Q556 432 576 432Q595 432 613.0 439.5Q631 447 645 461Q659 447 677.0 439.5Q695 432 715 432Q734 432 752.0 439.5Q770 447 784 461Q798 447 816.0 439.5Q834 432 854 432Q894 432 922.5 460.0Q951 488 951 529V598Q951 601 950.0 604.5Q949 608 947 610ZM756 570V529Q756 511 744.0 499.0Q732 487 714 487Q697 487 685.0 499.0Q673 511 673 529V570H756ZM617 570V529Q617 511 605.0 499.0Q593 487 575 487Q558 487 546.0 499.0Q534 511 534 529V570H617ZM479 570V529Q479 511 466.5 499.0Q454 487 437 487Q419 487 407.0 499.0Q395 511 395 529V570H479ZM340 526Q338 509 326.0 498.0Q314 487 298 487Q280 487 268.0 499.0Q256 511 256 529V570H340V526ZM159 487Q142 487 129.5 499.0Q117 511 117 529V570H201V529Q201 511 188.5 499.0Q176 487 159 487ZM302 724Q302 735 294.0 743.0Q286 751 275 751H181V841H831V751H575Q564 751 556.0 743.0Q548 735 548 724Q548 712 556.0 704.0Q564 696 575 696H837L876 626H136L175 696H275Q286 696 294.0 704.0Q302 712 302 724ZM895 570V529Q895 511 883.0 499.0Q871 487 853 487Q836 487 823.5 499.0Q811 511 811 529V570H895ZM859 423Q847 423 839.0 414.5Q831 406 831 395V55H492V327Q492 338 484.0 346.0Q476 354 465 354H244Q233 354 225.0 346.0Q217 338 217 327V55H181V395Q181 406 173.0 414.5Q165 423 154 423Q142 423 134.0 414.5Q126 406 126 395V27Q126 16 134.0 8.0Q142 0 154 0H859Q870 0 878.0 8.0Q886 16 886 27V395Q886 406 878.0 414.5Q870 423 859 423ZM437 299V55H272V299H437ZM781 352H544Q532 352 524.0 344.0Q516 336 516 325V188Q516 177 524.0 169.0Q532 161 544 161H781Q793 161 801.0 169.0Q809 177 809 188V325Q809 336 801.0 344.0Q793 352 781 352ZM753 297V216H571V297Z"/></symbol>
+</svg>
+
 <header class="ckhead">
   <div class="ckhead__in">
     <a class="ckhead__back t-label-m" href="./cart.html">
@@ -1184,6 +1196,7 @@ body[data-mode="steps"] .place.is-last{display:block}
         <label class="opt" data-ship="mytriumph" id="myTriumphShip">
           <input type="radio" name="ship" value="mytriumph" />
           <span class="opt__radio"></span>
+          <svg class="opt__icon" width="20" height="20" fill="currentColor" aria-hidden="true"><use href="#i-truck"/></svg>
           <span class="opt__body">
             <span class="opt__title opt__title--crown t-body-m">Free with MyTriumph<svg class="crown" width="16" height="14" viewBox="0 0 23 20" fill="none" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 6.93399e-09L11.2574 15.8444L6.89607 4.92073e-07L6.77135 4.99014e-07L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z" fill="currentColor"/></svg></span>
             <span class="opt__meta t-body-s">Free to join — applies to this order already</span>
@@ -1219,6 +1232,7 @@ body[data-mode="steps"] .place.is-last{display:block}
         <label class="opt is-on" data-ship="std">
           <input type="radio" name="ship" value="std" checked />
           <span class="opt__radio"></span>
+          <svg class="opt__icon" width="20" height="20" fill="currentColor" aria-hidden="true"><use href="#i-truck"/></svg>
           <span class="opt__body">
             <span class="opt__title t-body-m">Standard delivery · DHL</span>
             <span class="opt__meta opt__date t-body-s">Fri 11 – Sat 12 Sep 2026</span>
@@ -1228,6 +1242,7 @@ body[data-mode="steps"] .place.is-last{display:block}
         <label class="opt" data-ship="express">
           <input type="radio" name="ship" value="express" />
           <span class="opt__radio"></span>
+          <svg class="opt__icon" width="20" height="20" fill="currentColor" aria-hidden="true"><use href="#i-truck"/></svg>
           <span class="opt__body">
             <span class="opt__title t-body-m">Express delivery · DHL</span>
             <span class="opt__meta opt__date t-body-s">Thu 10 Sep 2026 — order by 12:00</span>
@@ -1237,6 +1252,7 @@ body[data-mode="steps"] .place.is-last{display:block}
         <label class="opt" data-ship="pickup">
           <input type="radio" name="ship" value="pickup" />
           <span class="opt__radio"></span>
+          <svg class="opt__icon" width="20" height="20" fill="currentColor" aria-hidden="true"><use href="#i-store"/></svg>
           <span class="opt__body">
             <span class="opt__title t-body-m">Collect in store · Triumph Berlin Ku'damm</span>
             <span class="opt__meta opt__date t-body-s">From Thu 10 Sep 2026</span>
