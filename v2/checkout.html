@@ -548,7 +548,8 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 /* a smaller tile with less air in it, so the mark itself fills more of the frame
    (Amelie, 2026-09-15) */
 #payList .opt__logo svg{flex:none;box-sizing:border-box;width:54px;height:32px;
-  max-height:none;padding:3px 4px;border:1px solid rgba(0,0,0,.12);background:var(--c-bg)}
+  max-height:none;padding:3px 4px;border:1px solid rgba(0,0,0,.12);border-radius:4px;
+  background:var(--c-bg)}
 /* the panel's text lines up with the brand mark above it — radio (24) + the row's gap
    (16) is where that column starts (Amelie, 2026-09-10) */
 #payList .opt__panel{padding-left:calc(24px + var(--space-16))}
@@ -700,7 +701,9 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review__items .review__news{margin:var(--space-24) 0 0}
 .ck__rail .trust + .place{margin-top:var(--space-24)}
 
-.review__items{margin-top:var(--space-64)}
+/* the same rhythm as the reviewed rows above it: 20px in, and the heading sits 6px off
+   its content, exactly as a dt sits off its dd (Amelie, 2026-09-15) */
+.review__items{margin-top:0;padding-top:var(--space-20)}
 .review__items-n{color:var(--c-ink-soft)}
 .review__items.is-folded #railItems{display:none}
 .review__items.is-folded .sec__head{margin-bottom:0;border-bottom:0;padding-bottom:0}
@@ -709,7 +712,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 
 /* a row of the summary, not a section: the heading takes the summary's own grey label
    style and there is no rule under it (Amelie, 2026-09-14) */
-.review__items .sec__head{margin-bottom:var(--space-16);padding-bottom:0;border-bottom:0}
+.review__items .sec__head{margin-bottom:var(--space-6);padding-bottom:0;border-bottom:0}
 /* the same heading the reviewed facts carry, so the list reads as one of them */
 .review__items .sec__head h3{font-weight:400;font-size:13px;line-height:18px;
   letter-spacing:.10em;text-transform:uppercase;color:var(--c-grey-medium)}
@@ -1651,7 +1654,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <span class="opt__radio"></span>
           <span class="opt__body"><span class="opt__title t-body-m">Credit or debit card</span></span>
           <span class="opt__logo">
-            <svg width="44" height="14" viewBox="0 0 43 13" aria-hidden="true"><text x="0" y="12" font-family="Helvetica,Arial" font-size="14" font-style="italic" font-weight="bold" fill="#1A1F71">VISA</text></svg>
+            <svg width="44" height="14" viewBox="0 -0.7 34.91 15.64" aria-hidden="true"><text x="0" y="12" font-family="Helvetica,Arial" font-size="14" font-style="italic" font-weight="bold" fill="#1A1F71">VISA</text></svg>
             <svg width="30" height="22" viewBox="4 1 30 22" aria-hidden="true"><circle cx="15" cy="12" r="11" fill="#EB001B"/><circle cx="23" cy="12" r="11" fill="#F79E1B" fill-opacity=".85"/></svg>
           </span>
         </label>
@@ -1679,7 +1682,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <input type="radio" name="pay" value="paypal" />
           <span class="opt__radio"></span>
           <span class="opt__body"><span class="opt__title t-body-m">PayPal</span></span>
-          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="25" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg></span>
+          <span class="opt__logo"><svg width="52" height="16" viewBox="0 1.18 46.7 15.36" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="25" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg></span>
         </label>
         <div class="opt__panel" data-panel="paypal">
           <p class="t-body-s muted">After “Place order” you go to PayPal and come back here to confirm.</p>
@@ -1694,7 +1697,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
             <span class="opt__title t-body-m">PayPal — Pay Later</span>
             <span class="opt__meta t-body-s">3 instalments · interest free</span>
           </span>
-          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="25" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg></span>
+          <span class="opt__logo"><svg width="52" height="16" viewBox="0 1.18 46.7 15.36" aria-hidden="true"><text x="0" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="25" y="13" font-family="Helvetica,Arial" font-size="13" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg></span>
         </label>
         <div class="opt__panel" data-panel="later">
           <p class="t-body-s muted">3 instalments of <strong style="font-weight:400" data-instalment>€21.65</strong>. The first at dispatch, then monthly. Credit check by PayPal.</p>
@@ -1704,7 +1707,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <input type="radio" name="pay" value="klarnaNow" />
           <span class="opt__radio"></span>
           <span class="opt__body"><span class="opt__title t-body-m">Klarna — pay now</span></span>
-          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="6" y="12" font-family="Helvetica,Arial" font-size="11" font-weight="bold" fill="#0B051D">Klarna</text></svg></span>
+          <span class="opt__logo"><svg width="38" height="12" viewBox="6 2.55 37.58 11.82" aria-hidden="true"><text x="6" y="12" font-family="Helvetica,Arial" font-size="11" font-weight="bold" fill="#0B051D">Klarna</text></svg></span>
         </label>
         <div class="opt__panel" data-panel="klarnaNow">
           <p class="t-body-s muted">Direct debit or instant bank transfer, handled by Klarna.</p>
@@ -1717,7 +1720,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
             <span class="opt__title t-body-m">Klarna — pay in 30 days</span>
             <span class="opt__meta t-body-s">Try first, pay later</span>
           </span>
-          <span class="opt__logo"><svg width="52" height="16" viewBox="0 0 52 16" aria-hidden="true"><text x="6" y="12" font-family="Helvetica,Arial" font-size="11" font-weight="bold" fill="#0B051D">Klarna</text></svg></span>
+          <span class="opt__logo"><svg width="38" height="12" viewBox="6 2.55 37.58 11.82" aria-hidden="true"><text x="6" y="12" font-family="Helvetica,Arial" font-size="11" font-weight="bold" fill="#0B051D">Klarna</text></svg></span>
         </label>
         <div class="opt__panel" data-panel="klarna30">
           <p class="t-body-s muted">Payable 30 days after dispatch, no fees. Credit check by Klarna.</p>
@@ -2271,7 +2274,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
       form.hidden = !(wantsNew || editingSaved);
       /* it used to appear outright; now it comes in the way every other row does
          (Amelie, 2026-09-14) */
-      if (was && !form.hidden) reveal(form, '.field');
+      /* every field, not the first eight — the phone box was arriving already on
+         screen while the rest rose in (Amelie, 2026-09-15) */
+      if (was && !form.hidden) reveal(form, '.field', 0, 20);
     }
     const change = $('#savedChange');
     if (change) change.textContent = editingSaved ? 'Save changes' : 'Change';
@@ -2629,9 +2634,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
     n.classList.add('rvl');
   }
   /* returns how many rows it moved, so whatever follows them can carry on the stagger */
-  function reveal(root, sel, start){
+  function reveal(root, sel, start, cap){
     if (REDUCED.matches || !root) return 0;
-    const rows = $$(sel, root).slice(0, 8);
+    const rows = $$(sel, root).slice(0, cap || 8);
     rows.forEach((n, i) => revealNode(n, (start || 0) + i));
     return rows.length;
   }
@@ -2686,7 +2691,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (on) {
             if (place && totals) {
         totals.after(place);
-        if (TRUST_EL) place.before(TRUST_EL);
+        if (TRUST_EL) place.after(TRUST_EL);
       }
       /* the opt-in sits under the address it would be sent to, not beside the button
          (Amelie, 2026-09-14) */
@@ -2782,7 +2787,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const live = $$('.sec[data-step].is-current').filter(n => n.offsetParent !== null).pop();
     if (live) {
       const ROWS = '.opt, .review__row, .field, .gate__col, .check';
-      let moved = reveal(live, ROWS);
+      let moved = reveal(live, ROWS, 0, 20);
       if (!moved) moved = reveal(live, ':scope > *');
       /* the section's own Continue comes after its rows — revealed on its own rather than
          with them, or an eight-field address step would cap it out (Amelie, 2026-09-14) */
