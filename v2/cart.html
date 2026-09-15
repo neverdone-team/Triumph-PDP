@@ -800,7 +800,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .item__row{gap:var(--space-16)}
   /* single column: express payment → delivery status → products → summary. The two
      column wrappers dissolve so their children become the flex items and can be ordered. */
-  .cart{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-24)}
+  .cart{display:flex;flex-direction:column;align-items:stretch;gap:var(--space-16)}
   .cart__left,.cart__right{display:contents}
   .cart__main,.cart__status,.sum,.cart__express{padding:0}
   .cart__express{order:1} .cart__status{order:2} .cart__main{order:3} .sum{order:4}
@@ -824,7 +824,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .hd__logo img{width:132px;height:auto}
   .wrap{padding:var(--space-16) var(--space-16) 120px}
   .t-title-xl{font-size:16px;line-height:22px}
-  .pagehead{margin-bottom:var(--space-4)}
+  /* the title is the same size as Complete your order below it, and sits close to the
+     bar it introduces (Amelie, 2026-09-15) */
+  .pagehead{margin-bottom:0}
+  .pagehead h1{font-size:14px;line-height:20px}
+  .cart{gap:var(--space-12)}
   /* the phone gets a tighter rhythm throughout: the page is one column, so the air
      between its blocks can come down (Amelie, 2026-09-14) */
   .cart{gap:var(--space-16)}
@@ -1166,9 +1170,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 <!-- mobile sticky checkout bar -->
 <div class="mbar" id="mbar">
-  <!-- the total rides in the CTA, the same shape the checkout's pay bar uses; the item
-       count is already in the page title, so the bar does not repeat it -->
-  <a class="btn btn--wide" href="./checkout.html">Checkout · <span data-total>€0.00</span></a>
+  <!-- the button names the step; the figure is in the summary above it (Amelie,
+       2026-09-15) -->
+  <a class="btn btn--wide" href="./checkout.html">Continue to checkout</a>
 </div>
 
 <div class="dash" id="dash">

@@ -1129,11 +1129,14 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   .ck__form{padding:var(--space-32) var(--space-32) var(--space-64) var(--space-24)}
 }
 @media (max-width:991px){
-  .ck{display:block;max-width:640px}
+  /* one clearance for the whole column, so whichever block ends up last is never under
+     the sticky bar (Amelie, 2026-09-15) */
+  .ck{display:block;max-width:640px;
+    padding-bottom:calc(var(--paybar-h, 140px) + var(--space-24) + env(safe-area-inset-bottom))}
   /* air under the sticky header by default; the stepped flow's tab row supplies its own,
      so only that mode zeroes it — the gate and the review have no tabs and keep it
      (Amelie, 2026-09-11) */
-  .ck__form{padding:var(--space-32) var(--space-16) 140px}
+  .ck__form{padding:var(--space-32) var(--space-16) var(--space-32)}
   body[data-mode="steps"]:not([data-step="0"]):not([data-step="4"]) .ck__form{padding-top:0}
   /* 64px between sections is right on a 1440 column, too loose on a phone */
   .sec{padding:var(--space-40) 0 0}
@@ -1184,8 +1187,10 @@ body:not([data-step="4"]) .review__items .sec__head h3{
      column used to give it (Amelie, 2026-09-14) */
   /* the summary ends with its three assurances, and the order list follows it — close,
      because the list is part of the summary now (Amelie, 2026-09-14) */
-  .ck > .review__items{order:3;margin-top:0;padding:var(--space-20) var(--space-16)
-    calc(150px + env(safe-area-inset-bottom))}
+  /* the same 24px the reviewed rows keep between them, and clearance for whatever the
+     sticky bar currently is (Amelie, 2026-09-15) */
+  .ck > .review__items{order:3;margin-top:0;padding:var(--space-24) var(--space-16)
+    var(--space-24)}
   /* a phone's summary runs tighter: the rows, the rule above the total and the block's
      own padding all come in */
   .ck__rail .trow{padding:var(--space-6) 0}
@@ -1195,7 +1200,11 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   .ck__rail .sum__head{margin-bottom:var(--space-20)}
   /* on the review the figures are in the sticky bar, so what was bought leads and the
      summary follows it (Amelie, 2026-09-14) */
-  body[data-step="4"] .ck > .review__items{order:1;padding-bottom:var(--space-32)}
+  /* on the review the block is one more row of the list above it: a hairline, then the
+     same 20px in, so it sits at the rhythm the reviewed rows keep (Amelie, 2026-09-15) */
+  body[data-step="4"] .ck > .review__items{order:1;padding-top:var(--space-20);
+    padding-bottom:var(--space-32);border-top:1px solid var(--c-hair)}
+  body[data-step="4"] .ck__form{padding-bottom:0}
   body[data-step="4"] .ck__railcol{order:2}
   /* the rail is no longer the last thing on the page: the order list under it carries
      the sticky bar's clearance instead */
@@ -2014,7 +2023,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     <span class="paybar__row paybar__row--total"><span class="t-title-s">Total</span><span class="t-price" data-total>&euro;114.84</span></span>
   </div>
   <button class="btn btn--wide" type="button">Place order · <span data-total>€114.84</span></button>
-  <p class="paybar__legal t-body-xs">By placing your order you accept our
+  <p class="paybar__legal t-body-xs" id="paybarLegal">By placing your order you accept our
     <a href="#">Terms &amp; Conditions</a>, our <a href="#">Cancellation Policy</a> and our
     <a href="#">Privacy Policy</a>.</p>
 </div>
@@ -2826,6 +2835,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     $('#steps').style.display =
       (mode === 'steps' && step !== 0 && step !== LAST_STEP) ? '' : 'none';
     $('.paybar').style.display = step === 0 ? 'none' : '';   // the gate has its own doors
+    document.dispatchEvent(new CustomEvent('ck:step'));
     $('.place').classList.toggle('is-last', step === LAST_STEP);
     if (step === LAST_STEP) fillReview();
     /* The step you have just arrived at comes in row by row — the same entrance the PLP
@@ -2858,6 +2868,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
          (Amelie, 2026-09-15) */
       const psum = $('#paybarSum');
       if (psum) psum.hidden = step === 0;
+      /* the legal line is about placing the order, so it only appears on the step that
+         does (Amelie, 2026-09-15) */
+      const plegal = $('#paybarLegal');
+      if (plegal) plegal.hidden = step !== LAST_STEP;
       /* the bar above it already carries the total (Amelie, 2026-09-14) */
       payBtn.innerHTML = step === LAST_STEP ? 'Place order' : STEP_CTA[step];
     }
@@ -3057,6 +3071,22 @@ body[data-mode="onepage"] .ck__rail{position:static;
   });
 
   /* another page (or the mini cart) changed the bag */
+  /* The bar grows and shrinks with the step — figures, button, sometimes the legal line
+     — so the page is told how much to keep clear rather than guessing (Amelie,
+     2026-09-15). */
+  (function payBarRoom(){
+    const bar = $('.paybar');
+    if (!bar) return;
+    const sync = () => {
+      const h = getComputedStyle(bar).display === 'none' ? 0 : bar.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--paybar-h', Math.round(h) + 'px');
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(sync).observe(bar);
+    window.addEventListener('resize', sync);
+    document.addEventListener('ck:step', sync);
+    setTimeout(sync, 0);
+  })();
+
   Shop.onChange(() => { if ($('#ckDone').hidden) applyState(); });
 
   /* Signed in from the bag: there is no gate to pass and nothing to fill in, so the
