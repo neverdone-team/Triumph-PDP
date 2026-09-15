@@ -1192,10 +1192,11 @@ body:not([data-step="4"]) .review__items .sec__head h3{
      column used to give it (Amelie, 2026-09-14) */
   /* the summary ends with its three assurances, and the order list follows it — close,
      because the list is part of the summary now (Amelie, 2026-09-14) */
-  /* the same 24px the reviewed rows keep between them, and clearance for whatever the
-     sticky bar currently is (Amelie, 2026-09-15) */
-  .ck > .review__items{order:3;margin-top:0;padding:var(--space-24) var(--space-16)
-    var(--space-24)}
+  /* Inset by margin rather than padding, so the block's rule starts and ends where the
+     reviewed rows' rules do — as a full-bleed line it read as a separate block instead
+     of one more row of the list (Amelie, 2026-09-15). */
+  .ck > .review__items{order:3;margin:0 var(--space-16);
+    padding:var(--space-24) 0 var(--space-24)}
   /* a phone's summary runs tighter: the rows, the rule above the total and the block's
      own padding all come in */
   .ck__rail .trow{padding:var(--space-6) 0}
@@ -1209,6 +1210,7 @@ body:not([data-step="4"]) .review__items .sec__head h3{
      same 20px in, so it sits at the rhythm the reviewed rows keep (Amelie, 2026-09-15) */
   body[data-step="4"] .ck > .review__items{order:1;padding-top:var(--space-20);
     padding-bottom:var(--space-32);border-top:1px solid var(--c-hair)}
+  body[data-step="4"] .ck > .review__items .sec__head{margin-bottom:var(--space-6)}
   body[data-step="4"] .ck__form{padding-bottom:0}
   body[data-step="4"] .ck__railcol{order:2}
   /* the rail is no longer the last thing on the page: the order list under it carries
