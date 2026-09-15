@@ -702,8 +702,9 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* a row of the summary, not a section: the heading takes the summary's own grey label
    style and there is no rule under it (Amelie, 2026-09-14) */
 .review__items .sec__head{margin-bottom:var(--space-16);padding-bottom:0;border-bottom:0}
-.review__items .sec__head h3{font-weight:300;font-size:12px;line-height:16px;
-  letter-spacing:.04em;text-transform:uppercase;color:var(--c-grey-medium)}
+/* the same heading the reviewed facts carry, so the list reads as one of them */
+.review__items .sec__head h3{font-weight:400;font-size:13px;line-height:18px;
+  letter-spacing:.10em;text-transform:uppercase;color:var(--c-grey-medium)}
 /* with the steppers gone the second row is empty, so the text hung at the top of a
    107px packshot: both columns span the rows and centre (Amelie, 2026-09-14) */
 .review__items .li__body,
@@ -2682,7 +2683,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   const itemsFold = $('#itemsFold');
   if (itemsFold) itemsFold.addEventListener('click', () => {
     const box = $('#reviewItems');
-    const open = box.classList.contains('is-folded');
+    const open = box.classList.contains('is-folded');   // it is folded, so this opens it
     box.dataset.open = open ? 'true' : 'false';
     box.classList.toggle('is-folded', !open);
     itemsFold.textContent = open ? 'Hide' : 'Show';
@@ -2735,8 +2736,15 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const showList = onReview || (mode === 'onepage' && step >= 1 && itemsMode !== 'hidden');
     layoutList(showList, onReview);
     const box = $('#reviewItems'), fold = $('#itemsFold');
-    if (box) box.classList.toggle('is-folded', showList && !onReview && itemsMode === 'collapsed' && box.dataset.open !== 'true');
-    if (fold) fold.hidden = onReview || !showList || itemsMode !== 'collapsed';
+    const folded = showList && !onReview && itemsMode === 'collapsed' && box && box.dataset.open !== 'true';
+    if (box) box.classList.toggle('is-folded', !!folded);
+    if (fold) {
+      fold.hidden = onReview || !showList || itemsMode !== 'collapsed';
+      /* the label names what the click does, so a folded list offers Show (Amelie,
+         2026-09-15) */
+      fold.textContent = folded ? 'Show' : 'Hide';
+      fold.setAttribute('aria-expanded', String(!folded));
+    }
     layoutReview(step === LAST_STEP);
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it
