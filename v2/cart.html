@@ -870,6 +870,12 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* sticky checkout bar */
   .mbar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--c-bg);
     border-top:1px solid var(--c-hair);padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom))}
+  /* the wallets ride in the bar under the button, and the label goes with them: in a
+     sticky strip the alternatives explain themselves (Amelie, 2026-09-15) */
+  .mbar .cart__express{margin:var(--space-8) 0 0}
+  .mbar .cart__express .or{display:none}
+  .mbar .express{margin-top:0;gap:var(--space-8)}
+  .mbar .xbtn{height:var(--control-40)}
 }
 
 </style>
@@ -1899,6 +1905,21 @@ h1,h2,h3,p{margin:0;font-weight:400}
       .wrap{padding-bottom:var(--space-32)!important} .dash{display:none!important}`;
     document.head.appendChild(st);
   }
+
+  /* On a phone the wallets belong in the sticky strip, under the button they are an
+     alternative to; on a wider screen they stay in the summary (Amelie, 2026-09-15). */
+  (function expressInBar(){
+    const ex = $('.cart__express'), bar = $('#mbar');
+    if (!ex || !bar) return;
+    const home = [ex.parentNode, ex.nextSibling];
+    const mq = window.matchMedia('(max-width:991px)');
+    const place = () => {
+      if (mq.matches) bar.appendChild(ex);
+      else if (home[0]) home[0].insertBefore(ex, home[1]);
+    };
+    place();
+    mq.addEventListener('change', place);
+  })();
 
   Shop.onChange(render);
   render();
