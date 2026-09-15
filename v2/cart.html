@@ -771,14 +771,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .dash__grab{display:flex;align-items:center;gap:var(--space-8);cursor:grab;
   margin:calc(var(--space-4) * -1) 0 var(--space-8);padding:var(--space-4) 0;opacity:.6}
 .dash__grab::before{content:"";width:22px;height:2px;background:currentColor;flex:none}
-.dash.is-dragging,.dash.is-dragging .dash__grab{cursor:grabbing}
+.dash.is-dragging,.dash.is-dragging .dash__grab,.dash__hide.is-dragging{cursor:grabbing}
+.dash__grab{touch-action:none}
 .dash h4{margin:0 0 var(--space-8);font-weight:400;font-size:10px;line-height:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
 .dash__row{display:flex;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-10)}
 .dash button{border:1px solid rgba(255,255,255,.3);padding:var(--space-6) var(--space-8);font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
 /* below 992 the sticky Checkout bar owns the bottom of the screen — the switcher
    is a prototype affordance and must never sit on top of the primary CTA */
 @media (max-width:991px){ .dash{bottom:calc(var(--space-16) + 80px)} }
-.dash__hide{position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;
+.dash__hide{cursor:grab;touch-action:none;position:fixed;right:var(--space-16);bottom:var(--space-16);z-index:200;
   background:var(--c-ink);color:var(--c-on-dark);padding:var(--space-8) var(--space-10);
   font-size:10px;letter-spacing:.08em;text-transform:uppercase}
 @media (max-width:991px){ .dash__hide{bottom:calc(var(--space-16) + 80px)} }
@@ -1929,49 +1930,59 @@ h1,h2,h3,p{margin:0;font-weight:400}
   render();
 })();
 
-  /* ---------- the switcher can be dragged ----------
-     It is a prototype device that sits over the page, so it has to be movable when it
-     covers the thing being looked at (Amelie, 2026-09-14). */
-  (function dragDash(){
-    const dash = document.getElementById('dash');
-    const grab = document.getElementById('dashGrab');
-    if (!dash || !grab) return;
-    let dx = 0, dy = 0;
+
+  /* ---------- makeDraggable ----------
+     Both the panel and the chip it collapses into can be dragged out of the way; on a
+     phone they sit over the very thing being looked at (Amelie, 2026-09-15). A move of
+     more than a few pixels suppresses the click, so the chip still taps open. */
+  function makeDraggable(el, handle){
+    if (!el) return;
+    handle = handle || el;
+    let dx = 0, dy = 0, moved = false;
     const place = (x, y) => {
-      const w = dash.offsetWidth, h = dash.offsetHeight;
+      const w = el.offsetWidth, h = el.offsetHeight;
       x = Math.min(Math.max(8, x), innerWidth - w - 8);
       y = Math.min(Math.max(8, y), innerHeight - h - 8);
-      dash.style.left = x + 'px';
-      dash.style.top = y + 'px';
-      dash.style.right = 'auto';
-      dash.style.bottom = 'auto';
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+      el.style.right = 'auto'; el.style.bottom = 'auto';
     };
     const move = e => {
       const p = e.touches ? e.touches[0] : e;
+      moved = true;
       place(p.clientX - dx, p.clientY - dy);
       if (e.cancelable) e.preventDefault();
     };
     const up = () => {
-      dash.classList.remove('is-dragging');
+      el.classList.remove('is-dragging');
       document.removeEventListener('mousemove', move);
       document.removeEventListener('mouseup', up);
       document.removeEventListener('touchmove', move);
       document.removeEventListener('touchend', up);
+      if (moved) setTimeout(() => { moved = false; }, 0);
     };
     const down = e => {
       const p = e.touches ? e.touches[0] : e;
-      const r = dash.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
       dx = p.clientX - r.left; dy = p.clientY - r.top;
-      place(r.left, r.top);                 // pin it before switching to left/top
-      dash.classList.add('is-dragging');
+      moved = false;
+      place(r.left, r.top);
+      el.classList.add('is-dragging');
       document.addEventListener('mousemove', move);
       document.addEventListener('mouseup', up);
       document.addEventListener('touchmove', move, { passive:false });
       document.addEventListener('touchend', up);
     };
-    grab.addEventListener('mousedown', down);
-    grab.addEventListener('touchstart', down, { passive:true });
-  })();
+    handle.addEventListener('mousedown', down);
+    handle.addEventListener('touchstart', down, { passive:true });
+    el.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+  }
+
+  makeDraggable(document.getElementById('dash'), document.getElementById('dashGrab'));
+  {
+    const hide = document.querySelector('.dash__hide');
+    if (hide) makeDraggable(hide);
+  }
+
 </script>
 </body>
 </html>
