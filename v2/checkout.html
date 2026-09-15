@@ -586,6 +586,11 @@ body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
    supporting band in between, so the gutter is a real 12 (Amelie, 2026-09-11) */
 #gateReg .grid,#addrForm,#addrForm .grid,#billing .grid,#payList .opt__panel .grid{
   row-gap:var(--space-12);column-gap:var(--space-12)}
+/* the billing block is three grids stacked, so the 12px lives between them as well as
+   inside them — otherwise its rows touch while the delivery address breathes (Amelie,
+   2026-09-15) */
+.billing{display:grid;row-gap:var(--space-12);margin-top:var(--space-12)}
+
 /* indented to the option text above it — radio (24) plus the row's gap (16) */
 .check--indent{padding-left:calc(24px + var(--space-16))}
 @media (max-width:575px){ .check--indent{padding-left:0} }
@@ -723,9 +728,12 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* in the checkout itself the block is a section of the form, so it carries the rule the
    reviewed rows carry; on the review it is one of those rows and does not (Amelie,
    2026-09-15) */
+body:not([data-step="4"]) .review__items{padding-top:var(--space-32)}
 body:not([data-step="4"]) .review__items .sec__head{
   padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair);
   margin-bottom:var(--space-16)}
+body:not([data-step="4"]) .review__items .sec__head h3{
+  font-size:14px;line-height:20px;letter-spacing:.20em;color:var(--c-ink)}
 .review__items.is-folded .sec__head a{display:none}
 /* the same heading the reviewed facts carry, so the list reads as one of them */
 .review__items .sec__head h3{font-weight:400;font-size:13px;line-height:18px;
@@ -1532,7 +1540,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
           <span class="t-body-s">Delivery address is also my billing address</span>
         </label>
-        <div id="billing" data-address-group hidden style="margin-top:var(--space-12)">
+        <div id="billing" class="billing" data-address-group hidden>
           <div class="grid grid--2">
             <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>First name</span></legend></fieldset><span class="field__label">First name</span></label>
             <label class="field"><input type="text" placeholder=" " /><fieldset class="field__frame"><legend><span>Last name</span></legend></fieldset><span class="field__label">Last name</span></label>
