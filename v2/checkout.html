@@ -163,6 +163,8 @@ body{background-image:none}
 }
 .sec__note{margin:calc(var(--space-4) * -1) 0 var(--space-16);color:var(--c-ink-soft)}
 
+#s-express .or{margin:0 0 var(--space-16)}
+
 /* ============================================================
    EXPRESS CHECKOUT
    ============================================================ */
@@ -1281,7 +1283,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
     <!-- ---------- EXPRESS ---------- -->
     <section class="sec" data-step="1" id="s-express" data-mode-only="onepage" aria-labelledby="h-express">
-      <h2 class="t-title-s" id="h-express" style="margin-bottom:var(--space-12)">Express checkout</h2>
+      <!-- the ruled label the bag uses, not a section headline: this is an aside from
+           the form, not a step of it (Amelie, 2026-09-15) -->
+      <p class="or t-label-m" id="h-express">express checkout</p>
       <div class="express">
         <button class="xbtn xbtn--paypal" type="button" aria-label="Mit PayPal bezahlen">
           <svg width="54" height="17" viewBox="0 0 53.7 17.2" aria-hidden="true"><text x="0" y="14" font-family="Helvetica,Arial" font-size="15" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="30" y="14" font-family="Helvetica,Arial" font-size="15" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
@@ -2850,8 +2854,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const payBtn = $('.paybar .btn');
     if (payBtn) {
       payBtn.dataset.step = String(step);
+      /* the figures ride with the button on every step, as they do on the review
+         (Amelie, 2026-09-15) */
       const psum = $('#paybarSum');
-      if (psum) psum.hidden = step !== LAST_STEP;
+      if (psum) psum.hidden = step === 0;
       /* the bar above it already carries the total (Amelie, 2026-09-14) */
       payBtn.innerHTML = step === LAST_STEP ? 'Place order' : STEP_CTA[step];
     }
