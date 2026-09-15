@@ -1214,8 +1214,10 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   /* the rail is no longer the last thing on the page: the order list under it carries
      the sticky bar's clearance instead */
   body[data-step="4"] .ck__rail{padding-bottom:var(--space-32)}
+  /* no rule over the summary on one column: the block's own heading and the space
+     above it already separate it (Amelie, 2026-09-15) */
   body[data-mode="onepage"]:not([data-step="0"]) .ck__railcol{display:block;order:2;
-    border-left:0;border-top:1px solid var(--c-hair)}
+    border-left:0;border-top:0}
   /* the rail is the last thing on the page now, so it carries the clearance the form
      column used to — or the sticky bar sits on top of the total */
 body[data-mode="onepage"] .ck__rail{position:static;
