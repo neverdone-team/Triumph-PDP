@@ -842,6 +842,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     grid-template-rows:repeat(7,min-content) auto}
   .item__media{grid-row:1 / -1;align-self:start;margin:0;aspect-ratio:auto}
   .item__img{width:128px;height:171px}
+  /* the cross-sell cards are narrow on a phone: the price comes down with them
+     (Amelie, 2026-09-15) */
+  .acard__pr{font-size:12px;line-height:16px}
   /* the row order and the price layout are the base now; a phone only needs the name a
      rung smaller, tighter under the collection, and the shot pinned to the top */
   .item__name{font-size:14px;line-height:20px;margin-top:var(--space-2)}
@@ -877,7 +880,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
     border-top:1px solid var(--c-hair);padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom))}
   /* the wallets ride in the bar under the button, and the label goes with them: in a
      sticky strip the alternatives explain themselves (Amelie, 2026-09-15) */
-  .mbar .cart__express{margin:var(--space-8) 0 0}
+  /* the wallets come first and the primary button closes the bar (Amelie, 2026-09-15) */
+  .mbar{display:flex;flex-direction:column}
+  .mbar .cart__express{order:1;margin:0 0 var(--space-8)}
+  .mbar > .btn{order:2}
   .mbar .cart__express .or{display:none}
   .mbar .express{margin-top:0;gap:var(--space-8)}
   .mbar .xbtn{height:var(--control-40)}
@@ -1902,6 +1908,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
     b.className = 'dash__hide'; b.textContent = 'States';
     b.addEventListener('click', () => { $('#dash').hidden = false; b.remove(); });
     document.body.appendChild(b);
+    makeDraggable(b);              // the chip is made on the fly, so it is wired here
   });
 
   if (/[?&]capture=1/.test(location.search)) {
@@ -1978,10 +1985,6 @@ h1,h2,h3,p{margin:0;font-weight:400}
   }
 
   makeDraggable(document.getElementById('dash'), document.getElementById('dashGrab'));
-  {
-    const hide = document.querySelector('.dash__hide');
-    if (hide) makeDraggable(hide);
-  }
 
 </script>
 </body>
