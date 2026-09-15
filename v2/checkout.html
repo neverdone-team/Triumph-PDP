@@ -422,7 +422,9 @@ body{background-image:none}
 .gate__box .field{margin-bottom:var(--space-4)}
 .gate__hint{margin:0 0 var(--space-16);color:var(--c-ink-soft)}
 .gate__hint--intro{margin:var(--space-8) 0 var(--space-24)}
-.gate__meta{display:flex;justify-content:flex-end;margin:calc(var(--space-4) * -1) 0 var(--space-24)}
+/* 4px clear of the field above it — it used to be pulled up against the box (Amelie,
+   2026-09-15) */
+.gate__meta{display:flex;justify-content:flex-end;margin:var(--space-4) 0 var(--space-24)}
 /* the guest door is a text button, so it does not compete with Create an account */
 .gate__guest{margin:var(--space-20) 0 0;text-align:center}
 .gate__next{margin-top:var(--space-48);padding-top:var(--space-40);border-top:1px solid var(--c-hair)}
