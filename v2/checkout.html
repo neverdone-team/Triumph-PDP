@@ -724,11 +724,24 @@ body[data-mode="steps"] .place.is-last{display:block}
 
 /* a row of the summary, not a section: the heading takes the summary's own grey label
    style and there is no rule under it (Amelie, 2026-09-14) */
-.review__items .sec__head{margin-bottom:var(--space-6);padding-bottom:0;border-bottom:0}
+.review__items .sec__head{margin-bottom:18px;padding-bottom:0;border-bottom:0}
 /* in the checkout itself the block is a section of the form, so it carries the rule the
    reviewed rows carry; on the review it is one of those rows and does not (Amelie,
    2026-09-15) */
 body:not([data-step="4"]) .review__items{padding-top:var(--space-32)}
+/* In the rail it is a block of the summary: it comes last, takes the summary's own
+   heading, and its rows keep the rail's stacked shape rather than the review's wide one
+   — both rule sets match in there, and they were colliding (Amelie, 2026-09-15). */
+body[data-mode="onepage"] .ck__rail .review__items{order:10;padding-top:var(--space-24);
+  margin-top:var(--space-24);border-top:1px solid var(--c-hair)}
+body[data-mode] .ck__rail .review__items .sec__head{border-bottom:0;padding-bottom:0;
+  margin-bottom:var(--space-12)}
+body[data-mode] .ck__rail .review__items .sec__head h3{font-size:13px;line-height:18px;
+  letter-spacing:.16em;color:var(--c-grey-medium)}
+body[data-mode] .ck__rail .review__items .li__body,
+body[data-mode] .ck__rail .review__items .li__price{grid-row:auto;align-self:auto}
+body[data-mode] .ck__rail .review__items .li__price{grid-column:2;margin-top:var(--space-12)}
+body[data-mode] .ck__rail .review__items .li__pricerow{flex-direction:row}
 body:not([data-step="4"]) .review__items .sec__head{
   padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair);
   margin-bottom:var(--space-16)}
@@ -2022,6 +2035,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   <div class="dash__row" data-group="items">
     <button data-items-set="collapsed" aria-pressed="true">Collapsed</button>
     <button data-items-set="hidden" aria-pressed="false">Hidden</button>
+    <button data-items-set="summary" aria-pressed="false">In summary</button>
   </div>
   <h4>MyTriumph</h4>
   <div class="dash__row" data-group="member">
@@ -2695,11 +2709,12 @@ body[data-mode="onepage"] .ck__rail{position:static;
       box.appendChild(items);
       reveal(items, '.li');
       const railcol = rail.closest('.ck__railcol');
-      /* On one column the summary comes first and the list that explains it second. On
-         two, it is the last block of the form column — its own home is inside the review
-         section, which is hidden until the review, so before then it is appended to the
-         column instead (Amelie, 2026-09-14). */
-      if (NARROW.matches && railcol) railcol.after(box);
+      /* Three homes: inside the summary under the assurances, at the foot of the page on
+         one column, or the last block of the form column. Its own place in the markup is
+         inside the review section, which is hidden until the review, so before then it
+         is appended rather than sent home (Amelie, 2026-09-15). */
+      if (!isReview && itemsMode === 'summary' && TRUST_EL) TRUST_EL.after(box);
+      else if (NARROW.matches && railcol) railcol.after(box);
       else if (isReview || !form) goHome(box);
       else form.appendChild(box);
     } else {
@@ -2785,12 +2800,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
        the stepped flow keeps it for the review (Amelie, 2026-09-14) */
     const onReview = step === LAST_STEP;
     const showList = onReview || (mode === 'onepage' && step >= 1 && itemsMode !== 'hidden');
+    /* in the summary the list is always foldable, whichever variant put it there */
+    const foldable = itemsMode === 'collapsed' || itemsMode === 'summary';
     layoutList(showList, onReview);
     const box = $('#reviewItems'), fold = $('#itemsFold');
-    const folded = showList && !onReview && itemsMode === 'collapsed' && box && box.dataset.open !== 'true';
+    const folded = showList && !onReview && foldable && box && box.dataset.open !== 'true';
     if (box) box.classList.toggle('is-folded', !!folded);
     if (fold) {
-      fold.hidden = onReview || !showList || itemsMode !== 'collapsed';
+      fold.hidden = onReview || !showList || !foldable;
       /* the label names what the click does, so a folded list offers Show (Amelie,
          2026-09-15) */
       fold.textContent = folded ? 'Show' : 'Hide';
@@ -2821,6 +2838,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
       /* behind the rows, never among them: at a cap of five it was arriving before the
          billing checkbox at the foot of a ten-field form (Amelie, 2026-09-15) */
       if (next) revealNode(next, Math.min(moved, 16));
+      /* and the list last of all, after the button it sits under (Amelie, 2026-09-15) */
+      if (box && !box.hidden && !onReview) revealNode(box, Math.min(moved, 16) + 1);
       /* the stepped flow's button lives outside the section it belongs to, so it is not
          picked up by the rows above — it comes in last, behind them (Amelie,
          2026-09-14) */
