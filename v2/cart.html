@@ -93,7 +93,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the same measure the checkout's columns sit in, so the bag and every step of the
    checkout line up (Amelie, 2026-09-14) */
 .wrap{max-width:1280px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
-.pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-16)}
 /* the count is part of the title, in brackets after it (Amelie, 2026-09-14) */
 .pagehead__n{font-weight:inherit;color:var(--c-ink-soft)}
 
@@ -876,9 +876,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 <header class="hd">
   <div class="hd__in">
-    <nav class="hd__links t-label-m">
-      <a href="#">Bras</a><a href="#">Briefs</a><a href="#">Lingerie</a><a href="#">Sale</a>
-    </nav>
+    <!-- the bag's header carries the logo alone: the nav and the icons all led away
+         from, or back to, the page you are already on (Amelie, 2026-09-15) -->
     <a class="hd__logo" href="./index.html" aria-label="Triumph"><img src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" /></a>
     <div class="hd__icons">
       <!-- wishlist, account and basket are gone from the bag's own header (Amelie,
@@ -909,15 +908,16 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   <!-- ======================= FILLED CART ======================= -->
   <div id="filledCart">
-    <div class="pagehead">
-      <h1 class="t-title-xl">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
-    </div>
-
     <div class="cart">
      <!-- Two column wrappers so the columns do not share grid rows (a tall packshot used
           to push the summary down the rail) and so the whole right column can stick.
           On a phone both wrappers go display:contents and the four blocks order freely. -->
      <div class="cart__left">
+      <!-- inside the column, so the title and the summary head start on the same line
+           (Amelie, 2026-09-15) -->
+      <div class="pagehead">
+        <h1 class="t-title-m">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
+      </div>
       <!-- The delivery status leads the order on desktop as well as on mobile: it is
            about this order, so it belongs where the order is read (Amelie, 2026-09-10). -->
       <div class="cart__status">

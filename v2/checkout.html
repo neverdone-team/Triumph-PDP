@@ -550,6 +550,9 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 #payList .opt__logo svg{flex:none;box-sizing:border-box;width:54px;height:32px;
   max-height:none;padding:3px 4px;border:1px solid rgba(0,0,0,.12);border-radius:4px;
   background:var(--c-bg)}
+/* Visa and Mastercard are dense blocks of colour; a little more room around them
+   balances against the wordmarks beside them (Amelie, 2026-09-15) */
+#payList .opt[data-pay="card"] .opt__logo svg{padding:6px 9px}
 /* the panel's text lines up with the brand mark above it — radio (24) + the row's gap
    (16) is where that column starts (Amelie, 2026-09-10) */
 #payList .opt__panel{padding-left:calc(24px + var(--space-16))}
@@ -583,6 +586,10 @@ body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
    supporting band in between, so the gutter is a real 12 (Amelie, 2026-09-11) */
 #gateReg .grid,#addrForm,#addrForm .grid,#billing .grid,#payList .opt__panel .grid{
   row-gap:var(--space-12);column-gap:var(--space-12)}
+/* indented to the option text above it — radio (24) plus the row's gap (16) */
+.check--indent{padding-left:calc(24px + var(--space-16))}
+@media (max-width:575px){ .check--indent{padding-left:0} }
+
 /* the open row and its fields are one block: the row's own rule goes and the form
    carries it instead (Amelie, 2026-09-15) */
 .savedaddr .opt:has(+ #addrForm){border-bottom-color:transparent}
@@ -698,7 +705,7 @@ body[data-mode="steps"] .place.is-last{display:block}
 .review__news{margin-top:var(--space-24)}
 /* in the rail it is a row of the summary, not a line of the form */
 /* under the reviewed facts, not among them */
-.review__items .review__news{margin:var(--space-24) 0 0}
+.review__row .review__news{grid-column:1 / -1;margin:var(--space-12) 0 0}
 .ck__rail .trust + .place{margin-top:var(--space-24)}
 
 /* the same rhythm as the reviewed rows above it: 20px in, and the heading sits 6px off
@@ -713,6 +720,13 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* a row of the summary, not a section: the heading takes the summary's own grey label
    style and there is no rule under it (Amelie, 2026-09-14) */
 .review__items .sec__head{margin-bottom:var(--space-6);padding-bottom:0;border-bottom:0}
+/* in the checkout itself the block is a section of the form, so it carries the rule the
+   reviewed rows carry; on the review it is one of those rows and does not (Amelie,
+   2026-09-15) */
+body:not([data-step="4"]) .review__items .sec__head{
+  padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair);
+  margin-bottom:var(--space-16)}
+.review__items.is-folded .sec__head a{display:none}
 /* the same heading the reviewed facts carry, so the list reads as one of them */
 .review__items .sec__head h3{font-weight:400;font-size:13px;line-height:18px;
   letter-spacing:.10em;text-transform:uppercase;color:var(--c-grey-medium)}
@@ -750,7 +764,11 @@ body[data-mode="steps"] .place.is-last{display:block}
    whitespace between two copied brand marks into a line break of its own, and dropped the
    label onto a second line under the icons (Amelie, 2026-09-14) */
 .review__mark{display:inline-flex;align-items:center;gap:var(--space-8);white-space:normal}
+/* the same framed tile the payment list uses, at the review's smaller scale (Amelie,
+   2026-09-15) */
 .review__mark svg{flex:none}
+[data-review="pay"] .review__mark svg{box-sizing:border-box;width:40px;height:26px;
+  padding:3px 4px;border:1px solid rgba(0,0,0,.12);border-radius:4px;background:var(--c-bg)}
 .review__sub{display:block;margin-top:var(--space-2);color:var(--c-ink)}
 @media (max-width:575px){
   /* the ink in this column is the answers, not the questions, and Edit sits on the
@@ -1509,7 +1527,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <div style="margin-top:var(--space-12)">
         <!-- ticked by default and stated the other way round: the billing fields only
              appear for the minority who need them (Amelie, 2026-09-10) -->
-        <label class="check">
+        <label class="check check--indent">
           <input type="checkbox" id="sameBilling" data-toggle-hide="#billing" checked />
           <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
           <span class="t-body-s">Delivery address is also my billing address</span>
@@ -2695,9 +2713,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
       }
       /* the opt-in sits under the address it would be sent to, not beside the button
          (Amelie, 2026-09-14) */
-      /* the opt-in follows what was bought (Amelie, 2026-09-14) */
-      const list = $('#reviewItems');
-      if (news && list) list.appendChild(news);
+      /* the opt-in belongs with the address it would be sent to (Amelie, 2026-09-15) */
+      const addrRow = REVIEW_DL && $('.review__row', REVIEW_DL);
+      if (news && addrRow) addrRow.appendChild(news);
     } else {
       goHome(place);
       goHome(news);
@@ -2792,12 +2810,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
       /* the section's own Continue comes after its rows — revealed on its own rather than
          with them, or an eight-field address step would cap it out (Amelie, 2026-09-14) */
       const next = $('.sec__next', live);
-      if (next) revealNode(next, Math.min(moved, 5));
+      /* behind the rows, never among them: at a cap of five it was arriving before the
+         billing checkbox at the foot of a ten-field form (Amelie, 2026-09-15) */
+      if (next) revealNode(next, Math.min(moved, 16));
       /* the stepped flow's button lives outside the section it belongs to, so it is not
          picked up by the rows above — it comes in last, behind them (Amelie,
          2026-09-14) */
       const nav = $('#stepnav');
-      if (nav && nav.style.display !== 'none') revealNode(nav, Math.min(moved, 5));
+      if (nav && nav.style.display !== 'none') revealNode(nav, Math.min(moved, 16));
     }
     // the mobile pay bar carries the same call to action as the desktop column
     const payBtn = $('.paybar .btn');
