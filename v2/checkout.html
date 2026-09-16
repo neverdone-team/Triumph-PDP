@@ -1179,12 +1179,12 @@ body:not([data-step="4"]) .review__items .sec__head h3{
     background:var(--c-bg); border-top:2px solid var(--c-hair);
     padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   }
-  /* the figures, then the wallets, then the primary button — the same order the bag's
-     bar uses (Amelie, 2026-09-16) */
+  /* the figures, the step's own button, then the wallets under it: here the primary
+     action is continuing, and the wallets are the way past it (Amelie, 2026-09-16) */
   .paybar__sum{order:1}
-  .paybar .express{order:2;margin:0 0 var(--space-8);gap:var(--space-8)}
+  .paybar > .btn{order:2}
+  .paybar .express{order:3;margin:var(--space-8) 0 0;gap:var(--space-8)}
   .paybar .xbtn{height:var(--control-40)}
-  .paybar > .btn{order:3}
   .paybar__legal{order:4}
   /* the express section's own label and divider go with the buttons */
   #s-express{display:none}
@@ -3122,8 +3122,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const place = () => {
       if (NARROW.matches) bar.appendChild(ex);
       else if (home[0]) home[0].insertBefore(ex, home[1]);
-      /* nothing to skip the form with once the order is being placed */
-      ex.hidden = NARROW.matches && Number(document.body.dataset.step) === LAST_STEP;
+      /* nothing left to skip once the payment step is reached: the ways to pay are on
+         the page itself from there on (Amelie, 2026-09-16) */
+      ex.hidden = NARROW.matches && Number(document.body.dataset.step) >= 3;
     };
     place();
     NARROW.addEventListener('change', place);
