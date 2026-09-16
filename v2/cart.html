@@ -1902,14 +1902,19 @@ h1,h2,h3,p{margin:0;font-weight:400}
     SAMPLE.forEach(l => Shop.add(l, l.sku.endsWith('-m') ? 2 : 1));
   }));
 
-  $('#dashHide').addEventListener('click', () => {
+  /* The switcher starts closed: it is a prototype device, and a panel of options over
+     the design is not what a page should open with (Amelie, 2026-09-16). */
+  function collapseDash(){
     $('#dash').hidden = true;
+    if (document.querySelector('.dash__hide')) return;
     const b = document.createElement('button');
     b.className = 'dash__hide'; b.textContent = 'States';
     b.addEventListener('click', () => { $('#dash').hidden = false; b.remove(); });
     document.body.appendChild(b);
     makeDraggable(b);              // the chip is made on the fly, so it is wired here
-  });
+  }
+  $('#dashHide').addEventListener('click', collapseDash);
+  collapseDash();
 
   if (/[?&]capture=1/.test(location.search)) {
     const st = document.createElement('style');

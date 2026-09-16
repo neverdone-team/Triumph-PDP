@@ -2599,14 +2599,19 @@ body[data-mode="onepage"] .ck__rail{position:static;
     $$('[data-member-set]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
     applyState();
   }));
-  $('#dashHide').addEventListener('click', () => {
+  /* The switcher starts closed: it is a prototype device, and a panel of options over
+     the design is not what a page should open with (Amelie, 2026-09-16). */
+  function collapseDash(){
     $('#dash').hidden = true;
+    if (document.querySelector('.dash__hide')) return;
     const b = document.createElement('button');
     b.className = 'dash__hide'; b.textContent = 'States';
     b.addEventListener('click', () => { $('#dash').hidden = false; b.remove(); });
     document.body.appendChild(b);
-    makeDraggable(b);
-  });
+    makeDraggable(b);              // the chip is made on the fly, so it is wired here
+  }
+  $('#dashHide').addEventListener('click', collapseDash);
+  collapseDash();
 
   // ?capture=1 — un-pin the fixed/sticky chrome so full-page screenshots don't stamp the
   // pay bar across the middle of the page. Presentation only; no layout logic depends on it.
