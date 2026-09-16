@@ -1225,7 +1225,11 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   body[data-step="4"] .ck > .review__items{order:1;padding-top:var(--space-20);
     padding-bottom:var(--space-32);border-top:0}
   body[data-step="4"] .ck > .review__items .sec__head{margin-bottom:var(--space-6)}
-  body[data-step="4"] .ck__form{padding-bottom:0}
+  /* the one-pager's own 32px was outliving this at equal specificity, so the block sat
+     62px off the payment row instead of 20 (Amelie, 2026-09-16) */
+  body[data-step="4"] .ck__form,
+  body[data-mode="onepage"][data-step="4"] .ck__form{padding-bottom:0}
+  body[data-step="4"] .sec[data-step="4"]{padding-bottom:0}
   body[data-step="4"] .ck__railcol{order:2}
   /* the rail is no longer the last thing on the page: the order list under it carries
      the sticky bar's clearance instead */
