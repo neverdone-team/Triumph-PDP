@@ -1006,10 +1006,13 @@ body:not([data-step="4"]) .review__items .sec__head h3{
 }
 
 /* the sticky bar's own summary, last step only */
-.paybar__sum{display:grid;gap:var(--space-4);padding-bottom:var(--space-10);
-  border-bottom:1px solid var(--c-hair);margin-bottom:var(--space-10)}
+/* no rule inside the bar: the bar's own top edge already separates it from the page
+   (Amelie, 2026-09-16) */
+.paybar__sum{display:grid;gap:var(--space-4);margin-bottom:var(--space-10)}
 .paybar__row{display:flex;justify-content:space-between;gap:var(--space-16);align-items:baseline}
 .paybar__row--total .t-price{font-size:16px;line-height:22px}
+/* free is free wherever it is stated */
+.paybar__row.is-free [data-paybar-ship]{color:var(--color-green)}
 
 /* alerts (DS Inline Alert) */
 .alert{display:flex;gap:var(--space-12);padding:var(--space-16);margin-bottom:var(--space-20);border:1px solid var(--c-hair)}
@@ -1172,10 +1175,19 @@ body:not([data-step="4"]) .review__items .sec__head h3{
 
   /* sticky pay bar */
   .paybar{
-    display:block; position:fixed; left:0; right:0; bottom:0; z-index:70;
-    background:var(--c-bg); border-top:1px solid var(--c-hair);
+    display:flex; flex-direction:column; position:fixed; left:0; right:0; bottom:0; z-index:70;
+    background:var(--c-bg); border-top:2px solid var(--c-hair);
     padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   }
+  /* the figures, then the wallets, then the primary button — the same order the bag's
+     bar uses (Amelie, 2026-09-16) */
+  .paybar__sum{order:1}
+  .paybar .express{order:2;margin:0 0 var(--space-8);gap:var(--space-8)}
+  .paybar .xbtn{height:var(--control-40)}
+  .paybar > .btn{order:3}
+  .paybar__legal{order:4}
+  /* the express section's own label and divider go with the buttons */
+  #s-express{display:none}
   /* One call to action on a phone, and it is the sticky bar — its label is whatever the
      section you are in asks for (Amelie, 2026-09-11). A sticky button cannot live inside
      the section itself: sticky is bounded by its containing block, and the button sits at
@@ -1208,8 +1220,10 @@ body:not([data-step="4"]) .review__items .sec__head h3{
      summary follows it (Amelie, 2026-09-14) */
   /* on the review the block is one more row of the list above it: a hairline, then the
      same 20px in, so it sits at the rhythm the reviewed rows keep (Amelie, 2026-09-15) */
+  /* the row above already draws the line; a second one here doubled it (Amelie,
+     2026-09-16) */
   body[data-step="4"] .ck > .review__items{order:1;padding-top:var(--space-20);
-    padding-bottom:var(--space-32);border-top:1px solid var(--c-hair)}
+    padding-bottom:var(--space-32);border-top:0}
   body[data-step="4"] .ck > .review__items .sec__head{margin-bottom:var(--space-6)}
   body[data-step="4"] .ck__form{padding-bottom:0}
   body[data-step="4"] .ck__railcol{order:2}
@@ -2028,7 +2042,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   <!-- on the last step the figures ride with the button, so the page above it does not
        have to be scrolled back to check them (Amelie, 2026-09-14) -->
   <div class="paybar__sum" id="paybarSum" hidden>
-    <span class="paybar__row"><span class="t-body-s">Shipping</span><span class="t-body-s" data-paybar-ship>&euro;4.99</span></span>
+    <span class="paybar__row" id="paybarShipRow"><span class="t-body-s">Shipping</span><span class="t-body-s" data-paybar-ship>&euro;4.99</span></span>
     <span class="paybar__row paybar__row--total"><span class="t-title-s">Total</span><span class="t-price" data-total>&euro;114.84</span></span>
   </div>
   <button class="btn btn--wide" type="button">Place order · <span data-total>€114.84</span></button>
@@ -2175,6 +2189,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const shipCell = r('[data-shipping]');
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     $$('[data-paybar-ship]').forEach(n => roll(n, t.shipCost === 0 ? 'Free' : eur(t.shipCost)));
+    const shipRow = $('#paybarShipRow');
+    if (shipRow) shipRow.classList.toggle('is-free', t.shipCost === 0);
     r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
     roll(r('[data-vat]'), eur(t.vat));
     $$('[data-total]').forEach(n => roll(n, eur(t.total)));
@@ -3095,6 +3111,23 @@ body[data-mode="onepage"] .ck__rail{position:static;
     window.addEventListener('resize', sync);
     document.addEventListener('ck:step', sync);
     setTimeout(sync, 0);
+  })();
+
+  /* On a phone the wallets belong in the sticky bar, as they do in the bag; on a wider
+     screen they stay in their own section (Amelie, 2026-09-16). */
+  (function expressInBar(){
+    const ex = $('#s-express .express'), bar = $('.paybar');
+    if (!ex || !bar) return;
+    const home = [ex.parentNode, ex.nextSibling];
+    const place = () => {
+      if (NARROW.matches) bar.appendChild(ex);
+      else if (home[0]) home[0].insertBefore(ex, home[1]);
+      /* nothing to skip the form with once the order is being placed */
+      ex.hidden = NARROW.matches && Number(document.body.dataset.step) === LAST_STEP;
+    };
+    place();
+    NARROW.addEventListener('change', place);
+    document.addEventListener('ck:step', place);
   })();
 
   Shop.onChange(() => { if ($('#ckDone').hidden) applyState(); });
