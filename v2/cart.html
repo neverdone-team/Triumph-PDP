@@ -880,10 +880,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
     border-top:1px solid var(--c-hair);padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom))}
   /* the wallets ride in the bar under the button, and the label goes with them: in a
      sticky strip the alternatives explain themselves (Amelie, 2026-09-15) */
-  /* the wallets come first and the primary button closes the bar (Amelie, 2026-09-15) */
+  /* the primary button leads and the wallets follow it, as the checkout's bar has it —
+     one order across every version (Amelie, 2026-09-16) */
   .mbar{display:flex;flex-direction:column}
-  .mbar .cart__express{order:1;margin:0 0 var(--space-8)}
-  .mbar > .btn{order:2}
+  .mbar > .btn{order:1}
+  .mbar .cart__express{order:2;margin:var(--space-8) 0 0}
   .mbar .cart__express .or{display:none}
   .mbar .express{margin-top:0;gap:var(--space-8)}
   .mbar .xbtn{height:var(--control-40)}
