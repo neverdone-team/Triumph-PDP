@@ -23,6 +23,16 @@ window.Shop = (function () {
      sets it so the checkout can skip its gate — a signed-in customer has an address and a
      card on file and has nothing to fill in (Amelie, 2026-09-11). */
   var ACCOUNT_KEY = 'triumph.proto.account';
+  /* What the mini cart offers alongside the bag (Amelie, 2026-09-16):
+       'off'   — the original: lines, shipping, two buttons
+       'row'   — ONE matching product on a single line above the shipping note
+       'tiles' — up to three, as small packshots in a strip that scrolls sideways
+     Two versions rather than one because the trade is real: a row costs ~100px and can
+     only ever offer one thing; the strip costs ~190px of a card that is capped at 560
+     and offers three. Neither adds a control — there is no size to choose here, so both
+     are doors to the product page. */
+  var SET_KEY = 'triumph.proto.miniSet';
+  var SET_MODES = { off: 1, row: 1, tiles: 1 };
   var FREE_AT = 130;      // free-shipping threshold, € — matches cart + checkout
   var SHIP_STD = 4.99;
   var VAT = 0.19;
@@ -67,6 +77,12 @@ window.Shop = (function () {
   /* ---------------- money ---------------- */
   // English + €: symbol first, point decimal. One formatter for all three pages.
   function money(n) { return '€' + (Math.round(n * 100) / 100).toFixed(2); }
+
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
 
   /* ---------------- lines ----------------
      A line is one sellable variant:
@@ -206,6 +222,97 @@ window.Shop = (function () {
     };
   }
 
+  /* ============================================================================
+     COMPLETE YOUR SET
+     What goes with what. It lives here rather than on the bag page because the mini
+     cart offers it too, and two catalogues would drift apart the way the shipping
+     figures used to (Amelie, 2026-09-16).
+     ============================================================================ */
+  var SET_CATALOGUE = [
+    { kind:'brief', series:'Amourette', name:'String', colour:'Black', size:'M',
+      sku:'amourette-string-black-m', price:22.95, member:19.95, img:'./Assets/10215855-0004_1.webp' },
+    { kind:'brief', series:'Amourette', name:'Tai', colour:'Black', size:'M',
+      sku:'amourette-tai-black-m', price:24.95, member:19.95, img:'./Assets/ck-brief.webp' },
+    { kind:'brief', series:'Aura Spotlight', name:'Maxi Brief', colour:'Black', size:'M',
+      sku:'aura-spotlight-maxi-black-m', price:24.95, member:21.95, img:'./Assets/10207997-0004_1.webp' },
+    { kind:'brief', series:'Aura Spotlight', name:'Tanga', colour:'Black', size:'M',
+      sku:'aura-spotlight-tanga-black-m', price:22.95, member:19.95, img:'./Assets/10208024-0004_1.webp' },
+    { kind:'brief', series:'Aura Spotlight', name:'Maxi Brief', colour:'Creamy Dream', size:'M',
+      sku:'aura-spotlight-maxi-creamy-m', price:24.95, member:21.95, img:'./Assets/10207997-6720_1.webp' },
+    { kind:'bra', series:'Aura Spotlight', name:'Aura Spotlight Bra', colour:'Black', size:'75B',
+      sku:'aura-spotlight-bra-black-75b', price:54.95, member:49.45, img:'./Assets/10208018-0004_1.webp' },
+    { kind:'bra', series:'Aura Spotlight', name:'Aura Spotlight Bra', colour:'Creamy Dream', size:'75B',
+      sku:'aura-spotlight-bra-creamy-75b', price:54.95, member:49.45, img:'./Assets/10208018-6720_1.webp' },
+    { kind:'bra', series:'Amourette', name:'Charm Balconette', colour:'White', size:'75B',
+      sku:'amourette-charm-white-75b', price:59.95, member:53.95, img:'./Assets/10214770-0003_1.webp' },
+    { kind:'bra', series:'Amourette', name:'Minimizer Bra', colour:'Black', size:'75B',
+      sku:'amourette-minimizer-black-75b', price:59.95, member:53.95, img:'./Assets/ck-bra.webp' },
+    { kind:'bra', series:'Body Make-Up', name:'Soft Bra', colour:'White', size:'75B',
+      sku:'body-make-up-soft-white-75b', price:49.95, member:44.95, img:'./Assets/10210668-0003_1.webp' }
+  ];
+
+  /* A bra is named as one, or sized as one (75C). Everything else is a brief. Good
+     enough for a prototype, and it never has to ask a server what a product is. */
+  function kindOf(l) {
+    var name = (l && l.name) || '', size = String((l && l.size) || '');
+    return (/\b(bra|bralette)\b/i.test(name) || /^\d{2,3}\s?[A-K]{1,2}$/i.test(size))
+      ? 'bra' : 'brief';
+  }
+  function baseSku(v) { return String(v || '').replace(/-[^-]+$/, ''); }
+
+  /* Which half of the set is missing, and what it is missing FROM. The anchor is the
+     line the suggestion is matched to, so the offer can name it rather than float. */
+  function matchSet(limit) {
+    var lines = read().lines;
+    if (!lines.length) return null;
+    var hasBra = false, hasBrief = false, i;
+    for (i = 0; i < lines.length; i++) {
+      if (kindOf(lines[i]) === 'bra') hasBra = true; else hasBrief = true;
+    }
+    /* with both halves already in the bag the briefs are the small, easy addition —
+       nobody buys a second bra to go with the bra they have just chosen */
+    var want = hasBra ? 'brief' : 'bra';
+    var anchor = lines.filter(function (l) { return kindOf(l) !== want; })[0];
+    if (!anchor) return null;
+    var owned = {};
+    lines.forEach(function (l) { owned[baseSku(l.sku)] = true; });
+    var pool = SET_CATALOGUE.filter(function (p) {
+      return p.kind === want && !owned[baseSku(p.sku)];
+    });
+    var same = pool.filter(function (p) { return p.series === anchor.series; });
+    var rest = pool.filter(function (p) { return p.series !== anchor.series; });
+    return { want: want, anchor: anchor, cards: same.concat(rest).slice(0, limit || 3) };
+  }
+
+  /* A second strip on the bag answers a different question: not "what goes with this"
+     but "what else is selling". So it is not matched to the bag at all — it is a fixed
+     popularity order, filtered against what is already in the bag and against whatever
+     the set strip is showing, because the same product twice on one page is worse than
+     no second strip (Amelie, 2026-09-17). */
+  var POPULAR = [
+    'aura-spotlight-bra-black-75b',
+    'amourette-charm-white-75b',
+    'amourette-tai-black-m',
+    'body-make-up-soft-white-75b',
+    'aura-spotlight-tanga-black-m',
+    'amourette-string-black-m'
+  ];
+  function alsoBought(exclude, limit) {
+    var n = limit || 3, taken = {}, out = [];
+    read().lines.forEach(function (l) { taken[baseSku(l.sku)] = true; });
+    (exclude || []).forEach(function (sku) { taken[baseSku(sku)] = true; });
+    function push(p) {
+      if (!p || out.length >= n || taken[baseSku(p.sku)]) return;
+      taken[baseSku(p.sku)] = true;
+      out.push(p);
+    }
+    POPULAR.forEach(function (sku) {
+      push(SET_CATALOGUE.filter(function (c) { return c.sku === sku; })[0]);
+    });
+    SET_CATALOGUE.forEach(push);   // the catalogue is small; top up rather than show two
+    return out;
+  }
+
   /* ---------------- header badge ---------------- */
   function paintBadges(n) {
     var nodes = document.querySelectorAll('[data-cart-count]');
@@ -245,7 +352,7 @@ window.Shop = (function () {
           '</button>' +
         '</header>' +
         '<div class="mc__body" data-mc-body></div>' +
-        '<p class="mc__ship" data-mc-ship></p>' +
+        '<div class="mc__set" data-mc-set hidden></div>' +
         '<div class="mc__foot">' +
           '<a class="mc__btn" href="./cart.html">View bag&nbsp;&middot;&nbsp;<span data-mc-count>0</span></a>' +
           '<a class="mc__btn mc__btn--primary" href="./checkout.html">Checkout</a>' +
@@ -315,6 +422,70 @@ window.Shop = (function () {
     if (mc && mc.getAttribute('data-open') === 'true') paintMini();
   }
 
+  function miniSet() {
+    try {
+      var v = localStorage.getItem(SET_KEY);
+      if (v === 'on') v = 'row';          // the first cut had two modes, not three
+      return SET_MODES[v] ? v : 'off';
+    } catch (e) { return 'off'; }
+  }
+  function setMiniSet(m) {
+    if (m === 'on') m = 'row';
+    if (!SET_MODES[m]) m = 'off';
+    try { localStorage.setItem(SET_KEY, m); } catch (e) {}
+    if (mc && mc.getAttribute('data-open') === 'true') paintMini();
+  }
+  /* ?mini=tiles on any page that carries the mini cart, because the switcher lives on the
+     bag and the mini cart is seen from the PDP (Amelie, 2026-09-16) */
+  (function () {
+    var m = (String(location.search).match(/[?&]mini=(off|row|tiles|on)/i) || [])[1];
+    if (m) setMiniSet(m.toLowerCase());
+  })();
+
+  var MC_GO = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true">' +
+    '<path d="M4.5 3L8 6l-3.5 3" stroke="currentColor" stroke-width="1"/></svg>';
+
+  /* No size, no quantity, no add button in either version: the mini cart is a
+     confirmation, not a place to work, and a size has to be chosen on the product page —
+     so every card here is a door, the way the bag's own strip opens quick shop. */
+  function paintSet() {
+    var box = mc && mc.querySelector('[data-mc-set]');
+    if (!box) return;
+    var mode = miniSet();
+    var m = mode === 'off' ? null : matchSet(mode === 'tiles' ? 3 : 1);
+    if (!m || !m.cards.length) { box.hidden = true; box.innerHTML = ''; box.className = 'mc__set'; return; }
+    box.hidden = false;
+    box.className = 'mc__set' + (mode === 'tiles' ? ' mc__set--tiles' : '');
+
+    var head = '<span class="mc__set-h">' +
+      (m.want === 'brief' ? 'Goes with your ' : 'Completes your ') + esc(m.anchor.name) +
+      '</span>';
+
+    if (mode === 'tiles') {
+      box.innerHTML = head +
+        '<div class="mc__tiles">' + m.cards.map(function (p) {
+          return '<a class="mc__tile" href="./pdp.html">' +
+            '<span class="mc__tile-img"><img src="' + esc(p.img) + '" alt="" loading="lazy" /></span>' +
+            '<span class="mc__tile-nm">' + esc(p.name) + '</span>' +
+            '<span class="mc__tile-pr">' + money(p.price) + '</span>' +
+          '</a>';
+        }).join('') + '</div>';
+      return;
+    }
+
+    var p = m.cards[0];
+    box.innerHTML = head +
+      '<a class="mc__set-row" href="./pdp.html">' +
+        '<span class="mc__set-thumb"><img src="' + esc(p.img) + '" alt="" /></span>' +
+        '<span class="mc__set-info">' +
+          '<span class="mc__set-series">' + esc(p.series) + '</span>' +
+          '<span class="mc__set-name">' + esc(p.name) + '</span>' +
+        '</span>' +
+        '<span class="mc__set-pr">' + money(p.price) + '</span>' +
+        '<span class="mc__set-go">' + MC_GO + '</span>' +
+      '</a>';
+  }
+
   function paintMini() {
     if (!mc) return;
     var t = totals();
@@ -334,16 +505,13 @@ window.Shop = (function () {
       ? shown.map(lineHTML).join('')
       : '<p class="mc__empty">Your bag is empty.</p>';
     mc.querySelector('[data-mc-count]').textContent = t.count;
+    paintSet();
 
-    var ship = mc.querySelector('[data-mc-ship]');
-    if (!t.lines.length) { ship.hidden = true; }
-    else {
-      ship.hidden = false;
-      ship.textContent = t.gap > 0
-        ? money(t.gap) + ' away from free shipping.'
-        : 'Your order ships free.';
-      ship.setAttribute('data-free', String(t.gap === 0));
-    }
+    /* No delivery line of any kind here (Amelie, 2026-09-17). Both halves of it were
+       wrong for a confirmation card: the gap priced the thing just added against a
+       threshold nobody asked about, with no way to act on it from here, and the free
+       state was a promise made where nothing had been decided. Delivery belongs to the
+       bag, which has the progress bar, and to the checkout, which has the method. */
     place();
   }
 
@@ -390,7 +558,11 @@ window.Shop = (function () {
     panel.style.top = Math.round(top) + 'px';
     // never let the card run off the bottom, and never let a long bag make a card as
     // tall as the window — the line list scrolls inside it either way
-    panel.style.maxHeight = Math.max(220, Math.min(560, window.innerHeight - top - 16)) + 'px';
+    /* The strip of recommendations needs the height the 560 cap would otherwise take
+       away — squeezed against it, the flexible part of the card is the line list, so the
+       very line being confirmed is what gets clipped (Amelie, 2026-09-16). */
+    var cap = mc.querySelector('.mc__set--tiles') ? 630 : 560;
+    panel.style.maxHeight = Math.max(220, Math.min(cap, window.innerHeight - top - 16)) + 'px';
   }
 
   /* ---------------- hover on desktop ----------------
@@ -473,6 +645,8 @@ window.Shop = (function () {
     money: money, onChange: onChange, refresh: emit,
     openMini: open, closeMini: close,
     miniMode: miniMode, setMiniMode: setMiniMode,
+    miniSet: miniSet, setMiniSet: setMiniSet,
+    matchSet: matchSet, alsoBought: alsoBought, kindOf: kindOf, SET_CATALOGUE: SET_CATALOGUE,
     account: account, setAccount: setAccount,
     FREE_AT: FREE_AT, SHIP_STD: SHIP_STD
   };

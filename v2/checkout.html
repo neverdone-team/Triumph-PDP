@@ -52,6 +52,12 @@
   --control-40:40px; --control-44:44px; --control-48:48px; --control-56:56px;
   --icon-16:16px; --icon-20:20px; --icon-24:24px;
 
+  /* The page's two columns, declared once: the rail's track, its inner padding and the
+     form's right padding. The gate derives its own two columns from these, so its login
+     and membership columns land on exactly the lines the form and the summary do
+     (Amelie, 2026-09-17) — change them here and both follow. */
+  --rail-w:480px; --rail-pad:var(--space-48); --form-pad-r:var(--space-64);
+
   --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
   --header-h:80px;
   --ease-out:cubic-bezier(.22,.61,.36,1);
@@ -69,7 +75,12 @@
 html,body{margin:0;padding:0}
 /* the page background lives on <html> so the fixed rail-bleed layer (.ck::after, z-index:-1)
    can sit behind the content without <body>'s own fill covering it */
-html{background:#FFFFFF}
+/* The grid is a constant 1fr + 480 at every step — what moved was the window. Step 1 of
+   the one-pager is short enough to have no scrollbar and step 3 is not, so the viewport
+   narrowed by the scrollbar's width partway through and the centred container, and with
+   it the whole right panel, jumped (Amelie, 2026-09-17). Reserving the gutter at all
+   times holds the columns still. */
+html{background:#FFFFFF; scrollbar-gutter:stable}
 body{
   background:transparent; color:var(--c-ink);
   font-family:var(--font-sans); font-weight:300;
@@ -133,10 +144,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
    ============================================================ */
 .ck{
   max-width:1280px; margin:0 auto;
-  display:grid; grid-template-columns:minmax(0,1fr) 480px;
+  display:grid; grid-template-columns:minmax(0,1fr) var(--rail-w);
   align-items:stretch;
 }
-.ck__form{padding:var(--space-64) var(--space-64) var(--space-64) var(--space-40);min-width:0}
+.ck__form{padding:var(--space-64) var(--form-pad-r) var(--space-64) var(--space-40);min-width:0}
 /* the tinted column is the full-height grid child; the rail inside it is what sticks */
 .ck__railcol{background:var(--c-bg);border-left:1px solid var(--c-hair);position:relative}
 /* The tint has to reach the right edge of the window, not stop at the 1200px container.
@@ -149,7 +160,7 @@ body{background-image:none}
   position:sticky; top:var(--header-h);
   /* same top padding as the form column so the ORDER heading sits on the EXPRESS
      CHECKOUT baseline — the two columns read as one row, not two starts */
-  padding:var(--space-64) var(--space-48) var(--space-64);
+  padding:var(--space-64) var(--rail-pad) var(--space-64);
 }
 
 /* ============================================================
@@ -163,26 +174,7 @@ body{background-image:none}
 }
 .sec__note{margin:calc(var(--space-4) * -1) 0 var(--space-16);color:var(--c-ink-soft)}
 
-#s-express .or{margin:0 0 var(--space-16)}
-/* the divider under the wallets needs room, or it reads as a caption to them */
-#s-express .express + .or{margin:var(--space-32) 0 0}
-
-/* ============================================================
-   EXPRESS CHECKOUT
-   ============================================================ */
-.express{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8)}
-/* every mark is cropped to its own ink, so the button centres what you can see rather
-   than a box with slack on one side (Amelie, 2026-09-14) */
-.xbtn{
-  height:var(--control-44); border:1px solid var(--c-ink); background:var(--c-bg);
-  display:flex;align-items:center;justify-content:center;
-  transition:border-color .15s var(--ease-out), background .15s var(--ease-out);
-}
-.xbtn:hover{border-color:var(--c-ink);background:var(--c-wash)}
-.xbtn svg{display:block}
-/* All three express buttons are the outlined variant: white ground, hairline border, brand
-   wordmark in its own colour. Each provider permits this — PayPal white, Apple Pay outline,
-   Klarna white — and it keeps a row of coloured blocks out of an otherwise monochrome page. */
+/* the ruled label — the wallets that used to sit under it now live only in the bag */
 .or{
   display:flex;align-items:center;gap:var(--space-24);
   margin:var(--space-32) 0 0; color:var(--c-ink-soft);
@@ -195,6 +187,10 @@ body{background-image:none}
    ============================================================ */
 .grid{display:grid;gap:var(--space-20)}
 .grid--2{grid-template-columns:1fr 1fr}
+/* The expiry and the security code are two halves of one fact about one card, and both
+   are short — so unlike first name / last name they hold their line at every width
+   (Amelie, 2026-09-16). Its own class, not .grid--2, because .grid--2 stacks below 576. */
+.grid--card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .grid--street{grid-template-columns:1fr 96px}
 .grid--zip{grid-template-columns:120px 1fr}
 
@@ -425,19 +421,122 @@ body{background-image:none}
 .gate .sso button .t-body-s,.login .sso button .t-label-m{font:inherit;letter-spacing:inherit}
 .gate__box .field{margin-bottom:var(--space-4)}
 .gate__hint{margin:0 0 var(--space-16);color:var(--c-ink-soft)}
-.gate__hint--intro{margin:var(--space-8) 0 var(--space-24)}
+.gate__hint--intro{margin:var(--space-8) 0 var(--space-12)}
 /* 4px clear of the field above it — it used to be pulled up against the box (Amelie,
    2026-09-15) */
 .gate__meta{display:flex;justify-content:flex-end;margin:var(--space-4) 0 var(--space-24)}
-/* the guest door is a text button, so it does not compete with Create an account */
-.gate__guest{margin:var(--space-20) 0 0;text-align:center}
 .gate__next{margin-top:var(--space-48);padding-top:var(--space-40);border-top:1px solid var(--c-hair)}
-.gate .or{margin:var(--space-24) 0 var(--space-16)}
+.gate .or{margin:var(--space-16) 0 var(--space-12)}
 .gate__reg{max-width:560px;margin-top:var(--space-48);padding-top:var(--space-40);border-top:1px solid var(--c-hair)}
+
+
+/* ---- JOIN MYTRIUMPH — the register column ----------------------------
+   The crown follows the words: leading, it read as a bullet on the heading and
+   pushed the label off the column's left edge, out of line with CUSTOMER LOGIN
+   beside it (Amelie, 2026-09-16). */
+.gate__mt-h{display:flex;align-items:center;gap:var(--space-8)}
+.gate__mt-h .crown{flex:none;display:block}
+/* The benefits are a list, not copy: Body/S, Regular, close to the heading they belong
+   to, so the block reads as one object rather than a paragraph (Amelie, 2026-09-17). The
+   ticks read each line as something you GET rather than something to do — they were taken
+   out on the 17th and put back the same day. */
+.mtlist{display:grid;gap:var(--space-8);margin:var(--space-12) 0 var(--space-20)}
+.mtlist li{display:flex;align-items:flex-start;gap:var(--space-8);
+  font-weight:400;font-size:12px;line-height:18px;letter-spacing:.05em}
+.mtlist svg{flex:none;margin-top:3px}
+
+/* ---- the burgundy version -------------------------------------------
+   Switched in the panel. The membership is the one thing on this page that is an offer
+   rather than a step, so it is the one thing that may carry brand colour — accent/brand
+   at full strength with text/on-dark on it, and the button outlined in white so it does
+   not become a second field of colour. The guest door stays outside, on white, or the
+   banner would be making an offer of it too. */
+body[data-mt="banner"] .gate__mt{
+  background:var(--c-burgundy);color:var(--c-on-dark);
+  padding:var(--space-24);
+}
+/* Filled white, not outlined. The DS secondary button is `background:transparent` — on
+   a white page that reads as a white fill, but on brand colour the ground shows through
+   and the button reads as a hole in the banner rather than a control on it. So this one
+   states the fill, and hovers to surface/hover the way every other secondary button in
+   the flow does (Amelie, 2026-09-17). */
+body[data-mt="banner"] .gate__mt .btn{
+  background:var(--c-bg);color:var(--c-ink);border-color:var(--c-bg);
+}
+body[data-mt="banner"] .gate__mt .btn:hover{
+  opacity:1;background:var(--c-wash);border-color:var(--c-wash);color:var(--c-ink);
+}
+/* The guest door follows the banner rather than a hairline — the block's own edge has
+   already done the separating — and runs the full width of the column, so its outer edges
+   line up with the banner's rather than with the button inside it (Amelie, 2026-09-17).
+   The two blocks are siblings on the page, not a card and its echo. */
+body[data-mt="banner"][data-gate="a"] .gate__guest{
+  padding-bottom:0;border-bottom:0;
+}
+body[data-mt="banner"][data-gate="a"] .gate__mt{margin-top:var(--space-40)}
+
+/* ---- THE GUEST DOOR ----------------------------------------------------
+   One block in four placements, switched by body[data-gate]. It carries no fill
+   of its own: a hairline and the air above it separate it, and the button is the
+   outlined one — never a second black button, which would cancel Sign in out. */
+.gate__guest{margin-top:var(--space-32);padding-top:var(--space-32);
+  border-top:1px solid var(--c-hair)}
+/* the supporting line under it carries the spacing now, exactly as it does under
+   Customer login */
+.gate__guest-h{margin-bottom:0}
+.gate__guest .btn{background:var(--c-bg);color:var(--c-ink);border-color:var(--c-ink)}
+.gate__guest .btn:hover{opacity:1;background:var(--c-wash)}
+
+/* The button starts where the email field's BOX starts, not where its element does: a
+   .field reserves 6px above itself for the notch the floating label sits in, so its
+   painted top edge is 6px down. Without the same 6px here, Continue sat a hair above
+   Email and the two columns read as misaligned (Amelie, 2026-09-17). */
+body[data-gate="a"] .gate__guest-act{padding-top:6px}
+
+/* A — guest LEADS the right column, so nothing separates it from above; the rule goes
+   under it instead, between guest and the membership that follows (Amelie, 2026-09-17) */
+body[data-gate="a"] .gate__guest{
+  margin-top:0;padding-top:0;border-top:0;
+  padding-bottom:var(--space-32);border-bottom:1px solid var(--c-hair);
+}
+body[data-gate="a"] .gate__mt{margin-top:var(--space-32)}
+
+/* B2 — the phone's band. Guest leads, so it has no rule above it; and it sits in the
+   gate's own right-hand track so its button measures what Create an account does. */
+body[data-gate="b2"] .gate__guest{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--space-64);align-items:center;
+  margin-top:0;padding-top:0;border-top:0;
+}
+body[data-gate="b2"] .gate__guest-txt{min-width:0}
+body[data-gate="b2"] .gate__guest-h{margin-bottom:0}
+body[data-gate="b2"] .gate__guest-act{padding-left:var(--space-64)}
+/* guest takes the outlined button and Sign in keeps the fill: position says which door
+   is quickest, weight says which one most people are here for (Amelie, 2026-09-16) */
+body[data-gate="b2"] .gate__box{margin-top:var(--space-40)}
+
 
 /* The gate carries no summary in either mode (Amelie, 2026-09-11): nothing has been
    decided yet, so the page is the gate and nothing else. It appears with the first step. */
-body[data-step="0"] .ck{grid-template-columns:minmax(0,1fr);max-width:1040px}
+body[data-step="0"] .ck{grid-template-columns:minmax(0,1fr)}
+/* The gate on the SAME lines as the steps that follow it (Amelie, 2026-09-17). It used to
+   sit on its own 1040 measure, so signing in happened on one grid and everything after it
+   on another — the membership column was a different width from the summary that replaces
+   it, and the page visibly re-laid itself the moment you passed the gate.
+   The derivation, with W = container, R = --rail-w, P = --rail-pad, F = --form-pad-r:
+     · the form's content ends at W − R − F, so the gate's first column must too → the two
+       tracks are separated by exactly F
+     · the rail's box starts at W − R and its content at W − R + P, so the second column's
+       box is R − P wide with P of its own padding, and its rule lands on the rail's
+     · the form's right padding becomes P, so the gate's right edge is the rail's
+   Min-width, because below 992 the gate is one column and none of this applies. */
+@media (min-width:992px){
+  body[data-step="0"] .ck__form{padding-right:var(--rail-pad)}
+  body[data-step="0"] .gate__box{
+    grid-template-columns:minmax(0,1fr) calc(var(--rail-w) - var(--rail-pad));
+    gap:var(--form-pad-r);
+  }
+  body[data-step="0"] .gate__col--new{padding-left:var(--rail-pad)}
+}
 /* The figures are what you watch while filling the form, so they lead; the list is
    reference and sits under the total (Amelie, 2026-09-14). */
 body[data-mode="onepage"] .ck__rail{display:flex;flex-direction:column}
@@ -453,13 +552,26 @@ body[data-mode="onepage"] .ck__rail .place{order:5}
 /* the same block shape as Order summary above it: the heading, 32px, then the rule the
    content starts under — the stroke above it was separating the heading from nothing
    (Amelie, 2026-09-14) */
-/* the list has left the rail for the foot of the page, and its heading with it */
+/* the list is back in the rail in both modes — Your items only exists on the review now
+   (Amelie, 2026-09-16) — but the rail is a heading and a set of figures, so the list runs
+   under the summary head without a second heading of its own */
 body[data-mode="onepage"] .ck__rail .rail__dhead{display:none}
 /* the date belongs with the order it describes, not with the figures (Amelie, 2026-09-14) */
 /* the rail states no date at all now: the delivery method carries it, and repeating it
    over the order list only split the two (Amelie, 2026-09-14) */
 body[data-mode="onepage"] .ck__rail .promise{display:none}
-body[data-mode="onepage"] .ck__rail #railItems{order:9;padding-top:var(--space-24);padding-bottom:0}
+/* order 2, between the summary head and the figures: it used to be 9, below the
+   assurances, because the list had been moved out of the rail into the foot of the form
+   column. It has not been moved out since 16 Sep, and left at 9 it read as an appendix
+   under Secure payment · 30-day returns (Amelie, 2026-09-16). */
+body[data-mode="onepage"] .ck__rail #railItems{order:2;padding-top:0;padding-bottom:var(--space-24)}
+body[data-mode="onepage"] .ck__rail #railEmpty{order:2}
+/* …but ONLY on the review. What was ordered is stated twice and no more: in the bag, and
+   on Check your order — everywhere between them the summary is figures (Amelie,
+   2026-09-17). The list came back into the rail when the rail itself was restored on the
+   17th; that was the rail's doing, not a decision. It must sit after the rule above it,
+   which has the same specificity. */
+body:not([data-step="4"]) .ck__rail #railItems{display:none}
 /* the list is a read-back of the bag, so it takes a heading of its own and stands well
    clear of the figures above it; the three assurances belong with the total they are
    about (Amelie, 2026-09-14) */
@@ -475,12 +587,14 @@ body[data-step="4"] .ck__rail .sum__head{margin-bottom:var(--space-24)}
 body[data-step="0"] .ck__railcol,
 body[data-step="0"] .msum{display:none}
 
-/* The stepped flow keeps the focus on the step: no summary rail at all until the review,
-   and no collapsed summary above the content on a phone either (Amelie, 2026-09-10). The
-   form column then takes the width the rail used to hold, capped at a readable measure
-   rather than the old rail-squeezed column. */
+/* The STEPPED flow keeps the focus on the step: no summary rail until the review, and no
+   collapsed summary above the content on a phone either (Amelie, 2026-09-10). The form
+   column then takes the width the rail used to hold, capped at a readable measure.
+   The one-pager keeps its rail throughout — it was dropped on 16 Sep and put back on the
+   17th: on one page the rail IS the running record of the order, and without it nothing
+   states what is being bought until the review (Amelie, 2026-09-17). */
 /* one measure for every step — only the gate, which is a sign-in and nothing else,
-   sits narrower (Amelie, 2026-09-14) */
+   sits wider (Amelie, 2026-09-14) */
 body[data-mode="steps"]:not([data-step="4"]) .ck{grid-template-columns:minmax(0,1fr)}
 body[data-mode="steps"]:not([data-step="4"]) .ck__railcol{display:none}
 body[data-mode="steps"] .msum{display:none}
@@ -510,7 +624,15 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
     padding-left:var(--space-16);padding-right:var(--space-16)}
   body[data-mode="steps"][data-step="0"] .ck__form{padding-top:var(--space-32)}
   .gate__box{grid-template-columns:minmax(0,1fr);gap:var(--space-40)}
-  .gate__col--new{border-left:0;padding-left:0;border-top:1px solid var(--c-hair);padding-top:var(--space-32)}
+  /* the column rule goes with the columns (Amelie, 2026-09-16): stacked, it read as a
+     divider between two offers rather than the seam between two columns, and the gate
+     now separates its blocks with air alone */
+  .gate__col--new{border-left:0;padding-left:0;padding-top:var(--space-8)}
+  /* no columns on a phone, so every band stacks and every button goes full width —
+     which is exactly why the ORDER of the doors is the decision here (Amelie,
+     2026-09-16) */
+  body[data-gate="b2"] .gate__guest{display:block}
+  body[data-gate="b2"] .gate__guest-act{padding-left:0}
 }
 
 /* a store collection that costs nothing says so in green, like the free shipping row */
@@ -830,7 +952,11 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   pointer-events:none;opacity:1;
 }
 .btn--wide{width:100%}
-.btn--ghost{background:transparent;color:var(--c-ink)}
+/* The secondary button states its fill rather than leaving it transparent (Amelie,
+   2026-09-17). On a white page the two look identical, which is why it went unnoticed —
+   but on any other ground the transparent version shows it through and reads as a hole
+   punched in the block rather than a control sitting on it. */
+.btn--ghost{background:var(--c-bg);color:var(--c-ink)}
 .btn--ghost:hover{background:var(--c-wash);opacity:1}
 /* the base button is 44 now, so a small one steps down to 36 */
 .btn--sm{height:var(--control-36);padding:0 var(--space-16);font-size:12px;line-height:16px}
@@ -905,13 +1031,19 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   .ck__rail .li__price{margin-top:var(--space-12)}
   .ck__rail .li__acts{margin-top:var(--space-12)}
   body[data-mode="onepage"] .ck__rail{padding-top:var(--space-24)}
-  body[data-mode="onepage"] .ck__rail #railItems{padding-top:var(--space-20)}
+  body[data-mode="onepage"] .ck__rail #railItems{padding-top:0}
 }
 /* the block above has to follow the .ck__rail rules it overrides: at equal specificity
    the later rule wins whatever the media query says, and the 128px packshot was
    overflowing an 80px column onto the text (Amelie, 2026-09-14) */
 /* the member price is the brand's own offer, so it is stated in the brand's colour, as
    it is in the bag (Amelie, 2026-09-14) */
+/* Every price is a figure, so every price is Regular: Light at 14px read as a caption
+   rather than the number the row is about (Amelie, 2026-09-17). The unit price, the
+   "member price" label and the VAT note stay Light — they support a figure, they are
+   not one. The grand total keeps its own weight: at 24px Light is the point of it. */
+.li__price .t-price,
+.trow .t-price{font-weight:400}
 .li__price--member .t-price{color:var(--c-burgundy)}
 .li__member{color:var(--c-burgundy);font-size:10px;line-height:14px;letter-spacing:.14em;text-transform:uppercase}
 
@@ -922,14 +1054,23 @@ body:not([data-step="4"]) .review__items .sec__head h3{
 
 /* the field reserves 6px above its box for the notch, so the row aligns on its end edge */
 /* collapsed by default — a code is the exception, not the next step */
+/* The code is entered on the bag, never in checkout (Amelie, 2026-09-16). The summary
+   here is a read-back of the order, and an empty Gift card or discount code field in it
+   sends people off to hunt for a code they may not have — the classic checkout leak. A
+   code already applied still shows, as its own row under the subtotal. Hidden rather than
+   deleted: the markup and its wiring stay, so it is one line to bring back. */
+.ck__rail .acc{display:none}
 .acc{border-top:1px solid var(--c-hair);margin:var(--space-24) 0 0}
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16) 0}
 .acc__chev{transition:transform .2s var(--ease-out)}
 .acc[data-open="true"] .acc__chev{transform:rotate(180deg)}
 .acc__body{display:none;padding-bottom:var(--space-20)}
-/* the total's own top margin was stacking on the accordion's padding, so the code row
-   sat closer to the rule above it than the one below (Amelie, 2026-09-14) */
-.totals .acc + .trow--grand{margin-top:0}
+/* `.totals .acc + .trow--grand{margin-top:0}` lived here: it zeroed the total's top
+   margin because the accordion above it brought its own padding. The accordion is
+   display:none in checkout now — but display:none does not take an element out of the
+   DOM, so the adjacent-sibling rule went on matching and the hairline sat hard against
+   Shipping instead of between the two rows. Deleted with the field (Amelie, 2026-09-17).
+*/
 .acc[data-open="true"] .acc__body{display:block}
 /* the applied code: name and rate on one line, the remove link under them, the figure
    in green on the right */
@@ -950,12 +1091,22 @@ body:not([data-step="4"]) .review__items .sec__head h3{
 /* the same rhythm as the bag's summary (Amelie, 2026-09-11) */
 .trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-10) 0}
 .trow--free [data-shipping]{color:var(--color-green)}
+/* One hairline over the total, as every other row carries — the ledger's double rule was
+   tried on 17 Sep and reverted: the space above it and the 24px figure already say the
+   column has closed, and a second stroke only added weight (Amelie, 2026-09-17). */
+/* The rule sits BETWEEN the two rows, not against one of them: the row above ends 10px
+   under its text (.trow's own padding), so the margin plus that 10 has to match the
+   padding below — 12 + 10 = 22 against 24, with the extra 2 going to the larger figure
+   below it (Amelie, 2026-09-17). */
 .trow--grand{
-  border-top:1px solid var(--c-hair); margin-top:var(--space-20); padding-top:var(--space-24);
+  border-top:1px solid var(--c-hair); margin-top:var(--space-12); padding-top:var(--space-24);
   align-items:baseline;
 }
 .trow--grand .t-title-m{letter-spacing:.20em}
 .grand__num{font-weight:300;font-size:24px;line-height:28px;letter-spacing:.01em}
+/* the figure and its VAT note are one column, right-aligned under each other */
+.grand__col{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-2);
+  text-align:right}
 
 .promise{
   display:flex;gap:var(--space-8);align-items:center;
@@ -1132,9 +1283,8 @@ body:not([data-step="4"]) .review__items .sec__head h3{
    RESPONSIVE — 992 is the DS breakpoint where the rail folds
    ============================================================ */
 @media (max-width:1180px){
-  .ck{grid-template-columns:minmax(0,1fr) 420px}
-  .ck__rail{padding-left:var(--space-40);padding-right:var(--space-40)}
-  .ck__form{padding:var(--space-32) var(--space-32) var(--space-64) var(--space-24)}
+  :root{--rail-w:420px; --rail-pad:var(--space-40); --form-pad-r:var(--space-32)}
+  .ck__form{padding:var(--space-32) var(--form-pad-r) var(--space-64) var(--space-24)}
 }
 @media (max-width:991px){
   /* one clearance for the whole column, so whichever block ends up last is never under
@@ -1167,8 +1317,6 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   .msum .ck__rail::before{display:none}
   .msum .sum__head{display:none}
 
-  .express{gap:var(--space-6)}
-  .xbtn svg{max-width:100%;height:auto}
   /* the security cue drops out below 992 but its slot stays, or the logo loses its centre */
   .ckhead__secure{visibility:hidden}
   .ckhead__in{grid-template-columns:1fr auto 1fr;padding:0 var(--space-16)}
@@ -1179,15 +1327,10 @@ body:not([data-step="4"]) .review__items .sec__head h3{
     background:var(--c-bg); border-top:1px solid var(--c-edge);
     padding:var(--space-12) var(--space-16) calc(var(--space-12) + env(safe-area-inset-bottom));
   }
-  /* the figures, the step's own button, then the wallets under it: here the primary
-     action is continuing, and the wallets are the way past it (Amelie, 2026-09-16) */
+  /* the figures, then the step's own button (Amelie, 2026-09-16) */
   .paybar__sum{order:1}
   .paybar > .btn{order:2}
-  .paybar .express{order:3;margin:var(--space-8) 0 0;gap:var(--space-8)}
-  .paybar .xbtn{height:var(--control-40)}
   .paybar__legal{order:4}
-  /* the express section's own label and divider go with the buttons */
-  #s-express{display:none}
   /* One call to action on a phone, and it is the sticky bar — its label is whatever the
      section you are in asks for (Amelie, 2026-09-11). A sticky button cannot live inside
      the section itself: sticky is bounded by its containing block, and the button sits at
@@ -1222,8 +1365,13 @@ body:not([data-step="4"]) .review__items .sec__head h3{
      same 20px in, so it sits at the rhythm the reviewed rows keep (Amelie, 2026-09-15) */
   /* the row above already draws the line; a second one here doubled it (Amelie,
      2026-09-16) */
+  /* The summary belongs to the order above it, not to a new page (Amelie, 2026-09-16).
+     Three paddings were stacking under the last line — the line's own 32, the block's 32
+     and the rail's 32 — and pushed ORDER SUMMARY ~100px clear of what it summarises. The
+     last line keeps 24 and the two blocks add nothing. */
   body[data-step="4"] .ck > .review__items{order:1;padding-top:var(--space-20);
-    padding-bottom:var(--space-32);border-top:0}
+    padding-bottom:0;border-top:0}
+  body[data-step="4"] .ck > .review__items .li:last-of-type{padding-bottom:var(--space-24)}
   body[data-step="4"] .ck > .review__items .sec__head{margin-bottom:var(--space-6)}
   /* the one-pager's own 32px was outliving this at equal specificity, so the block sat
      62px off the payment row instead of 20 (Amelie, 2026-09-16) */
@@ -1233,17 +1381,20 @@ body:not([data-step="4"]) .review__items .sec__head h3{
   body[data-step="4"] .ck__railcol{order:2}
   /* the rail is no longer the last thing on the page: the order list under it carries
      the sticky bar's clearance instead */
-  body[data-step="4"] .ck__rail{padding-bottom:var(--space-32)}
+  body[data-step="4"] .ck__rail{padding-top:0;padding-bottom:var(--space-32)}
   /* no rule over the summary on one column: the block's own heading and the space
      above it already separate it (Amelie, 2026-09-15) */
   body[data-mode="onepage"]:not([data-step="0"]) .ck__railcol{display:block;order:2;
     border-left:0;border-top:0}
+  /* the rail is the last thing on the page again, so it carries the sticky bar's
+     clearance and the form column hands it back */
+  body[data-mode="onepage"] .ck__form{padding-bottom:var(--space-32)}
+  body[data-mode="onepage"] .msum{display:none!important}
   /* the rail is the last thing on the page now, so it carries the clearance the form
      column used to — or the sticky bar sits on top of the total */
 body[data-mode="onepage"] .ck__rail{position:static;
     padding:var(--space-32) var(--space-16)}
-  body[data-mode="onepage"] .ck__form{padding-bottom:var(--space-32)}
-  body[data-mode="onepage"] .msum{display:none!important}
+
   .paybar__legal{margin-top:var(--space-8);color:var(--c-ink-soft);text-align:center}
   .paybar__legal a{text-decoration:underline;text-underline-offset:3px}
 }
@@ -1258,6 +1409,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
   .ckhead__backlabel{display:none}
   .ckhead__logo img{width:112px}
   .grid--2{grid-template-columns:1fr}
+  /* narrower gutter so both card fields keep their labels at 390 */
+  .grid--card{gap:var(--space-12)}
   .grid--street{grid-template-columns:1fr 84px}
 }
 </style>
@@ -1317,35 +1470,19 @@ body[data-mode="onepage"] .ck__rail{position:static;
     </div>
 
 
-    <!-- ---------- EXPRESS ---------- -->
-    <section class="sec" data-step="1" id="s-express" data-mode-only="onepage" aria-labelledby="h-express">
-      <!-- the ruled label the bag uses, not a section headline: this is an aside from
-           the form, not a step of it (Amelie, 2026-09-15) -->
-      <p class="or t-label-m" id="h-express">express checkout</p>
-      <div class="express">
-        <button class="xbtn xbtn--paypal" type="button" aria-label="Mit PayPal bezahlen">
-          <svg width="54" height="17" viewBox="0 0 53.7 17.2" aria-hidden="true"><text x="0" y="14" font-family="Helvetica,Arial" font-size="15" font-style="italic" font-weight="bold" fill="#003087">Pay</text><text x="30" y="14" font-family="Helvetica,Arial" font-size="15" font-style="italic" font-weight="bold" fill="#009cde">Pal</text></svg>
-        </button>
-        <button class="xbtn xbtn--apple" type="button" aria-label="Mit Apple Pay bezahlen">
-          <svg width="41" height="16" viewBox="3.1 2 41 16" aria-hidden="true">
-            <path fill="#000" d="M12.1 10.6c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6c-1.1 0-2.2.7-2.7 1.7-1.2 2-.3 5 .8 6.6.6.8 1.2 1.7 2.1 1.7.9 0 1.2-.5 2.2-.5s1.3.5 2.2.5 1.5-.8 2.1-1.6c.7-.9.9-1.8.9-1.9 0 0-1.8-.7-1.9-2.8zM10.5 5.3c.5-.6.8-1.4.7-2.3-.7 0-1.5.5-2 1.1-.4.5-.8 1.4-.7 2.2.8.1 1.6-.4 2-1z"/>
-            <text x="20" y="15" font-family="Helvetica,Arial" font-size="14" fill="#000">Pay</text>
-          </svg>
-        </button>
-        <button class="xbtn xbtn--klarna" type="button" aria-label="Mit Klarna bezahlen">
-          <svg width="47" height="17" viewBox="0 0 46.7 17" aria-hidden="true"><text x="0" y="14" font-family="Helvetica,Arial" font-size="15" font-weight="bold" fill="#0B051D">Klarna</text></svg>
-        </button>
-      </div>
-      <p class="or t-label-m">or</p>
-    </section>
+    <!-- The express wallets used to open this page. They belong to the bag and only to
+         the bag (Amelie, 2026-09-16): once checkout has started, a wallet that jumps
+         past the address and the delivery method is not a shortcut, it is a fork — and
+         in the stepped flow it offered to skip steps the customer had already paid for
+         with their attention. The ways to pay are the payment step. -->
 
     <!-- ---------- 1 · KONTAKT ---------- -->
     <!-- ---------- STEP 1 GATE (3-step mode only) ---------- -->
     <section class="sec gate" data-step="0" id="s-gate" aria-labelledby="h-gate">
       <h2 class="t-title-m" id="h-gate" hidden>Sign in, continue as a guest, or register</h2>
 
-      <div class="gate__box">
-       <div class="gate__col">
+      <div class="gate__box" id="gateBox">
+       <div class="gate__col gate__col--login">
         <h3 class="t-title-s">Customer login</h3>
         <p class="gate__hint gate__hint--intro t-body-s">Your sloggi.com login works here too.</p>
 
@@ -1368,34 +1505,47 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
         <button class="btn btn--wide" type="button" id="gateSignIn">Sign in</button>
 
-        <p class="or t-label-m">or</p>
+        <!-- "Sign in using", not "or": these are the same action by another route, not a
+             third door, and the label saying so lets the row sit tight under the button
+             it belongs to rather than floating between two blocks (Amelie, 2026-09-16) -->
+        <p class="or t-label-m">Sign in using</p>
 
         <div class="sso">
           <button type="button">
             <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.5h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.6z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 010-3.4V5H.9a9 9 0 000 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 00.9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
             <span class="t-body-s">Google</span>
           </button>
+          <!-- Apple, not Facebook (Amelie, 2026-09-16): Apple Pay is already in the
+               wallets and Apple ID is the login a phone offers first. -->
           <button type="button">
-            <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#1877F2" d="M18 9a9 9 0 10-10.4 8.9v-6.3H5.3V9h2.3V7c0-2.3 1.4-3.5 3.4-3.5 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.5.7-1.5 1.4V9h2.5l-.4 2.6h-2.1v6.3A9 9 0 0018 9z"/></svg>
-            <span class="t-body-s">Facebook</span>
+            <svg width="14" height="17" viewBox="0 0 14 17" aria-hidden="true"><path fill="currentColor" d="M11.2 9c0-2 1.6-3 1.7-3-1-1.4-2.4-1.6-2.9-1.6-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7c-1.3 0-2.6.8-3.3 2.1-1.4 2.4-.4 6 1 8 .7 1 1.5 2.1 2.5 2 1 0 1.4-.6 2.6-.6s1.6.6 2.7.6 1.8-1 2.5-2c.8-1.1 1.1-2.2 1.1-2.2s-2.1-.8-2.3-3.3zM9.3 2.6c.6-.7 1-1.7.9-2.6-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.8 2.6.9.1 1.9-.5 2.4-1.3z"/></svg>
+            <span class="t-body-s">Apple</span>
           </button>
         </div>
 
        </div><!-- /.gate__col -->
 
+       <!-- Registration is not paperwork, it is the membership (Amelie, 2026-09-16): the
+            account and MyTriumph are the same act, so this column sells the programme
+            rather than describing a form. Three benefits, no preamble and no note under
+            the button — the list IS the argument, and a paragraph either side of it only
+            makes it harder to read (Amelie, 2026-09-16). -->
        <div class="gate__col gate__col--new">
-        <h3 class="t-title-s">New to Triumph?</h3>
-        <p class="gate__hint gate__hint--intro t-body-s">An account keeps your addresses, follows your order and collects MyTriumph rewards.</p>
+        <!-- its own wrapper, so the burgundy version can take the membership without
+             swallowing the guest door that sits under it (Amelie, 2026-09-17) -->
+        <div class="gate__mt">
+        <h3 class="t-title-s gate__mt-h">
+          <span>Join MyTriumph</span>
+          <svg class="crown" width="18" height="16" viewBox="0 0 23 20" fill="currentColor" aria-hidden="true"><use href="#i-crown"/></svg>
+        </h3>
+        <ul class="mtlist">
+          <li><svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg><span>Free shipping on every order</span></li>
+          <li><svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg><span>Member prices on selected styles</span></li>
+          <li><svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l3.4 3.4L12 3.8" stroke="currentColor" stroke-width="1.2"/></svg><span>A reward on your birthday</span></li>
+        </ul>
         <button class="btn btn--ghost btn--wide" type="button" id="gateRegister" aria-expanded="false">Create an account</button>
-        <!-- guest is the quiet door: an underlined text button, not a second bordered one -->
-        <p class="gate__guest"><button class="t-link" type="button" id="gateGuest">Continue as guest</button></p>
+        </div><!-- /.gate__mt -->
 
-        <!-- ---- registration, opened in place ----
-           Two things the live registration asks for are deliberately gone: the second
-           "confirm your email" field, and a date of birth pre-filled to 01 January 2008.
-           The delivery address is not here either — it is step 2, and asking twice is
-             what makes the live flow long. It opens directly under the buttons that
-             offer it, in the right-hand column (Amelie, 2026-09-10). -->
         <div class="gate__reg" id="gateReg" hidden>
         <h3 class="t-title-s gate__h">Create your account</h3>
 
@@ -1470,6 +1620,33 @@ body[data-mode="onepage"] .ck__rail{position:static;
         </div><!-- /.gate__reg -->
        </div><!-- /.gate__col--new -->
       </div><!-- /.gate__box -->
+
+      <!-- ---- THE GUEST DOOR ----
+           One block, four placements (Amelie, 2026-09-16). It used to be an underlined
+           line of text under Create an account, which read as a concession rather than a
+           choice. The layout switcher moves it:
+             ≥992  first in the right column, with Join MyTriumph under it
+             <992  first, ahead of the whole gate
+           Guest leads at both widths (Amelie, 2026-09-17) — it sat under the membership
+           until the 17th, which put the quickest door at the foot of the longest block.
+           The desktop keeps the two columns intact and stacks guest over the membership in
+           the right one; the phone has no columns, so whatever comes first wins. The four
+           rankings that were here for comparison are gone.
+           No email field, no tinted ground and no paragraph in any of them: the address
+           step already asks for the email, a grey panel makes the fast door look like a
+           disclaimer, and the heading says the whole of it. It ranks by position, width
+           and the button alone. -->
+      <div class="gate__guest" id="gateGuestBlock">
+        <div class="gate__guest-txt">
+          <h3 class="t-title-s gate__guest-h">Guest checkout</h3>
+          <!-- the same supporting line the login column carries under its heading: it
+               answers the one thing guest is actually chosen for (Amelie, 2026-09-17) -->
+          <p class="gate__hint gate__hint--intro t-body-s">Your details are used for this order and not stored.</p>
+        </div>
+        <div class="gate__guest-act">
+          <button class="btn btn--wide" type="button" id="gateGuest">Continue</button>
+        </div>
+      </div>
     </section>
 
     <!-- Contact is gone (Amelie, 2026-09-11): identity is settled at the gate, which now
@@ -1744,7 +1921,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
               <fieldset class="field__frame"><legend><span>Card number</span></legend></fieldset>
               <span class="field__label">Card number</span>
             </label>
-            <div class="grid grid--2">
+            <div class="grid grid--card">
               <label class="field"><input type="text" placeholder=" " autocomplete="cc-exp" /><fieldset class="field__frame"><legend><span>MM / YY</span></legend></fieldset><span class="field__label">MM / YY</span></label>
               <label class="field"><input type="text" placeholder=" " autocomplete="cc-csc" /><fieldset class="field__frame"><legend><span>Security code</span></legend></fieldset><span class="field__label">Security code</span></label>
             </div>
@@ -1863,9 +2040,6 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <div class="review__items" id="reviewItems" hidden>
         <div class="sec__head">
           <h3 class="t-title-s">Your items <span class="review__items-n" data-items-count></span></h3>
-          <!-- before the review the list can be folded away; on the review it is the
-               point of the page and is always open (Amelie, 2026-09-14) -->
-          <button class="t-link-s" type="button" id="itemsFold" hidden aria-expanded="true">Hide</button>
           <a class="t-link-s" href="./cart.html">Edit</a>
         </div>
       </div>
@@ -1890,7 +2064,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
     <!-- ---------- PLACE ORDER (desktop) ---------- -->
     <div class="place">
-      <button class="btn btn--wide" type="button">Place order · <span data-total>€64.94</span></button>
+      <!-- no figure on the button (Amelie, 2026-09-17): TOTAL sits directly above it, so
+           the sum on the button was the same number twice in 80px, and the button's job
+           is to name the action -->
+      <button class="btn btn--wide" type="button">Place order</button>
       <p class="place__legal t-body-xs">
         By placing your order you accept our <a href="#">Terms &amp; Conditions</a>, our
         <a href="#">Cancellation Policy</a> and the processing of your data as described in
@@ -1950,12 +2127,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
         </div>
       </div>
 
+      <!-- incl. VAT sits under the FIGURE, not under the word: it is a statement about
+           the amount, and under "Total" it read as a second label (Amelie, 2026-09-17) -->
       <div class="trow trow--grand">
-        <span>
-          <span class="t-title-m" style="display:block">Total</span>
+        <span class="t-title-m">Total</span>
+        <span class="grand__col">
+          <span class="grand__num" data-total>€114.84</span>
           <span class="t-price-note muted">incl. VAT <span data-vat>€18.26</span></span>
         </span>
-        <span class="grand__num" data-total>€114.84</span>
       </div>
     </div>
 
@@ -2046,10 +2225,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
   <!-- on the last step the figures ride with the button, so the page above it does not
        have to be scrolled back to check them (Amelie, 2026-09-14) -->
   <div class="paybar__sum" id="paybarSum" hidden>
-    <span class="paybar__row" id="paybarShipRow"><span class="t-body-s">Shipping</span><span class="t-body-s" data-paybar-ship>&euro;4.99</span></span>
+    <span class="paybar__row" id="paybarShipRow" hidden><span class="t-body-s">Shipping</span><span class="t-body-s" data-paybar-ship>&euro;4.99</span></span>
     <span class="paybar__row paybar__row--total"><span class="t-title-s">Total</span><span class="t-price" data-total>&euro;114.84</span></span>
   </div>
-  <button class="btn btn--wide" type="button">Place order · <span data-total>€114.84</span></button>
+  <button class="btn btn--wide" type="button">Place order</button>
   <p class="paybar__legal t-body-xs" id="paybarLegal">By placing your order you accept our
     <a href="#">Terms &amp; Conditions</a>, our <a href="#">Cancellation Policy</a> and our
     <a href="#">Privacy Policy</a>.</p>
@@ -2065,17 +2244,16 @@ body[data-mode="onepage"] .ck__rail{position:static;
     <button data-mode-set="onepage" aria-pressed="true">One page</button>
     <button data-mode-set="steps" aria-pressed="false">3 steps</button>
   </div>
+  <h4>MyTriumph block</h4>
+  <div class="dash__row" data-group="mt">
+    <button data-mt-set="plain" aria-pressed="true">Plain</button>
+    <button data-mt-set="banner" aria-pressed="false">Burgundy banner</button>
+  </div>
   <h4>Prototype · State</h4>
   <div class="dash__row" data-group="account">
     <button data-account-set="guest" aria-pressed="true">Guest</button>
     <button data-account-set="member" aria-pressed="false">Signed in</button>
     <button data-account-set="new" aria-pressed="false">New + account</button>
-  </div>
-  <h4>Items in steps</h4>
-  <div class="dash__row" data-group="items">
-    <button data-items-set="collapsed" aria-pressed="true">Collapsed</button>
-    <button data-items-set="hidden" aria-pressed="false">Hidden</button>
-    <button data-items-set="summary" aria-pressed="false">In summary</button>
   </div>
   <h4>MyTriumph</h4>
   <div class="dash__row" data-group="member">
@@ -2175,9 +2353,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
        (Amelie, 2026-09-14). Only the section being worked on reveals. */
     const listEl = RAIL_ITEMS || r('#railItems');
     listEl.innerHTML = t.lines.map(l => railLine(l, t.member)).join('');
-    /* ...except on the review, where the list has moved into the left column and is part
-       of what is being read rather than the reference beside it (Amelie, 2026-09-14) */
-    if (listEl.closest('.review__items')) reveal(listEl, '.li');
+    /* The list does NOT start its own reveal here: on the review it comes in behind the
+       rows above it, and applyStep owns that stagger (Amelie, 2026-09-17). Re-revealing on
+       every recalc also re-ran the entrance on a quantity change. */
     $$('[data-items-count]').forEach(n => { n.textContent = t.count ? '(' + t.count + ')' : ''; });
     r('#railEmpty').hidden = t.lines.length > 0;
     $$('.place .btn, .paybar .btn').forEach(b => b.setAttribute('aria-disabled', String(t.lines.length === 0)));
@@ -2193,8 +2371,15 @@ body[data-mode="onepage"] .ck__rail{position:static;
     const shipCell = r('[data-shipping]');
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     $$('[data-paybar-ship]').forEach(n => roll(n, t.shipCost === 0 ? 'Free' : eur(t.shipCost)));
+    /* The sticky bar states the shipping line only when it is FREE (Amelie, 2026-09-16).
+       A charge is already inside the Total beside it, and repeating it over the button
+       turns the last thing read before paying into a second price. Good news earns the
+       row; a cost does not. */
     const shipRow = $('#paybarShipRow');
-    if (shipRow) shipRow.classList.toggle('is-free', t.shipCost === 0);
+    if (shipRow) {
+      shipRow.classList.toggle('is-free', t.shipCost === 0);
+      shipRow.hidden = t.shipCost !== 0;
+    }
     r('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
     roll(r('[data-vat]'), eur(t.vat));
     $$('[data-total]').forEach(n => roll(n, eur(t.total)));
@@ -2665,15 +2850,8 @@ body[data-mode="onepage"] .ck__rail{position:static;
   const PLACE_EL = $('.place');
   const NEWS_EL = $('.review__news');
   const REVIEW_DL = $('.review');
-  /* Two answers to "what do the products do before the review": fold them away behind
-     their heading, or leave them out until the review entirely. The switcher picks
-     (Amelie, 2026-09-14). */
-  let itemsMode = 'collapsed';
-  $$('[data-items-set]').forEach(b => b.addEventListener('click', () => {
-    itemsMode = b.dataset.itemsSet;
-    $$('[data-items-set]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
-    applyStep(step);
-  }));
+  /* The question this used to answer — what the products do before the review — is
+     settled: they do nothing, because they are not there (Amelie, 2026-09-16). */
   /* scoped to the real rail for the same reason the list is: the drawer's clone carries
      the same classes and sits earlier in the DOM */
   const TRUST_EL = RAIL && $('.trust', RAIL);
@@ -2755,14 +2933,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (on) {
       box.hidden = false;
       box.appendChild(items);
-      reveal(items, '.li');
       const railcol = rail.closest('.ck__railcol');
-      /* Three homes: inside the summary under the assurances, at the foot of the page on
-         one column, or the last block of the form column. Its own place in the markup is
-         inside the review section, which is hidden until the review, so before then it
-         is appended rather than sent home (Amelie, 2026-09-15). */
-      if (!isReview && itemsMode === 'summary' && TRUST_EL) TRUST_EL.after(box);
-      else if (NARROW.matches && railcol) railcol.after(box);
+      /* Two homes now that the list only appears on the review: under the summary column
+         when the page is one column, and its own place in the markup otherwise. */
+      if (NARROW.matches && railcol) railcol.after(box);
       else if (isReview || !form) goHome(box);
       else form.appendChild(box);
     } else {
@@ -2778,9 +2952,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
     if (!rail) return;
     park(place); park(news); park(TRUST_EL);
     if (on) {
-            if (place && totals) {
+            /* totals → the three assurances → Place order (Amelie, 2026-09-17). They are
+         reassurance for the decision, so they belong BEFORE the button that takes it,
+         not stranded under the legal line where they read as a footer. The one-pager
+         already had this order through its flex `order`; the stepped rail follows the
+         DOM, so it needed the move. */
+      if (place && totals) {
         totals.after(place);
-        if (TRUST_EL) place.after(TRUST_EL);
+        if (TRUST_EL) place.before(TRUST_EL);
       }
       /* the opt-in sits under the address it would be sent to, not beside the button
          (Amelie, 2026-09-14) */
@@ -2794,16 +2973,6 @@ body[data-mode="onepage"] .ck__rail{position:static;
     }
   }
   /* the two columns become one and back again as the window is resized */
-  const itemsFold = $('#itemsFold');
-  if (itemsFold) itemsFold.addEventListener('click', () => {
-    const box = $('#reviewItems');
-    const open = box.classList.contains('is-folded');   // it is folded, so this opens it
-    box.dataset.open = open ? 'true' : 'false';
-    box.classList.toggle('is-folded', !open);
-    itemsFold.textContent = open ? 'Hide' : 'Show';
-    itemsFold.setAttribute('aria-expanded', String(open));
-  });
-
   NARROW.addEventListener('change', () => {
     const step = Number(document.body.dataset.step);
     layoutList((document.body.dataset.mode === 'onepage' && step >= 1) || step === LAST_STEP,
@@ -2844,23 +3013,15 @@ body[data-mode="onepage"] .ck__rail{position:static;
        the mobile rules key off .is-last while the desktop ones read [hidden]. */
     $('.place').hidden = step !== LAST_STEP;
     $('.place').classList.toggle('is-last', step === LAST_STEP);
-    /* the one-pager shows what is being bought from the moment there is a form to fill;
-       the stepped flow keeps it for the review (Amelie, 2026-09-14) */
+    /* Your items appears ONCE, on the review, in both modes (Amelie, 2026-09-16). It used
+       to sit at the foot of every step of the one-pager, which put a second copy of the
+       bag under every form — the summary rail already states what is being bought, and
+       the list belongs where it is being checked, not where an address is being typed. */
     const onReview = step === LAST_STEP;
-    const showList = onReview || (mode === 'onepage' && step >= 1 && itemsMode !== 'hidden');
-    /* in the summary the list is always foldable, whichever variant put it there */
-    const foldable = itemsMode === 'collapsed' || itemsMode === 'summary';
+    const showList = onReview;
     layoutList(showList, onReview);
-    const box = $('#reviewItems'), fold = $('#itemsFold');
-    const folded = showList && !onReview && foldable && box && box.dataset.open !== 'true';
-    if (box) box.classList.toggle('is-folded', !!folded);
-    if (fold) {
-      fold.hidden = onReview || !showList || !foldable;
-      /* the label names what the click does, so a folded list offers Show (Amelie,
-         2026-09-15) */
-      fold.textContent = folded ? 'Show' : 'Hide';
-      fold.setAttribute('aria-expanded', String(!folded));
-    }
+    const box = $('#reviewItems');
+    if (box) box.classList.remove('is-folded');
     layoutReview(step === LAST_STEP);
     // the gate has its own doors and the last step has Place order — neither wants a
     // generic Continue underneath it
@@ -2887,8 +3048,16 @@ body[data-mode="onepage"] .ck__rail{position:static;
       /* behind the rows, never among them: at a cap of five it was arriving before the
          billing checkbox at the foot of a ten-field form (Amelie, 2026-09-15) */
       if (next) revealNode(next, Math.min(moved, 16));
-      /* and the list last of all, after the button it sits under (Amelie, 2026-09-15) */
-      if (box && !box.hidden && !onReview) revealNode(box, Math.min(moved, 16) + 1);
+      /* And the list last of all — including on the review, where it used to be the one
+         block already sitting there while the address, the delivery method and the payment
+         animated in above it (Amelie, 2026-09-17). On a phone it has been moved out of the
+         section by then, so it is revealed by reference rather than found inside `live`,
+         and its own lines carry on the stagger from where the rows stopped. */
+      if (box && !box.hidden) {
+        const after = Math.min(moved, 16) + 1;
+        revealNode(box, after);
+        if (onReview) reveal(box, '.li', after + 1, 8);
+      }
       /* the stepped flow's button lives outside the section it belongs to, so it is not
          picked up by the rows above — it comes in last, behind them (Amelie,
          2026-09-14) */
@@ -2973,6 +3142,48 @@ body[data-mode="onepage"] .ck__rail{position:static;
   if (gateSignIn) gateSignIn.addEventListener('click', () => leaveGate('signin', 'member'));
   const gateGuest = $('#gateGuest');
   if (gateGuest) gateGuest.addEventListener('click', () => leaveGate('guest', 'guest'));
+
+  /* ---------- how the gate ranks its three doors ----------
+     One block of markup in four placements, rather than four gates to keep in step.
+     See the note on #gateGuestBlock for what each layout does. */
+  /* ---------- how the gate ranks its three doors ----------
+     One layout, resolved by width (Amelie, 2026-09-17). The four that were here for
+     comparison are gone; what shipped is:
+       ≥992  guest leads the right column, with the membership under it — the same width
+             as Create an account either way
+       <992  guest leads the page — no columns to hide a ranking in, so whatever comes
+             first wins, though Sign in keeps the fill
+     The block MOVES between the two, which is why this is not a media query alone. */
+  const GATE_MQ = window.matchMedia('(max-width:991px)');
+
+  function applyGate() {
+    const lead = GATE_MQ.matches;
+    document.body.dataset.gate = lead ? 'b2' : 'a';
+    const block = $('#gateGuestBlock'), box = $('#gateBox'), col = $('.gate__col--new');
+    if (block && box && col) {
+      if (lead) box.before(block);   // guest leads the page
+      else      col.prepend(block);   // guest leads the column, membership follows it
+    }
+    /* "Guest checkout" at both widths (Amelie, 2026-09-17). "Rather not sign in?" framed
+       the door as a reaction to the account beside it; naming it makes it a way to check
+       out in its own right — and with the heading naming the door, the button only has to
+       name the action. */
+  }
+  GATE_MQ.addEventListener('change', applyGate);
+  applyGate();
+  /* ---------- the membership block, plain or in brand colour ---------- */
+  const MT_KEY = 'triumph.proto.mt';
+  function applyMt(v) {
+    const mt = v === 'banner' ? 'banner' : 'plain';
+    try { localStorage.setItem(MT_KEY, mt); } catch (e) {}
+    document.body.dataset.mt = mt;
+    $$('[data-mt-set]').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.mtSet === mt)));
+  }
+  $$('[data-mt-set]').forEach(b => b.addEventListener('click', () => applyMt(b.dataset.mtSet)));
+  let mtStart = 'plain';
+  try { mtStart = localStorage.getItem(MT_KEY) || 'plain'; } catch (e) {}
+  applyMt(mtStart);
   const gateRegister = $('#gateRegister');
   if (gateRegister) gateRegister.addEventListener('click', () => {
     const reg = $('#gateReg');
@@ -3120,24 +3331,6 @@ body[data-mode="onepage"] .ck__rail{position:static;
     window.addEventListener('resize', sync);
     document.addEventListener('ck:step', sync);
     setTimeout(sync, 0);
-  })();
-
-  /* On a phone the wallets belong in the sticky bar, as they do in the bag; on a wider
-     screen they stay in their own section (Amelie, 2026-09-16). */
-  (function expressInBar(){
-    const ex = $('#s-express .express'), bar = $('.paybar');
-    if (!ex || !bar) return;
-    const home = [ex.parentNode, ex.nextSibling];
-    const place = () => {
-      if (NARROW.matches) bar.appendChild(ex);
-      else if (home[0]) home[0].insertBefore(ex, home[1]);
-      /* nothing left to skip once the payment step is reached: the ways to pay are on
-         the page itself from there on (Amelie, 2026-09-16) */
-      ex.hidden = NARROW.matches && Number(document.body.dataset.step) >= 3;
-    };
-    place();
-    NARROW.addEventListener('change', place);
-    document.addEventListener('ck:step', place);
   })();
 
   Shop.onChange(() => { if ($('#ckDone').hidden) applyState(); });

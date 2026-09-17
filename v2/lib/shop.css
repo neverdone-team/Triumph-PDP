@@ -93,18 +93,86 @@
 .mc__series{font-weight:300;font-size:12px;line-height:17px;letter-spacing:.04em;color:var(--mc-ink)}
 .mc__name{font-weight:400;font-size:13px;line-height:18px;letter-spacing:.06em;text-transform:uppercase;
   margin-top:2px}
-.mc__meta{font-weight:300;font-size:12px;line-height:17px;letter-spacing:.04em;color:var(--mc-ink-50)}
+/* the variant is what was actually chosen, so it is read, not skimmed past — ink, like
+   every other fact about the line (Amelie, 2026-09-17) */
+.mc__meta{font-weight:300;font-size:12px;line-height:17px;letter-spacing:.04em;color:var(--mc-ink)}
 .mc__num{margin-top:8px;font-weight:400;font-size:14px;line-height:18px}
 
-/* ---------------- free shipping ---------------- */
-.mc__ship{
-  flex:none;margin:0;padding:16px var(--mc-pad);border-top:1px solid var(--mc-hair);
-  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;
+/* ---------------- complete your set ----------------
+   One row, and only one. The card is a confirmation of an add, so a second list inside
+   it is what makes a mini cart feel cramped: a 44px thumb, the name, the price and a
+   chevron — nothing that can be operated, because there is no size here to choose
+   (Amelie, 2026-09-16). */
+.mc__set{
+  flex:none;padding:16px var(--mc-pad);border-top:1px solid var(--mc-hair);
 }
-.mc__ship[data-free="true"]{color:var(--mc-green)}
+/* the card's own title type — one label style in the card, not two (Amelie, 2026-09-17) */
+.mc__set-h{
+  display:block;margin-bottom:12px;
+  font-weight:400;font-size:12px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;
+}
+/* the strip runs tighter than the single row: it is the block that has to earn its
+   height back (Amelie, 2026-09-17) */
+/* more air above the label than below the tiles: the block has to read as its own thing
+   under the line it belongs to, not as part of it (Amelie, 2026-09-17) */
+.mc__set--tiles{padding-top:20px;padding-bottom:14px}
+.mc__set--tiles .mc__set-h{margin-bottom:10px}
+.mc__set-row{
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto 12px;
+  gap:12px;align-items:center;text-decoration:none;color:var(--mc-ink);
+}
+.mc__set-row:hover .mc__set-name{text-decoration:underline;text-underline-offset:3px}
+.mc__set-thumb{display:block;width:44px;height:58px;background:var(--mc-grey);overflow:hidden}
+.mc__set-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.mc__set-info{display:flex;flex-direction:column;gap:1px;min-width:0}
+.mc__set-series{font-weight:300;font-size:11px;line-height:15px;letter-spacing:.04em;
+  color:var(--mc-ink-50)}
+.mc__set-name{font-weight:400;font-size:12px;line-height:16px;letter-spacing:.06em;
+  text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mc__set-pr{font-weight:300;font-size:13px;line-height:17px;letter-spacing:.02em}
+.mc__set-go{display:block;width:12px;height:12px;color:var(--mc-ink-50)}
+.mc__set-go svg{display:block;width:12px;height:12px}
 
-/* ---------------- foot ---------------- */
-.mc__foot{flex:none;padding:0 var(--mc-pad) var(--mc-pad);display:grid;gap:10px}
+/* ---- the second version: a strip of packshots ----
+   Three products instead of one, at the cost of ~90px more height. The strip scrolls
+   sideways rather than wrapping, so the block's height never depends on how many were
+   matched, and the tiles are bled to the card's edge so a half-visible fourth is what
+   says "there is more" — no arrows, no dots (Amelie, 2026-09-16). */
+.mc__tiles{
+  display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory;
+  margin:0 calc(var(--mc-pad) * -1); padding:0 var(--mc-pad);
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.mc__tiles::-webkit-scrollbar{display:none}
+.mc__tile{
+  flex:0 0 84px; scroll-snap-align:start;
+  display:flex; flex-direction:column; gap:0;
+  text-decoration:none; color:var(--mc-ink);
+}
+/* 4:5, not the 3:4 the bag's cards use: the block has to stay well under the room the
+   confirmed line needs, and height is the only thing it costs (Amelie, 2026-09-16) */
+.mc__tile-img{display:block; aspect-ratio:4/5; background:var(--mc-grey); overflow:hidden;
+  margin-bottom:6px}
+.mc__tile-img img{width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .4s cubic-bezier(.22,.61,.36,1)}
+.mc__tile:hover .mc__tile-img img{transform:scale(1.04)}
+.mc__tile-nm{
+  font-weight:400; font-size:10px; line-height:14px; letter-spacing:.06em;
+  text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+/* the price is a figure, not supporting text — Regular and in ink, like every other
+   price in the flow, and a step up from the name above it, which is a label (Amelie,
+   2026-09-17) */
+.mc__tile-pr{font-weight:400; font-size:12px; line-height:16px; letter-spacing:.02em;
+  color:var(--mc-ink)}
+@media (prefers-reduced-motion:reduce){
+  .mc__tile-img img{transition:none}
+}
+
+/* ---------------- foot ----------------
+   It carries its own top padding now that nothing sits between it and the list: with the
+   delivery line gone there was no gap at all when the recommendations are switched off. */
+.mc__foot{flex:none;padding:16px var(--mc-pad) var(--mc-pad);display:grid;gap:10px}
 .mc__btn{
   display:flex;align-items:center;justify-content:center;height:44px;
   border:1px solid var(--mc-ink);background:var(--mc-bg);color:var(--mc-ink);

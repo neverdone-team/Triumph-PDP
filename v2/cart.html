@@ -95,7 +95,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the same measure the checkout's columns sit in, so the bag and every step of the
    checkout line up (Amelie, 2026-09-14) */
 .wrap{max-width:1280px;margin:0 auto;padding:var(--space-40) var(--space-24) var(--space-64)}
-.pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-16)}
+/* it stands over both columns now, and .cart's own top margin is the air under it */
+.pagehead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:0}
 /* the count is part of the title, in brackets after it (Amelie, 2026-09-14) */
 .pagehead__n{font-weight:inherit;color:var(--c-ink-soft)}
 
@@ -180,6 +181,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 .statusbox.is-free #shipMsg svg{flex:none;margin-left:var(--space-6)}
 .shipfree{grid-column:1;grid-row:1;display:flex;align-items:center;gap:var(--space-8);
   color:var(--color-green);margin:0}
+/* The tick closes the line rather than introducing it — the sentence is the message and
+   the mark confirms it — which is already how the free-shipping state sets its own tick
+   (Amelie, 2026-09-17). Beside the words on two columns, where the far edge belongs to
+   the delivery date; at the box's right edge on one, where it has the row to itself. */
+.shipfree svg{order:2;margin-left:var(--space-6)}
 /* A member has one fact here and it is good news, so the box says so: tinted green,
    one line, and no taller than that line. The tint IS the box, so it carries no stroke
    (Amelie, 2026-09-10). */
@@ -393,9 +399,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* no box around the cross-sell — the head sits on a hairline and the rows run flush
    with the product list above, the same treatment the checkout option lists get */
 .addon{margin-top:var(--space-40)}
+/* a section label under the page title, not its equal: 12/16 against the title's 14/20
+   (Amelie, 2026-09-17) */
+.addon__head .t-title-s{font-size:12px;line-height:16px}
 .addon__head{padding:0 0 var(--space-20)}
-.addon__grid{display:flex;flex-wrap:wrap;gap:var(--space-40)}
-.acard{display:flex;flex-direction:column;flex:none;width:220px}
+/* Three across, always — a grid of equal shares rather than three fixed 220px cards,
+   which wrapped to two the moment the product column was narrower than 740 (Amelie,
+   2026-09-17). The gutter comes down with the cards. */
+.addon__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-24)}
+.acard{display:flex;flex-direction:column;min-width:0}
 .acard__img{width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--c-grey-light)}
 .acard__img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
 .acard:hover .acard__img img{transform:scale(1.04)}
@@ -420,6 +432,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
 /* the figures need room to read as separate lines (Amelie, 2026-09-11) */
 .trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-10) 0}
 .trow--free [data-shipping]{color:var(--color-green)}
+/* every price is a figure, so every price is Regular — see the note in checkout.html
+   (Amelie, 2026-09-17) */
+.trow .t-price{font-weight:400}
+/* one hairline over the total — the double rule was tried and reverted, see the note in
+   checkout.html (Amelie, 2026-09-17) */
 .trow--grand{border-top:1px solid var(--c-edge);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
 /* what this order saves against the list prices — burgundy, the colour every member and
    sale figure in the flow uses */
@@ -445,7 +462,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
   transition:opacity .15s var(--ease-out)}
 .btn:hover{opacity:.82}
 .btn--wide{width:100%}
-.btn--ghost{background:transparent;color:var(--c-ink)}
+/* The secondary button states its fill rather than leaving it transparent (Amelie,
+   2026-09-17). On a white page the two look identical, which is why it went unnoticed —
+   but on any other ground the transparent version shows it through and reads as a hole
+   punched in the block rather than a control sitting on it. */
+.btn--ghost{background:var(--c-bg);color:var(--c-ink)}
 .btn--ghost:hover{background:var(--c-bg);opacity:1}
 .express{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);margin-top:var(--space-8)}
 /* the wallets are an alternative to the button above them, not a continuation of it —
@@ -810,6 +831,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
      an explicit row — .shipfree inherits row 1 from the desktop rule and would paint on
      top of the delivery date. */
   .statusbox{grid-template-columns:minmax(0,1fr);gap:var(--space-12)}
+  /* the date and the shipping line are two halves of one statement, so they sit as close
+     as two lines of the same paragraph would (Amelie, 2026-09-17) */
+  .statusbox.is-free,.statusbox.is-member{gap:var(--space-4)}
+  .shipfree svg{margin-left:auto}
   .promise{grid-column:1;grid-row:1;justify-self:start}
   #shipMsg{grid-column:1;grid-row:2}
   .shipfree{grid-column:1;grid-row:2}
@@ -823,16 +848,26 @@ h1,h2,h3,p{margin:0;font-weight:400}
   .hd__links{display:none}
   .hd__in{display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-16)}
   .hd__logo img{width:132px;height:auto}
-  .wrap{padding:var(--space-16) var(--space-16) 120px}
+  /* The page starts right under the header on a phone (Amelie, 2026-09-17): 16 of wrap
+     and 32 of .cart put 48px of nothing between the logo bar and the first thing worth
+     reading, on the screen that has the least room to spare. */
+  /* One clearance for the page, measured rather than guessed (Amelie, 2026-09-17): the
+     bar carries figures, a button and the wallets, and it grew when the Total moved into
+     it — the hard-coded 120 then left the summary's foot under it with no way to scroll
+     to. --mbar-h is written by the observer in barRoom(). */
+  .wrap{padding:var(--space-8) var(--space-16)
+    calc(var(--mbar-h, 150px) + var(--space-24) + env(safe-area-inset-bottom))}
   .t-title-xl{font-size:16px;line-height:22px}
-  /* the title is the same size as Complete your order below it, and sits close to the
-     bar it introduces (Amelie, 2026-09-15) */
+  /* the title sits close to the bar it introduces (Amelie, 2026-09-15) */
   .pagehead{margin-bottom:0}
   .pagehead h1{font-size:14px;line-height:20px}
-  .cart{gap:var(--space-12)}
+  /* The status card is a note ABOUT the order, not part of it: at Body/M it carried the
+     same weight as the product names under it, on the screen where they are what you came
+     to check. Body/S on a phone (Amelie, 2026-09-17). */
+  .statusbox .t-body-m{font-size:12px;line-height:18px}
   /* the phone gets a tighter rhythm throughout: the page is one column, so the air
      between its blocks can come down (Amelie, 2026-09-14) */
-  .cart{gap:var(--space-16)}
+  .cart{gap:var(--space-16);margin-top:var(--space-16)}
   .item{padding:var(--space-20) 0}
   /* one text column beside the shot, with the price sitting between the series and the
      colour — and controls at 44px so they are actually tappable */
@@ -860,7 +895,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
      being the sliver that gets cut; the 220 cap keeps the card at the width the bag's own
      packshot uses, so above ~560 the cards stop growing and the strip simply stops
      overflowing once all three fit. */
-  .addon__grid{--per:2.25;flex-wrap:nowrap;gap:var(--space-16);
+  .addon__grid{display:flex;--per:2.25;flex-wrap:nowrap;gap:var(--space-16);
     overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
     scroll-snap-type:x proximity;scroll-padding-inline-start:var(--space-16);
     margin-inline:calc(var(--space-16) * -1);padding-inline:var(--space-16);
@@ -883,6 +918,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
   /* the primary button leads and the wallets follow it, as the checkout's bar has it —
      one order across every version (Amelie, 2026-09-16) */
   .mbar{display:flex;flex-direction:column}
+  /* the figures, then the button, then the wallets under it */
+  .mbar__sum{order:0;display:grid;gap:var(--space-4);margin-bottom:var(--space-10)}
+  .mbar__row{display:flex;justify-content:space-between;gap:var(--space-16);align-items:baseline}
+  .mbar__row--total .t-price{font-size:16px;line-height:22px}
+  .mbar__row.is-free [data-mbar-ship]{color:var(--color-green)}
   .mbar > .btn{order:1}
   .mbar .cart__express{order:2;margin:var(--space-8) 0 0}
   .mbar .cart__express .or{display:none}
@@ -928,16 +968,19 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
   <!-- ======================= FILLED CART ======================= -->
   <div id="filledCart">
+    <!-- ABOVE the columns, not inside the left one (Amelie, 2026-09-17). It had been put
+         in the column so it would start on the same line as Summary — but that put the
+         delivery status half a title lower than the figures it belongs with. It is the
+         page's title, so it sits over the page, and the two columns then start together:
+         the green box and Summary on one line. -->
+    <div class="pagehead">
+      <h1 class="t-title-m">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
+    </div>
     <div class="cart">
      <!-- Two column wrappers so the columns do not share grid rows (a tall packshot used
           to push the summary down the rail) and so the whole right column can stick.
           On a phone both wrappers go display:contents and the four blocks order freely. -->
      <div class="cart__left">
-      <!-- inside the column, so the title and the summary head start on the same line
-           (Amelie, 2026-09-15) -->
-      <div class="pagehead">
-        <h1 class="t-title-m">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
-      </div>
       <!-- The delivery status leads the order on desktop as well as on mobile: it is
            about this order, so it belongs where the order is read (Amelie, 2026-09-10). -->
       <div class="cart__status">
@@ -964,63 +1007,28 @@ h1,h2,h3,p{margin:0;font-weight:400}
       <div class="cart__main">
         <div class="items" id="cartItems"></div>
 
-        <!-- cross-sell strip: the upsell lives IN the cart, it never blocks the way out -->
-        <div class="addon">
+        <!-- COMPLETE YOUR SET
+             The strip used to be three fixed cards under "Complete your order", which is
+             not a set — it is a shelf. A bra in the bag now asks for the briefs that go
+             with it, and briefs ask for the bra, same series first (Amelie, 2026-09-16).
+             The upsell still lives IN the cart and never blocks the way out. -->
+        <div class="addon" id="addonStrip" hidden>
           <div class="addon__head">
-            <span class="t-title-s">Complete your order</span>
+            <span class="t-title-s">Complete your set</span>
           </div>
-          <!-- Colour and size are gone from the card: the + opens quick shop and the size
-               is chosen there, before anything joins the bag (Amelie, 2026-09-10). -->
-          <div class="addon__grid">
-            <article class="acard">
-              <div class="acard__img"><img src="./Assets/10215855-0004_1.webp" alt="Amourette String" loading="lazy" /></div>
-              <div class="acard__info">
-                <span class="t-body-s acard__series">Amourette</span>
-                <span class="acard__nm t-title-xs">String</span>
-                <span class="acard__buy">
-                  <span class="acard__pr t-price">€22.95</span>
-                  <button class="addon__btn" type="button" aria-label="Choose a size for String"
-                data-sku="amourette-string-black-m" data-name="String" data-series="Amourette"
-                data-colour="Black" data-size="M"
-                data-price="22.95" data-member="19.95" data-img="./Assets/10215855-0004_1.webp">
-                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
-                  </button>
-                </span>
-              </div>
-            </article>
-            <article class="acard">
-              <div class="acard__img"><img src="./Assets/10208018-0004_1.webp" alt="Aura Spotlight Bra" loading="lazy" /></div>
-              <div class="acard__info">
-                <span class="t-body-s acard__series">Aura Spotlight</span>
-                <span class="acard__nm t-title-xs">Aura Spotlight Bra</span>
-                <span class="acard__buy">
-                  <span class="acard__pr t-price">€54.95</span>
-                  <button class="addon__btn" type="button" aria-label="Choose a size for Aura Spotlight Bra"
-                data-sku="aura-spotlight-bra-black-70c" data-name="Aura Spotlight Bra" data-series="Aura Spotlight"
-                data-colour="Black" data-size="70C"
-                data-price="54.95" data-member="49.45" data-img="./Assets/10208018-0004_1.webp">
-                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
-                  </button>
-                </span>
-              </div>
-            </article>
-            <article class="acard">
-              <div class="acard__img"><img src="./Assets/ck-brief.webp" alt="Amourette Tai" loading="lazy" /></div>
-              <div class="acard__info">
-                <span class="t-body-s acard__series">Amourette</span>
-                <span class="acard__nm t-title-xs">Tai</span>
-                <span class="acard__buy">
-                  <span class="acard__pr t-price">€24.95</span>
-                  <button class="addon__btn" type="button" aria-label="Choose a size for Tai"
-                data-sku="amourette-tai-black-m" data-name="Tai" data-series="Amourette"
-                data-colour="Black" data-size="M"
-                data-price="24.95" data-member="19.95" data-img="./Assets/ck-brief.webp">
-                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>
-                  </button>
-                </span>
-              </div>
-            </article>
-          </div><!-- /.addon__grid -->
+          <div class="addon__grid" id="addonGrid"></div>
+        </div><!-- /.addon -->
+
+        <!-- A SECOND STRIP, a different question (Amelie, 2026-09-17): the first answers
+             "what goes with this", so it is matched to the bag; this one answers "what
+             else is selling", so it is not matched to anything. Same card and same
+             scroller — two of the same shelf, not two different devices — and the two
+             never show the same product. -->
+        <div class="addon" id="alsoStrip" hidden>
+          <div class="addon__head">
+            <span class="t-title-s">What other customers bought</span>
+          </div>
+          <div class="addon__grid" id="alsoGrid"></div>
         </div><!-- /.addon -->
       </div><!-- /.cart__main -->
      </div><!-- /.cart__left -->
@@ -1178,8 +1186,21 @@ h1,h2,h3,p{margin:0;font-weight:400}
 
 <!-- mobile sticky checkout bar -->
 <div class="mbar" id="mbar">
-  <!-- the button names the step; the figure is in the summary above it (Amelie,
-       2026-09-15) -->
+  <!-- The figures ride with the button here too, as they do on the checkout's bar
+       (Amelie, 2026-09-16): on a phone the summary is below the products and the bar is
+       the only thing on screen at the moment of deciding — it should not take a scroll
+       back up to learn what the order costs.
+       The shipping row appears ONLY when shipping is free. A charge is already inside
+       the Total beside it, and repeating it over the button turns the last thing read
+       before checkout into a second price. -->
+  <div class="mbar__sum" id="mbarSum">
+    <span class="mbar__row is-free" id="mbarShipRow" hidden>
+      <span class="t-body-s">Shipping</span><span class="t-body-s" data-mbar-ship>Free</span>
+    </span>
+    <span class="mbar__row mbar__row--total">
+      <span class="t-title-s">Total</span><span class="t-price" data-total>&euro;0.00</span>
+    </span>
+  </div>
   <a class="btn btn--wide" href="./checkout.html">Continue to checkout</a>
 </div>
 
@@ -1216,9 +1237,15 @@ h1,h2,h3,p{margin:0;font-weight:400}
     <button data-sale-set="on" aria-pressed="false">Sale −20%</button>
   </div>
   <h4>Mini cart after an add</h4>
-  <div class="dash__row" style="margin-bottom:0">
+  <div class="dash__row">
     <button data-mini-set="last" aria-pressed="true">Last added</button>
     <button data-mini-set="all" aria-pressed="false">Whole bag</button>
+  </div>
+  <h4>Mini cart · complete your set</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-miniset-set="off" aria-pressed="true">Off</button>
+    <button data-miniset-set="row" aria-pressed="false">One row</button>
+    <button data-miniset-set="tiles" aria-pressed="false">Three tiles</button>
   </div>
   <div class="dash__row" style="margin-bottom:0">
     <button id="dashHide">Hide</button>
@@ -1462,10 +1489,11 @@ h1,h2,h3,p{margin:0;font-weight:400}
   }
 
   /* the cross-sell cards wait until they are scrolled to, the same trigger and the same
-     threshold the PLP uses for its grid */
-  (function revealAddons(){
+     threshold the PLP uses for its grid. Called again whenever the strip is rebuilt,
+     which it is every time the bag changes (Amelie, 2026-09-16). */
+  function revealAddons(){
     if (REDUCED.matches) return;
-    const cards = $$('.acard');
+    const cards = $$('.acard:not(.rvl)');
     if (!cards.length || !('IntersectionObserver' in window)) return;
     cards.forEach(c => c.classList.add('rvl-pre'));
     const io = new IntersectionObserver(entries => {
@@ -1478,7 +1506,52 @@ h1,h2,h3,p{margin:0;font-weight:400}
       });
     }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
     cards.forEach(c => io.observe(c));
-  })();
+  }
+
+  /* ================= COMPLETE YOUR SET =================
+     The catalogue and the matching live in lib/shop.js, because the mini cart offers
+     the same thing and two lists would drift apart (Amelie, 2026-09-16). This page
+     owns the card only. */
+  function setCardHTML(p){
+    return '<article class="acard">' +
+      '<div class="acard__img"><img src="' + esc(p.img) + '" alt="' + esc(p.series + ' ' + p.name) + '" loading="lazy" /></div>' +
+      '<div class="acard__info">' +
+        '<span class="t-body-s acard__series">' + esc(p.series) + '</span>' +
+        '<span class="acard__nm t-title-xs">' + esc(p.name) + '</span>' +
+        '<span class="acard__buy">' +
+          '<span class="acard__pr t-price">' + eur(p.price) + '</span>' +
+          '<button class="addon__btn" type="button" aria-label="Choose a size for ' + esc(p.name) + '"' +
+            ' data-kind="' + p.kind + '" data-sku="' + esc(p.sku) + '" data-name="' + esc(p.name) + '"' +
+            ' data-series="' + esc(p.series) + '" data-colour="' + esc(p.colour) + '" data-size="' + esc(p.size) + '"' +
+            ' data-price="' + p.price + '" data-member="' + p.member + '" data-img="' + esc(p.img) + '">' +
+            '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>' +
+          '</button>' +
+        '</span>' +
+      '</div>' +
+    '</article>';
+  }
+
+  /* No subline naming what the suggestions match (Amelie, 2026-09-16): the heading says
+     what the strip is for and the cards say what they are — a sentence repeating the
+     product you just looked at only pushes them down the page. */
+  /* one painter for both strips — they differ in what they are given, not in how they
+     are drawn */
+  function paintStrip(stripSel, gridSel, cards){
+    const strip = $(stripSel), grid = $(gridSel);
+    if (!strip || !grid) return;
+    if (!cards.length) { strip.hidden = true; grid.innerHTML = ''; return; }
+    strip.hidden = false;
+    grid.innerHTML = cards.map(setCardHTML).join('');
+  }
+
+  function renderSet(){
+    const m = Shop.matchSet(3);
+    const set = (m && m.cards) || [];
+    paintStrip('#addonStrip', '#addonGrid', set);
+    /* the second strip is told what the first is showing, so nothing appears twice */
+    paintStrip('#alsoStrip', '#alsoGrid', Shop.alsoBought(set.map(p => p.sku), 3));
+    revealAddons();
+  }
 
   /* ---------------- render ---------------- */
   function render(){
@@ -1517,6 +1590,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const shipCell = $('[data-shipping]');
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
+    /* the sticky bar states shipping only when it is free — see the note on #mbarSum */
+    const mShip = $('#mbarShipRow');
+    if (mShip) mShip.hidden = t.shipCost !== 0;
     $$('[data-total]').forEach(n => roll(n, eur(t.total)));
     $$('[data-count]').forEach(n => n.textContent = '(' + t.count + ')');
 
@@ -1532,6 +1608,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
       sum + (was(l) - charged(l, bag.member)) * l.qty, 0);
     $('#saveRow').hidden = saved < 0.01;
     roll($('[data-saved]'), eur(saved));
+
+    renderSet();
 
     $('#shipFill').style.width = Math.min(100, (t.base / t.freeAt) * 100) + '%';
     $('#shipCard').classList.toggle('is-free', t.gap === 0);
@@ -1594,7 +1672,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
       const l = Shop.read().lines.filter(x => x.sku === sku)[0];
       if (l) openQuickShop({ mode:'size', sku:sku, size:l.size,
         data:{ name:l.name, series:l.series, colour:l.colour, img:l.img,
-               price:l.unit, member:l.member } });
+               price:l.unit, member:l.member, kind:Shop.kindOf(l) } });
       return;
     }
 
@@ -1682,6 +1760,10 @@ h1,h2,h3,p{margin:0;font-weight:400}
      The + no longer adds blind: it opens quick shop, a size is chosen there, and the
      card only leaves the strip once the product is really in the bag. */
   let qsCard = null, qsData = null, qsSize = null, qsMode = 'add', qsSku = null, qsColour = null;
+  /* Which grid to draw. It used to be inferred from the size already chosen, so a bra
+     opened with nothing selected was offered XS–XXL — now that briefs suggest bras, that
+     showed up every time (Amelie, 2026-09-16). The card states its kind. */
+  let qsKind = 'brief';
   const OUT_OF_STOCK = { '70A':1, '85D':1, 'XXL':1 };   // a couple of gaps, so the state shows
 
   /* A bra size is two decisions, so it is shown as two bands rather than a 49-item list —
@@ -1693,9 +1775,9 @@ h1,h2,h3,p{margin:0;font-weight:400}
     const m = /^(\d+)([A-H])$/.exec(sz || '');
     return m ? { band: m[1], cup: m[2] } : null;
   };
-  function sizeGrid(current){
+  function sizeGrid(current, kind){
     const cur = splitSize(current);
-    if (!cur) {                                  // briefs: one band of letters
+    if (kind !== 'bra') {                        // briefs: one band of letters
       return '<div class="qs__band"><span class="qs__bandlabel t-label-s">Size</span>'+
         '<div class="qs__sizes">'+ BRIEF_SIZES.map(sz =>
           '<button type="button" data-qs-size="'+sz+'"'+(OUT_OF_STOCK[sz] ? ' disabled' : '')+
@@ -1703,17 +1785,17 @@ h1,h2,h3,p{margin:0;font-weight:400}
     }
     const band = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Underbust size</span>'+
       '<div class="qs__sizes">'+ BANDS.map(b =>
-        '<button type="button" data-qs-band="'+b+'"'+(String(b) === cur.band ? ' data-on="true"' : '')+
+        '<button type="button" data-qs-band="'+b+'"'+(cur && String(b) === cur.band ? ' data-on="true"' : '')+
           '>'+b+'</button>').join('') +'</div></div>';
     const cups = '<div class="qs__band"><span class="qs__bandlabel t-label-s">Cup size</span>'+
       '<div class="qs__sizes">'+ CUPS.map(c =>
-        '<button type="button" data-qs-cup="'+c+'"'+(c === cur.cup ? ' data-on="true"' : '')+
+        '<button type="button" data-qs-cup="'+c+'"'+(cur && c === cur.cup ? ' data-on="true"' : '')+
           '>'+c+'</button>').join('') +'</div></div>';
     return band + cups;
   }
 
   function paintQsGrid(){
-    $('#qsSizes').innerHTML = sizeGrid(qsSize);
+    $('#qsSizes').innerHTML = sizeGrid(qsSize, qsKind);
     const s = splitSize(qsSize);
     $$('#qsSizes [data-qs-band]').forEach(b => { b.disabled = false; });
     $$('#qsSizes [data-qs-size],#qsSizes [data-qs-band],#qsSizes [data-qs-cup]').forEach(b => {
@@ -1726,6 +1808,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   function openQuickShop(opts){
     qsMode = opts.mode; qsCard = opts.card || null; qsSku = opts.sku || null;
     qsData = opts.data; qsSize = opts.size || null; qsColour = opts.data.colour || null;
+    qsKind = opts.data.kind || (/^\d/.test(String(opts.data.size || '')) ? 'bra' : 'brief');
 
     $('#qsImg').src = qsData.img || ''; $('#qsImg').alt = qsData.name;
     $('#qsSeries').textContent = qsData.series;
@@ -1761,10 +1844,13 @@ h1,h2,h3,p{margin:0;font-weight:400}
     setTimeout(() => { if (qs.dataset.open !== 'true') qs.hidden = true; }, 260);
   }
 
-  $$('.acard').forEach(card => {
-    const btn = $('.addon__btn', card);
-    if (btn) btn.addEventListener('click', () =>
-      openQuickShop({ mode:'add', card, data:{ ...btn.dataset }, size:null }));
+  /* Delegated on the column, not on one grid: both strips are rebuilt every time the bag
+     changes, so per-card listeners would be bound to elements that no longer exist — and
+     one listener covers however many strips the column ends up carrying. */
+  $('.cart__main').addEventListener('click', e => {
+    const btn = e.target.closest('.addon__btn');
+    if (!btn) return;
+    openQuickShop({ mode:'add', card: btn.closest('.acard'), data:{ ...btn.dataset }, size:null });
   });
 
   $('#qsColour').addEventListener('click', e => {
@@ -1801,7 +1887,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
       closeQuickShop();
       return;
     }
-    const bra = /^\d/.test(qsData.size);
+    const bra = qsKind === 'bra';
     Shop.add({
       sku: qsData.sku.replace(/-[^-]+$/, '') + '-' + qsSize.toLowerCase(),
       name: qsData.name, series: qsData.series, colour: qsData.colour, size: qsSize,
@@ -1866,6 +1952,8 @@ h1,h2,h3,p{margin:0;font-weight:400}
     $$('[data-acct-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.acctSet === acct)));
     const mini = Shop.miniMode();
     $$('[data-mini-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.miniSet === mini)));
+    const mset = Shop.miniSet();
+    $$('[data-miniset-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.minisetSet === mset)));
     const sale = document.body.dataset.sale || 'off';
     $$('[data-sale-set]').forEach(o => o.setAttribute('aria-pressed', String(o.dataset.saleSet === sale)));
     const st = stockMode();
@@ -1873,6 +1961,7 @@ h1,h2,h3,p{margin:0;font-weight:400}
   }
   $$('[data-member-set]').forEach(b => b.addEventListener('click', () => Shop.setMember(b.dataset.memberSet === 'true')));
   $$('[data-mini-set]').forEach(b => b.addEventListener('click', () => { Shop.setMiniMode(b.dataset.miniSet); syncDash(); }));
+  $$('[data-miniset-set]').forEach(b => b.addEventListener('click', () => { Shop.setMiniSet(b.dataset.minisetSet); syncDash(); }));
   /* Signing in here is what lets the stepped checkout skip straight to the overview: the
      address, the delivery method and the card are all on file (Amelie, 2026-09-11).
      A signed-in shopper is the MyTriumph persona, so membership follows it. */
@@ -1937,6 +2026,22 @@ h1,h2,h3,p{margin:0;font-weight:400}
     };
     place();
     mq.addEventListener('change', place);
+  })();
+
+  /* How much room the sticky bar needs — see the note on .wrap. It is observed rather
+     than measured once, because the bar changes height with the wallets, the shipping
+     row and the safe-area inset. */
+  (function barRoom(){
+    const bar = $('#mbar');
+    if (!bar) return;
+    const sync = () => {
+      const h = getComputedStyle(bar).display === 'none' ? 0 : bar.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--mbar-h', Math.round(h) + 'px');
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(sync).observe(bar);
+    window.addEventListener('resize', sync);
+    Shop.onChange(sync);
+    setTimeout(sync, 0);
   })();
 
   Shop.onChange(render);
