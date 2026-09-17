@@ -1150,7 +1150,7 @@ body.dash-open .dash { display: flex; }
 }
 </style>
 </head>
-<body data-view="products" data-filters="some" data-labels="short" data-images="new" data-price="a" data-model="on" data-minicart="last">
+<body data-view="products" data-filters="some" data-labels="short" data-images="new" data-price="a" data-model="on" data-minicart="last" data-miniset="off">
 
 <!-- HEADER -->
 <header>
@@ -1316,6 +1316,17 @@ body.dash-open .dash { display: flex; }
     <div class="dash__seg">
       <button data-k="minicart" data-val="last" data-on="true">Last added</button>
       <button data-k="minicart" data-val="all">Whole bag</button>
+    </div>
+  </div>
+  <!-- the mini cart's other setting: whether it offers matching products under the bag,
+       and in which of the two versions. Stored by lib/shop.js like the one above, so it
+       holds on the PDP and the bag page too (Amelie, 2026-09-17). -->
+  <div class="dash__group">
+    <div class="dash__label">Mini cart · suggestions</div>
+    <div class="dash__seg">
+      <button data-k="miniset" data-val="off" data-on="true">Off</button>
+      <button data-k="miniset" data-val="row">One row</button>
+      <button data-k="miniset" data-val="tiles">Three tiles</button>
     </div>
   </div>
   <div class="dash__group">
@@ -2517,6 +2528,7 @@ const CONTROLS = {
   price:    ['a', 'b'],   /* price facet: A = min/max + range, B = bands */
   model:    ['on', 'off'], /* driven from the sheet's own switch; here for deep links */
   minicart: ['last', 'all'], /* what the mini cart shows after an Add */
+  miniset:  ['off', 'row', 'tiles'], /* and whether it suggests what goes with it */
 };
 
 /* the URL mirrors the panel — options at their default drop out of the
@@ -2545,6 +2557,7 @@ function setOption(key, val) {
     });
   }
   if (key === 'minicart' && window.Shop) Shop.setMiniMode(val);
+  if (key === 'miniset' && window.Shop) Shop.setMiniSet(val);
   if (key === 'labels') applyLabels(val === 'long');
   if (key === 'view') applyView(val);
   if (key === 'model') {
@@ -2583,6 +2596,7 @@ const params = new URLSearchParams(location.search);
 /* the mini cart mode is remembered by lib/shop.js, not by this page, so the panel has to
    adopt what is stored — unless the URL says otherwise, which the loop below handles */
 if (!params.get('minicart') && window.Shop) setOption('minicart', Shop.miniMode());
+if (!params.get('miniset') && window.Shop) setOption('miniset', Shop.miniSet());
 Object.keys(CONTROLS).forEach(k => { if (params.get(k)) setOption(k, params.get(k)); });
 alignTiles();
 if (params.get('drawer')) setDrawer(true);
