@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Aura Spotlight – Padded Underwire Bra | Triumph</title>
 <link rel="stylesheet" href="./lib/shop.css" />
+<link rel="stylesheet" href="./lib/search.css?v=30" />
 <style>
 /* ============================================================
    FONTS (local — Alliance No.1 Light + Regular)
@@ -69,47 +70,122 @@ ul { margin: 0; padding: 0; list-style: none; }
 h1, h2, h3 { margin: 0; font-weight: 400; }
 
 /* ============================================================
-   HEADER (same as PLP prototype)
+   HEADER — the Design System component, 101:186, all three of
+   its builds. Ported from search.html 2026-09-23: the PLP was
+   carrying an approximation with its own hand-drawn icons.
+     · Inline   — from XL/1200: 78 tall, one row
+     · Stacked  — 992–1199: 124 tall, logo + utilities over the
+                  nav row, used only where the one row will not fit
+     · Compact  — below LG: 54 tall, bare glyphs, burger
+   Links keep the PLP's own category set; only the chrome changed.
    ============================================================ */
-header {
-  position: sticky; top: 0; z-index: 50;
-  background: var(--c-bg);
+header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
+/* STACKED — the two-row build, and now only 992–1199: from XL the row fits on
+   one line and folds into the Inline build, below LG the phone collapses it
+   (see the breakpoint rules at the foot of this block). */
+.nav{
+  max-width:2400px;margin:0 auto;
+  padding:36px 24px 0;
+  display:flex;flex-direction:column;gap:32px;
 }
-.nav {
-  max-width: 2200px; margin: 0 auto;
-  padding: 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+.nav__top{display:flex;align-items:center;gap:24px;height:22px}
+.logo{display:inline-flex;align-items:center;flex:none;height:22px}
+.logo__img{width:136px;height:17px;display:block}
+.nav__row{display:flex;align-items:flex-start;height:34px}
+.nav__links{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:24px}
+.nav__links a{
+  font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;
+  font-weight:400;white-space:nowrap;
 }
-.logo { display: inline-flex; align-items: center; flex: none; }
-.logo__img { width: 156px; height: 20px; display: block; }
-.nav__links { display: flex; gap: 24px; }
-.nav__links a {
-  font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
-  font-weight: 300;
-  padding-bottom: 2px;
-  transition: color .25s var(--ease-out);
+.nav__links a:hover{text-decoration:underline;text-underline-offset:4px}
+.nav__links .is-sale{color:var(--c-burgundy)}
+.nav__right{display:flex;align-items:center;gap:30px;height:22px;flex:none;margin-left:auto}
+/* the resting search control — search.js takes this over and grows it */
+.search{
+  display:flex;align-items:center;gap:8px;
+  width:160px;height:22px;padding:0 8px;
+  background:rgba(0,0,0,.05);cursor:pointer;
 }
-.nav__links a:hover { color: var(--c-ink-soft); } /* grey/medium — Figma 637-2373 hover state */
-.nav__right { display: flex; align-items: center; gap: 20px; }
-.search {
-  display: flex; align-items: center; gap: 4px;
-  height: 32px; padding: 0 16px 0 8px;
-  background: #F1F1F1;
+.search svg{width:16px;height:16px;fill:none;stroke:var(--c-ink);stroke-width:1.3;flex:none}
+.search input{
+  border:0;outline:0;background:transparent;width:100%;min-width:0;cursor:pointer;
+  font-family:inherit;font-weight:300;
+  font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--c-ink);
 }
-.search svg { width: 16px; height: 16px; fill: none; stroke: var(--c-ink); stroke-width: 1; flex: none; }
-.search input {
-  border: 0; outline: 0; background: transparent;
-  font-family: inherit; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
-  font-weight: 300;
-  width: 64px; color: var(--c-ink);
+.search input::placeholder{color:var(--c-ink);opacity:1}
+.nav__icons{display:flex;align-items:center;gap:30px}
+.icon{height:16px;width:auto;display:block;fill:none;stroke:var(--c-ink);stroke-width:1.3}
+.icon--search{width:16px}
+.icon--account{width:15px}
+.icon--heart{width:16px;height:14.66px}
+.icon--basket{width:16px}
+.nav__icons button{display:inline-flex;align-items:center}
+.nav__icons button[aria-label="Cart"]{gap:4px}
+.cart-count{font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+.nav__icons .burger{display:none}
+.burger svg{width:20px;height:8px;fill:none;stroke:var(--c-ink);stroke-width:1.3;display:block}
+
+/* INLINE — one row, logo 156x20, nav centred, utilities right.
+
+   FROM 1200, NOT 1400 (Amelie, 2026-09-23): the second row is for when there
+   is not enough space for the first, and the DS's XXL breakpoint was 280px
+   later than that. Measured natural widths of the one row — 24 of padding
+   either side, logo 156, 24 gap, the nav's links and their 24px gaps, 24 gap,
+   the utilities:
+
+     search.html   48 + 156 + 24 + 621 + 24 + 247 = 1120
+     plp / pdp     48 + 156 + 24 + 685 + 24 + 222 = 1159
+
+   So the row stops fitting somewhere around 1160, and the next stop up
+   Triumph's own ramp is XL/1200 — which leaves 40–80px of slack and hands the
+   stacked build the 992–1199 band it is actually needed in. (German labels run
+   longer than these English ones; if the live set overflows at 1200 the switch
+   moves to 1400, it does not get a number invented for it.)
+
+   THREE COLUMNS, THE OUTER TWO EQUAL. The DS component gives Nav flex:1 0 0
+   between a 156 logo slot and the utilities, so the links centre in the space
+   those two happen to leave — which is 45px left of the row's real centre at
+   1440, and constant at every width (half the 91px by which the utilities
+   outweigh the logo). Invisible until something else centred sits under them;
+   the search sheet is centred, and it showed (Amelie, 2026-09-23). A 1fr/auto/
+   1fr grid makes the two ends reserve the same width, so the middle column IS
+   the middle of the row. justify-self keeps the logo and the utilities their
+   own size inside those tracks rather than stretching them. */
+@media (min-width:1200px){
+  .nav{
+    display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    align-items:center;gap:24px;padding:36px 24px 20px;
+  }
+  .nav__top{display:contents}
+  /* grid-area, not order: an item that goes display:none is removed from the
+     grid, and auto-placement would then slide the utilities into the middle.
+     THE ROW IS PINNED TOO. The logo and the utilities come from .nav__top via
+     display:contents and so are placed first; the nav row follows them in
+     source order, and sparse auto-placement will not send the cursor backwards
+     to column 2 — it drops to row 2 instead, which is how the one-row header
+     grew a second row it was never meant to have. */
+  .logo{grid-area:1 / 1;justify-self:start}
+  .logo__img{width:156px;height:20px}
+  .nav__row{grid-area:1 / 2;justify-self:center;height:16px}
+  .nav__links{flex:0 0 auto;justify-content:center}
+  .nav__right{grid-area:1 / 3;justify-self:end;margin-left:0}
 }
-.search input::placeholder { color: var(--c-ink); opacity: 1; }
-.nav__icons { display: flex; align-items: center; gap: 20px; }
-.nav__icons .icon { width: 18px; height: 18px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; }
-.nav__icons button[aria-label="Cart"] { display: inline-flex; align-items: flex-start; gap: 2px; }
-.cart-count { font-size: 12px; font-weight: 300; letter-spacing: .04em; line-height: 1; }
-.burger { display: none; }
-.burger svg { width: 20px; height: 8px; fill: none; stroke: var(--c-ink); stroke-width: 1.2; display: block; }
+
+/* COMPACT — phone (869:51), everything below LG: 54 tall, padding 16/12,
+   gap 16; logo 100x13; utilities gap 24 — the search is a bare glyph, there is
+   no wishlist, and the menu closes the row. */
+@media (max-width:991.98px){
+  .nav{flex-direction:row;align-items:center;gap:16px;padding:16px 12px}
+  .nav__top{display:contents}
+  .logo__img{width:100px;height:13px}
+  .nav__row{display:none}
+  .nav__right{gap:24px;margin-left:auto;height:16px}
+  .nav__icons{gap:24px}
+  .search{width:auto;height:16px;padding:0;gap:0;background:none}
+  .search input{display:none}
+  .nav__icons button[aria-label="Wishlist"]{display:none}
+  .nav__icons .burger{display:inline-flex}
+}
 
 /* ============================================================
    SCROLL REVEAL — same blurred rise as the PLP
@@ -617,18 +693,7 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
    everything under 1200px stacks like the @375/@600/@900 frames
    ============================================================ */
 @media (max-width: 1199.98px) {
-  /* header — same 50px bar as the PLP */
-  .nav { padding: 12px 16px; gap: 16px; }
-  .logo__img { width: 100px; height: 13px; }
-  .nav__links { display: none; }
-  .nav__right { gap: 16px; }
-  .nav__icons { gap: 16px; }
-  .nav__icons .icon { width: 16px; height: 16px; }
-  .nav__icons button[aria-label="Wishlist"] { display: none; }
-  .burger { display: inline-flex; }
-  .search { height: 26px; padding: 0 12px 0 8px; }
-  .search svg { width: 14px; height: 14px; }
-  .search input { width: 60px; }
+  /* the header is the DS component and owns its breakpoints — see HEADER above */
 
   /* main stacks; gallery becomes a swipe carousel */
   .main { display: block; }
@@ -778,9 +843,44 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
 <!-- HEADER -->
 <header>
   <nav class="nav">
+   <div class="nav__top">
     <a class="logo" href="./plp.html" aria-label="Triumph">
       <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="156" height="20" />
     </a>
+    <div class="nav__right">
+      <!-- the resting search control: search.js takes this over. The build is
+           TriumphSearch.control('label') — glyph + the word, no ground. -->
+      <label class="search" aria-label="Search">
+        <!-- Icon / Search 81:13 -->
+        <svg class="icon icon--search" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.83 9.83L15.35 15.35M11.4 6.025C11.4 8.99361 8.99361 11.4 6.025 11.4C3.05639 11.4 0.65 8.99361 0.65 6.025C0.65 3.05639 3.05639 0.65 6.025 0.65C8.99361 0.65 11.4 3.05639 11.4 6.025Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="search" placeholder="Search" />
+      </label>
+      <div class="nav__icons">
+        <!-- Icon / Account 98:9 — the dev team's .svgIcon__user, 15x16 -->
+        <button aria-label="Account">
+          <svg class="icon icon--account" viewBox="0 0 15 16" aria-hidden="true">
+            <path d="M7.2998 6.2C8.79097 6.2 9.9998 4.99117 9.9998 3.5C9.9998 2.00883 8.79097 0.8 7.2998 0.8C5.80863 0.8 4.5998 2.00883 4.5998 3.5C4.5998 4.99117 5.80863 6.2 7.2998 6.2Z"/>
+            <path d="M13.7998 16C13.7998 12.134 10.8897 9 7.2998 9C3.70995 9 0.799805 12.134 0.799805 16"/>
+          </svg>
+        </button>
+        <!-- Icon / Heart 80:8, Outline — .svgIcon__heart scaled into the 16 box -->
+        <button aria-label="Wishlist">
+          <svg class="icon icon--heart" viewBox="0 0 16.0715 14.6616" aria-hidden="true">
+            <path d="M7.97584 3.2867L9.41404 1.78858C10.1331 1.06948 10.9721 0.65 11.9309 0.65C12.8298 0.65 13.7287 1.06948 14.3878 1.72865C15.7661 3.16685 15.7661 5.50393 14.3878 7.00206C13.3691 8.02079 8.03577 13.7137 8.03577 13.7137C8.03577 13.7137 2.64251 8.02079 1.68371 7.00206C0.305431 5.56386 0.305431 3.22678 1.68371 1.72865C2.28296 1.06948 3.18184 0.65 4.08071 0.65C4.97959 0.65 5.87846 1.06948 6.53764 1.72865L7.97584 3.2867Z"/>
+          </svg>
+        </button>
+        <!-- Icon / Basket 145:519, Default — .svgIcon__shoppingBag, with its count -->
+        <button aria-label="Cart" id="cartBtn">
+          <svg class="icon icon--basket" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4.4 9.6V2.95C4.4 1.7 5 0.65 8 0.65C11 0.65 11.6 1.7 11.6 2.95V9.6M0.65 5.45H15.35V15.35H0.65V5.45Z"/>
+          </svg>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+        <button class="burger" aria-label="Menu"><svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg></button>
+      </div>
+    </div>
+   </div>
+   <div class="nav__row">
     <ul class="nav__links">
       <li><a href="#">Special Deals</a></li>
       <li><a href="./plp.html">Bras</a></li>
@@ -790,27 +890,7 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
       <li><a href="#">Sleep &amp; Lounge</a></li>
       <li><a href="#">Swimwear</a></li>
     </ul>
-    <div class="nav__right">
-      <label class="search" aria-label="Search">
-        <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
-        <input type="search" placeholder="Suche" />
-      </label>
-      <div class="nav__icons">
-        <button aria-label="Account">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-        </button>
-        <button aria-label="Wishlist">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M15.8408 4.44336C17.1912 4.44336 18.2899 4.87105 19.1729 5.71387C20.0544 6.55568 20.4941 7.59381 20.4941 8.86328C20.4941 9.46621 20.393 10.0523 20.1904 10.624C19.992 11.1839 19.6299 11.8164 19.085 12.5234C18.5395 13.2309 17.7918 14.0442 16.835 14.9639C15.8763 15.8852 14.6584 16.9818 13.1787 18.2539H13.1777L11.9814 19.2832L10.7861 18.2539H10.7852C9.31358 16.9897 8.10194 15.8988 7.14746 14.9814C6.19533 14.0663 5.45194 13.254 4.91113 12.5439C4.36932 11.8323 4.00572 11.1954 3.80273 10.6328C3.59698 10.0626 3.49414 9.47361 3.49414 8.86328C3.49415 7.5931 3.93146 6.55448 4.80859 5.71289C5.68701 4.87025 6.78027 4.44336 8.12305 4.44336C8.79466 4.4434 9.42974 4.56649 10.0322 4.81152C10.6343 5.05623 11.1657 5.40828 11.6289 5.87012L11.9814 6.22168L12.335 5.87012C12.7984 5.40827 13.3297 5.05622 13.9316 4.81152C14.5343 4.56649 15.1694 4.44339 15.8408 4.44336Z" stroke-linejoin="round"/></svg>
-        </button>
-        <button aria-label="Cart" id="cartBtn">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l1 12H5L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-          <span class="cart-count" id="cartCount" data-cart-count>0</span>
-        </button>
-        <button class="burger" aria-label="Menu">
-          <svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg>
-        </button>
-      </div>
-    </div>
+   </div>
   </nav>
 </header>
 
@@ -1145,6 +1225,8 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
 </div>
 
 <script src="./lib/shop.js"></script>
+<!-- the search overlay: the Apple arrangement, opened from the header's control -->
+<script src="./lib/search.js?v=30" defer></script>
 <script>
 /* ============================================================
    DATA — You might like this (Figma rows 727:2022 / 2099 / 2176)
