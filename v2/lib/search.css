@@ -1,0 +1,785 @@
+/* ============================================================================
+   Triumph prototype — search overlay (Nike pattern, Triumph design system)
+   ----------------------------------------------------------------------------
+   Measured off nike.com/de (WebKit, 1440 + 390, 2026-09-22):
+     · the sheet REPLACES the header row — logo left, one wide field centred,
+       "Abbrechen" right. Nav and utilities are gone, not dimmed.
+     · there is NO scrim. The panel is white, sits in the flow under the header
+       and PUSHES the page down; its height animates, so the page below slides.
+     · no query  → "Beliebte Suchbegriffe" + a wrap of term pills (36 tall).
+     · typing    → a narrow suggestion column left (x=48, w≈222) and a five-up
+       product row right (tile 208 wide, image 208×263, title/price under it).
+     · mobile    → full-screen takeover: field + Abbrechen, pills below, no logo.
+
+   Everything visual is Triumph's: square corners (the DS says radius/none is the
+   norm), Alliance No.1, the DS Text Field "Outlined + Fill" box (surface/muted
+   container, 1px border that thickens to 2px on focus), uppercase Label/S for
+   system headings and sentence-case Body/M for anything a person typed.
+
+   Self-contained on purpose — it is injected into pages that carry their own
+   token blocks, so every value it needs is declared locally on .ts.
+   ============================================================================ */
+.ts {
+  --ts-ink:        #000;
+  --ts-ink-soft:   #747474;          /* text/secondary, the AA-safe grey the PLP uses */
+  --ts-bg:         #fff;             /* surface/raised */
+  --ts-muted:      #F1F1F1;          /* surface/muted */
+  --ts-offwhite:   #F8F3F3;
+  --ts-edge:       rgba(0,0,0,.2);   /* border/medium contrast */
+  --ts-hair:       rgba(0,0,0,.08);  /* border/low contrast, one step up so it reads */
+  --ts-scrim:      rgba(0,0,0,.38);  /* the Scrim option — Triumph's own flyout */
+  --ts-scrim-soft: rgba(0,0,0,.22);  /* the default: the page steps back behind it */
+  --ts-burgundy:   #5E2039;
+  --ts-sales:      #C1003F;          /* surface/sales — the Badge/Sale ground */
+
+  --ts-pad:        24px;             /* matches the header's own side padding */
+  --ts-field-h:    52px;             /* DS Text Field, one step down from 56 */
+  --ts-field-max:  460px;            /* it sits over the utilities, not the nav;
+                                        the wider the screen the wider it runs —
+                                        see the min-width rules at the foot */
+  --ts-field-bg:   #F7F7F7;
+  --ts-field-edge: rgba(0,0,0,.12);
+  --ts-field-edge-on: rgba(0,0,0,.42);
+  /* JS keeps this equal to the field's width so the column of words below it
+     lines up with its left and right edges */
+  --ts-rail:       460px;
+
+  /* Motion. One gesture: the field grows, the sheet drops, the contents arrive.
+     One curve for all of it — an expo-out, which leaves fast and settles slowly,
+     so the field never appears to stop and start. The open is generous; the
+     close is a third quicker, because leaving should not be dwelt on. */
+  --ts-ease:       cubic-bezier(.16,1,.3,1);
+  --ts-t-morph:    460ms;            /* the field growing out of its pill */
+  --ts-t-panel:    420ms;            /* the sheet's height */
+  --ts-t-fade:     220ms;            /* nav out, content in */
+  --ts-t-close:    300ms;
+
+  font-family: "Alliance No1", "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ts-ink);
+  /* the ramp's tracking: +4% on everything except prices (0) and Display (2) */
+  letter-spacing: .04em;
+  display: block;
+}
+
+/* ---------------------------------------------------------------- the bar ---
+   Laid over the host page's own header row rather than replacing it: the page
+   keeps its logo (Nike keeps the swoosh), we fade its nav and utilities and
+   hang the field and CANCEL in the same 80px row. */
+.ts__bar {
+  /* JS writes the height — it is the host header's own row, nothing more */
+  position: absolute; left: 0; right: 0; top: 0; height: 80px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--ts-t-fade) var(--ts-ease);
+}
+.ts[data-open="true"] .ts__bar { opacity: 1; pointer-events: auto; }
+
+/* The field is absolutely placed and MORPHS: JS writes the resting pill's box
+   on open, then the target box one frame later, so left/top/width/height carry
+   it across. Transforms would distort the 1px border, so it travels on real
+   geometry instead. */
+.ts__field {
+  position: absolute;
+  display: flex; align-items: center; gap: 14px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  background: var(--ts-field-bg);
+  border: 1px solid var(--ts-field-edge);
+  transition:
+    left var(--ts-t-morph) var(--ts-ease),
+    top var(--ts-t-morph) var(--ts-ease),
+    width var(--ts-t-morph) var(--ts-ease),
+    height var(--ts-t-morph) var(--ts-ease),
+    border-color 160ms linear;
+  will-change: left, width;
+}
+/* Refining a query is not an opening: while the sheet is already up and only
+   its contents change, the height settles in 240ms so typing stays responsive. */
+.ts--quick .ts__panel { transition-duration: 240ms; }
+/* on the way back it is 300ms, not 460 — the same curve read the other way
+   would otherwise feel like the sheet was reluctant to go */
+.ts[data-open="false"] .ts__field,
+.ts[data-open="false"] .ts__panel { transition-duration: var(--ts-t-close); }
+/* The DS Text Field thickens its border 1px → 2px on focus. At this size, in
+   the middle of the chrome, that reads as a hard box, so the focus state is a
+   darker hairline instead — the weight stays put and nothing reflows. */
+.ts__field:focus-within { border-color: var(--ts-field-edge-on); }
+
+.ts__glyph { width: 17px; height: 17px; flex: none; fill: none; stroke: var(--ts-ink); stroke-width: 1.3; }
+
+.ts__input {
+  flex: 1 1 auto; min-width: 0;
+  border: 0; outline: 0; background: transparent;
+  font-family: inherit; font-weight: 300;              /* Body/M */
+  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  color: var(--ts-ink);
+}
+/* A query is what the shopper typed, so it is never uppercased — the DS rule
+   from the first search round. The placeholder follows the value's case. */
+.ts__input::placeholder { color: var(--ts-ink-soft); opacity: 1; }
+.ts__input::-webkit-search-cancel-button { display: none; }
+
+/* One control, two jobs: clear the query, and — once the field is empty —
+   close the search. It only exists while the field does. */
+.ts__clear {
+  width: 26px; height: 26px; flex: none; display: none;
+  place-items: center; background: none; border: 0; padding: 0; cursor: pointer; color: inherit;
+  opacity: 0; transition: opacity var(--ts-t-fade) var(--ts-ease) 80ms;
+}
+.ts[data-open="true"] .ts__clear { display: grid; opacity: 1; }
+.ts__clear svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+.ts__clear:hover { opacity: .5; }
+.ts__clear:focus-visible { outline: 1px solid var(--ts-ink); outline-offset: 3px; }
+
+/* Mobile only. On the desktop sheet the page behind is the way out, and the ×
+   inside the field is the other one; the full-screen takeover has neither, so
+   it states it. Label/Control L. */
+.ts__cancel { display: none; }
+@media (max-width: 991.98px) {
+  .ts[data-open="true"] .ts__cancel {
+    display: inline-flex; align-items: center; flex: none;
+    background: none; border: 0; padding: 4px 0; cursor: pointer; color: inherit;
+    font-family: inherit; font-weight: 400;
+    font-size: 14px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .ts__cancel:active { opacity: .55; }
+}
+
+/* ------------------------------------------------------------- the sheet ---
+   Height is written by JS (0 → measured → auto) because a sheet whose content
+   changes under the cursor cannot animate to `auto`.
+
+   Two ways of sitting on the page, and the default is the first:
+   · overlay — out of the flow, hung under the header, floating over the page
+     on a soft elevation. Nothing behind it moves.
+   · push    — Nike's: in the flow, so growing it slides the page down. */
+.ts__panel {
+  position: relative; z-index: 2;
+  height: 0; overflow: hidden;
+  background: var(--ts-bg);
+  transition: height var(--ts-t-panel) var(--ts-ease);
+}
+.ts[data-open="true"] .ts__panel { border-bottom: 1px solid var(--ts-hair); }
+.ts[data-mode="overlay"] .ts__panel {
+  position: absolute; left: 0; right: 0;   /* JS writes `top` = the row's height */
+  box-shadow: 0 18px 34px rgba(0,0,0,.07);
+}
+
+.ts__inner {
+  max-width: 2400px; margin: 0 auto;
+  /* 36 above the content on every state, so the sheet opens to the same
+     rhythm whether it is showing four tiles or one line of apology */
+  padding: 36px var(--ts-pad) 40px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+/* Everything inside rises 8px and fades, staggered — the sheet arrives before
+   its contents do, which is what makes Nike's open read as one move and not a
+   jump cut. --i is set per block by JS, .is-in one frame after the render. */
+.ts__block {
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 260ms var(--ts-ease), transform 260ms var(--ts-ease);
+  transition-delay: calc(70ms + var(--i, 0) * 40ms);
+}
+.ts__block.is-in { opacity: 1; transform: none; }
+/* within one state the content is only being refined as the query grows — it
+   crossfades in place instead of restaging */
+.ts--nostagger .ts__block { transition-duration: 140ms; transition-delay: 0ms; }
+
+/* One heading style, and one gap under it: 14px to the top of whatever comes
+   next. A row of terms carries 8px of its own padding, so its heading gives up
+   that much — measured to the same 14 either way. */
+.ts__h {                                              /* Label/S */
+  display: block; margin: 0 0 14px;
+  font-weight: 300; font-size: 10px; line-height: 12px;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ts-ink-soft);
+}
+
+/* --------------------------------------------------------------- columns ---
+   The sheet is read right to left: the words hang under the field they were
+   typed into, and the products take everything left of them. The rail is
+   exactly as wide as the field, so its two edges continue the field's. */
+.ts__cols {
+  display: grid; grid-template-columns: minmax(0, 1fr) var(--ts-rail); gap: 40px;
+  align-items: start;
+}
+/* The heading's cap sits on the same line as the top of the photographs — the
+   row now has 36 above the field, so the rail needs no offset of its own. */
+.ts__rail { display: flex; flex-direction: column; gap: 28px; padding-top: 0; }
+.ts__rail .ts__h { margin-bottom: 6px; }
+/* The last searches sit BESIDE the other list rather than under it, in both
+   states: two short lists read faster side by side, and the sheet stays
+   shallow. */
+.ts__rail--split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+
+.ts__sugs { display: flex; flex-direction: column; }
+.ts__sug {
+  display: block; width: 100%; text-align: left;
+  padding: 8px 8px 8px 0;
+  background: none; border: 0; cursor: pointer;
+  font-family: inherit; font-weight: 300;              /* Body/M */
+  font-size: 14px; line-height: 20px; letter-spacing: .04em;
+  color: var(--ts-ink);
+}
+/* The two-tone completion. Which half carries the weight is still the open
+   question from the Figma round: Nike weights what you typed, the A/B/C round
+   weighted what it is offering you. data-weight on .ts switches it, so both can
+   be seen on the same query. */
+.ts__sug b { font-weight: 400; }
+.ts__sug i { font-style: normal; color: var(--ts-ink-soft); }
+.ts[data-weight="completion"] .ts__sug b { font-weight: 300; color: var(--ts-ink-soft); }
+.ts[data-weight="completion"] .ts__sug i { font-weight: 400; color: var(--ts-ink); }
+.ts__sug:hover,
+.ts__sug[aria-selected="true"] { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ----------------------------------------------------------------- tiles ---
+   The DS Product Card, Context=Recommendation, Breakpoint=Desktop (93:217 →
+   260:1312/1344/1379). Photo 1:1.316 on surface/page; badge slot bottom-left
+   at a 12px inset; Info padding 16/12/0/12 with a 6px gap; title Title/Card
+   12/20 uppercase, +4%, ONE truncated line; price Price/M 12/14.
+   Recommendation carries NO colour variations — no "+ n colors", no colour
+   panel — which is exactly what the search rail wants. */
+/* Four tiles, never more, capped at 840 so the row reads as a suggestion strip
+   rather than a results page. Where four will not fit at a legible size the row
+   SCROLLS SIDEWAYS instead of dropping tiles — the fourth suggestion is still
+   the fourth suggestion on a narrow screen. 164 is the floor: below that the
+   title and the two prices stop fitting on the mobile card.
+   The DS Recommendation Carousel behaves the same way: it clips, it does not
+   wrap. */
+.ts__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(164px, 220px);   /* never wider than a DS card reads */
+  gap: 20px; max-width: 840px;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;                 /* the rail is swiped, not scrubbed */
+  padding-bottom: 2px;                   /* room for the focus ring on a tile */
+}
+.ts__grid::-webkit-scrollbar { display: none; }
+.ts__tile { scroll-snap-align: start; }
+.ts__tile { display: block; color: inherit; }
+.ts__tile-ph {
+  display: block; position: relative;
+  aspect-ratio: 320 / 421; background: var(--ts-offwhite); overflow: hidden;
+}
+.ts__tile-ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 600ms var(--ts-ease); }
+.ts__tile:hover .ts__tile-ph img { transform: scale(1.03); }
+
+/* Badge, Type=Card: 18 tall on New (white, frosted), 16 on Sale (surface/sales,
+   on-dark). The top padding is 1px more than the bottom — uppercase ink sits
+   high in its line box. */
+.ts__badge {
+  position: absolute; left: 12px; bottom: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 18px; padding: 1px 4px 0;
+  background: var(--ts-bg); backdrop-filter: blur(10px); color: var(--ts-ink);
+  font-weight: 400; font-size: 11px; line-height: 14px;  /* Title/6 */
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.ts__badge--sale { height: 16px; padding: 2px 4px 0; background: var(--ts-sales); color: #fff; }
+
+.ts__tile-info { display: flex; flex-direction: column; gap: 6px; padding: 16px 12px 0; }
+.ts__tile-name {
+  display: block; width: 100%; font-weight: 400;
+  font-size: 12px; line-height: 20px; letter-spacing: .04em; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ts__tile-pr {                                        /* Price/M — tracking 0 */
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px;
+  font-weight: 400; font-size: 12px; line-height: 14px; letter-spacing: 0;
+}
+/* Sale stacks: the two prices on one line, the Omnibus note under them. Never a
+   strike beside a member price — two plain prices, the member one in burgundy
+   with the crown (Amelie's rule, and the component's). */
+.ts__tile-prices { display: inline-flex; align-items: flex-start; gap: 4px; }
+.ts__tile-pr .was { color: var(--ts-ink-soft); text-decoration: line-through; }
+.ts__tile-pr .mem { display: inline-flex; align-items: center; gap: 4px; color: var(--ts-burgundy); }
+.ts__tile-pr .mem svg { width: 11px; height: 10px; fill: currentColor; }
+.ts__tile-low {                                       /* Price/Note */
+  display: block; font-weight: 300; font-size: 12px; line-height: 14px; letter-spacing: 0;
+  color: var(--ts-ink-soft);
+}
+
+/* ------------------------------------------------------------- no results ---*/
+.ts__none-h {                                         /* Body/L */
+  margin: 0 0 8px; font-weight: 400;
+  font-size: 16px; line-height: 20px; letter-spacing: .04em;
+}
+.ts__none-p {                                         /* Body/M */
+  margin: 0 0 20px; font-weight: 300;
+  font-size: 14px; line-height: 20px; letter-spacing: .04em; color: var(--ts-ink-soft);
+}
+
+/* --------------------------------------------------------------- the scrim ---
+   An overlay dims what it sits over — lightly, 10%, just enough for the page to
+   step back behind the sheet. The Scrim option takes it to Triumph's own flyout
+   weight of 38%; Nike's push leaves the page alone entirely, because there the
+   page is moving and does not need to be told it is behind.
+   The top edge is written by JS to the sheet's lower edge and travels on the
+   same curve, so the dimming starts where the sheet ends rather than washing
+   over the search row itself. */
+.ts__scrim {
+  position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+  background: var(--ts-scrim-soft);
+  opacity: 0; pointer-events: none;
+  transition: opacity 280ms var(--ts-ease), top var(--ts-t-panel) var(--ts-ease);
+  z-index: 1;
+}
+.ts[data-open="true"] .ts__scrim { opacity: 1; pointer-events: auto; }
+.ts[data-scrim="true"] .ts__scrim { background: var(--ts-scrim); }
+.ts[data-mode="push"]:not([data-scrim="true"]) .ts__scrim { opacity: 0; pointer-events: none; }
+
+/* ------------------------------------------------ the host page while open ---
+   The nav and the utilities do not dim, they leave: Nike's row holds the logo,
+   the field and Abbrechen and nothing else. */
+.ts-host .nav__links,
+.ts-host .nav__right { transition: opacity var(--ts-t-fade) var(--ts-ease); }
+/* An open search gives the field the same 36 above it that the logo has — so
+   the row grows 80 → 124 while it is open, which is the live site's own desktop
+   header height. The padding travels on the same curve as the field. */
+.ts-host .nav { transition: padding var(--ts-t-morph) var(--ts-ease); }
+.ts-searching .nav__links,
+.ts-searching .nav__right { opacity: 0; pointer-events: none; }
+/* the beat after a close: the pointer is still sitting on the basket icon that
+   the field was covering, and that icon opens the mini cart on hover */
+.ts-justclosed .nav__right { pointer-events: none; }
+
+/* Only the pushing version grows the row: an overlay must leave the page
+   exactly where it is, so there the taller row is drawn over the page by the
+   sheet itself rather than added to the flow. */
+@media (min-width: 768px) {
+  .ts-searching.ts-push .nav { padding-top: var(--ts-row-pad, 36px); padding-bottom: var(--ts-row-pad, 36px); }
+}
+.ts-searching { overflow-x: clip; }
+
+/* ============================================================================
+   BREAKPOINTS — Triumph's own ramp, not invented ones:
+     XS 375 · SM 576 · MD 768 · LG 992 · XL 1200 · XXL 1400
+   The live site switches to its desktop build at LG/992 (not 1200), which is
+   why the logo, the two-column sheet and the morph all arrive together there.
+   ============================================================================ */
+
+/* ---------------------------------------------------------- XL and below ---*/
+@media (max-width: 1199.98px) {
+  .ts__cols { gap: 32px; }
+}
+
+/* --------------------------------------------- below LG: the phone sheet ---
+   Full-screen takeover, the way every phone search that works behaves: the
+   field replaces the whole chrome and the sheet is the screen. No morph — at
+   this size the pill and the field are nearly the same box, so it fades. */
+@media (max-width: 991.98px) {
+  .ts { --ts-pad: 16px; }
+  .ts[data-open="true"] {
+    position: fixed; inset: 0; z-index: 9500;
+    background: var(--ts-bg);
+    display: flex; flex-direction: column;
+  }
+  .ts[data-open="true"] .ts__bar {
+    position: relative; left: auto; right: auto; top: auto; flex: none;
+    /* the field needs air above it here too — 20 over the status bar / chrome,
+       16 under it, rather than a field jammed against the top edge */
+    height: auto !important; padding: 20px var(--ts-pad) 12px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ts[data-open="true"] .ts__field {
+    position: relative;
+    left: auto !important; top: auto !important; width: auto !important;
+    height: var(--ts-field-h) !important;
+    flex: 1 1 auto; min-width: 0;
+  }
+  .ts[data-open="true"] .ts__panel {
+    position: relative !important; top: auto !important;
+    flex: 1 1 auto; height: auto !important; overflow: hidden;
+    border-bottom: 0; box-shadow: none;
+  }
+  /* the first heading sits close under the field — 12 below the bar plus 8
+     here, against the 36 the desktop sheet takes */
+  .ts__inner { max-height: none; height: 100%; padding: 8px var(--ts-pad) 32px; }
+  /* Product Card, Breakpoint=Mobile: Info padding 10/4/0/4, gap 4,
+     title Title/6 (11/14), price Price/S (10/12), badge inset 8 */
+  .ts__tile-info { padding: 10px 4px 0; gap: 4px; }
+  .ts__tile-name { font-size: 11px; line-height: 14px; }   /* Title/6 */
+  .ts__tile-pr { font-size: 10px; line-height: 12px; gap: 6px; }  /* Price/S */
+  .ts__tile-low { font-size: 10px; line-height: 12px; }
+  .ts__badge { left: 8px; bottom: 8px; height: 16px; font-size: 10px; line-height: 12px; }
+  /* one column, and the words come first: on a phone the suggestions are the
+     fastest way out of the keyboard */
+  .ts__cols { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .ts__rail { order: -1; gap: 24px; padding-top: 0; }
+  /* Label/S is a 10px style — right against a desktop sheet, too quiet on a
+     phone where the headings carry the whole structure. One step up the same
+     column of the ramp: Label/M, Light 12/16 uppercase, +4%. */
+  .ts__h { font-size: 12px; line-height: 16px; margin-bottom: 12px; }
+  .ts__rail--split { display: flex; flex-direction: column; }
+  /* Body/M here too, not Body/L: the ramp's only 16 is Regular, and setting a
+     whole list in Regular both reads as a heavier face than the desktop's and
+     leaves the two-tone completions nothing to weight against. The rows keep
+     Light 14/20 and gain their height from the padding instead. */
+  .ts__sug { padding: 12px 8px 12px 0; }
+  .ts__grid { gap: 12px; grid-auto-columns: minmax(150px, 180px); }
+  .ts__scrim { display: none; }
+}
+
+/* ------------------------------------------- LG · XL · XXL: the field ------
+   One step per breakpoint, so the field grows on the ramp the rest of the
+   design system moves on rather than on numbers picked for this component. */
+@media (min-width: 992px)  { .ts { --ts-field-max: 420px; } }
+@media (min-width: 1200px) { .ts { --ts-field-max: 460px; } }
+@media (min-width: 1400px) { .ts { --ts-field-max: 560px; } }
+
+/* Reduced motion: the states are still the point, the travel is not. */
+@media (prefers-reduced-motion: reduce) {
+  .ts, .ts * { transition-duration: 1ms !important; transition-delay: 0ms !important; }
+}
+
+
+/* ============================================================================
+   THE RESTING CONTROL — six builds of the search in the header
+   ----------------------------------------------------------------------------
+   The overlay is one thing; the control that opens it is another, and the
+   header can carry it six ways. Each is a class on the control itself
+   (.search--x) so a specimen board can set all six side by side, and
+   TriumphSearch.control('x') moves the live one in the nav.
+
+     fill     the grey box the prototype has carried so far — surface/muted,
+              glyph + SEARCH. It reads as a field at rest.
+     label    the glyph and the word SEARCH, nothing under them. The lightest
+              of the six, and the one that matches the rest of the utilities:
+              account, wishlist and basket are all unboxed too.
+     outline  a 1px border/medium-contrast box, no fill — the DS Text Field's
+              Outlined build with the fill taken off. A field drawn, not filled.
+     rule     no box at all: glyph and placeholder sitting on a single hairline.
+              A field reduced to the one line that says "type here".
+     glyph    the magnifier alone. It is what the compact build already does,
+              so the header stops changing shape at 992.
+     wide     the field takes the row's free width, glyph closing it on the
+              right. The search stops being a utility and becomes the header.
+
+   Specificity: every rule is written .search.search--x, because the host pages
+   declare their own .search AFTER this stylesheet and would otherwise win.
+   Below LG the header is the compact build and the control is already a bare
+   glyph, so the whole block is desktop-only.
+   ============================================================================ */
+@media (min-width: 992px) {
+  .search.search--fill,
+  .search.search--label,
+  .search.search--outline,
+  .search.search--rule,
+  .search.search--glyph,
+  .search.search--wide {
+    display: flex; align-items: center; box-sizing: border-box;
+    background: none; border: 0; border-radius: 0;
+    width: auto; height: 22px; padding: 0; gap: 8px;
+    cursor: pointer;
+    transition: opacity 200ms ease, border-color 200ms ease, background 200ms ease;
+  }
+  /* the placeholder, whether it is a real input in the nav or a span in the
+     specimen board — Label/M, uppercase, +4%, the same as the nav links */
+  .search.search--fill    :is(input, .search__ph),
+  .search.search--label   :is(input, .search__ph),
+  .search.search--outline :is(input, .search__ph),
+  .search.search--rule    :is(input, .search__ph),
+  .search.search--wide    :is(input, .search__ph) {
+    display: block; border: 0; outline: 0; background: transparent; padding: 0;
+    font-family: inherit; font-weight: 300; color: var(--c-ink, #000);
+    font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
+    white-space: nowrap; cursor: pointer; min-width: 0;
+  }
+  .search.search--fill svg,
+  .search.search--label svg,
+  .search.search--outline svg,
+  .search.search--rule svg,
+  .search.search--glyph svg,
+  .search.search--wide svg {
+    width: 16px; height: 16px; flex: none;
+    fill: none; stroke: var(--c-ink, #000); stroke-width: 1.3;   /* icon/stroke-weight */
+  }
+
+  /* --- fill: surface/muted, the box it has always been ------------------- */
+  .search.search--fill { height: 28px; padding: 0 12px; background: var(--c-muted, #F1F1F1); }
+  .search.search--fill :is(input, .search__ph) { width: 76px; }
+  .search.search--fill:hover { background: #E8E8E8; }
+
+  /* --- label: glyph + SEARCH, no ground ---------------------------------- */
+  .search.search--label { gap: 6px; }
+  /* 76, not the 54 the string measures: an <input> clips its placeholder a
+     few px short of the text's own advance, and at 62 the final H lost its
+     right stem. Measured on the rendered pixels, not on the metrics. */
+  .search.search--label :is(input, .search__ph) { width: 76px; }
+  .search.search--label:hover { opacity: .55; }
+
+  /* --- outline: the box drawn, not filled -------------------------------- */
+  .search.search--outline {
+    height: 28px; padding: 0 12px; gap: 10px;
+    width: 176px;
+    border: 1px solid rgba(0,0,0,.2);                 /* border/medium contrast */
+  }
+  .search.search--outline :is(input, .search__ph) { flex: 1 1 auto; width: auto; }
+  .search.search--outline:hover { border-color: #000; }
+
+  /* --- rule: one hairline, nothing else ---------------------------------- */
+  .search.search--rule {
+    height: 24px; width: 160px; padding: 0 0 6px; gap: 10px;
+    align-items: flex-end;
+    border-bottom: 1px solid rgba(0,0,0,.25);
+  }
+  .search.search--rule :is(input, .search__ph) { flex: 1 1 auto; width: auto; }
+  .search.search--rule:hover { border-bottom-color: #000; }
+
+  /* --- glyph: the magnifier alone ---------------------------------------- */
+  .search.search--glyph { width: 16px; height: 16px; gap: 0; }
+  .search.search--glyph :is(input, .search__ph) { display: none; }
+  .search.search--glyph:hover { opacity: .55; }
+
+  /* --- wide: the field takes the row -------------------------------------
+     The glyph closes the field on the right, where a rule wants its weight,
+     and the placeholder is the only one of the six set in sentence case —
+     it is a question, not a label. */
+  .search.search--wide {
+    flex: 1 1 auto; width: auto; min-width: 140px; max-width: 460px;
+    height: 28px; padding: 0 0 6px; gap: 12px;
+    align-items: flex-end;
+    flex-direction: row-reverse;
+    border-bottom: 1px solid rgba(0,0,0,.18);
+  }
+  .search.search--wide :is(input, .search__ph) {
+    flex: 1 1 auto; width: auto;
+    font-size: 13px; line-height: 16px; text-transform: none;
+    color: var(--c-ink-soft, #747474);
+  }
+  .search.search--wide:hover { border-bottom-color: #000; }
+  /* it can only take the row if the utilities let go of their width */
+  body[data-search-control="wide"] .nav__right { flex: 1 1 auto; margin-left: 24px; }
+  body[data-search-control="wide"] .search { margin-right: 4px; }
+}
+
+/* Below LG the DS header is the Compact build (869:51), whose utilities are
+   bare 16px glyphs — no pill, no label, no wishlist. So every build that
+   carries a word collapses to the glyph here rather than leaving the host
+   page's own pill behind, which clipped SEARCH into a 60px box. */
+@media (max-width: 991.98px) {
+  .search.search--fill,
+  .search.search--label,
+  .search.search--outline,
+  .search.search--rule,
+  .search.search--glyph,
+  .search.search--wide {
+    display: flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; min-width: 0; max-width: none;
+    padding: 0; gap: 0; background: none; border: 0; flex: none;
+  }
+  .search.search--fill    :is(input, .search__ph),
+  .search.search--label   :is(input, .search__ph),
+  .search.search--outline :is(input, .search__ph),
+  .search.search--rule    :is(input, .search__ph),
+  .search.search--glyph   :is(input, .search__ph),
+  .search.search--wide    :is(input, .search__ph) { display: none; }
+  .search.search--fill svg,
+  .search.search--label svg,
+  .search.search--outline svg,
+  .search.search--rule svg,
+  .search.search--glyph svg,
+  .search.search--wide svg {
+    width: 16px; height: 16px; flex: none;
+    fill: none; stroke: var(--c-ink, #000); stroke-width: 1.3;
+  }
+}
+
+/* The specimen board's samples are spans, not labels — they must never look
+   interactive, and they must sit on the same baseline at any size. */
+.search.is-specimen { cursor: default; pointer-events: none; }
+
+
+/* ============================================================================
+   THE APPLE ARRANGEMENT  —  .ts[data-layout="apple"]
+   ----------------------------------------------------------------------------
+   The second of the two layouts, and the default. Apple's search (apple.com,
+   the overlay behind the magnifier) does three things the Nike one does not:
+
+     1. NOTHING TRAVELS. The header is left exactly as it is — nav, utilities
+        and the search control all stay put and stay lit. The sheet simply
+        drops out from under the row with the field already inside it. There is
+        no morph, so there is nothing to follow across the row with your eye.
+     2. THE FIELD IS THE FIRST LINE OF THE SHEET, centred, set large, on no
+        ground at all: a magnifier hanging in the margin and one line of type.
+        It is a heading you can type into, not a control.
+     3. THE PAGE BEHIND IS BLURRED, not dimmed, and the blur starts at the
+        sheet's lower edge. The page is still legibly there — it has just
+        stepped out of focus while the search has it.
+
+   Everything in the column — the words and the photographs — is left-aligned
+   to where the field's TEXT starts, not to the glyph, so the query and the
+   answers share one edge.
+   ============================================================================ */
+.ts[data-layout="apple"] .ts__bar { display: none; }
+
+/* the sheet is one centred column, and it is what gets measured */
+.ts__sheet { display: block; }
+.ts[data-layout="apple"] .ts__sheet {
+  max-height: calc(100vh - var(--ts-top, 140px));
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.ts[data-layout="apple"] .ts__sheet::-webkit-scrollbar { display: none; }
+.ts[data-layout="apple"] .ts__inner {
+  max-width: 880px; max-height: none; overflow: visible;
+  padding: 32px var(--ts-pad) 44px;
+}
+.ts[data-layout="apple"] .ts__head {
+  max-width: 880px; margin: 0 auto; width: 100%;
+  padding: 40px var(--ts-pad) 0;
+}
+
+/* ---------------------------------------------------------------- field ---
+   No fill, no border, no box: the DS says a field is a box, but this one is a
+   heading. It arrives with the sheet rather than growing out of anything, so
+   it fades and rises 8px on the same beat as the first block of content. */
+/* The ground is back, a step lighter (Amelie, 2026-09-23): #F7F7F7, the fill
+   the component already uses on the Nike field, rather than surface/muted's
+   #F1F1F1 — at this size a box 832 wide asks for the quieter of the two.
+   Square, no border.
+
+   The box carries its own 20 of padding and pays for it with 20 of negative
+   margin, so it hangs 20 past the column on each side and the GLYPH lands on
+   the column's left edge — the same line as every heading, every row and every
+   photograph. The grey is a surface the column sits on; only the query itself
+   is indented, by the glyph and its gap. */
+.ts[data-layout="apple"] .ts__field {
+  position: static;
+  width: auto; height: 56px;
+  margin: 0 -20px; padding: 0 20px; gap: 14px;
+  background: var(--ts-field-bg); border: 0;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 300ms var(--ts-ease), transform 300ms var(--ts-ease);
+  will-change: opacity, transform;
+}
+.ts[data-layout="apple"][data-open="true"] .ts__field { opacity: 1; transform: none; }
+.ts[data-layout="apple"] .ts__glyph { width: 20px; height: 20px; stroke-width: 1.2; }
+/* One step down from the 28 it opened at (Amelie, 2026-09-23) — inside a box
+   that size read as a headline rather than as a line to type on. Sentence case
+   and Regular: a query is what the shopper typed, so it is never uppercased,
+   and the ramp's tracking drops to +1% at this size or the line comes apart. */
+.ts[data-layout="apple"] .ts__input {
+  font-weight: 400; font-size: 16px; line-height: 24px; letter-spacing: .02em;
+}
+.ts[data-layout="apple"] .ts__input::placeholder { color: var(--ts-ink-soft); }
+.ts[data-layout="apple"] .ts__clear {
+  width: 28px; height: 28px; margin-left: 12px; flex: none;
+}
+/* nothing to clear and nothing to close from here — the page behind, Escape and
+   the control in the header are all the way out. The × arrives with the query. */
+.ts[data-layout="apple"][data-query="false"] .ts__clear { display: none; }
+.ts[data-layout="apple"] .ts__clear svg { width: 15px; height: 15px; }
+
+/* --------------------------------------------------------------- column ---
+   One column, stacked, indented to the field's text: glyph 24 + gap 16 = 40. */
+.ts[data-layout="apple"] .ts__cols {
+  display: flex; flex-direction: column; gap: 36px;
+  /* Nothing is indented: the glyph, the headings, the rows and the photographs
+     all take the column's own left edge. The field's box reaches 20 past them
+     on either side, which is its padding, not an alignment. */
+  padding-left: 0; grid-template-columns: none;
+}
+.ts[data-layout="apple"] .ts__rail,
+.ts[data-layout="apple"] .ts__rail--split {
+  display: contents;                      /* the rail's two lists become blocks */
+}
+/* Amelie, 2026-09-23: Label/S is a 10px style — right against a Nike sheet
+   where the rail is narrow, too quiet here where the headings carry the whole
+   structure of a single column. One step up the same column of the ramp:
+   Label/M, Light 12/16 uppercase, +4%. (The phone sheet already did this.) */
+.ts[data-layout="apple"] .ts__h { font-size: 12px; line-height: 16px; margin-bottom: 10px; }
+
+/* ----------------------------------------------------------------- rows ---
+   Apple prefixes its quick links with an arrow. Taken off (Amelie,
+   2026-09-23): a list of terms is not a list of destinations, and six arrows
+   down the left of a single column read as one repeated pattern rather than as
+   six separate offers. The underline on its own is the hover. Body/M, one step
+   up from the Nike rail's, because here the rows are the sheet's main event. */
+.ts[data-layout="apple"] .ts__sug {
+  display: flex; align-items: center;
+  padding: 8px 0;
+  font-size: 15px; line-height: 22px; font-weight: 400;
+}
+.ts[data-layout="apple"] .ts__sug:hover .ts__sug-t,
+.ts[data-layout="apple"] .ts__sug[aria-selected="true"] .ts__sug-t {
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.ts[data-layout="apple"] .ts__sug:hover,
+.ts[data-layout="apple"] .ts__sug[aria-selected="true"] { text-decoration: none; }
+
+/* ---------------------------------------------------------------- tiles ---
+   Four across the column rather than a scrolling rail: the column is 840 of
+   content at most, which is four DS cards and their gaps almost exactly. */
+/* Four, never more (Amelie, 2026-09-23) — the same cap the Nike sheet carries.
+   Across an 832 column that is a 196 card, which is a DS Product Card at its
+   proper size, so the Desktop Info block stands and the Info padding only
+   loses its side inset: the card's photo edge has to meet the column's. */
+.ts[data-layout="apple"] .ts__grid {
+  grid-auto-flow: row; grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-columns: auto;
+  gap: 16px; max-width: none; overflow: visible;
+}
+.ts[data-layout="apple"] .ts__tile-info { padding: 16px 0 0; }
+
+/* --------------------------------------------------------------- the blur ---
+   backdrop:'blur' — the page steps out of focus instead of going dark. It is
+   the one thing in the whole overlay that is not a Triumph token, because it
+   is not a colour: it is 20px of blur and a 55% white veil over whatever the
+   page happens to be. Where backdrop-filter is unsupported the veil alone
+   still separates the sheet from the page. */
+.ts[data-backdrop="blur"] .ts__scrim {
+  background: rgba(255,255,255,.55);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  backdrop-filter: blur(20px) saturate(1.15);
+  transition: opacity 360ms var(--ts-ease), top var(--ts-t-panel) var(--ts-ease);
+}
+@supports not (backdrop-filter: blur(2px)) {
+  .ts[data-backdrop="blur"] .ts__scrim { background: rgba(255,255,255,.78); }
+}
+
+/* -------------------------------------------- the header while apple is up ---
+   It does not move and it does not fade: that is the point of this layout. The
+   utilities only lose their pointer for the beat after a close, as before. */
+.ts-searching.ts-apple .nav__links,
+.ts-searching.ts-apple .nav__right { opacity: 1; pointer-events: auto; }
+.ts-searching.ts-apple.ts-push .nav { padding-top: inherit; padding-bottom: inherit; }
+/* the control that opened it reads as held down while the sheet is up */
+.ts-searching.ts-apple .search { opacity: .45; }
+
+/* ------------------------------------------------------- apple on a phone ---
+   The same column, full screen, one tile row of two. The field keeps its size
+   relative to the screen rather than its 28px: at 375 that would eat the row. */
+@media (max-width: 991.98px) {
+  .ts[data-layout="apple"][data-open="true"] .ts__head {
+    padding: 18px var(--ts-pad) 0;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ts[data-layout="apple"] .ts__field {
+    flex: 1 1 auto; min-width: 0;
+    height: 48px !important; margin: 0; padding: 0 14px; gap: 12px;
+  }
+  .ts[data-layout="apple"] .ts__glyph { width: 18px; height: 18px; }
+  .ts[data-layout="apple"] .ts__input { font-size: 17px; line-height: 24px; }
+  .ts[data-layout="apple"] .ts__inner { padding: 26px var(--ts-pad) 40px; }
+  .ts[data-layout="apple"] .ts__sheet { max-height: none; height: 100%; display: flex; flex-direction: column; }
+  .ts[data-layout="apple"] .ts__inner { height: auto; flex: 1 1 auto; overflow-y: auto; }
+  /* On a phone the box cannot hang past the column — it sits beside CANCEL, and
+     bleeding on one side only would read as broken. It keeps its 14 of padding
+     and the lists take the same 14, so the glyph and the rows still share a
+     line; at this width the indent costs nothing. */
+  .ts[data-layout="apple"] .ts__cols { padding-left: 14px; gap: 28px; }
+  .ts[data-layout="apple"] .ts__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ts[data-layout="apple"] .ts__sug { font-size: 15px; padding: 10px 0; }
+  .ts[data-layout="apple"] .ts__clear { display: none !important; }
+}
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .ts[data-layout="apple"] .ts__inner { max-width: 760px; }
+  .ts[data-layout="apple"] .ts__head { max-width: 760px; }
+}

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Search results – Triumph prototype</title>
+<link rel="stylesheet" href="./lib/search.css?v=30" />
+<style>
+/* ============================================================
+   FONTS — Alliance No.1 Light + Regular, same as the PLP/PDP
+   ============================================================ */
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Light.otf") format("opentype"); font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Regular.otf") format("opentype"); font-weight:400; font-style:normal; font-display:swap; }
+
+/* ============================================================
+   TOKENS — the Design System Triumph semantic roles
+   ============================================================ */
+:root{
+  --c-bg:#FFFFFF;
+  --c-ink:#000000;
+  --c-ink-soft:#747474;
+  --c-line:#DADADA;
+  --c-offwhite:#F8F3F3;
+  --c-muted:#F1F1F1;
+  --c-burgundy:#5E2039;
+  --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
+  --pad-x:24px;
+  --ease-out:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;overflow-x:clip}
+body{
+  background:var(--c-bg); color:var(--c-ink); font-family:var(--font-sans);
+  font-weight:400; font-size:14px; line-height:20px; letter-spacing:.04em;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;background:none;border:0;padding:0;color:inherit}
+a{color:inherit;text-decoration:none}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0;font-weight:400}
+
+/* ============================================================
+   HEADER — the Design System's own component, 101:186.
+   One build per breakpoint, exactly as the component carries
+   them:
+     · Compact — phone (869:51), up to LG: 54 tall, padding
+       16/12, gap 16; logo 100x13; utilities gap 24 = search
+       GLYPH (no pill), account, basket + count, menu. No heart.
+     · Stacked — LG · XL (869:52): 124 tall, padding 36/24/0,
+       row gap 32; top row = logo 136x17 + utilities (gap 30,
+       search pill 160x22); nav row 34 under it.
+     · Inline — XXL (869:50), from 1400: 78 tall, padding
+       36/24/20, gap 24; logo 156x20; nav centred, gap 24;
+       utilities gap 30 on a 22px row.
+   Links are Title/5 (12/16 upper, +4%) with SALE in accent;
+   icons are the dev team's own glyphs at 16 and stroke 1.3.
+   ============================================================ */
+header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
+/* STACKED — LG · XL is the default build; XXL folds it into one row and the
+   phone collapses it (see the breakpoint rules at the foot of this block). */
+.nav{
+  max-width:2400px;margin:0 auto;
+  padding:36px 24px 0;
+  display:flex;flex-direction:column;gap:32px;
+}
+.nav__top{display:flex;align-items:center;gap:24px;height:22px}
+.logo{display:inline-flex;align-items:center;flex:none;height:22px}
+.logo__img{width:136px;height:17px;display:block}
+.nav__row{display:flex;align-items:flex-start;height:34px}
+.nav__links{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:24px}
+.nav__links a{
+  font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;
+  font-weight:400;white-space:nowrap;
+}
+.nav__links a:hover{text-decoration:underline;text-underline-offset:4px}
+.nav__links .is-sale{color:var(--c-burgundy)}
+.nav__right{display:flex;align-items:center;gap:30px;height:22px;flex:none;margin-left:auto}
+/* the resting search control — search.js takes this over and grows it */
+.search{
+  display:flex;align-items:center;gap:8px;
+  width:160px;height:22px;padding:0 8px;
+  background:rgba(0,0,0,.05);cursor:pointer;
+}
+.search svg{width:16px;height:16px;fill:none;stroke:var(--c-ink);stroke-width:1.3;flex:none}
+.search input{
+  border:0;outline:0;background:transparent;width:100%;min-width:0;cursor:pointer;
+  font-family:inherit;font-weight:300;
+  font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--c-ink);
+}
+.search input::placeholder{color:var(--c-ink);opacity:1}
+.nav__icons{display:flex;align-items:center;gap:30px}
+.icon{height:16px;width:auto;display:block;fill:none;stroke:var(--c-ink);stroke-width:1.3}
+.icon--search{width:16px}
+.icon--account{width:15px}
+.icon--heart{width:16px;height:14.66px}
+.icon--basket{width:16px}
+.nav__icons button{display:inline-flex;align-items:center}
+.nav__icons button[aria-label="Cart"]{gap:4px}
+.cart-count{font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+.nav__icons .burger{display:none}
+.burger svg{width:20px;height:8px;fill:none;stroke:var(--c-ink);stroke-width:1.3;display:block}
+
+/* INLINE — XXL (869:50): one row, logo 156x20, nav centred, utilities right */
+@media (min-width:1400px){
+  .nav{flex-direction:row;align-items:center;gap:24px;padding:36px 24px 20px}
+  .nav__top{display:contents}
+  .logo{order:1}
+  .logo__img{width:156px;height:20px}
+  .nav__row{order:2;flex:1 1 0;min-width:0;height:16px}
+  .nav__links{justify-content:center}
+  .nav__right{order:3;margin-left:0}
+}
+
+/* COMPACT — phone (869:51), everything below LG: 54 tall, padding 16/12,
+   gap 16; logo 100x13; utilities gap 24 — the search is a bare glyph, there is
+   no wishlist, and the menu closes the row. */
+@media (max-width:991.98px){
+  .nav{flex-direction:row;align-items:center;gap:16px;padding:16px 12px}
+  .nav__top{display:contents}
+  .logo__img{width:100px;height:13px}
+  .nav__row{display:none}
+  .nav__right{gap:24px;margin-left:auto;height:16px}
+  .nav__icons{gap:24px}
+  .search{width:auto;height:16px;padding:0;gap:0;background:none}
+  .search input{display:none}
+  .nav__icons button[aria-label="Wishlist"]{display:none}
+  .nav__icons .burger{display:inline-flex}
+}
+
+/* ============================================================
+   THE PAGE UNDER THE SHEET
+   It exists so the open can be judged: Nike's search pushes the
+   page down instead of covering it, and that only reads when
+   there is something below the fold to be pushed.
+   ============================================================ */
+.hero{position:relative;height:520px;overflow:hidden;background:var(--c-offwhite)}
+.hero img{width:100%;height:100%;object-fit:cover}
+.hero__copy{position:absolute;left:var(--pad-x);bottom:40px;color:#fff;max-width:520px}
+.hero__eyebrow{font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;opacity:.9} /* Label/M */
+.hero__h{margin-top:10px;font-weight:400;font-size:32px;line-height:38px;letter-spacing:.02em;text-transform:uppercase} /* Display */
+.hero__btn{margin-top:22px;display:inline-flex;align-items:center;height:44px;padding:0 28px;background:#fff;color:#000;
+  font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase} /* Label/Control L */
+
+.rail{padding:56px var(--pad-x) 24px;max-width:2400px;margin:0 auto}
+.rail__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:20px}
+.rail__h{font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase} /* Title/5 */
+.rail__all{font-weight:300;font-size:14px;line-height:16px;letter-spacing:.04em;text-decoration:underline;text-underline-offset:4px} /* Link */
+.rail__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.tile-ph{aspect-ratio:3/4;background:var(--c-offwhite);overflow:hidden}
+.tile-ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.tile:hover .tile-ph img{transform:scale(1.03)}
+.tile-name{margin-top:12px;font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase} /* Title/5 */
+.tile-pr{margin-top:4px;font-weight:400;font-size:12px;line-height:14px;letter-spacing:0} /* Price/M */
+
+.strip{margin:56px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.strip img{width:100%;height:420px;object-fit:cover}
+.note{padding:64px var(--pad-x);text-align:center;color:var(--c-ink-soft);
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em} /* Body/M */
+
+@media (max-width:991.98px){
+  .rail__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero{height:420px}
+}
+@media (max-width:767.98px){
+  :root{--pad-x:16px}
+  .hero{height:380px}
+  .hero__h{font-size:24px;line-height:30px}
+  .strip{grid-template-columns:1fr}
+  .strip img{height:300px}
+}
+</style>
+<style>
+/* ============================================================
+   RESULTS — the PLP, with the query in place of the category.
+   The bar and the filter row are the PLP's own (plp.html): the
+   title left, the chips right, both on one baseline, and the
+   chips are plain Title/5 labels with a 7x4 chevron — no boxes.
+   Product Card, Context=PLP, Breakpoint=Desktop (93:217 →
+   93:37/76/116): Info minHeight 94, padding 16/12/0/12, gap 6,
+   title Title/5, price Price/M, the colour note under it, the
+   badge slot 12 inside the photo.
+   Every size here is a Design System text style, named in situ.
+   ============================================================ */
+.crumbs{                                   /* Label/M */
+  max-width:2400px;margin:0 auto;padding:16px var(--pad-x) 0;
+  display:flex;gap:8px;align-items:center;
+  font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;
+}
+.crumbs span{opacity:.4}
+.crumbs b{font-weight:300;color:var(--c-ink-soft)}
+
+.results{background:var(--c-bg)}
+.results__row{
+  max-width:2400px;margin:0 auto;
+  /* baseline, not flex-start: the title's line box is taller than the chips',
+     and a shared baseline is a shared cap line (the PLP's own note) */
+  display:flex;align-items:baseline;justify-content:space-between;gap:24px;
+  padding:36px var(--pad-x);
+}
+.results__h{                               /* Title/5 on the PLP's 24 line box */
+  font-weight:400;font-size:12px;line-height:24px;letter-spacing:.04em;text-transform:uppercase;
+  flex:0 1 auto;min-width:0;
+}
+.results__h .count{                        /* Body/S in text/secondary */
+  font-weight:300;font-size:12px;line-height:16px;color:var(--c-ink-soft);
+  position:relative;bottom:.5px;
+}
+/* the PLP filter row: plain labels, right-aligned, wrapping inside the space
+   the title leaves */
+.filters{
+  display:flex;flex:1 1 0;flex-wrap:wrap;justify-content:flex-end;align-items:center;
+  gap:12px 20px;
+}
+.filters button{                           /* Title/5 */
+  display:inline-flex;align-items:center;gap:6px;
+  font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;
+  text-transform:uppercase;white-space:nowrap;
+}
+.filters button svg{width:7px;height:4px;fill:none;stroke:var(--c-ink);stroke-width:1;flex:none}
+.filters button:hover{opacity:.55}
+.filters-mobile{
+  display:none;align-items:center;gap:6px;
+  font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;
+  text-transform:uppercase;white-space:nowrap;
+}
+.filters-mobile svg{width:10px;height:10px;fill:none;stroke:var(--c-ink);stroke-width:1;flex:none}
+
+/* no top padding: the results row already carries 36 under it, which is the
+   PLP's own rhythm between the bar and the first row of photographs */
+.grid{
+  max-width:2400px;margin:0 auto;padding:0 var(--pad-x) 80px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 12px;
+}
+@media (min-width:768px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px} }
+@media (min-width:1200px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+
+.pc{display:block;color:inherit}
+.pc__ph{display:block;position:relative;aspect-ratio:320/421;background:var(--c-offwhite);overflow:hidden}
+.pc__ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease-out)}
+.pc:hover .pc__ph img{transform:scale(1.03)}
+.pc__badge{                                /* Title/6 */
+  position:absolute;left:12px;bottom:12px;display:inline-flex;align-items:center;justify-content:center;
+  height:18px;padding:1px 4px 0;background:#fff;backdrop-filter:blur(10px);
+  font-weight:400;font-size:11px;line-height:14px;letter-spacing:.04em;text-transform:uppercase;
+}
+.pc__badge--sale{height:16px;padding:2px 4px 0;background:#C1003F;color:#fff}
+.pc__wish{position:absolute;right:12px;top:12px;width:24px;height:24px;display:grid;place-items:center}
+.pc__wish svg{width:16px;height:14.66px;fill:none;stroke:var(--c-ink);stroke-width:1.3}
+.pc__info{display:flex;flex-direction:column;gap:6px;padding:16px 12px 0;min-height:94px}
+.pc__nm{                                   /* Title/5 */
+  font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pc__pr{                                   /* Price/M — tracking 0 */
+  display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;
+  font-weight:400;font-size:12px;line-height:14px;letter-spacing:0;
+}
+.pc__prices{display:inline-flex;gap:4px}
+.pc__pr .was{color:var(--c-ink-soft);text-decoration:line-through}
+.pc__pr .mem{display:inline-flex;align-items:center;gap:4px;color:var(--c-burgundy)}
+.pc__pr .mem svg{width:11px;height:10px;fill:currentColor;stroke:none}
+.pc__low{font-weight:300;font-size:12px;line-height:14px;letter-spacing:0;color:var(--c-ink-soft)}  /* Price/Note */
+.pc__cols{font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;color:var(--c-ink-soft)} /* Body/S */
+
+/* ============================================================
+   ZERO RESULTS — the search itself, embedded in the page.
+   The overlay stopped passing judgement (search.js, 2026-09-24):
+   a verdict inside a sheet is a dead end, because the sheet
+   closes the moment you look away from it. So the whole of the
+   no-results state is here instead — the verdict FIRST, because
+   that is the answer to what was asked; then the field carrying
+   the query that failed, ready to be corrected in place; then
+   the terms that do land; then a row of products, so the page
+   is never only an apology.
+
+   Every padding and gap here is a value on the DS spacing
+   scale, and the Figma frames bind each one to its spacing/*
+   token (2026-09-24). Where a number was off the scale it moved
+   rather than being tokenised at a lie: the column's two gaps
+   became one rhythm of 32, and the phone's blocks joined its 24.
+
+   The field is the OVERLAY's field, to the measurement: 56 tall
+   on #F7F7F7, square and borderless, 20 of padding paid for
+   with 20 of negative margin so the glyph lands on the column's
+   left edge; glyph 20 at stroke 1.2, query Regular 16/24 at
+   +2%, the × only once there is something to clear. The column
+   is the overlay's 880 and the rows are its 15/22, so the two
+   surfaces are one design read at two scales.
+   ============================================================ */
+.zero{display:none}
+.zero.is-on{display:block}
+.zero__col{max-width:880px;margin:0 auto;padding:72px var(--pad-x) 0}
+
+.zero__h{margin:0;font-weight:400;font-size:22px;line-height:30px;letter-spacing:.02em}  /* Heading/S */
+.zero__p{margin:8px 0 0;font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em;color:var(--c-ink-soft)} /* Body/M */
+
+.zfield{display:flex;align-items:center;gap:14px;height:56px;margin:32px -20px 0;padding:0 20px;background:#F7F7F7}
+.zfield__g{width:20px;height:20px;flex:none;fill:none;stroke:var(--c-ink);stroke-width:1.2}
+.zfield input{
+  flex:1 1 auto;min-width:0;border:0;outline:0;background:none;padding:0;
+  font-family:inherit;font-weight:400;font-size:16px;line-height:24px;letter-spacing:.02em;color:var(--c-ink);
+}
+.zfield input::placeholder{color:var(--c-ink-soft);opacity:1}
+.zfield input::-webkit-search-cancel-button,
+.zfield input::-webkit-search-decoration{-webkit-appearance:none;display:none}
+.zfield__x{width:28px;height:28px;margin-left:12px;flex:none;display:none;place-items:center}
+.zfield__x svg{width:15px;height:15px;fill:none;stroke:var(--c-ink);stroke-width:1.3}
+.zero.has-q .zfield__x{display:grid}
+
+.zblock{margin-top:32px}
+.zh{display:block;margin:0 0 10px;font-weight:300;font-size:12px;line-height:16px;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--c-ink-soft)}    /* Label/M */
+.zrows{display:flex;flex-direction:column}
+.zrow{display:flex;align-items:center;width:100%;text-align:left;padding:8px 0;
+  font-weight:400;font-size:15px;line-height:22px;letter-spacing:.02em}
+.zrow b{font-weight:400}
+.zrow i{font-style:normal;color:var(--c-ink-soft)}
+.zrow:hover span,.zrow:focus-visible span{text-decoration:underline;text-underline-offset:3px}
+
+/* the products are the page's full width again — a suggestion strip inside the
+   column would read as four thumbnails, not as something to buy */
+.zprod{max-width:2400px;margin:0 auto;padding:64px var(--pad-x) 120px}
+.zprod .zh{margin-bottom:20px}
+.zprod__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:768px){ .zprod__grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px} }
+@media (min-width:1200px){ .zprod__grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+
+@media (max-width:767.98px){
+  .zero__col{padding-top:32px}
+  .zero__h{font-size:20px;line-height:28px}
+  /* the phone sheet's own field: 48 tall, glyph 18, query 17/24 */
+  .zfield{height:48px;gap:12px;margin:24px -16px 0;padding:0 16px}
+  .zfield__g{width:18px;height:18px}
+  .zfield input{font-size:17px;line-height:24px}
+  .zblock{margin-top:24px}
+  .zrow{padding:12px 0;font-size:16px;line-height:24px}
+  .zprod{padding-top:40px}
+}
+
+@media (max-width:991.98px){
+  .results__row{padding:24px var(--pad-x) 16px;align-items:flex-end}
+  .grid{padding-top:8px}
+  .filters{display:none}
+  .filters-mobile{display:inline-flex}
+  .pc__info{min-height:74px;padding:10px 4px 0;gap:4px}
+  .pc__nm{font-size:11px;line-height:14px}
+  .pc__pr{font-size:10px;line-height:12px;gap:6px}
+  .pc__badge{left:8px;bottom:8px;height:16px;font-size:10px;line-height:13px}
+  .pc__low,.pc__cols{font-size:11px;line-height:15px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+   <div class="nav__top">
+    <a class="logo" href="./plp.html" aria-label="Triumph">
+      <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="136" height="17" />
+    </a>
+    <div class="nav__right">
+      <!-- the resting control: search.js takes this over and morphs it -->
+      <label class="search" aria-label="Search">
+        <svg class="icon icon--search" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.83 9.83L15.35 15.35M11.4 6.025C11.4 8.99361 8.99361 11.4 6.025 11.4C3.05639 11.4 0.65 8.99361 0.65 6.025C0.65 3.05639 3.05639 0.65 6.025 0.65C8.99361 0.65 11.4 3.05639 11.4 6.025Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="search" placeholder="Search" />
+      </label>
+      <div class="nav__icons">
+        <!-- Icon / Account 98:9 — the dev team's .svgIcon__user, 15x16 -->
+        <button aria-label="Account">
+          <svg class="icon icon--account" viewBox="0 0 15 16" aria-hidden="true">
+            <path d="M7.2998 6.2C8.79097 6.2 9.9998 4.99117 9.9998 3.5C9.9998 2.00883 8.79097 0.8 7.2998 0.8C5.80863 0.8 4.5998 2.00883 4.5998 3.5C4.5998 4.99117 5.80863 6.2 7.2998 6.2Z"/>
+            <path d="M13.7998 16C13.7998 12.134 10.8897 9 7.2998 9C3.70995 9 0.799805 12.134 0.799805 16"/>
+          </svg>
+        </button>
+        <!-- Icon / Heart 80:8, Outline — .svgIcon__heart scaled into the 16 box -->
+        <button aria-label="Wishlist">
+          <svg class="icon icon--heart" viewBox="0 0 16.0715 14.6616" aria-hidden="true">
+            <path d="M7.97584 3.2867L9.41404 1.78858C10.1331 1.06948 10.9721 0.65 11.9309 0.65C12.8298 0.65 13.7287 1.06948 14.3878 1.72865C15.7661 3.16685 15.7661 5.50393 14.3878 7.00206C13.3691 8.02079 8.03577 13.7137 8.03577 13.7137C8.03577 13.7137 2.64251 8.02079 1.68371 7.00206C0.305431 5.56386 0.305431 3.22678 1.68371 1.72865C2.28296 1.06948 3.18184 0.65 4.08071 0.65C4.97959 0.65 5.87846 1.06948 6.53764 1.72865L7.97584 3.2867Z"/>
+          </svg>
+        </button>
+        <!-- Icon / Basket 145:519, Default — .svgIcon__shoppingBag, with its count -->
+        <button aria-label="Cart">
+          <svg class="icon icon--basket" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4.4 9.6V2.95C4.4 1.7 5 0.65 8 0.65C11 0.65 11.6 1.7 11.6 2.95V9.6M0.65 5.45H15.35V15.35H0.65V5.45Z"/>
+          </svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="burger" aria-label="Menu"><svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg></button>
+      </div>
+    </div>
+   </div>
+   <div class="nav__row">
+    <ul class="nav__links">
+      <li><a href="#">Special Deals</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Briefs</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Swimwear</a></li>
+      <li><a href="#">Night &amp; Lounge</a></li>
+      <li><a class="is-sale" href="#">Sale</a></li>
+    </ul>
+   </div>
+  </nav>
+</header>
+
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="./search.html">Home</a><span>/</span><b>Search</b>
+  </nav>
+
+  <section class="results">
+    <div class="results__row">
+      <h1 class="results__h" id="resultsHead">Search results</h1>
+      <!-- the PLP's own chip row (plp.html / Figma 848-5899) -->
+      <div class="filters" aria-label="Filter">
+        <button>Size <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Colour <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Fabric <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Price <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Series <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+        <button>Sort by: Newest <svg viewBox="0 0 7 4"><path d="M.5.5 3.5 3.5 6.5.5"/></svg></button>
+      </div>
+      <button class="filters-mobile">Sort &amp; Filter <svg viewBox="0 0 10 10"><path d="M5 0v10M0 5h10"/></svg></button>
+    </div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+
+  <!-- the zero state: field, verdict, terms, products -->
+  <section class="zero" id="zero" aria-live="polite">
+    <div class="zero__col">
+      <p class="zero__h" id="zeroH"></p>
+      <p class="zero__p" id="zeroP"></p>
+      <form class="zfield" id="zeroForm" role="search">
+        <svg class="zfield__g" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.83 9.83L15.35 15.35M11.4 6.025C11.4 8.99361 8.99361 11.4 6.025 11.4C3.05639 11.4 0.65 8.99361 0.65 6.025C0.65 3.05639 3.05639 0.65 6.025 0.65C8.99361 0.65 11.4 3.05639 11.4 6.025Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input id="zeroInput" type="search" autocomplete="off" autocapitalize="none" spellcheck="false"
+               placeholder="Search Triumph" aria-label="Search Triumph" />
+        <button type="button" class="zfield__x" id="zeroClear" aria-label="Clear search">
+          <svg viewBox="0 0 13 13" aria-hidden="true"><path d="M.5.5l12 12M12.5.5l-12 12"/></svg>
+        </button>
+      </form>
+      <section class="zblock">
+        <span class="zh" id="zeroTermsH">Popular searches</span>
+        <div class="zrows" id="zeroTerms"></div>
+      </section>
+    </div>
+    <section class="zprod">
+      <span class="zh" id="zeroProdH">Popular right now</span>
+      <div class="zprod__grid" id="zeroProd"></div>
+    </section>
+  </section>
+</main>
+
+<script src="./lib/search.js?v=30" defer></script>
+<script>
+/* The results page reads the query off the URL and asks the search library for
+   the matches — one catalogue and one matcher for the sheet and the page, so
+   the count in the heading is the count the sheet promised.
+
+   And when there are none, the page takes the whole job over (2026-09-24). The
+   overlay used to render the verdict itself; it no longer does. Here the field
+   comes with it: the query that failed is IN the field, selected, so correcting
+   a typo is one keystroke rather than a reopened sheet. Under it the terms that
+   do land, and under those a row of products, because a shop with nothing to
+   show for a query still has something to show.
+
+   The field is live. Typing re-runs both lists against the catalogue without
+   leaving the page; Enter, or a click on a term, commits the search properly so
+   the URL can be sent on. */
+document.addEventListener('DOMContentLoaded', function () {
+  var q = (new URLSearchParams(location.search).get('q') || '').trim();
+  var S = window.TriumphSearch;
+  var hits = q ? S.match(q) : [];
+  var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var money = function (n) { return '\u20AC' + n.toFixed(2); };
+  var CROWN = '<svg viewBox="0 0 23 20" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 0L11.2574 15.8444L6.89607 0L6.77135 0L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z"/></svg>';
+
+  /* one card, two homes: the results grid and the zero state's product row */
+  function card(p) {
+    var price;
+    if (p.was) {
+      price = '<span class="pc__prices"><span>' + money(p.price) + '</span><span class="was">' + money(p.was) + '</span></span>';
+    } else if (p.member) {
+      price = '<span>' + money(p.price) + '</span><span class="mem">Member price ' + money(p.member) + CROWN + '</span>';
+    } else {
+      price = '<span>' + money(p.price) + '</span>';
+    }
+    return '<a class="pc" href="./pdp.html">' +
+      '<span class="pc__ph"><img src="' + esc(p.ph) + '" alt="' + esc(p.name) + '" loading="lazy" />' +
+        (p.was ? '<span class="pc__badge pc__badge--sale">Sale</span>' : (p.nw ? '<span class="pc__badge">New</span>' : '')) +
+        '<span class="pc__wish"><svg viewBox="0 0 16.0715 14.6616" aria-hidden="true"><path d="M7.97584 3.2867L9.41404 1.78858C10.1331 1.06948 10.9721 0.65 11.9309 0.65C12.8298 0.65 13.7287 1.06948 14.3878 1.72865C15.7661 3.16685 15.7661 5.50393 14.3878 7.00206C13.3691 8.02079 8.03577 13.7137 8.03577 13.7137C8.03577 13.7137 2.64251 8.02079 1.68371 7.00206C0.305431 5.56386 0.305431 3.22678 1.68371 1.72865C2.28296 1.06948 3.18184 0.65 4.08071 0.65C4.97959 0.65 5.87846 1.06948 6.53764 1.72865L7.97584 3.2867Z"/></svg></span>' +
+      '</span>' +
+      '<span class="pc__info">' +
+        '<span class="pc__nm">' + esc(p.name) + '</span>' +
+        '<span class="pc__pr">' + price + '</span>' +
+        (p.was ? '<span class="pc__low">Last lowest price: ' + money(p.was * 0.82) + '</span>' : '') +
+        (p.cl ? '<span class="pc__cols">+ ' + p.cl + ' colours</span>' : '') +
+      '</span></a>';
+  }
+
+  /* ------------------------------------------------------------ results ---*/
+  document.getElementById('resultsHead').innerHTML =
+    q ? 'Search results for <span class="q">\u201C' + esc(q) + '\u201D</span> <span class="count">(' + hits.length + ')</span>'
+      : 'Search results';
+  document.getElementById('grid').innerHTML = hits.map(card).join('');
+
+  if (hits.length) return;
+
+  /* --------------------------------------------------------- zero state ---
+     The results bar goes with the grid: a filter row over nothing is a control
+     that cannot do anything, and the breadcrumb is the only chrome the state
+     needs. */
+  document.querySelector('.results').style.display = 'none';
+  document.getElementById('grid').style.display = 'none';   /* it carries 80 of padding */
+
+  var zero  = document.getElementById('zero');
+  var input = document.getElementById('zeroInput');
+  var termsH = document.getElementById('zeroTermsH');
+  var terms  = document.getElementById('zeroTerms');
+  var prodH  = document.getElementById('zeroProdH');
+  var prod   = document.getElementById('zeroProd');
+
+  zero.classList.add('is-on');
+
+  /* the popular products are the popular SEARCHES made visible: one product per
+     term at the head of the list, so the two lists agree with each other */
+  var PICKS = ['Amourette 300', 'Doreen', 'True Shape Sensation', 'Triaction'];
+  var popularProducts = PICKS.map(function (series) {
+    return S.products.filter(function (p) { return p.series.indexOf(series) === 0; })[0];
+  }).filter(Boolean);
+
+  /* the two-tone completion, the same one the sheet draws */
+  function twoTone(term, typed) {
+    var i = term.toLowerCase().indexOf(typed.toLowerCase());
+    if (i < 0) return '<i>' + esc(term) + '</i>';
+    var end = i + typed.length;
+    return (i ? '<i>' + esc(term.slice(0, i)) + '</i>' : '') +
+           '<b>' + esc(term.slice(i, end)) + '</b>' +
+           (end < term.length ? '<i>' + esc(term.slice(end)) + '</i>' : '');
+  }
+
+  /* Did you mean. The catalogue matcher is exact, so one doubled letter loses
+     the whole series — and "check the spelling" is advice, not help. Shortening
+     the query a character at a time until the index answers finds the stem the
+     shopper was actually typing: amourettte → amourett → Amourette. Four is the
+     floor; below it the stem stops being a word and starts matching everything. */
+  function nearest(typed) {
+    var t = typed.toLowerCase();
+    for (var cut = t.length - 1; cut >= 4; cut--) {
+      var stem = t.slice(0, cut);
+      var sug = S.suggest(stem);
+      if (sug.length) return { stem: stem, terms: sug };
+    }
+    return null;
+  }
+
+  function paint(typed) {
+    typed = (typed || '').trim();
+    zero.classList.toggle('has-q', !!typed);
+
+    var sug  = typed ? S.suggest(typed) : [];
+    var near = (typed && !sug.length) ? nearest(typed) : null;
+    var stem = near ? near.stem : typed;
+    var list = sug.length ? sug : (near ? near.terms : S.popular.slice(0, 6));
+
+    termsH.textContent = sug.length ? 'Suggestions' : (near ? 'Did you mean' : 'Popular searches');
+    terms.innerHTML = list.map(function (t) {
+      return '<button type="button" class="zrow" data-term="' + esc(t) + '"><span>' +
+        (sug.length || near ? twoTone(t, stem) : esc(t)) + '</span></button>';
+    }).join('');
+
+    var live = stem ? S.match(stem) : [];
+    prodH.textContent = live.length ? (sug.length ? 'Products' : 'Closest matches') : 'Popular right now';
+    prod.innerHTML = (live.length ? live : popularProducts).slice(0, 4).map(card).join('');
+  }
+
+  function go(term) {
+    term = (term || '').trim();
+    if (!term) return;
+    if (S.remember) S.remember(term);
+    location.href = S.resultsUrl(term);
+  }
+
+  /* The verdict is written once, for the query the URL carried — not on every
+     keystroke, because a line that rewrites itself under a moving caret is
+     read as an error message rather than as the page's own statement. Which
+     line it is depends on whether the query nearly landed. */
+  var n0 = q ? nearest(q) : null;
+  document.getElementById('zeroH').textContent =
+    q ? 'No results for \u201C' + q + '\u201D' : 'What are you looking for?';
+  document.getElementById('zeroP').textContent = !q
+    ? 'Start with a series name, a shape or an occasion.'
+    : (n0 ? 'Nothing carries that spelling \u2014 these come closest.'
+          : 'Try a shorter term \u2014 a series name or a shape works best.');
+
+  /* the query that failed is in the field and SELECTED: the next keystroke
+     replaces it, and the arrow keys put the caret where the typo is */
+  input.value = q;
+  paint(q);
+  if (q) { input.focus({ preventScroll: true }); input.select(); }
+
+  var tick = null;
+  input.addEventListener('input', function () {
+    window.clearTimeout(tick);
+    tick = window.setTimeout(function () { paint(input.value); }, 70);
+  });
+  document.getElementById('zeroForm').addEventListener('submit', function (e) {
+    e.preventDefault(); go(input.value);
+  });
+  document.getElementById('zeroClear').addEventListener('click', function () {
+    input.value = ''; paint(''); input.focus({ preventScroll: true });
+  });
+  terms.addEventListener('click', function (e) {
+    var row = e.target.closest('[data-term]');
+    if (row) go(row.dataset.term);
+  });
+});
+</script>
+</body>
+</html>

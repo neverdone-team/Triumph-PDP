@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prototype vs DS only</title>
+<style>
+@font-face{font-family:"Alliance No1";src:url("./fonts/AllianceNo1-Light.otf") format("opentype");font-weight:300}
+@font-face{font-family:"Alliance No1";src:url("./fonts/AllianceNo1-Regular.otf") format("opentype");font-weight:400}
+:root{--ink:#000;--soft:#747474;--line:#cecece;--bg:#fff;--wash:#f1f1f1}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--wash);color:var(--ink);font:300 12px/16px "Alliance No1",Helvetica,Arial,sans-serif;letter-spacing:.04em;
+  display:flex;flex-direction:column}
+button{font:inherit;letter-spacing:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);
+  height:30px;padding:0 12px;cursor:pointer;text-transform:uppercase}
+button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.bar{display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+.grp{display:flex;gap:4px;align-items:center}
+.grp > span{color:var(--soft);text-transform:uppercase;margin-right:4px}
+.bar label{display:flex;gap:6px;align-items:center;text-transform:uppercase;cursor:pointer}
+.stage{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+.stage.is-flip{grid-template-columns:1fr}
+.pane{min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
+.pane__head{display:flex;justify-content:space-between;align-items:baseline;text-transform:uppercase}
+.pane__head b{font-weight:400}
+.pane__head span{color:var(--soft)}
+.viewport{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.viewport iframe{position:absolute;top:0;left:0;border:0;transform-origin:0 0;background:#fff}
+.stage.is-flip .pane[data-side="b"]{display:none}
+.stage.is-flip.show-b .pane[data-side="a"]{display:none}
+.stage.is-flip.show-b .pane[data-side="b"]{display:flex}
+.log{position:fixed;right:0;top:0;bottom:0;width:min(560px,100vw);background:var(--bg);border-left:1px solid var(--line);
+  overflow:auto;padding:16px 20px 40px;transform:translateX(100%);transition:transform .25s;z-index:5}
+.log.is-open{transform:none}
+.log h2{font-weight:400;font-size:14px;line-height:20px;text-transform:uppercase;margin:24px 0 8px}
+.log h2:first-of-type{margin-top:8px}
+.log table{width:100%;border-collapse:collapse}
+.log td{border-top:1px solid var(--line);padding:6px 8px 6px 0;vertical-align:top;font-size:11px;line-height:14px}
+.log td:first-child{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--soft);width:38%;word-break:break-all}
+.log .k{text-transform:uppercase;font-size:10px;color:var(--soft)}
+.log p{color:var(--soft);margin:0 0 8px}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="grp" id="views"><span>Screen</span>
+    <button data-view="bag" aria-pressed="true">Bag</button>
+    <button data-view="mini">Mini cart</button>
+    <button data-view="onepage">Checkout · one page</button>
+    <button data-view="steps">Checkout · 3 steps</button>
+  </div>
+  <div class="grp" id="widths"><span>Width</span>
+    <button data-w="1440" aria-pressed="true">Desktop 1440</button>
+    <button data-w="768">Tablet 768</button>
+    <button data-w="390">Mobile 390</button>
+  </div>
+  <div class="grp" id="layout"><span>Layout</span>
+    <button data-lay="side" aria-pressed="true">Side by side</button>
+    <button data-lay="flip">Flip A/B <kbd>space</kbd></button>
+  </div>
+  <label><input type="checkbox" id="link" checked> Mirror clicks + scroll</label>
+  <button id="openLog">What changed</button>
+</div>
+<div class="stage" id="stage">
+  <div class="pane" data-side="a">
+    <div class="pane__head"><b>A · Before the DS pass</b><span id="srcA"></span></div>
+    <div class="viewport"><iframe id="fa" title="Prototype"></iframe></div>
+  </div>
+  <div class="pane" data-side="b">
+    <div class="pane__head"><b>B · Design system only (live)</b><span id="srcB"></span></div>
+    <div class="viewport"><iframe id="fb" title="DS only"></iframe></div>
+  </div>
+</div>
+<aside class="log" id="log"><button id="closeLog" style="float:right">Close</button><div id="logBody"></div></aside>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const state = { view: 'bag', w: 1440, lay: 'side' };
+try { Object.assign(state, JSON.parse(localStorage.getItem('ds-compare') || '{}')); } catch (e) {}
+const PAGES = { bag: 'cart', mini: 'cart', onepage: 'checkout', steps: 'checkout' };
+const fa = $('#fa'), fb = $('#fb');
+
+function press(group, attr, val){ $$(`#${group} [${attr}]`).forEach(b => b.setAttribute('aria-pressed', String(b.getAttribute(attr) == val))); }
+
+function load(){
+  try { localStorage.setItem('ds-compare', JSON.stringify(state)); } catch (e) {}
+  press('views', 'data-view', state.view); press('widths', 'data-w', state.w); press('layout', 'data-lay', state.lay);
+  $('#stage').classList.toggle('is-flip', state.lay === 'flip');
+  // the checkout reads its mode from storage, and both panes share the origin
+  if (state.view === 'onepage' || state.view === 'steps')
+    try { localStorage.setItem('triumph.proto.checkoutMode', state.view); } catch (e) {}
+  const p = PAGES[state.view];
+  $('#srcA').textContent = p + '-original.html'; $('#srcB').textContent = p + '.html';
+  fa.src = `./${p}-original.html?v=${Date.now()}`; fb.src = `./${p}.html?v=${Date.now()}`;
+  fit();
+}
+
+function fit(){
+  [fa, fb].forEach(f => {
+    const vp = f.parentElement, W = state.w;
+    const vis = vp.offsetParent !== null ? vp : [...document.querySelectorAll('.viewport')].find(v => v.offsetParent);
+    const k = Math.min(1, vis.clientWidth / W);
+    f.style.width = W + 'px'; f.style.height = (vis.clientHeight / k) + 'px';
+    f.style.transform = `scale(${k})`;
+  });
+}
+
+let ready = 0;
+function onReady(f){
+  const w = f.contentWindow, d = f.contentDocument;
+  // the switcher is prototype chrome, not the design
+  const st = d.createElement('style'); st.textContent = '.dash,.dash__hide{display:none!important}'; d.head.appendChild(st);
+  // an empty bag shows nothing worth comparing — fill it with the page's own sample
+  try {
+    const bag = JSON.parse(w.localStorage.getItem('triumph.proto.cart.v1') || '{}');
+    if (!bag.lines || !bag.lines.length) {
+      const fill = d.querySelector('[data-cart-set]:not([data-cart-set="empty"])');
+      if (fill) { fill.click(); setTimeout(load, 150); return; }
+    }
+  } catch (e) {}
+  if (state.view === 'mini' && w.Shop && w.Shop.openMini) setTimeout(() => w.Shop.openMini({ title: 'Added to your bag' }), 400);
+  wire(f);
+}
+fa.addEventListener('load', () => onReady(fa));
+fb.addEventListener('load', () => onReady(fb));
+
+/* The two pages share their markup — only the CSS differs — so a click can be replayed on
+   the same node on the other side by its path from <body>. */
+function pathOf(el){ const p = []; while (el && el.parentElement && el.tagName !== 'BODY'){ p.unshift([...el.parentElement.children].indexOf(el)); el = el.parentElement; } return p; }
+function nodeAt(d, p){ let el = d.body; for (const i of p){ el = el && el.children[i]; } return el; }
+let replaying = false;
+function wire(f){
+  const other = f === fa ? fb : fa, d = f.contentDocument;
+  d.addEventListener('click', e => {
+    if (replaying || !$('#link').checked || !e.isTrusted) return;
+    const t = nodeAt(other.contentDocument, pathOf(e.target));
+    if (t) { replaying = true; try { t.click(); } finally { replaying = false; } }
+  }, true);
+  d.addEventListener('input', e => {
+    if (!$('#link').checked || !e.isTrusted) return;
+    const t = nodeAt(other.contentDocument, pathOf(e.target));
+    if (t && 'value' in t) { t.value = e.target.value; t.dispatchEvent(new Event('input', { bubbles: true })); }
+  }, true);
+  f.contentWindow.addEventListener('scroll', () => {
+    if (!$('#link').checked || replaying) return;
+    const a = f.contentWindow, b = other.contentWindow;
+    const r = a.scrollY / Math.max(1, a.document.documentElement.scrollHeight - a.innerHeight);
+    replaying = true; b.scrollTo(0, r * (b.document.documentElement.scrollHeight - b.innerHeight));
+    requestAnimationFrame(() => { replaying = false; });
+  });
+}
+
+$$('#views [data-view]').forEach(b => b.onclick = () => { state.view = b.dataset.view; load(); });
+$$('#widths [data-w]').forEach(b => b.onclick = () => { state.w = +b.dataset.w; load(); });
+$$('#layout [data-lay]').forEach(b => b.onclick = () => { state.lay = b.dataset.lay; press('layout','data-lay',state.lay); $('#stage').classList.toggle('is-flip', state.lay === 'flip'); fit(); });
+addEventListener('keydown', e => { if (e.code === 'Space' && state.lay === 'flip' && e.target === document.body){ e.preventDefault(); $('#stage').classList.toggle('show-b'); fit(); } });
+addEventListener('resize', fit);
+
+$('#openLog').onclick = () => $('#log').classList.add('is-open');
+$('#closeLog').onclick = () => $('#log').classList.remove('is-open');
+fetch('./ds-constrained/changes.json').then(r => r.json()).then(data => {
+  const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  let h = '<p>Every rule the build rewrote. Type = mapped to the nearest DS text style; override = a local size/weight tweak removed so the element falls back to its style; colour, spacing and shadow = snapped to the nearest DS role, step or effect style.</p>';
+  for (const [file, rows] of Object.entries(data)) {
+    h += `<h2>${esc(file)}</h2><table>`;
+    for (const r of rows) h += `<tr><td>${esc(r.sel)}</td><td><span class="k">${esc(r.kind)}${r.prop ? ' · ' + esc(r.prop) : ''}</span><br>${esc(r.from)} → <b>${esc(r.to)}</b></td></tr>`;
+    h += '</table>';
+  }
+  $('#logBody').innerHTML = h;
+}).catch(() => { $('#logBody').innerHTML = '<p>Serve this folder over http to see the change log.</p>'; });
+
+load();
+</script>
+</body>
+</html>

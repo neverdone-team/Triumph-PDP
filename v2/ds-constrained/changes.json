@@ -1,0 +1,943 @@
+{
+ "Bag (cart.html)": [
+  {
+   "sel": ":root",
+   "kind": "colour",
+   "prop": "--c-wash",
+   "from": "#F9FAFB",
+   "to": "surface/hover"
+  },
+  {
+   "sel": ":root",
+   "kind": "colour",
+   "prop": "--c-hair",
+   "from": "rgba(0,0,0,.05)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ":root",
+   "kind": "colour",
+   "prop": "--c-edge",
+   "from": "rgba(0,0,0,.2)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": "body",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": "input",
+   "kind": "type",
+   "from": "\u2013 14px/\u2013 ls \u2013",
+   "to": "Body/M"
+  },
+  {
+   "sel": "h1,h2,h3,p",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".t-title-xxl",
+   "kind": "type",
+   "from": "400 32px/38px ls .04em UPPER",
+   "to": "Display"
+  },
+  {
+   "sel": ".t-title-xl",
+   "kind": "type",
+   "from": "400 24px/30px ls .04em UPPER",
+   "to": "Title/1"
+  },
+  {
+   "sel": ".t-title-l",
+   "kind": "type",
+   "from": "400 20px/26px ls .04em UPPER",
+   "to": "Title/2"
+  },
+  {
+   "sel": ".t-title-m",
+   "kind": "type",
+   "from": "400 16px/24px ls .04em UPPER",
+   "to": "Title/3"
+  },
+  {
+   "sel": ".t-title-s",
+   "kind": "type",
+   "from": "400 14px/20px ls .04em UPPER",
+   "to": "Title/4"
+  },
+  {
+   "sel": ".t-title-xs",
+   "kind": "type",
+   "from": "400 12px/16px ls .04em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".t-body-m",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".t-body-s",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".t-body-xs",
+   "kind": "type",
+   "from": "300 10px/14px ls .04em",
+   "to": "Body/XS"
+  },
+  {
+   "sel": ".t-label-m",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em UPPER",
+   "to": "Label/M"
+  },
+  {
+   "sel": ".t-label-s",
+   "kind": "type",
+   "from": "300 10px/12px ls .04em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".t-price",
+   "kind": "type",
+   "from": "400 14px/16px ls 0",
+   "to": "Price/L"
+  },
+  {
+   "sel": ".t-price-s",
+   "kind": "type",
+   "from": "400 12px/14px ls 0",
+   "to": "Price/M"
+  },
+  {
+   "sel": ".t-price-note",
+   "kind": "type",
+   "from": "300 12px/14px ls 0",
+   "to": "Price/Note"
+  },
+  {
+   "sel": ".t-link-s",
+   "kind": "type",
+   "from": "300 12px/14px ls .04em",
+   "to": "Link"
+  },
+  {
+   "sel": ".pagehead__n",
+   "kind": "type-override",
+   "from": "font-weight:inherit",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".cart__left",
+   "kind": "spacing",
+   "prop": "padding-right",
+   "from": "calc(var(--space-64) + var(--space-64) + var(--space-32)) = 160px",
+   "to": "120px"
+  },
+  {
+   "sel": ".promise span",
+   "kind": "type-override",
+   "from": "line-height:20px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".joinbadge .t-link-s,.joinbadge__note",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".joinbadge__note",
+   "kind": "colour",
+   "prop": "color",
+   "from": "rgba(255,255,255,.8)",
+   "to": "text/on-dark"
+  },
+  {
+   "sel": ".item__qty",
+   "kind": "type-override",
+   "from": "font-weight:inherit",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".sizesel select",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".sizesel select",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "--space-28 (28px, not a DS step)",
+   "to": "24px"
+  },
+  {
+   "sel": ".colours",
+   "kind": "shadow",
+   "prop": "box-shadow",
+   "from": "0 10px 24px rgba(0,0,0,.10)",
+   "to": "Elevation/Popover"
+  },
+  {
+   "sel": ".cthumb img",
+   "kind": "colour",
+   "prop": "border",
+   "from": "rgba(0,0,0,.06)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ".item__side .t-price,.item__side .t-price-was",
+   "kind": "type-override",
+   "from": "font-size:13px, line-height:18px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".addon__head .t-title-s",
+   "kind": "type-override",
+   "from": "font-size:12px, line-height:16px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".addon__btn",
+   "kind": "type",
+   "from": "400 12px/16px ls .04em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".trow .t-price",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".grand__num",
+   "kind": "type",
+   "from": "300 24px/28px ls .01em",
+   "to": "Title/1"
+  },
+  {
+   "sel": ".btn",
+   "kind": "type",
+   "from": "400 14px/20px ls .04em",
+   "to": "Label/Control L (DS component)"
+  },
+  {
+   "sel": ".field input,.field select",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".field__frame legend",
+   "kind": "type",
+   "from": "400 10px/12px ls .04em",
+   "to": "Label/S (DS component)"
+  },
+  {
+   "sel": ".field__label",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".field:focus-within .field__label,\n.field input:not(:placeholder-shown) ~ .field__label,\n.field select:valid ~ .field__label,\n.field--float .field__label,\n.field.is-float .field__label",
+   "kind": "type",
+   "from": "400 10px/12px ls \u2013",
+   "to": "Label/S (DS component)"
+  },
+  {
+   "sel": ".field__hint,.field__err",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".voucher .btn",
+   "kind": "type-override",
+   "from": "font-size:12px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".trust",
+   "kind": "type",
+   "from": "\u2013 10px/14px ls .12em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".qs__name",
+   "kind": "type",
+   "from": "400 16px/22px ls .10em UPPER",
+   "to": "Title/3"
+  },
+  {
+   "sel": ".qs__bandlabel",
+   "kind": "type",
+   "from": "400 12px/14px ls -.02em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".qs__sizes button",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".qs__sizes button",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "7px",
+   "to": "6px"
+  },
+  {
+   "sel": ".qs__sizes button",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "5px",
+   "to": "4px"
+  },
+  {
+   "sel": ".qs__sizes button",
+   "kind": "colour",
+   "prop": "border",
+   "from": "#ddd",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ".qs__sizes button[disabled]",
+   "kind": "colour",
+   "prop": "border-color",
+   "from": "rgba(0,0,0,.05)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ".qs__sizes button[disabled]::after",
+   "kind": "colour",
+   "prop": "background",
+   "from": "rgba(0,0,0,.5)",
+   "to": "surface/frosted-dark"
+  },
+  {
+   "sel": ".undobar",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".undobar",
+   "kind": "shadow",
+   "prop": "box-shadow",
+   "from": "0 8px 24px rgba(0,0,0,.10)",
+   "to": "Elevation/Popover"
+  },
+  {
+   "sel": ".undobar .t-body-s,.undobar .t-link-s",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".t-title-xl",
+   "kind": "type-override",
+   "from": "font-size:16px, line-height:22px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".pagehead h1",
+   "kind": "type-override",
+   "from": "font-size:14px, line-height:20px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".statusbox .t-body-m",
+   "kind": "type-override",
+   "from": "font-size:12px, line-height:18px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".acard__pr",
+   "kind": "type-override",
+   "from": "font-size:12px, line-height:16px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".item__name",
+   "kind": "type-override",
+   "from": "font-size:14px, line-height:20px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".mbar__row--total .t-price",
+   "kind": "type-override",
+   "from": "font-size:16px, line-height:22px",
+   "to": "removed (inherits its DS style)"
+  }
+ ],
+ "Checkout (checkout.html)": [
+  {
+   "sel": ":root",
+   "kind": "colour",
+   "prop": "--c-wash",
+   "from": "#F9FAFB",
+   "to": "surface/hover"
+  },
+  {
+   "sel": ":root",
+   "kind": "colour",
+   "prop": "--c-hair",
+   "from": "rgba(0,0,0,.05)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ":root",
+   "kind": "colour",
+   "prop": "--c-edge",
+   "from": "rgba(0,0,0,.2)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": "body",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": "input,select",
+   "kind": "type",
+   "from": "\u2013 14px/\u2013 ls \u2013",
+   "to": "Body/M"
+  },
+  {
+   "sel": "h1,h2,h3,p",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".t-title-l",
+   "kind": "type",
+   "from": "400 24px/30px ls .14em UPPER",
+   "to": "Title/1"
+  },
+  {
+   "sel": ".t-title-m",
+   "kind": "type",
+   "from": "400 14px/20px ls .20em UPPER",
+   "to": "Title/4"
+  },
+  {
+   "sel": ".t-title-s",
+   "kind": "type",
+   "from": "400 14px/20px ls .16em UPPER",
+   "to": "Title/4"
+  },
+  {
+   "sel": ".t-title-xs",
+   "kind": "type",
+   "from": "300 12px/16px ls .16em UPPER",
+   "to": "Label/M"
+  },
+  {
+   "sel": ".t-body-m",
+   "kind": "type",
+   "from": "300 14px/22px ls .05em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".t-body-s",
+   "kind": "type",
+   "from": "300 12px/18px ls .05em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".t-body-xs",
+   "kind": "type",
+   "from": "300 10px/14px ls .04em",
+   "to": "Body/XS"
+  },
+  {
+   "sel": ".t-label-m",
+   "kind": "type",
+   "from": "300 11px/16px ls .22em UPPER",
+   "to": "Label/M"
+  },
+  {
+   "sel": ".t-label-s",
+   "kind": "type",
+   "from": "300 10px/12px ls .18em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".t-label-hm",
+   "kind": "type",
+   "from": "400 12px/16px ls .04em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".t-price",
+   "kind": "type",
+   "from": "300 14px/18px ls .02em",
+   "to": "Price/L"
+  },
+  {
+   "sel": ".t-price-s",
+   "kind": "type",
+   "from": "300 12px/16px ls .02em",
+   "to": "Price/Note"
+  },
+  {
+   "sel": ".t-price-note",
+   "kind": "type",
+   "from": "300 12px/14px ls 0",
+   "to": "Price/Note"
+  },
+  {
+   "sel": ".t-link",
+   "kind": "type",
+   "from": "300 14px/16px ls .04em",
+   "to": "Link"
+  },
+  {
+   "sel": ".t-link-s",
+   "kind": "type",
+   "from": "300 12px/14px ls .04em",
+   "to": "Link"
+  },
+  {
+   "sel": ".field input,.field select",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".field__frame legend",
+   "kind": "type",
+   "from": "400 10px/12px ls .04em",
+   "to": "Label/S (DS component)"
+  },
+  {
+   "sel": ".field__label",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".field:focus-within .field__label,\n.field input:not(:placeholder-shown) ~ .field__label,\n.field select:valid ~ .field__label,\n.field--float .field__label,\n.field.is-float .field__label",
+   "kind": "type",
+   "from": "400 10px/12px ls \u2013",
+   "to": "Label/S (DS component)"
+  },
+  {
+   "sel": ".field__hint,.field__err",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".opt__date",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".opt.is-on .opt__title",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".gate .sso button,.login .sso button",
+   "kind": "type",
+   "from": "400 14px/20px ls .04em",
+   "to": "Label/Control L (DS component)"
+  },
+  {
+   "sel": ".gate .sso button .t-body-s,.login .sso button .t-label-m",
+   "kind": "type-override",
+   "from": "letter-spacing:inherit",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".mtlist li",
+   "kind": "type",
+   "from": "400 12px/18px ls .05em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".mtlist svg",
+   "kind": "spacing",
+   "prop": "margin-top",
+   "from": "3px",
+   "to": "2px"
+  },
+  {
+   "sel": ".storelist",
+   "kind": "spacing",
+   "prop": "margin",
+   "from": "calc(24px + var(--space-16) + 20px + var(--space-16)) = 76px",
+   "to": "72px"
+  },
+  {
+   "sel": "#payList .opt__logo svg",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "3px",
+   "to": "2px"
+  },
+  {
+   "sel": "#payList .opt__logo svg",
+   "kind": "colour",
+   "prop": "border",
+   "from": "rgba(0,0,0,.12)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": "#payList .opt[data-pay=\"card\"] .opt__logo svg",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "9px",
+   "to": "8px"
+  },
+  {
+   "sel": "#payList .opt__logo svg",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "3px",
+   "to": "2px"
+  },
+  {
+   "sel": ".steps__no",
+   "kind": "type",
+   "from": "\u2013 10px/1 ls 0",
+   "to": "Title/6 (DS component)"
+  },
+  {
+   "sel": ".steps__item[data-done=\"true\"] .steps__no",
+   "kind": "type-override",
+   "from": "font-size:0",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".suggest",
+   "kind": "shadow",
+   "prop": "box-shadow",
+   "from": "0 8px 20px rgba(0,0,0,.08)",
+   "to": "Elevation/Popover"
+  },
+  {
+   "sel": ".suggest__item mark",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".review dt",
+   "kind": "type",
+   "from": "400 13px/18px ls .10em UPPER",
+   "to": "Title/4"
+  },
+  {
+   "sel": ".review__items .sec__head",
+   "kind": "spacing",
+   "prop": "margin-bottom",
+   "from": "18px",
+   "to": "16px"
+  },
+  {
+   "sel": "body[data-mode] .ck__rail .review__items .sec__head h3",
+   "kind": "type-override",
+   "from": "font-size:13px, line-height:18px, letter-spacing:.16em",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": "body:not([data-step=\"4\"]) .review__items .sec__head h3",
+   "kind": "type-override",
+   "from": "font-size:14px, line-height:20px, letter-spacing:.20em",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".review__items .sec__head h3",
+   "kind": "type",
+   "from": "400 13px/18px ls .10em UPPER",
+   "to": "Title/4"
+  },
+  {
+   "sel": "[data-review=\"pay\"] .review__mark svg",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "3px",
+   "to": "2px"
+  },
+  {
+   "sel": "[data-review=\"pay\"] .review__mark svg",
+   "kind": "colour",
+   "prop": "border",
+   "from": "rgba(0,0,0,.12)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ".btn",
+   "kind": "type",
+   "from": "\u2013 14px/20px ls .04em",
+   "to": "Label/Control L (DS component)"
+  },
+  {
+   "sel": ".btn--sm",
+   "kind": "type-override",
+   "from": "font-size:12px, line-height:16px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".li__name",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".li__price .t-price,\n.trow .t-price",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".li__member",
+   "kind": "type",
+   "from": "\u2013 10px/14px ls .14em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".voucher .btn",
+   "kind": "type-override",
+   "from": "font-size:12px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".trow--grand .t-title-m",
+   "kind": "type-override",
+   "from": "letter-spacing:.20em",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".grand__num",
+   "kind": "type",
+   "from": "300 24px/28px ls .01em",
+   "to": "Title/1"
+  },
+  {
+   "sel": ".promise span",
+   "kind": "type-override",
+   "from": "line-height:20px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".trust",
+   "kind": "type",
+   "from": "\u2013 10px/14px ls .12em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".paybar__row--total .t-price",
+   "kind": "type-override",
+   "from": "font-size:16px, line-height:22px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": "#doneMail",
+   "kind": "type-override",
+   "from": "font-weight:400",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".donerec__head",
+   "kind": "type",
+   "from": "300 12px/16px ls .04em UPPER",
+   "to": "Label/M"
+  },
+  {
+   "sel": ".donerec__nm",
+   "kind": "type",
+   "from": "400 12px/20px ls .04em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".donerec__pr",
+   "kind": "type",
+   "from": "400 12px/14px ls \u2013",
+   "to": "Price/M"
+  },
+  {
+   "sel": ".done__in .t-title-l",
+   "kind": "type-override",
+   "from": "font-size:20px, line-height:26px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".donerec__nm",
+   "kind": "type-override",
+   "from": "font-size:11px, line-height:16px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".donerec__pr",
+   "kind": "type-override",
+   "from": "font-size:10px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".steps__item",
+   "kind": "type-override",
+   "from": "font-size:10px, line-height:14px, letter-spacing:.10em",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".steps__no",
+   "kind": "type-override",
+   "from": "font-size:9px",
+   "to": "removed (inherits its DS style)"
+  }
+ ],
+ "Mini cart (lib/shop.css)": [
+  {
+   "sel": ".mc",
+   "kind": "colour",
+   "prop": "--mc-ink-50",
+   "from": "rgba(0,0,0,.5)",
+   "to": "text/secondary"
+  },
+  {
+   "sel": ".mc",
+   "kind": "colour",
+   "prop": "--mc-hair",
+   "from": "rgba(0,0,0,.08)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ".mc",
+   "kind": "colour",
+   "prop": "--mc-edge",
+   "from": "rgba(0,0,0,.2)",
+   "to": "border/low-contrast"
+  },
+  {
+   "sel": ".mc__panel",
+   "kind": "shadow",
+   "prop": "box-shadow",
+   "from": "0 12px 34px rgba(0,0,0,.13)",
+   "to": "Elevation/Overlay"
+  },
+  {
+   "sel": ".mc__head",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "18px",
+   "to": "16px"
+  },
+  {
+   "sel": ".mc__title",
+   "kind": "type",
+   "from": "400 12px/16px ls .08em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".mc__empty",
+   "kind": "type",
+   "from": "300 14px/20px ls .04em",
+   "to": "Body/M"
+  },
+  {
+   "sel": ".mc__info",
+   "kind": "spacing",
+   "prop": "gap",
+   "from": "3px",
+   "to": "2px"
+  },
+  {
+   "sel": ".mc__series",
+   "kind": "type",
+   "from": "300 12px/17px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".mc__name",
+   "kind": "type",
+   "from": "400 13px/18px ls .06em UPPER",
+   "to": "Title/4"
+  },
+  {
+   "sel": ".mc__meta",
+   "kind": "type",
+   "from": "300 12px/17px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".mc__num",
+   "kind": "type",
+   "from": "400 14px/18px ls \u2013",
+   "to": "Price/L"
+  },
+  {
+   "sel": ".mc__set-h",
+   "kind": "type",
+   "from": "400 12px/16px ls .08em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".mc__set-series",
+   "kind": "type",
+   "from": "300 11px/15px ls .04em",
+   "to": "Body/S"
+  },
+  {
+   "sel": ".mc__set-name",
+   "kind": "type",
+   "from": "400 12px/16px ls .06em UPPER",
+   "to": "Title/5"
+  },
+  {
+   "sel": ".mc__set-pr",
+   "kind": "type",
+   "from": "300 13px/17px ls .02em",
+   "to": "Price/L"
+  },
+  {
+   "sel": ".mc__tile-nm",
+   "kind": "type",
+   "from": "400 10px/14px ls .06em UPPER",
+   "to": "Title/6"
+  },
+  {
+   "sel": ".mc__tile-pr",
+   "kind": "type",
+   "from": "400 12px/16px ls .02em",
+   "to": "Price/M"
+  },
+  {
+   "sel": ".mc__btn",
+   "kind": "type",
+   "from": "400 14px/20px ls .04em",
+   "to": "Label/Control L (DS component)"
+  },
+  {
+   "sel": ".mc__btn--primary:hover",
+   "kind": "colour",
+   "prop": "background",
+   "from": "#222",
+   "to": "surface/dark"
+  },
+  {
+   "sel": ".mc__panel",
+   "kind": "shadow",
+   "prop": "box-shadow",
+   "from": "0 -6px 28px rgba(0,0,0,.16)",
+   "to": "Elevation/Popover"
+  }
+ ]
+}

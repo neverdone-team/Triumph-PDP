@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Search – Triumph prototype</title>
+<link rel="stylesheet" href="./lib/search.css?v=30" />
+<style>
+/* ============================================================
+   FONTS — Alliance No.1 Light + Regular, same as the PLP/PDP
+   ============================================================ */
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Light.otf") format("opentype"); font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:"Alliance No1"; src:url("./fonts/AllianceNo1-Regular.otf") format("opentype"); font-weight:400; font-style:normal; font-display:swap; }
+
+/* ============================================================
+   TOKENS — the Design System Triumph semantic roles
+   ============================================================ */
+:root{
+  --c-bg:#FFFFFF;
+  --c-ink:#000000;
+  --c-ink-soft:#747474;
+  --c-line:#DADADA;
+  --c-offwhite:#F8F3F3;
+  --c-muted:#F1F1F1;
+  --c-burgundy:#5E2039;
+  --font-sans:"Alliance No1","Inter","Helvetica Neue",Arial,sans-serif;
+  --pad-x:24px;
+  --ease-out:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;overflow-x:clip}
+body{
+  background:var(--c-bg); color:var(--c-ink); font-family:var(--font-sans);
+  font-weight:400; font-size:14px; line-height:20px; letter-spacing:.04em;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;background:none;border:0;padding:0;color:inherit}
+a{color:inherit;text-decoration:none}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0;font-weight:400}
+
+/* ============================================================
+   HEADER — the Design System's own component, 101:186.
+   One build per breakpoint, exactly as the component carries
+   them:
+     · Compact — phone (869:51), up to LG: 54 tall, padding
+       16/12, gap 16; logo 100x13; utilities gap 24 = search
+       GLYPH (no pill), account, basket + count, menu. No heart.
+     · Stacked — LG · XL (869:52): 124 tall, padding 36/24/0,
+       row gap 32; top row = logo 136x17 + utilities (gap 30,
+       search pill 160x22); nav row 34 under it.
+     · Inline — XXL (869:50), from 1400: 78 tall, padding
+       36/24/20, gap 24; logo 156x20; nav centred, gap 24;
+       utilities gap 30 on a 22px row.
+   Links are Title/5 (12/16 upper, +4%) with SALE in accent;
+   icons are the dev team's own glyphs at 16 and stroke 1.3.
+   ============================================================ */
+header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
+/* STACKED — the two-row build, and now only 992–1199: from XL the row fits on
+   one line and folds into the Inline build, below LG the phone collapses it
+   (see the breakpoint rules at the foot of this block). */
+.nav{
+  max-width:2400px;margin:0 auto;
+  padding:36px 24px 0;
+  display:flex;flex-direction:column;gap:32px;
+}
+.nav__top{display:flex;align-items:center;gap:24px;height:22px}
+.logo{display:inline-flex;align-items:center;flex:none;height:22px}
+.logo__img{width:136px;height:17px;display:block}
+.nav__row{display:flex;align-items:flex-start;height:34px}
+.nav__links{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:24px}
+.nav__links a{
+  font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;
+  font-weight:400;white-space:nowrap;
+}
+.nav__links a:hover{text-decoration:underline;text-underline-offset:4px}
+.nav__links .is-sale{color:var(--c-burgundy)}
+.nav__right{display:flex;align-items:center;gap:30px;height:22px;flex:none;margin-left:auto}
+/* the resting search control — search.js takes this over and grows it */
+.search{
+  display:flex;align-items:center;gap:8px;
+  width:160px;height:22px;padding:0 8px;
+  background:rgba(0,0,0,.05);cursor:pointer;
+}
+.search svg{width:16px;height:16px;fill:none;stroke:var(--c-ink);stroke-width:1.3;flex:none}
+.search input{
+  border:0;outline:0;background:transparent;width:100%;min-width:0;cursor:pointer;
+  font-family:inherit;font-weight:300;
+  font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--c-ink);
+}
+.search input::placeholder{color:var(--c-ink);opacity:1}
+.nav__icons{display:flex;align-items:center;gap:30px}
+.icon{height:16px;width:auto;display:block;fill:none;stroke:var(--c-ink);stroke-width:1.3}
+.icon--search{width:16px}
+.icon--account{width:15px}
+.icon--heart{width:16px;height:14.66px}
+.icon--basket{width:16px}
+.nav__icons button{display:inline-flex;align-items:center}
+.nav__icons button[aria-label="Cart"]{gap:4px}
+.cart-count{font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em}
+.nav__icons .burger{display:none}
+.burger svg{width:20px;height:8px;fill:none;stroke:var(--c-ink);stroke-width:1.3;display:block}
+
+/* INLINE — one row, logo 156x20, nav centred, utilities right.
+
+   FROM 1200, NOT 1400 (Amelie, 2026-09-23): the second row is for when there
+   is not enough space for the first, and the DS's XXL breakpoint was 280px
+   later than that. Measured natural widths of the one row — 24 of padding
+   either side, logo 156, 24 gap, the nav's links and their 24px gaps, 24 gap,
+   the utilities:
+
+     search.html   48 + 156 + 24 + 621 + 24 + 247 = 1120
+     plp / pdp     48 + 156 + 24 + 685 + 24 + 222 = 1159
+
+   So the row stops fitting somewhere around 1160, and the next stop up
+   Triumph's own ramp is XL/1200 — which leaves 40–80px of slack and hands the
+   stacked build the 992–1199 band it is actually needed in. (German labels run
+   longer than these English ones; if the live set overflows at 1200 the switch
+   moves to 1400, it does not get a number invented for it.)
+
+   THREE COLUMNS, THE OUTER TWO EQUAL. The DS component gives Nav flex:1 0 0
+   between a 156 logo slot and the utilities, so the links centre in the space
+   those two happen to leave — which is 45px left of the row's real centre at
+   1440, and constant at every width (half the 91px by which the utilities
+   outweigh the logo). Invisible until something else centred sits under them;
+   the search sheet is centred, and it showed (Amelie, 2026-09-23). A 1fr/auto/
+   1fr grid makes the two ends reserve the same width, so the middle column IS
+   the middle of the row. justify-self keeps the logo and the utilities their
+   own size inside those tracks rather than stretching them. */
+@media (min-width:1200px){
+  .nav{
+    display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    align-items:center;gap:24px;padding:36px 24px 20px;
+  }
+  .nav__top{display:contents}
+  /* grid-area, not order: an item that goes display:none is removed from the
+     grid, and auto-placement would then slide the utilities into the middle.
+     THE ROW IS PINNED TOO. The logo and the utilities come from .nav__top via
+     display:contents and so are placed first; the nav row follows them in
+     source order, and sparse auto-placement will not send the cursor backwards
+     to column 2 — it drops to row 2 instead, which is how the one-row header
+     grew a second row it was never meant to have. */
+  .logo{grid-area:1 / 1;justify-self:start}
+  .logo__img{width:156px;height:20px}
+  .nav__row{grid-area:1 / 2;justify-self:center;height:16px}
+  .nav__links{flex:0 0 auto;justify-content:center}
+  .nav__right{grid-area:1 / 3;justify-self:end;margin-left:0}
+}
+
+/* COMPACT — phone (869:51), everything below LG: 54 tall, padding 16/12,
+   gap 16; logo 100x13; utilities gap 24 — the search is a bare glyph, there is
+   no wishlist, and the menu closes the row. */
+@media (max-width:991.98px){
+  .nav{flex-direction:row;align-items:center;gap:16px;padding:16px 12px}
+  .nav__top{display:contents}
+  .logo__img{width:100px;height:13px}
+  .nav__row{display:none}
+  .nav__right{gap:24px;margin-left:auto;height:16px}
+  .nav__icons{gap:24px}
+  .search{width:auto;height:16px;padding:0;gap:0;background:none}
+  .search input{display:none}
+  .nav__icons button[aria-label="Wishlist"]{display:none}
+  .nav__icons .burger{display:inline-flex}
+}
+
+/* ============================================================
+   THE PAGE UNDER THE SHEET
+   It exists so the open can be judged: Nike's search pushes the
+   page down instead of covering it, and that only reads when
+   there is something below the fold to be pushed.
+   ============================================================ */
+.hero{position:relative;height:520px;overflow:hidden;background:var(--c-offwhite)}
+.hero img{width:100%;height:100%;object-fit:cover}
+.hero__copy{position:absolute;left:var(--pad-x);bottom:40px;color:#fff;max-width:520px}
+.hero__eyebrow{font-weight:300;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;opacity:.9} /* Label/M */
+.hero__h{margin-top:10px;font-weight:400;font-size:32px;line-height:38px;letter-spacing:.02em;text-transform:uppercase} /* Display */
+.hero__btn{margin-top:22px;display:inline-flex;align-items:center;height:44px;padding:0 28px;background:#fff;color:#000;
+  font-weight:400;font-size:14px;line-height:20px;letter-spacing:.04em;text-transform:uppercase} /* Label/Control L */
+
+.rail{padding:56px var(--pad-x) 24px;max-width:2400px;margin:0 auto}
+.rail__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:20px}
+.rail__h{font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase} /* Title/5 */
+.rail__all{font-weight:300;font-size:14px;line-height:16px;letter-spacing:.04em;text-decoration:underline;text-underline-offset:4px} /* Link */
+.rail__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.tile-ph{aspect-ratio:3/4;background:var(--c-offwhite);overflow:hidden}
+.tile-ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.tile:hover .tile-ph img{transform:scale(1.03)}
+.tile-name{margin-top:12px;font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase} /* Title/5 */
+.tile-pr{margin-top:4px;font-weight:400;font-size:12px;line-height:14px;letter-spacing:0} /* Price/M */
+
+.strip{margin:56px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.strip img{width:100%;height:420px;object-fit:cover}
+.note{padding:64px var(--pad-x);text-align:center;color:var(--c-ink-soft);
+  font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em} /* Body/M */
+
+/* ============================================================
+   THE SPECIMEN BOARD — the six resting controls at real size
+   Each sample is the control itself, not a picture of it, so
+   what is on the board is exactly what lands in the header.
+   Click one and the nav takes it.
+   ============================================================ */
+.board{max-width:1100px;margin:0 auto;padding:72px var(--pad-x) 8px}
+.board__h{font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase} /* Title/5 */
+.board__lede{margin:10px 0 0;max-width:640px;font-weight:300;font-size:14px;line-height:20px;letter-spacing:.04em;color:var(--c-ink-soft)} /* Body/M */
+.board__lede strong{font-weight:400;color:var(--c-ink)}
+.board__list{margin-top:36px;border-top:1px solid var(--c-line)}
+.board__row{
+  display:grid;grid-template-columns:132px minmax(0,1fr) 1fr;gap:24px;align-items:center;
+  width:100%;text-align:left;
+  padding:22px 0;border-bottom:1px solid var(--c-line);
+  transition:background .2s var(--ease-out);
+}
+.board__row:hover{background:rgba(0,0,0,.02)}
+.board__row[data-on="true"] .board__name{text-decoration:underline;text-underline-offset:4px}
+.board__name{font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase}
+.board__why{font-weight:300;font-size:13px;line-height:19px;letter-spacing:.04em;color:var(--c-ink-soft)}
+.board__spec{display:flex;align-items:center;justify-content:flex-start;min-height:34px;padding-left:8px}
+/* the wide build has no fixed width — it is given the room it would have */
+.board__spec .search--wide{width:100%;max-width:320px}
+.board__on{
+  margin-left:auto;flex:none;
+  font-weight:300;font-size:10px;line-height:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--c-ink-soft);
+  opacity:0;transition:opacity .2s
+}
+.board__row:hover .board__on{opacity:1}
+.board__row[data-on="true"] .board__on{opacity:1;color:var(--c-ink)}
+@media (max-width:767.98px){
+  .board__row{grid-template-columns:1fr;gap:12px}
+  .board__spec{padding-left:0}
+}
+
+/* ============================================================
+   DASHBOARD (prototype chrome) — same panel as the PLP
+   ============================================================ */
+.dash-toggle{
+  position:fixed;left:24px;bottom:24px;z-index:9601;
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.88);color:#fff;backdrop-filter:blur(8px);
+  padding:10px 18px;border-radius:999px;
+  font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);transition:background .25s;
+}
+.dash-toggle:hover{background:rgba(0,0,0,.72)}
+.dash-toggle svg{width:10px;height:6px;fill:none;stroke:#fff;stroke-width:1.2;transition:transform .3s var(--ease-out)}
+body.dash-open .dash-toggle svg{transform:rotate(180deg)}
+.dash{
+  position:fixed;left:24px;bottom:72px;z-index:9600;
+  width:272px;max-height:calc(100vh - 120px);overflow-y:auto;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(12px);
+  border-radius:16px;padding:20px;color:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  display:none;flex-direction:column;gap:16px;
+}
+body.dash-open .dash{display:flex}
+.dash__group--view{padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.15)}
+.dash__label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px}
+.dash__seg{display:flex;flex-wrap:wrap;gap:4px}
+.dash__seg button{
+  flex:1;padding:7px 10px;border-radius:999px;
+  font-size:11px;letter-spacing:.03em;color:rgba(255,255,255,.65);
+  background:rgba(255,255,255,.08);white-space:nowrap;transition:color .2s,background .2s;
+}
+.dash__seg button:hover{color:#fff}
+.dash__seg button[data-on="true"]{background:#fff;color:#000}
+.dash__note{font-size:10px;line-height:15px;letter-spacing:.03em;color:rgba(255,255,255,.45)}
+@media (max-width:760px){
+  .dash{left:12px;right:12px;width:auto;bottom:64px;max-height:55vh}
+  .dash-toggle{left:12px;bottom:12px}
+}
+
+@media (max-width:991.98px){
+  .rail__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero{height:420px}
+}
+@media (max-width:767.98px){
+  :root{--pad-x:16px}
+  .hero{height:380px}
+  .hero__h{font-size:24px;line-height:30px}
+  .strip{grid-template-columns:1fr}
+  .strip img{height:300px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+   <div class="nav__top">
+    <a class="logo" href="./plp.html" aria-label="Triumph">
+      <img class="logo__img" src="./Assets/Vector.svg" alt="Triumph" width="136" height="17" />
+    </a>
+    <div class="nav__right">
+      <!-- the resting control: search.js takes this over and morphs it -->
+      <label class="search" aria-label="Search">
+        <svg class="icon icon--search" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.83 9.83L15.35 15.35M11.4 6.025C11.4 8.99361 8.99361 11.4 6.025 11.4C3.05639 11.4 0.65 8.99361 0.65 6.025C0.65 3.05639 3.05639 0.65 6.025 0.65C8.99361 0.65 11.4 3.05639 11.4 6.025Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="search" placeholder="Search" />
+      </label>
+      <div class="nav__icons">
+        <!-- Icon / Account 98:9 — the dev team's .svgIcon__user, 15x16 -->
+        <button aria-label="Account">
+          <svg class="icon icon--account" viewBox="0 0 15 16" aria-hidden="true">
+            <path d="M7.2998 6.2C8.79097 6.2 9.9998 4.99117 9.9998 3.5C9.9998 2.00883 8.79097 0.8 7.2998 0.8C5.80863 0.8 4.5998 2.00883 4.5998 3.5C4.5998 4.99117 5.80863 6.2 7.2998 6.2Z"/>
+            <path d="M13.7998 16C13.7998 12.134 10.8897 9 7.2998 9C3.70995 9 0.799805 12.134 0.799805 16"/>
+          </svg>
+        </button>
+        <!-- Icon / Heart 80:8, Outline — .svgIcon__heart scaled into the 16 box -->
+        <button aria-label="Wishlist">
+          <svg class="icon icon--heart" viewBox="0 0 16.0715 14.6616" aria-hidden="true">
+            <path d="M7.97584 3.2867L9.41404 1.78858C10.1331 1.06948 10.9721 0.65 11.9309 0.65C12.8298 0.65 13.7287 1.06948 14.3878 1.72865C15.7661 3.16685 15.7661 5.50393 14.3878 7.00206C13.3691 8.02079 8.03577 13.7137 8.03577 13.7137C8.03577 13.7137 2.64251 8.02079 1.68371 7.00206C0.305431 5.56386 0.305431 3.22678 1.68371 1.72865C2.28296 1.06948 3.18184 0.65 4.08071 0.65C4.97959 0.65 5.87846 1.06948 6.53764 1.72865L7.97584 3.2867Z"/>
+          </svg>
+        </button>
+        <!-- Icon / Basket 145:519, Default — .svgIcon__shoppingBag, with its count -->
+        <button aria-label="Cart">
+          <svg class="icon icon--basket" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4.4 9.6V2.95C4.4 1.7 5 0.65 8 0.65C11 0.65 11.6 1.7 11.6 2.95V9.6M0.65 5.45H15.35V15.35H0.65V5.45Z"/>
+          </svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="burger" aria-label="Menu"><svg viewBox="0 0 20 8"><path d="M0 1h20M0 7h20"/></svg></button>
+      </div>
+    </div>
+   </div>
+   <div class="nav__row">
+    <ul class="nav__links">
+      <li><a href="#">Special Deals</a></li>
+      <li><a href="#">Bras</a></li>
+      <li><a href="#">Briefs</a></li>
+      <li><a href="#">Shapewear</a></li>
+      <li><a href="#">Swimwear</a></li>
+      <li><a href="#">Night &amp; Lounge</a></li>
+      <li><a class="is-sale" href="#">Sale</a></li>
+    </ul>
+   </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <img src="./Assets/plp/hero-burgundy.jpg" alt="" />
+    <div class="hero__copy">
+      <div class="hero__eyebrow">New season</div>
+      <h1 class="hero__h">Ode to burgundy and blush</h1>
+      <a class="hero__btn" href="./plp.html">Shop the collection</a>
+    </div>
+  </section>
+
+  <!-- the six resting controls, at real size, on the real component -->
+  <section class="board">
+    <h2 class="board__h">The resting control — six builds</h2>
+    <p class="board__lede">
+      What the header carries when nothing is open. Every sample below is the
+      live control, not a picture of one — click a row and the nav takes it, then
+      open the search to see the pair working together. <strong>Label ships</strong>
+      (Amelie, 2026-09-23); the other five are kept here as the record of what
+      was weighed against it.
+    </p>
+    <div class="board__list" id="board"></div>
+  </section>
+
+  <section class="rail">
+    <div class="rail__head">
+      <h2 class="rail__h">New in</h2>
+      <a class="rail__all" href="./plp.html">See all</a>
+    </div>
+    <div class="rail__grid" id="rail"></div>
+  </section>
+
+  <div class="strip">
+    <img src="./Assets/plp/ed-peonies-wide.jpg" alt="" />
+    <img src="./Assets/plp/ed-tulle.jpg" alt="" />
+  </div>
+
+  <p class="note">The page is here to be pushed. Open the search and watch where this sits.</p>
+</main>
+
+
+<button class="dash-toggle" aria-expanded="false">Options
+  <svg viewBox="0 0 10 6"><path d="M.5.5 5 5 9.5.5"/></svg>
+</button>
+<aside class="dash" aria-label="Prototype options">
+  <!-- Layout settled 2026-09-23 on Apple's arrangement, and the toggle removed
+       with it. The Nike one is still in the library and still reachable as
+       ?layout=nike, it is simply no longer offered here. -->
+  <div class="dash__group dash__group--view">
+    <div class="dash__label">Nav control &mdash; label ships</div>
+    <div class="dash__seg">
+      <button data-k="control" data-val="fill">Fill</button>
+      <button data-k="control" data-val="label">Label</button>
+      <button data-k="control" data-val="outline">Outline</button>
+      <button data-k="control" data-val="rule">Rule</button>
+      <button data-k="control" data-val="glyph">Glyph</button>
+      <button data-k="control" data-val="wide">Wide</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Behind the sheet</div>
+    <div class="dash__seg">
+      <button data-k="backdrop" data-val="blur">Blur</button>
+      <button data-k="backdrop" data-val="overlay">Float</button>
+      <button data-k="backdrop" data-val="scrim">Dim</button>
+      <button data-k="backdrop" data-val="push">Push</button>
+    </div>
+    <p class="dash__note">Push moves the page down under the sheet — the Nike layout only; the Apple one never moves the header.</p>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Completion weight</div>
+    <div class="dash__seg">
+      <button data-k="weight" data-val="typed">Typed</button>
+      <button data-k="weight" data-val="completion">Completion</button>
+    </div>
+  </div>
+  <div class="dash__group">
+    <div class="dash__label">Last viewed products</div>
+    <div class="dash__seg">
+      <button data-k="trending" data-val="true">On</button>
+      <button data-k="trending" data-val="false">Off</button>
+    </div>
+  </div>
+</aside>
+
+<script src="./lib/search.js?v=30" defer></script>
+<script>
+/* the rail behind the sheet — the same records the search reads, so the
+   prototype only ever holds one catalogue */
+document.addEventListener('DOMContentLoaded', function () {
+  var rail = document.getElementById('rail');
+  var money = function (n) { return '€' + n.toFixed(2); };
+  (window.TriumphSearch.products || []).slice(2, 6).forEach(function (p) {
+    var a = document.createElement('a');
+    a.className = 'tile';
+    a.href = './pdp.html';
+    a.innerHTML =
+      '<span class="tile-ph"><img src="' + p.ph + '" alt="" loading="lazy" /></span>' +
+      '<span class="tile-name">' + p.name + '</span>' +
+      '<span class="tile-pr">' + money(p.price) + '</span>';
+    rail.appendChild(a);
+  });
+
+  /* ==========================================================
+     THE SPECIMEN BOARD
+     The samples are the real control with the real DS glyph —
+     only the <input> is a <span>, so nothing on the board can
+     take a caret. Clicking a row puts that build in the nav.
+     ========================================================== */
+  var GLYPH = '<svg class="icon icon--search" viewBox="0 0 16 16" aria-hidden="true">' +
+    '<path d="M9.83 9.83L15.35 15.35M11.4 6.025C11.4 8.99361 8.99361 11.4 6.025 11.4C3.05639 11.4 0.65 8.99361 0.65 6.025C0.65 3.05639 3.05639 0.65 6.025 0.65C8.99361 0.65 11.4 3.05639 11.4 6.025Z" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var BUILDS = [
+    { k: 'fill',    ph: 'Search',
+      why: 'The grey box the prototype has carried so far — surface/muted, glyph and label. It reads as a field at rest, which is the one thing none of the others do.' },
+    { k: 'label',   ph: 'Search',
+      why: 'The glyph and the word, nothing under them. The lightest of the six and the only one that matches the utilities beside it: account, wishlist and basket are unboxed too.' },
+    { k: 'outline', ph: 'Search',
+      why: 'The DS Text Field\u2019s Outlined build with the fill taken off. Still legibly a field, but drawn instead of filled, so the header keeps one flat white ground.' },
+    { k: 'rule',    ph: 'Search',
+      why: 'A field reduced to the one line that says type here. It carries the most weight of the unboxed three and costs the least ink.' },
+    { k: 'glyph',   ph: '',
+      why: 'The magnifier alone \u2014 what the compact build below 992 already does, so the header stops changing shape at the breakpoint. Quietest, and the least discoverable.' },
+    { k: 'wide',    ph: 'What are you looking for?',
+      why: 'The field takes the row\u2019s free width with the glyph closing it on the right. The search stops being a utility and becomes part of the header \u2014 a statement, and a commitment.' }
+  ];
+
+  var board = document.getElementById('board');
+  BUILDS.forEach(function (b) {
+    var row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'board__row';
+    row.dataset.build = b.k;
+    row.innerHTML =
+      '<span class="board__name">' + b.k + '</span>' +
+      '<span class="board__why">' + b.why + '</span>' +
+      '<span class="board__spec">' +
+        '<span class="search is-specimen search--' + b.k + '">' + GLYPH +
+          (b.ph ? '<span class="search__ph">' + b.ph + '</span>' : '') +
+        '</span>' +
+        '<span class="board__on">Use in nav</span>' +
+      '</span>';
+    row.addEventListener('click', function () { apply({ control: b.k }); });
+    board.appendChild(row);
+  });
+
+  /* ==========================================================
+     DASHBOARD — every option deep-links, so a version can be
+     sent on as a URL: ?layout=apple&control=rule&backdrop=blur
+     ========================================================== */
+  /* The "Last searches" state cannot be judged on an empty machine, so the
+     demo seeds two the first time it is opened. A real shopper's list is their
+     own and is never touched. */
+  try {
+    var K = 'triumph.proto.search.recent';
+    if (!localStorage.getItem(K)) localStorage.setItem(K, JSON.stringify(['doreen bra', 'amourette charm']));
+  } catch (e) {}
+
+  var qs = new URLSearchParams(location.search);
+  var state = {
+    layout:   qs.get('layout')   || 'apple',
+    control:  qs.get('control')  || 'label',
+    backdrop: qs.get('backdrop') || 'blur',
+    weight:   qs.get('weight')   || 'typed',
+    trending: qs.get('trending') !== 'false'
+  };
+
+  function apply(next) {
+    Object.keys(next || {}).forEach(function (k) { state[k] = next[k]; });
+    /* push is the Nike layout's alone — asking for it switches the layout too,
+       rather than silently doing nothing */
+    if (state.backdrop === 'push' && state.layout === 'apple' && next && next.backdrop) state.layout = 'nike';
+    window.TriumphSearch.set({
+      layout: state.layout, backdrop: state.backdrop,
+      weight: state.weight, trending: state.trending
+    });
+    window.TriumphSearch.control(state.control);
+    paint();
+    var u = new URLSearchParams();
+    Object.keys(state).forEach(function (k) { u.set(k, String(state[k])); });
+    history.replaceState(null, '', location.pathname + '?' + u.toString());
+  }
+
+  function paint() {
+    document.querySelectorAll('.dash__seg button').forEach(function (b) {
+      b.dataset.on = String(String(state[b.dataset.k]) === b.dataset.val);
+    });
+    document.querySelectorAll('.board__row').forEach(function (r) {
+      r.dataset.on = String(r.dataset.build === state.control);
+    });
+  }
+
+  document.querySelectorAll('.dash__seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var v = b.dataset.val;
+      var patch = {};
+      patch[b.dataset.k] = (v === 'true' ? true : v === 'false' ? false : v);
+      apply(patch);
+    });
+  });
+
+  var toggle = document.querySelector('.dash-toggle');
+  toggle.addEventListener('click', function () {
+    var on = document.body.classList.toggle('dash-open');
+    toggle.setAttribute('aria-expanded', String(on));
+  });
+
+  apply({});
+});
+</script>
+</body>
+</html>
