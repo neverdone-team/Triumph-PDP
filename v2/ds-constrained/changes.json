@@ -12,7 +12,7 @@
    "kind": "colour",
    "prop": "--c-hair",
    "from": "rgba(0,0,0,.05)",
-   "to": "border/low-contrast"
+   "to": "border/subtle"
   },
   {
    "sel": ":root",
@@ -394,7 +394,7 @@
    "kind": "colour",
    "prop": "--c-hair",
    "from": "rgba(0,0,0,.05)",
-   "to": "border/low-contrast"
+   "to": "border/subtle"
   },
   {
    "sel": ":root",
@@ -818,6 +818,13 @@
    "prop": "--mc-hair",
    "from": "rgba(0,0,0,.08)",
    "to": "border/low-contrast"
+  },
+  {
+   "sel": ".mc",
+   "kind": "colour",
+   "prop": "--mc-hair-soft",
+   "from": "rgba(0,0,0,.05)",
+   "to": "surface/hover"
   },
   {
    "sel": ".mc",

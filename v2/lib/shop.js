@@ -343,8 +343,6 @@ window.Shop = (function () {
         '<span class="mc__grab" aria-hidden="true"></span>' +
         '<header class="mc__head">' +
           '<span class="mc__headline">' +
-            '<svg class="mc__tick" viewBox="0 0 20 20" aria-hidden="true">' +
-              '<circle cx="10" cy="10" r="9"/><path d="M6 10.4l2.8 2.8L14.2 7"/></svg>' +
             '<span class="mc__title" data-mc-title>Added to your bag</span>' +
           '</span>' +
           '<button class="mc__x" type="button" aria-label="Close" data-mc-close>' +
@@ -561,7 +559,10 @@ window.Shop = (function () {
     /* The strip of recommendations needs the height the 560 cap would otherwise take
        away — squeezed against it, the flexible part of the card is the line list, so the
        very line being confirmed is what gets clipped (Amelie, 2026-09-16). */
-    var cap = mc.querySelector('.mc__set--tiles') ? 630 : 560;
+    /* …and on a tall screen the card grows into the room it has, up to 80% of the
+       window, so the line list shows more before it scrolls (Amelie, 2026-09-25) */
+    var base = mc.querySelector('.mc__set--tiles') ? 630 : 560;
+    var cap = Math.max(base, Math.min(820, Math.round(window.innerHeight * .8)));
     panel.style.maxHeight = Math.max(220, Math.min(cap, window.innerHeight - top - 16)) + 'px';
   }
 

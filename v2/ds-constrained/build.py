@@ -58,15 +58,17 @@ ROLES = {
     'surface/error': '#f8e6e8', 'surface/success': '#e7f8e6', 'surface/warning': '#f8f7e6',
     'surface/info': '#e6f0f8', 'action/primary': '#000000', 'accent/brand': '#5e2039',
     'border/high-contrast': '#000000', 'border/medium-contrast': '#aeaeae',
-    'border/low-contrast': '#cecece', 'border/error': '#e40032',
+    'border/low-contrast': '#cecece', 'border/subtle': '#e0e0e0', 'border/error': '#e40032',
     'border/success': '#008000', 'border/warning': '#936a00', 'border/info': '#0f5e8b',
 }
 FAMILY = {
     'text':    [r for r in ROLES if r.startswith(('text/', 'icon/', 'accent/'))],
     'surface': [r for r in ROLES if r.startswith(('surface/', 'overlay/', 'action/'))],
-    'border':  [r for r in ROLES if r.startswith('border/')],
+    # border/subtle is for dividers only: it is reached through --c-hair, never by snapping a
+    # literal, so control outlines (payment tiles, size chips) keep border/low contrast
+    'border':  [r for r in ROLES if r.startswith('border/') and r != 'border/subtle'],
 }
-FAMILY['any'] = list(ROLES)
+FAMILY['any'] = [r for r in ROLES if r != 'border/subtle']
 # payment-provider marks keep their own colours — they are not the system's to set
 BRAND_MARKS = {'#003087', '#009cde', '#0b051d', '#1a1f71', '#eb001b', '#f79e1b',
                '#fbbc05', '#ea4335', '#4285f4', '#34a853', '#ffb3c7', '#17120f'}
@@ -233,19 +235,21 @@ def snap_spacing(value, log, sel, prop):
     parts = re.split(r'(var\([^()]*(?:\([^()]*\)[^()]*)*\))', value)
     return ''.join(x if x.startswith('var(') else re.sub(r'(?<![\w.-])(-?\d*\.?\d+)px', rep, x) for x in parts)
 
-# the prototypes' named tokens → the role each one stands for. Hairlines are by value: the
-# DS no longer has a 5% border (border/low contrast is #CECECE now), so both rules land on it.
+# the prototypes' named tokens → the role each one stands for. The DS no longer has a 5% border
+# (border/low contrast is #CECECE now). The checkout/bag separators (--c-hair) take border/subtle
+# #E0E0E0, added to the DS for exactly this on 2026-09-25 (#F1F1F1 read too faint there); the
+# mini cart's header rule stays on surface/hover #F1F1F1, which Amelie liked.
 TOKEN_ROLES = {
     '--c-ink': 'text/primary', '--c-ink-soft': 'text/secondary', '--c-on-dark': 'text/on-dark',
     '--c-bg': 'surface/raised', '--c-offwhite': 'surface/page', '--c-wash': 'surface/hover',
     '--c-grey-light': 'surface/hover', '--c-grey-medium': 'icon/medium-contrast',
-    '--c-hair': 'border/low-contrast', '--c-edge': 'border/low-contrast',
+    '--c-hair': 'border/subtle', '--c-edge': 'border/low-contrast',
     '--c-burgundy': 'text/accent', '--c-sales': 'surface/sales', '--c-scrim': 'overlay/scrim',
     '--color-error': 'text/error', '--color-tutu': 'surface/error', '--color-green': 'text/success',
     '--color-peppermint': 'surface/success', '--color-buddha': 'text/warning', '--color-warning': 'surface/warning',
     '--color-buddha-ink': 'text/warning', '--color-darkcerulean': 'text/info', '--color-info-tint': 'surface/info',
     '--mc-ink': 'text/primary', '--mc-ink-50': 'text/secondary', '--mc-bg': 'surface/raised',
-    '--mc-hair': 'border/low-contrast', '--mc-edge': 'border/low-contrast', '--mc-grey': 'surface/hover',
+    '--mc-hair': 'border/low-contrast', '--mc-hair-soft': 'surface/hover', '--mc-edge': 'border/low-contrast', '--mc-grey': 'surface/hover',
     '--mc-scrim': 'overlay/scrim', '--mc-green': 'text/success',
 }
 
