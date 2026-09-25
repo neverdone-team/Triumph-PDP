@@ -231,6 +231,24 @@
    "to": "Label/Control L (DS component)"
   },
   {
+   "sel": ".reward__eyebrow",
+   "kind": "type",
+   "from": "\u2013 10px/12px ls .12em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".reward__btn",
+   "kind": "type",
+   "from": "\u2013 10px/12px ls .1em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".reward__rm",
+   "kind": "type-override",
+   "from": "font-size:11px, line-height:14px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
    "sel": ".field input,.field select",
    "kind": "type",
    "from": "300 14px/20px ls .04em",
@@ -584,6 +602,37 @@
    "prop": "margin",
    "from": "calc(24px + var(--space-16) + 20px + var(--space-16)) = 76px",
    "to": "72px"
+  },
+  {
+   "sel": ".pointfind",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "calc(24px + var(--space-16) + 20px + var(--space-16)) = 76px",
+   "to": "72px"
+  },
+  {
+   "sel": ".pt__tag",
+   "kind": "type",
+   "from": "\u2013 10px/12px ls .08em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".reward__eyebrow",
+   "kind": "type",
+   "from": "\u2013 10px/12px ls .12em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".reward__btn",
+   "kind": "type",
+   "from": "\u2013 10px/12px ls .1em UPPER",
+   "to": "Label/S"
+  },
+  {
+   "sel": ".reward__rm",
+   "kind": "type-override",
+   "from": "font-size:11px, line-height:14px",
+   "to": "removed (inherits its DS style)"
   },
   {
    "sel": "#payList .opt__logo svg",

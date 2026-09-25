@@ -631,6 +631,84 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 .storelist__it[aria-current="true"]{background:var(--c-wash);box-shadow:inset 2px 0 0 var(--c-ink)}
 @media (max-width:575px){ .storelist{margin-left:0} }
 
+/* ---- PARCELSHOP (Amelie, 2026-09-25) --------------------------------------
+   Picking the option opens a short list of Paketshops and post offices near the billing
+   address, nearest first and already chosen — no DHL customer number to look up, which
+   is why Packstations are not offered. The list is part of the option, as a payment
+   panel is: the row's rule stands down and the one under the list separates it from
+   the next option. */
+.pointfind{padding:0 0 var(--space-24) var(--space-72);
+  border-bottom:1px solid var(--c-hair);display:grid;gap:var(--space-12)}
+.pointfind[hidden]{display:none}
+.opt:has(+ .pointfind:not([hidden])){border-bottom-color:transparent}
+/* an address of the customer's choosing, for when the billing address is not where
+   they will be — Enter searches; no button, no location (Amelie, 2026-09-25) */
+.pointfind__search{display:flex;align-items:flex-end;gap:var(--space-8)}
+/* a full-size DS field — 56 on desktop, the phone's 48 below 576 — like every other
+   address field on the page (Amelie, 2026-09-25) */
+.pointfind__search .field{flex:1}
+.pointfind__search input::-webkit-search-decoration,.pointfind__search input::-webkit-search-cancel-button{-webkit-appearance:none}
+.pointfind__bar{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-12);flex-wrap:wrap}
+.pointfind .storelist{margin:0}
+.pt__row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-12);width:100%}
+.pt__dist{flex:none;color:var(--c-ink-soft)}
+.pt__tag{font-weight:300;font-size:var(--ds-label-s-fs);line-height:var(--ds-label-s-lh);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--color-green);margin-left:var(--space-8)}
+.pt__hours{color:var(--c-ink-soft)}
+@media (max-width:575px){ .pointfind{padding-left:0} }
+/* ---- MYTRIUMPH REWARD ---------------------------------------------------
+   Signed in AND a member only. It sits with the code fields, since it is one more way
+   to take money off the order, and it is out in the open rather than folded into a row:
+   it can be redeemed now, so it shows itself (Amelie, 2026-09-25). No brand colour — on
+   surface/page — the subtle pink — with ink on it and the crown in accent/brand, cut as a voucher: a torn line and two notches between
+   what it is worth and the one thing to do with it. The notches are a mask, so they show
+   whatever the summary sits on. Named colours, not hex, in the mask: build.py snaps
+   every hex and rgba to a DS token, and a token there punches the wrong holes. */
+.reward{
+  --tear:112px;
+  display:flex;align-items:stretch;position:relative;
+  background:var(--c-offwhite);color:var(--c-ink);
+  margin:var(--space-16) 0 0;
+  -webkit-mask:
+    radial-gradient(circle at calc(100% - var(--tear)) 0, transparent 6px, black 6.5px),
+    radial-gradient(circle at calc(100% - var(--tear)) 100%, transparent 6px, black 6.5px);
+  -webkit-mask-composite:source-in;
+  mask:
+    radial-gradient(circle at calc(100% - var(--tear)) 0, transparent 6px, black 6.5px),
+    radial-gradient(circle at calc(100% - var(--tear)) 100%, transparent 6px, black 6.5px);
+  mask-composite:intersect}
+.reward[hidden]{display:none}
+.reward__main{flex:1;min-width:0;padding:var(--space-16) var(--space-16);
+  display:flex;flex-direction:column;justify-content:center;gap:var(--space-2)}
+.reward__eyebrow{display:flex;align-items:center;gap:var(--space-6);
+  font-weight:300;font-size:var(--ds-label-s-fs);line-height:var(--ds-label-s-lh);letter-spacing:.04em;text-transform:uppercase;color:var(--c-burgundy)}
+.reward__crown{flex:none;color:var(--c-burgundy)}
+.reward__amt{display:flex;align-items:baseline;gap:var(--space-6);margin-top:var(--space-4)}
+/* the figure is set as a price — the DS Price style the bag's line prices use */
+.reward__num{white-space:nowrap}
+.reward__act{width:var(--tear);flex:none;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:var(--space-6);padding:var(--space-16);
+  border-left:2px dotted var(--c-bg)}
+.reward__btn{height:var(--control-30);padding:0 var(--space-12);white-space:nowrap;display:inline-flex;align-items:center;
+  justify-content:center;gap:var(--space-6);background:var(--c-bg);color:var(--c-ink);
+  box-shadow:inset 0 0 0 1px var(--c-ink);
+  font-weight:300;font-size:var(--ds-label-s-fs);line-height:var(--ds-label-s-lh);letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s var(--ease-out),color .2s var(--ease-out)}
+.reward__btn:hover{background:var(--c-wash)}
+.reward__rm{color:var(--c-ink);text-decoration:underline;
+  text-underline-offset:3px;display:none}
+.reward__rm:hover{opacity:.6}
+.reward__tick{display:none}
+/* applied: the button stands down to an outline and says so; the way back sits under it */
+.reward[data-on="true"] .reward__btn{background:transparent;color:var(--c-ink);
+  box-shadow:inset 0 0 0 1px var(--c-ink);cursor:default;opacity:1}
+.reward[data-on="true"] .reward__tick{display:block}
+.reward[data-on="true"] .reward__rm{display:block}
+@media (prefers-reduced-motion:no-preference){
+  .reward[data-on="true"] .reward__num{animation:rewardPop .34s cubic-bezier(.34,1.56,.64,1)}
+}
+@keyframes rewardPop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+
 /* Payment logos sit between the radio and the label, so the eye lands on the brand it is
    looking for before it reads the words (Amelie, 2026-09-10). */
 #payList .opt__radio{order:-2}
@@ -1021,16 +1099,29 @@ body:not([data-step="4"]) .review__items .sec__head h3{color:var(--c-ink)}
 
 /* the field reserves 6px above its box for the notch, so the row aligns on its end edge */
 /* collapsed by default — a code is the exception, not the next step */
-/* The code is entered on the bag, never in checkout (Amelie, 2026-09-16). The summary
-   here is a read-back of the order, and an empty Gift card or discount code field in it
-   sends people off to hunt for a code they may not have — the classic checkout leak. A
-   code already applied still shows, as its own row under the subtotal. Hidden rather than
-   deleted: the markup and its wiring stay, so it is one line to bring back. */
-.ck__rail .acc{display:none}
+/* 2026-09-16 took the code out of checkout altogether (the empty field sends people off
+   to hunt for a code — the classic leak); 2026-09-25 brought it back. */
+/* Back on every step of the one-pager before the review (Amelie, 2026-09-25): Address,
+   Delivery and Payment each carry it in the rail. The review itself is the confirmation of
+   the order and asks for nothing new, so it goes there; an applied code still reads back
+   as its own row under the subtotal. */
+body[data-step="0"] #voucherAcc,
+body[data-step="4"] #voucherAcc,
+body[data-mode="steps"] #voucherAcc{display:none}
+/* the stepped flow takes the code on the bag only (Amelie, 2026-09-25) */
+/* The row sits centred between its rule and the total's: the total brings a 12px margin
+   of its own above its rule, so the row gives that back — a margin, not a sibling rule,
+   so nothing is left over when the row is hidden (see the note under .acc__body). */
+.totals #voucherAcc{margin-bottom:calc(var(--space-12) * -1)}
 .acc{border-top:1px solid var(--c-hair);margin:var(--space-24) 0 0}
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16) 0}
-.acc__chev{transition:transform .2s var(--ease-out)}
-.acc[data-open="true"] .acc__chev{transform:rotate(180deg)}
+/* a plus, not a chevron — the bag's own mark: it adds a code rather than revealing more
+   of the summary (Amelie, 2026-09-25) */
+.acc__plus{position:relative;width:12px;height:12px;flex:none}
+.acc__plus::before,.acc__plus::after{content:"";position:absolute;background:currentColor}
+.acc__plus::before{left:0;right:0;top:5.5px;height:1px}
+.acc__plus::after{top:0;bottom:0;left:5.5px;width:1px;transition:opacity .2s var(--ease-out)}
+.acc[data-open="true"] .acc__plus::after{opacity:0}
 .acc__body{display:none;padding-bottom:var(--space-20)}
 /* `.totals .acc + .trow--grand{margin-top:0}` lived here: it zeroed the total's top
    margin because the accordion above it brought its own padding. The accordion is
@@ -1053,6 +1144,21 @@ body:not([data-step="4"]) .review__items .sec__head h3{color:var(--c-ink)}
 .voucher .field{flex:1;--ctl:var(--control-44)}
 .voucher .field__frame{background:transparent}
 .voucher .btn{height:var(--control-44);padding:0 var(--space-16)}
+/* How loudly the code offers itself — switched in the panel (Amelie, 2026-09-25).
+   plain: the hairline row it has always been · dashed: a dotted frame, the coupon's own
+   mark · grey: a surface/muted fill, the field inside it back on white. Both framed
+   versions take the row's rules away, since the frame now does their job. */
+body[data-voucher-style="dashed"] #voucherAcc,
+body[data-voucher-style="grey"] #voucherAcc{padding:0 var(--space-16);border-top:0}
+body[data-voucher-style="dashed"] #voucherAcc{border:1px dashed var(--c-grey-medium)}
+body[data-voucher-style="grey"] #voucherAcc{background:var(--c-grey-light)}
+body[data-voucher-style="grey"] #voucherAcc .field__frame{background:var(--c-bg)}
+body[data-voucher-style="dashed"] #voucherAcc .voucher,
+body[data-voucher-style="grey"] #voucherAcc .voucher{margin-bottom:0}
+body[data-voucher-style="dashed"] #voucherAcc .acc__body,
+body[data-voucher-style="grey"] #voucherAcc .acc__body{padding-bottom:var(--space-16)}
+body[data-voucher-style="dashed"] .ck__rail #voucherAcc,
+body[data-voucher-style="grey"] .ck__rail #voucherAcc{margin-bottom:var(--space-16)}
 
 .totals{border-top:1px solid var(--c-hair);padding-top:var(--space-24)}
 /* the same rhythm as the bag's summary (Amelie, 2026-09-11) */
@@ -1171,6 +1277,8 @@ body:not([data-step="4"]) .review__items .sec__head h3{color:var(--c-ink)}
 .done__in > *:nth-child(4){animation-delay:.60s}
 .done__in > *:nth-child(5){animation-delay:.72s}
 .done__in > *:nth-child(6){animation-delay:.88s}
+/* the guest's account offer arrives after Continue shopping, never before it */
+.done__in > *:nth-child(7){animation-delay:1.08s}
 .donerec{animation:rowReveal .7s var(--ease-reveal) 1.08s backwards}
 @media (prefers-reduced-motion: reduce){
   .done__in > *,.donerec{animation:none}
@@ -1208,6 +1316,15 @@ body:not([data-step="4"]) .review__items .sec__head h3{color:var(--c-ink)}
   .donerec__pr{}
 }
 /* what happens next, in the customer's own reading width */
+/* the guest's account offer: a link under Continue shopping, opening to one field */
+.doneacct{width:100%;display:grid;gap:var(--space-16);justify-items:center;margin-top:var(--space-8)}
+.doneacct[hidden],.doneacct__form[hidden],.doneacct__ok[hidden]{display:none}
+.doneacct__form{width:100%;display:grid;gap:var(--space-16);text-align:left}
+.doneacct__form > p{text-align:center}
+.doneacct__ok{display:flex;align-items:center;gap:var(--space-8);color:var(--color-green)}
+@media (prefers-reduced-motion:no-preference){
+  .doneacct__form:not([hidden]),.doneacct__ok:not([hidden]){animation:rowReveal .5s var(--ease-reveal) backwards}
+}
 .done__next{max-width:46ch;margin:var(--space-24) auto 0;color:var(--c-ink)}
 .done__facts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-24);
   width:100%;margin:var(--space-24) 0;padding:var(--space-24) 0;
@@ -1824,6 +1941,33 @@ body[data-mode="onepage"] .ck__rail{position:static;
           </span>
           <span class="opt__price t-price" data-ship-price="express">€9.99</span>
         </label>
+        <label class="opt" data-ship="parcel">
+          <input type="radio" name="ship" value="parcel" />
+          <span class="opt__radio"></span>
+          <svg class="opt__icon" width="20" height="20" fill="currentColor" aria-hidden="true"><use href="#i-store"/></svg>
+          <span class="opt__body">
+            <span class="opt__title t-body-m">Pick up at a DHL Paketshop</span>
+            <span class="opt__meta opt__date t-body-s">Fri 11 – Sat 12 Sep 2026</span>
+            <span class="storepick" id="pointPick" hidden>
+              <span class="t-body-s" id="pointName">—</span>
+              <button class="t-link-s" type="button" id="pointChange">Change</button>
+            </span>
+          </span>
+          <span class="opt__price t-price" data-ship-price="parcel">€4.99</span>
+        </label>
+        <div class="pointfind" id="pointFind" hidden>
+          <div class="pointfind__search">
+            <label class="field">
+              <input type="search" id="pointQuery" placeholder=" " autocomplete="off" enterkeyhint="search" />
+              <fieldset class="field__frame"><legend><span>Address, postcode or city</span></legend></fieldset>
+              <span class="field__label">Address, postcode or city</span>
+            </label>
+          </div>
+          <div class="pointfind__bar">
+            <span class="t-body-s muted" id="pointNote">Near your billing address</span>
+          </div>
+          <div class="storelist" id="pointList" role="group" aria-label="Choose a pick-up point"></div>
+        </div>
         <label class="opt" data-ship="pickup">
           <input type="radio" name="ship" value="pickup" />
           <span class="opt__radio"></span>
@@ -1841,23 +1985,35 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <span class="opt__price t-price is-free" data-ship-price="pickup">Free</span>
         </label>
 
-        <div class="storelist" id="storeList" hidden role="group" aria-label="Choose a store">
-          <button class="storelist__it" type="button" data-store="Triumph Berlin Ku'damm" data-addr="Kurfürstendamm 231 &middot; 10719 Berlin">
-            <span class="t-body-m">Triumph Berlin Ku'damm</span>
-            <span class="t-body-s muted">Kurfürstendamm 231 &middot; 10719 Berlin</span>
-          </button>
-          <button class="storelist__it" type="button" data-store="Triumph Berlin Alexa" data-addr="Grunerstra&szlig;e 20 &middot; 10179 Berlin">
-            <span class="t-body-m">Triumph Berlin Alexa</span>
-            <span class="t-body-s muted">Grunerstra&szlig;e 20 &middot; 10179 Berlin</span>
-          </button>
-          <button class="storelist__it" type="button" data-store="Triumph Hamburg M&ouml;nckeberg" data-addr="M&ouml;nckebergstra&szlig;e 7 &middot; 20095 Hamburg">
-            <span class="t-body-m">Triumph Hamburg M&ouml;nckeberg</span>
-            <span class="t-body-s muted">M&ouml;nckebergstra&szlig;e 7 &middot; 20095 Hamburg</span>
-          </button>
-          <button class="storelist__it" type="button" data-store="Triumph M&uuml;nchen Stachus" data-addr="Karlsplatz 5 &middot; 80335 M&uuml;nchen">
-            <span class="t-body-m">Triumph M&uuml;nchen Stachus</span>
-            <span class="t-body-s muted">Karlsplatz 5 &middot; 80335 M&uuml;nchen</span>
-          </button>
+        <div class="pointfind" id="storeFind" hidden>
+          <div class="pointfind__search">
+            <label class="field">
+              <input type="search" id="storeQuery" placeholder=" " autocomplete="off" enterkeyhint="search" />
+              <fieldset class="field__frame"><legend><span>Address, postcode or city</span></legend></fieldset>
+              <span class="field__label">Address, postcode or city</span>
+            </label>
+          </div>
+          <div class="pointfind__bar">
+            <span class="t-body-s muted" id="storeNote">Near your billing address</span>
+          </div>
+          <div class="storelist" id="storeList" role="group" aria-label="Choose a store">
+            <button class="storelist__it" type="button" data-store="Triumph Berlin Ku'damm" data-city="berlin" data-dist="1200" data-addr="Kurfürstendamm 231 &middot; 10719 Berlin">
+              <span class="pt__row"><span class="t-body-m">Triumph Berlin Ku'damm</span><span class="pt__dist t-body-s" data-dist-out></span></span>
+              <span class="t-body-s muted">Kurfürstendamm 231 &middot; 10719 Berlin</span>
+            </button>
+            <button class="storelist__it" type="button" data-store="Triumph Berlin Alexa" data-city="berlin" data-dist="7800" data-addr="Grunerstra&szlig;e 20 &middot; 10179 Berlin">
+              <span class="pt__row"><span class="t-body-m">Triumph Berlin Alexa</span><span class="pt__dist t-body-s" data-dist-out></span></span>
+              <span class="t-body-s muted">Grunerstra&szlig;e 20 &middot; 10179 Berlin</span>
+            </button>
+            <button class="storelist__it" type="button" data-store="Triumph Hamburg M&ouml;nckeberg" data-city="hamburg" data-dist="255000" data-addr="M&ouml;nckebergstra&szlig;e 7 &middot; 20095 Hamburg">
+              <span class="pt__row"><span class="t-body-m">Triumph Hamburg M&ouml;nckeberg</span><span class="pt__dist t-body-s" data-dist-out></span></span>
+              <span class="t-body-s muted">M&ouml;nckebergstra&szlig;e 7 &middot; 20095 Hamburg</span>
+            </button>
+            <button class="storelist__it" type="button" data-store="Triumph M&uuml;nchen Stachus" data-city="m&uuml;nchen" data-dist="505000" data-addr="Karlsplatz 5 &middot; 80335 M&uuml;nchen">
+              <span class="pt__row"><span class="t-body-m">Triumph M&uuml;nchen Stachus</span><span class="pt__dist t-body-s" data-dist-out></span></span>
+              <span class="t-body-s muted">Karlsplatz 5 &middot; 80335 M&uuml;nchen</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2008,9 +2164,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <!-- the bag itself moves in here on the review (Amelie, 2026-09-14): the left
            column carries what was ordered, the rail keeps the date and the figures -->
       <div class="review__items" id="reviewItems" hidden>
+        <!-- the heading is back, without its Edit — the header's Shopping bag link already
+             goes back to the bag (Amelie, 2026-09-25) -->
         <div class="sec__head">
-          <h3 class="t-title-s">Your items <span class="review__items-n" data-items-count></span></h3>
-          <a class="t-link-s" href="./cart.html">Edit</a>
+          <h3 class="t-title-s">Items <span class="review__items-n" data-items-count></span></h3>
         </div>
       </div>
 
@@ -2065,6 +2222,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       Your bag is empty. <a class="t-link-s" href="./pdp.html">Keep shopping</a>.
     </p>
 
+
     <div class="totals">
       <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€109.85</span></div>
       <!-- the applied code sits right under the subtotal it comes off, with its own
@@ -2079,11 +2237,35 @@ body[data-mode="onepage"] .ck__rail{position:static;
         </span>
         <span class="t-price" data-discount>−€10.99</span>
       </div>
+      <!-- applied, the voucher is a line like any code: its name and a remove link beside
+           it, and the card itself goes (Amelie, 2026-09-25) -->
+      <div class="trow trow--code" id="rewardRow" hidden>
+        <span class="dcode">
+          <span class="dcode__line">
+            <span class="t-body-m">MyTriumph voucher</span>
+            <span class="muted t-body-s" data-reward-note>€15 off</span>
+            <button class="t-link-s dcode__x" type="button" data-reward-remove>remove</button>
+          </span>
+        </span>
+        <span class="t-price" data-reward-off>−€10.00</span>
+      </div>
       <div class="trow" data-ship-row><span class="t-body-m">Shipping</span><span class="t-price" data-shipping>€4.99</span></div>
+    <!-- the MyTriumph reward — signed-in members only, out in the open beside the
+         code fields (Amelie, 2026-09-25) -->
+    <div class="reward" data-reward hidden data-on="false">
+      <div class="reward__main">
+        <span class="reward__eyebrow"><svg class="reward__crown" width="14" height="12" viewBox="0 0 23 20" fill="none" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 6.93399e-09L11.2574 15.8444L6.89607 4.92073e-07L6.77135 4.99014e-07L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z" fill="currentColor"/></svg>MyTriumph voucher</span>
+        <span class="reward__amt"><span class="reward__num t-price" data-reward-amt>€15 reduction</span></span>
+      </div>
+      <div class="reward__act">
+        <button class="reward__btn" type="button" data-reward-redeem><svg class="reward__tick" width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="currentColor" stroke-width="1.3"/></svg><span data-reward-label>Redeem</span></button>
+        <button class="reward__rm" type="button" data-reward-remove>Remove</button>
+      </div>
+    </div>
     <div class="acc" data-open="false" id="voucherAcc">
         <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false" aria-controls="voucherBody">
           <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
-          <svg class="acc__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 8l3-3.5" stroke="currentColor" stroke-width="1"/></svg>
+          <span class="acc__plus" aria-hidden="true"></span>
         </button>
         <div class="acc__body" id="voucherBody">
           <div class="voucher">
@@ -2140,6 +2322,27 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <div><dt class="t-label-s muted">Delivery</dt><dd class="t-body-m" id="doneShip">—</dd></div>
     </dl>
     <a class="btn btn--wide" href="./pdp.html">Continue shopping</a>
+    <!-- a guest's order already holds everything an account needs but a password, so the
+         offer is one field, after the order and never before it (Amelie, 2026-09-25) -->
+    <div class="doneacct" id="doneAcct" hidden>
+      <button class="t-link-s" type="button" id="doneAcctOpen" aria-expanded="false" aria-controls="doneAcctForm">Create an account for next time</button>
+      <div class="doneacct__form" id="doneAcctForm" hidden>
+        <p class="t-body-s muted">We have your details from this order. Choose a password for
+          <span data-done-mail>your email</span> and you are set.</p>
+        <label class="field" id="doneAcctField">
+          <input type="password" id="doneAcctPw" placeholder=" " autocomplete="new-password" />
+          <fieldset class="field__frame"><legend><span>Password</span></legend></fieldset>
+          <span class="field__label">Password</span>
+          <span class="field__hint">At least 8 characters and a number.</span>
+          <span class="field__err">At least 8 characters and a number, please.</span>
+        </label>
+        <button class="btn btn--ghost btn--wide" type="button" id="doneAcctGo">Sign up</button>
+      </div>
+      <p class="doneacct__ok t-body-m" id="doneAcctOk" hidden role="status">
+        <svg width="14" height="12" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="currentColor" stroke-width="1.2"/></svg>
+        Your registration was successful.
+      </p>
+    </div>
   </div>
 
   <!-- the order is done, so this is the only thing left to offer (Amelie, 2026-09-14) -->
@@ -2219,6 +2422,12 @@ body[data-mode="onepage"] .ck__rail{position:static;
     <button data-mt-set="plain" aria-pressed="true">Plain</button>
     <button data-mt-set="banner" aria-pressed="false">Burgundy banner</button>
   </div>
+  <h4>Discount code</h4>
+  <div class="dash__row" data-group="voucher">
+    <button data-voucher-set="plain" aria-pressed="true">Plain</button>
+    <button data-voucher-set="dashed" aria-pressed="false">Dotted frame</button>
+    <button data-voucher-set="grey" aria-pressed="false">Grey fill</button>
+  </div>
   <h4>Prototype · State</h4>
   <div class="dash__row" data-group="account">
     <button data-account-set="guest" aria-pressed="true">Guest</button>
@@ -2235,7 +2444,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   </div>
 </div>
 
-<script src="./lib/shop.js"></script>
+<script src="./lib/shop.js?v=2026-09-25d"></script>
 <script>
 (function () {
   const $  = (s, r = document) => r.querySelector(s);
@@ -2256,6 +2465,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     std: '<span class="promise__label">Delivery</span> <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
     mytriumph: '<span class="promise__label">Delivery</span> <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
     express: '<span class="promise__label">Delivery</span> <strong style="font-weight:400">Thu 10 Sep 2026</strong>',
+    parcel: '<span class="promise__label">At your collection point</span> <strong style="font-weight:400">Fri 11 – Sat 12 Sep 2026</strong>',
     pickup: '<span class="promise__label">Ready to collect</span> <strong style="font-weight:400">from Thu 10 Sep 2026</strong>',
   };
 
@@ -2336,6 +2546,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
        gift-card section stays folded — it does not need to open to prove it. */
     if (t.voucher && $('#voucher') && !$('#voucher').value) $('#voucher').value = t.voucher;
     roll(r('[data-discount]'), '−' + eur(t.discount));
+    r('#rewardRow').hidden = !t.reward;
+    roll(r('[data-reward-off]'), '−' + eur(t.reward));
+    syncReward(t);
     $$('[data-voucher-count]').forEach(n => { n.textContent = t.voucher ? ' (1)' : ''; });
     if (t.voucher) $$('[data-voucher-name]').forEach(n => { n.textContent = t.voucher; });
     const shipCell = r('[data-shipping]');
@@ -2356,11 +2569,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
     r('[data-promise]').innerHTML = PROMISE[state.ship];
 
     // the standard-shipping price cell reflects membership / the free-shipping threshold
-    const stdCell = $('[data-ship-price="std"]');
-    if (stdCell) {
+    // …and so does the parcelshop's, which is priced as standard delivery
+    $$('[data-ship-price="std"], [data-ship-price="parcel"]').forEach(stdCell => {
       stdCell.textContent = t.freeShip ? 'Free' : eur(Shop.SHIP_STD);
       stdCell.classList.toggle('is-free', t.freeShip);   // green, like every other Free
-    }
+    });
 
     // the MyTriumph row has nothing to offer a member, or a basket that already ships free
     const myRow = $('#myTriumphShip');
@@ -2373,8 +2586,32 @@ body[data-mode="onepage"] .ck__rail{position:static;
     syncMobileSummary();
   }
 
+  /* ---------- MyTriumph reward ----------
+     Every copy of the card (the rail and the phone drawer's clone of it) is written from
+     the same totals, and the buttons are delegated so the clone's work too. */
+  function syncReward(t) {
+    /* a reward card must never be able to stop the page: with an older lib/shop.js
+       (a cached copy) there is no reward to offer, and the card simply stays hidden */
+    if (!Shop.REWARD) { $$('[data-reward]').forEach(c => { c.hidden = true; }); return; }
+    $$('[data-reward-note]').forEach(n => { n.textContent = eur(Shop.REWARD.amount).replace('.00', '') + ' off'; });
+    $$('[data-reward]').forEach(c => {
+      // once applied it is a summary line with its own remove, not a card any more
+      c.hidden = !t.rewardOffered || t.count === 0 || t.rewardOn;
+      c.dataset.on = String(t.rewardOn);
+      $('[data-reward-amt]', c).textContent = eur(Shop.REWARD.amount).replace('.00', '') + ' reduction';
+      $('[data-reward-label]', c).textContent = t.rewardOn ? 'Applied' : 'Redeem';
+      $('[data-reward-redeem]', c).setAttribute('aria-pressed', String(t.rewardOn));
+    });
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-reward-redeem]')) { if (!Shop.read().reward) Shop.setReward(true); }
+    else if (e.target.closest('[data-reward-remove]')) Shop.setReward(false);
+  });
+
+
   function pickShip(value) {
     state.ship = value;
+    document.dispatchEvent(new CustomEvent('ck:ship', { detail: value }));
     const input = $(`.opt input[name="ship"][value="${value}"]`);
     if (input) { input.checked = true; }
     $$('.opt input[name="ship"]').forEach(o => o.closest('.opt').classList.toggle('is-on', o.checked));
@@ -2566,8 +2803,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
       const group = r.name;
       $$(`.opt input[name="${group}"]`).forEach(o => o.closest('.opt').classList.toggle('is-on', o.checked));
       if (group === 'pay') {
-        $$('.opt__panel[data-panel]:not([data-panel="mytriumph"])')
-          .forEach(p => p.classList.toggle('is-open', p.dataset.panel === r.value));
+        $$('.opt__panel[data-panel]:not([data-panel="mytriumph"])').forEach(p => {
+          const opening = p.dataset.panel === r.value && !p.classList.contains('is-open');
+          p.classList.toggle('is-open', p.dataset.panel === r.value);
+          /* a panel that opens rises in the way the card's fields do when the step arrives
+             — the same rowReveal, but all at once: no stagger, no delay (Amelie, 2026-09-25) */
+          if (opening) $$('.field, .check, p, .btn', p).filter(n => n.offsetParent !== null)
+            .forEach(n => revealNode(n, 0));
+        });
       }
       // pickShip, not a bare assignment: it also opens the MyTriumph join panel
       if (group === 'ship') pickShip(r.value);
@@ -2585,6 +2828,14 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
   // voucher
   const vAcc = $('#voucherAcc');
+  const VSTYLE_KEY = 'triumph.proto.voucherStyle';
+  function setVoucherStyle(v){
+    document.body.dataset.voucherStyle = v;
+    $$('[data-voucher-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.voucherSet === v)));
+    try { localStorage.setItem(VSTYLE_KEY, v); } catch (e) {}
+  }
+  $$('[data-voucher-set]').forEach(b => b.addEventListener('click', () => setVoucherStyle(b.dataset.voucherSet)));
+  { let v = 'plain'; try { v = localStorage.getItem(VSTYLE_KEY) || 'plain'; } catch (e) {} setVoucherStyle(v); }
   $('#voucherToggle').addEventListener('click', () => {
     const open = vAcc.dataset.open === 'true';
     vAcc.dataset.open = String(!open);
@@ -2842,29 +3093,137 @@ body[data-mode="onepage"] .ck__rail{position:static;
      The store is a choice inside the choice, so it is named on the option and changed
      from a short list under it (Amelie, 2026-09-14). */
   (function storePicker(){
-    const list = $('#storeList'), toggle = $('#storeChange');
-    if (!STORE_NAME || !list || !toggle) return;
+    const list = $('#storeList'), find = $('#storeFind'), toggle = $('#storeChange');
+    if (!STORE_NAME || !list || !find || !toggle) return;
     const mark = () => $$('.storelist__it', list).forEach(b =>
       b.setAttribute('aria-current', String(b.dataset.store === STORE_NAME.textContent.trim())));
-    const close = () => { list.hidden = true; toggle.textContent = 'Change store'; };
+    const km = m => m < 1000 ? m + ' m' : (m / 1000 < 10 ? (m / 1000).toFixed(1).replace('.0', '') : Math.round(m / 1000)) + ' km';
+    /* sorted nearest first; a typed address re-sorts — a city it names brings its own
+       stores to the top, which is all a prototype needs to show */
+    function sortBy(q){
+      const items = $$('.storelist__it', list);
+      const d = b => {
+        if (!q) return +b.dataset.dist;
+        const city = b.querySelector('.muted').textContent.toLowerCase();
+        return city.includes(q) || q.includes(b.dataset.city.replace('&uuml;', 'ü'))
+          ? +b.dataset.dist % 9000 + 400 : +b.dataset.dist + 300000;
+      };
+      items.sort((a, b) => d(a) - d(b)).forEach(b => {
+        list.appendChild(b);
+        const out = b.querySelector('[data-dist-out]'); if (out) out.textContent = km(d(b));
+      });
+    }
+    /* the finder comes in top down — the address field first, then the stores */
+    const FIND_ROWS = '.pointfind__search, .pointfind__bar, .storelist__it';
+    const setOpen = on => {
+      find.hidden = !on; toggle.textContent = on ? 'Done' : 'Change store';
+      if (on) { mark(); reveal(find, FIND_ROWS, 0, 8); }
+    };
     toggle.addEventListener('click', e => {
       /* the control sits inside the option's label, so a plain click would also toggle
          the radio — and the radio is not what this button is for */
       e.preventDefault(); e.stopPropagation();
-      list.hidden = !list.hidden;
-      toggle.textContent = list.hidden ? 'Change store' : 'Done';
-      mark();
+      setOpen(find.hidden);
     });
+    function search(){
+      const q = $('#storeQuery').value.trim();
+      $('#storeNote').textContent = q ? 'Near ' + q : 'Near your billing address';
+      sortBy(q.toLowerCase());
+    }
+    $('#storeQuery').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
     list.addEventListener('click', e => {
       const b = e.target.closest('.storelist__it');
       if (!b) return;
       STORE_NAME.textContent = b.dataset.store;
-      close();
+      setOpen(false);
       const radio = $('.opt[data-ship="pickup"] input');
       if (radio && !radio.checked) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
       mark();
     });
+    sortBy('');
     mark();
+  })();
+
+  /* ---------- pick up at a DHL Paketshop ----------
+     The nearest point is picked for the customer when the option is chosen; the finder
+     re-sorts from an address the customer types (Amelie, 2026-09-25). */
+  const POINTS = [
+    { id:'shop1', kind:'Paketshop', name:'DHL Paketshop · Späti Ludwigkirchplatz', addr:'Pfalzburger Straße 72 · 10719 Berlin', hours:'Mon–Sat 8:00–22:00', d:{ addr:350, here:240 } },
+    { id:'post1', kind:'Filiale', name:'Deutsche Post Filiale', addr:'Joachimsthaler Straße 7 · 10719 Berlin', hours:'Mon–Fri 9:00–19:00 · Sat 9:00–14:00', d:{ addr:600, here:1100 } },
+    { id:'shop2', kind:'Paketshop', name:'DHL Paketshop · Blumen Uhland', addr:'Uhlandstraße 160 · 10719 Berlin', hours:'Mon–Fri 9:00–19:00 · Sat 9:00–16:00', d:{ addr:750, here:450 } },
+    { id:'shop3', kind:'Paketshop', name:'DHL Paketshop · Schreibwaren König', addr:'Wilmersdorfer Straße 50 · 10627 Berlin', hours:'Mon–Sat 9:00–20:00', d:{ addr:1300, here:2100 } },
+    { id:'shop4', kind:'Paketshop', name:'DHL Paketshop · Rewe Bundesallee', addr:'Bundesallee 26 · 10717 Berlin', hours:'Mon–Sat 7:00–22:00', d:{ addr:1600, here:820 } },
+  ];
+  const POINT = { chosen:null, from:'addr' };
+  const POINT_NAME = $('#pointName');
+  (function pointPicker(){
+    const find = $('#pointFind'), list = $('#pointList'), pick = $('#pointPick'),
+          toggle = $('#pointChange'), note = $('#pointNote');
+    if (!find || !list) return;
+    const dist = m => m < 1000 ? m + ' m' : (m / 1000).toFixed(1).replace('.0', '') + ' km';
+    const sorted = () => POINTS.slice().sort((a, b) => a.d[POINT.from] - b.d[POINT.from]);
+    /* the billing address when one was entered separately, otherwise the delivery
+       address — which is the billing address unless the box was unticked */
+    const billingPlace = () => {
+      const v = sel => { const el = $(sel); return el && el.value.trim() ? el.value.trim() : ''; };
+      const same = $('#sameBilling');
+      const zip = (same && !same.checked && v('#billing [data-addr="zip"]')) || v('#zip') || '10719';
+      const city = (same && !same.checked && v('#billing [data-addr="city"]')) || v('#city') || 'Berlin';
+      return zip + ' ' + city;
+    };
+    const isOn = () => state.ship === 'parcel';
+    function render(){
+      list.innerHTML = sorted().map((p, i) =>
+        '<button class="storelist__it" type="button" data-point="' + p.id + '" aria-current="' + !!(POINT.chosen && POINT.chosen.id === p.id) + '">' +
+          '<span class="pt__row"><span class="t-body-m">' + esc(p.name) + (i === 0 ? '<span class="pt__tag">Nearest</span>' : '') + '</span>' +
+          '<span class="pt__dist t-body-s">' + dist(p.d[POINT.from]) + '</span></span>' +
+          '<span class="t-body-s muted">' + esc(p.addr) + '</span>' +
+          '<span class="pt__hours t-body-xs">' + esc(p.hours) + '</span>' +
+        '</button>').join('');
+    }
+    function choose(p){
+      POINT.chosen = p;
+      POINT_NAME.innerHTML = esc(p.name) + ' <span class="muted">· ' + dist(p.d[POINT.from]) + '</span>';
+      pick.hidden = false;
+      render();
+    }
+    const open = on => {
+      const was = !find.hidden;
+      find.hidden = !on; toggle.textContent = on ? 'Done' : 'Change';
+      if (on) { render(); if (!was) reveal(find, '.pointfind__search, .pointfind__bar, .storelist__it', 0, 8); }
+    };
+    toggle.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); open(find.hidden); });
+    list.addEventListener('click', e => {
+      const b = e.target.closest('[data-point]'); if (!b) return;
+      choose(POINTS.find(p => p.id === b.dataset.point)); open(false);
+    });
+    /* a typed address re-sorts the list from there — simulated: a stable shuffle of the
+       distances per address, so the same address always gives the same order */
+    function search(){
+      const q = $('#pointQuery').value.trim();
+      if (!q) return;
+      let h = 0; for (const ch of q.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+      const STEPS = [280, 540, 830, 1300, 1900];
+      POINTS.map((p, i) => [p, (h ^ (i * 2654435761)) >>> 0]).sort((x, y) => x[1] - y[1])
+        .forEach(([p], i) => { p.d.q = STEPS[i] + (h % 7) * 10; });
+      POINT.from = 'q';
+      note.textContent = 'Near ' + q;
+      choose(sorted()[0]);
+    }
+    $('#pointQuery').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+    /* choosing the option opens the list with the nearest shop already picked; the
+       customer confirms it by carrying on, or taps another */
+    document.addEventListener('ck:ship', e => {
+      const on = e.detail === 'parcel';
+      if (on && !POINT.chosen) {
+        POINT.from = 'addr';
+        note.textContent = 'Near your billing address · ' + billingPlace();
+        choose(sorted()[0]);
+        open(true);
+      }
+      pick.hidden = !on || !POINT.chosen;
+      if (!on) open(false);
+    });
   })();
 
   const NARROW  = window.matchMedia('(max-width:991px)');
@@ -2883,7 +3242,10 @@ body[data-mode="onepage"] .ck__rail{position:static;
   /* returns how many rows it moved, so whatever follows them can carry on the stagger */
   function reveal(root, sel, start, cap){
     if (REDUCED.matches || !root) return 0;
-    const rows = $$(sel, root).slice(0, cap || 8);
+    /* only what is on screen: a field inside a closed panel used to take a late place in
+       the stagger and, opened a moment later, arrived after everything around it
+       (Amelie, 2026-09-25) */
+    const rows = $$(sel, root).filter(n => n.offsetParent !== null).slice(0, cap || 8);
     rows.forEach((n, i) => revealNode(n, (start || 0) + i));
     return rows.length;
   }
@@ -3198,6 +3560,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
   const SHIP_LABEL = {
     std: 'Standard delivery · DHL', express: 'Express delivery · DHL',
     pickup: 'Collect in store', mytriumph: 'Free with MyTriumph',
+    parcel: 'Pick up at a DHL Paketshop',
   };
   const PAY_LABEL = {
     card: 'Credit or debit card', paypal: 'PayPal', later: 'PayPal — Pay Later',
@@ -3246,16 +3609,21 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
     /* the same marks the options carry, so the read-out matches what was chosen
        (Amelie, 2026-09-14) */
-    const SHIP_MARK = { std:'i-truck', express:'i-truck', mytriumph:'i-truck', pickup:'i-crown' };
+    const SHIP_MARK = { std:'i-truck', express:'i-truck', mytriumph:'i-truck', pickup:'i-crown', parcel:'i-store' };
     const mark = id => '<svg width="20" height="20" fill="currentColor" aria-hidden="true">'+
       '<use href="#'+id+'"/></svg>';
     /* the date comes with the method here, since the rail no longer states it */
     const shipDate = ($('.opt[data-ship="' + state.ship + '"] .opt__date') || {}).textContent || '';
     const shipText = state.ship === 'pickup' && STORE_NAME
       ? SHIP_LABEL.pickup + ' &middot; ' + esc(STORE_NAME.textContent.trim())
+      : state.ship === 'parcel' && POINT.chosen
+      ? esc(POINT.chosen.name)
       : (SHIP_LABEL[state.ship] || '—');
+    // a collection point is an address of its own, so it is stated under the name
+    const shipWhere = state.ship === 'parcel' && POINT.chosen
+      ? '<span class="review__sub t-body-m">' + esc(POINT.chosen.addr) + '</span>' : '';
     putHTML('ship', '<span class="review__mark">' + mark(SHIP_MARK[state.ship] || 'i-truck') +
-      shipText + '</span>' +
+      shipText + '</span>' + shipWhere +
       (shipDate ? '<span class="review__sub t-body-m">' + shipDate.trim() + '</span>' : ''));
     const pay = $('.opt input[name="pay"]:checked');
     /* The payment row lifts the brand marks from the option it names — and drops the part
@@ -3284,6 +3652,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
     $('#doneCount').textContent = t.count + (t.count === 1 ? ' item' : ' items');
     $('#doneTotal').textContent = eur(t.total);
     $('#doneShip').textContent = $('[data-promise]').textContent.replace(/^Delivery\s*/, '');
+    // only a guest is offered an account — a member has one, and "new" made one on the way
+    $('#doneAcct').hidden = state.account !== 'guest';
+    $$('[data-done-mail]').forEach(n => { n.textContent = mail; });
     $('.ck').hidden = true;
     const msum = $('.msum'); if (msum) msum.style.display = 'none';
     $('.paybar').style.display = 'none';
@@ -3292,6 +3663,26 @@ body[data-mode="onepage"] .ck__rail{position:static;
     Shop.clear();
   }
   $$('.place .btn').forEach(b => b.addEventListener('click', placeOrder));
+
+  /* ---------- confirmation: create an account for next time ---------- */
+  $('#doneAcctOpen').addEventListener('click', () => {
+    const form = $('#doneAcctForm'), open = form.hidden;
+    form.hidden = !open;
+    $('#doneAcctOpen').setAttribute('aria-expanded', String(open));
+    if (open) $('#doneAcctPw').focus();
+  });
+  function doneSignUp(){
+    const pw = $('#doneAcctPw').value;
+    const ok = pw.length >= 8 && /\d/.test(pw);
+    $('#doneAcctField').classList.toggle('is-error', !ok);
+    if (!ok) { $('#doneAcctPw').focus(); return; }
+    $('#doneAcctOpen').hidden = true;
+    $('#doneAcctForm').hidden = true;
+    $('#doneAcctOk').hidden = false;
+  }
+  $('#doneAcctGo').addEventListener('click', doneSignUp);
+  $('#doneAcctPw').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doneSignUp(); } });
+  $('#doneAcctPw').addEventListener('input', () => $('#doneAcctField').classList.remove('is-error'));
   $('.paybar .btn').addEventListener('click', () => {
     if (step < LAST_STEP) applyStep(step + 1);
     else placeOrder();

@@ -597,6 +597,59 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .or{display:flex;align-items:center;gap:var(--space-12);margin:var(--space-16) 0 0;color:var(--c-ink-soft)}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--c-edge)}
 
+/* ---- MYTRIUMPH REWARD ---------------------------------------------------
+   Signed in AND a member only. It sits with the code fields, since it is one more way
+   to take money off the order, and it is out in the open rather than folded into a row:
+   it can be redeemed now, so it shows itself (Amelie, 2026-09-25). No brand colour — on
+   surface/page — the subtle pink — with ink on it and the crown in accent/brand, cut as a voucher: a torn line and two notches between
+   what it is worth and the one thing to do with it. The notches are a mask, so they show
+   whatever the summary sits on. Named colours, not hex, in the mask: build.py snaps
+   every hex and rgba to a DS token, and a token there punches the wrong holes. */
+.reward{
+  --tear:112px;
+  display:flex;align-items:stretch;position:relative;
+  background:var(--c-offwhite);color:var(--c-ink);
+  margin:var(--space-16) 0 0;
+  -webkit-mask:
+    radial-gradient(circle at calc(100% - var(--tear)) 0, transparent 6px, black 6.5px),
+    radial-gradient(circle at calc(100% - var(--tear)) 100%, transparent 6px, black 6.5px);
+  -webkit-mask-composite:source-in;
+  mask:
+    radial-gradient(circle at calc(100% - var(--tear)) 0, transparent 6px, black 6.5px),
+    radial-gradient(circle at calc(100% - var(--tear)) 100%, transparent 6px, black 6.5px);
+  mask-composite:intersect}
+.reward[hidden]{display:none}
+.reward__main{flex:1;min-width:0;padding:var(--space-16) var(--space-16);
+  display:flex;flex-direction:column;justify-content:center;gap:var(--space-2)}
+.reward__eyebrow{display:flex;align-items:center;gap:var(--space-6);
+  font-weight:300;font-size:var(--ds-label-s-fs);line-height:var(--ds-label-s-lh);letter-spacing:.04em;text-transform:uppercase;color:var(--c-burgundy)}
+.reward__crown{flex:none;color:var(--c-burgundy)}
+.reward__amt{display:flex;align-items:baseline;gap:var(--space-6);margin-top:var(--space-4)}
+/* the figure is set as a price — the DS Price style the bag's line prices use */
+.reward__num{white-space:nowrap}
+.reward__act{width:var(--tear);flex:none;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:var(--space-6);padding:var(--space-16);
+  border-left:2px dotted var(--c-bg)}
+.reward__btn{height:var(--control-30);padding:0 var(--space-12);white-space:nowrap;display:inline-flex;align-items:center;
+  justify-content:center;gap:var(--space-6);background:var(--c-bg);color:var(--c-ink);
+  box-shadow:inset 0 0 0 1px var(--c-ink);
+  font-weight:300;font-size:var(--ds-label-s-fs);line-height:var(--ds-label-s-lh);letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s var(--ease-out),color .2s var(--ease-out)}
+.reward__btn:hover{background:var(--c-wash)}
+.reward__rm{color:var(--c-ink);text-decoration:underline;
+  text-underline-offset:3px;display:none}
+.reward__rm:hover{opacity:.6}
+.reward__tick{display:none}
+/* applied: the button stands down to an outline and says so; the way back sits under it */
+.reward[data-on="true"] .reward__btn{background:transparent;color:var(--c-ink);
+  box-shadow:inset 0 0 0 1px var(--c-ink);cursor:default;opacity:1}
+.reward[data-on="true"] .reward__tick{display:block}
+.reward[data-on="true"] .reward__rm{display:block}
+@media (prefers-reduced-motion:no-preference){
+  .reward[data-on="true"] .reward__num{animation:rewardPop .34s cubic-bezier(.34,1.56,.64,1)}
+}
+@keyframes rewardPop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+
 .acc{margin-top:var(--space-20)}   /* no rule above it (Amelie, 2026-09-11) */
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-14,14px) 0}
 /* a plus, not a chevron: it adds a code rather than revealing more of the summary */
@@ -1199,6 +1252,18 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
           </span>
           <span class="t-price" data-discount>−€0.00</span>
         </div>
+        <!-- applied, the voucher is a line like any code: its name and a remove link beside
+             it, and the card itself goes (Amelie, 2026-09-25) -->
+        <div class="trow trow--code" id="rewardRow" hidden>
+          <span class="dcode">
+            <span class="dcode__line">
+              <span class="t-body-m">MyTriumph voucher</span>
+              <span class="muted t-body-s" data-reward-note>€15 off</span>
+              <button class="t-link-s dcode__x" type="button" data-reward-remove>remove</button>
+            </span>
+          </span>
+          <span class="t-price" data-reward-off>−€10.00</span>
+        </div>
         <div class="trow" data-ship-row>
           <span class="t-body-m">Shipping <span class="muted t-body-s">(Standard, DHL)</span></span>
           <span class="t-price" data-shipping>€4.99</span>
@@ -1213,6 +1278,18 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 
         <!-- above the total it changes, as the checkout's summary has it (Amelie,
              2026-09-14) -->
+        <!-- the MyTriumph reward — signed-in members only, out in the open beside the
+             code fields (Amelie, 2026-09-25) -->
+        <div class="reward" data-reward hidden data-on="false">
+          <div class="reward__main">
+            <span class="reward__eyebrow"><svg class="reward__crown" width="14" height="12" viewBox="0 0 23 20" fill="none" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 6.93399e-09L11.2574 15.8444L6.89607 4.92073e-07L6.77135 4.99014e-07L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z" fill="currentColor"/></svg>MyTriumph voucher</span>
+            <span class="reward__amt"><span class="reward__num t-price" data-reward-amt>€15 reduction</span></span>
+          </div>
+          <div class="reward__act">
+            <button class="reward__btn" type="button" data-reward-redeem><svg class="reward__tick" width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="currentColor" stroke-width="1.3"/></svg><span data-reward-label>Redeem</span></button>
+            <button class="reward__rm" type="button" data-reward-remove>Remove</button>
+          </div>
+        </div>
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
@@ -1396,7 +1473,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   </div>
 </div>
 
-<script src="./lib/shop.js"></script>
+<script src="./lib/shop.js?v=2026-09-25d"></script>
 <!-- the search overlay, opened from the header's control, as on the PLP -->
 <script src="./lib/search.js?v=30" defer></script>
 <script>
@@ -1732,6 +1809,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
     roll($('[data-subtotal]'), eur(t.sub));
     $('#discountRow').hidden = !t.voucher;
     roll($('[data-discount]'), '−' + eur(t.discount));
+    $('#rewardRow').hidden = !t.reward;
+    roll($('[data-reward-off]'), '−' + eur(t.reward));
+    syncReward(t);
     if (t.voucher) $('[data-voucher-name]').textContent = t.voucher;
     const shipCell = $('[data-shipping]');
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
@@ -2189,6 +2269,29 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
     Shop.onChange(sync);
     setTimeout(sync, 0);
   })();
+
+  /* ---------- MyTriumph reward ----------
+     Signed in and a member: the reward is offered here and in the checkout's summary,
+     and redeeming it in one place carries to the other (lib/shop.js keeps it). */
+  function syncReward(t) {
+    /* a reward card must never be able to stop the page: with an older lib/shop.js
+       (a cached copy) there is no reward to offer, and the card simply stays hidden */
+    if (!Shop.REWARD) { $$('[data-reward]').forEach(c => { c.hidden = true; }); return; }
+    $$('[data-reward-note]').forEach(n => { n.textContent = eur(Shop.REWARD.amount).replace('.00', '') + ' off'; });
+    $$('[data-reward]').forEach(c => {
+      // once applied it is a summary line with its own remove, not a card any more
+      c.hidden = !t.rewardOffered || t.count === 0 || t.rewardOn;
+      c.dataset.on = String(t.rewardOn);
+      $('[data-reward-amt]', c).textContent = eur(Shop.REWARD.amount).replace('.00', '') + ' reduction';
+      $('[data-reward-label]', c).textContent = t.rewardOn ? 'Applied' : 'Redeem';
+      $('[data-reward-redeem]', c).setAttribute('aria-pressed', String(t.rewardOn));
+    });
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-reward-redeem]')) { if (!Shop.read().reward) Shop.setReward(true); }
+    else if (e.target.closest('[data-reward-remove]')) Shop.setReward(false);
+  });
+
 
   Shop.onChange(render);
   render();

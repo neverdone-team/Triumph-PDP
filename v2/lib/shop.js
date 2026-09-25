@@ -36,6 +36,11 @@ window.Shop = (function () {
   var FREE_AT = 130;      // free-shipping threshold, € — matches cart + checkout
   var SHIP_STD = 4.99;
   var VAT = 0.19;
+  /* The MyTriumph reward a signed-in member can redeem on the bag or in checkout
+     (Amelie, 2026-09-25). A fixed amount rather than a percentage, as a points reward
+     is; it only counts while the shopper is signed in AND a member, and never takes an
+     order below zero. */
+  var REWARD = { amount: 15, name: 'MyTriumph reward', until: '31 Oct 2026', points: 500 };
 
   /* ---------------- storage ---------------- */
   var mem = null;
@@ -179,6 +184,8 @@ window.Shop = (function () {
 
   function setMember(on) { var s = read(); s.member = !!on; return write(s); }
   function setVoucher(code) { var s = read(); s.voucher = code || null; return write(s); }
+  function setReward(on) { var s = read(); s.reward = !!on; return write(s); }
+  function rewardOffered(s) { s = s || read(); return !!s.member && account() === 'member'; }
 
   function count(s) {
     s = s || read();
@@ -204,7 +211,9 @@ window.Shop = (function () {
     var sub = s.lines.reduce(function (t, l) { return t + charged(l, member) * l.qty; }, 0);
     var listSub = s.lines.reduce(function (t, l) { return t + l.unit * l.qty; }, 0);
     var discount = s.voucher ? Math.round(sub * 10) / 100 : 0;
-    var base = sub - discount;
+    var offered = rewardOffered(s);
+    var reward = (offered && s.reward) ? Math.min(REWARD.amount, Math.max(0, sub - discount)) : 0;
+    var base = sub - discount - reward;
     var freeShip = member || base >= FREE_AT;
 
     var shipCost;
@@ -216,6 +225,7 @@ window.Shop = (function () {
     return {
       lines: s.lines, member: member, voucher: s.voucher,
       count: count(s), sub: sub, listSub: listSub, discount: discount,
+      rewardOffered: offered, reward: reward, rewardOn: offered && !!s.reward,
       base: base, freeShip: freeShip, shipCost: shipCost, total: total,
       vat: total - total / (1 + VAT),
       gap: Math.max(0, FREE_AT - base), freeAt: FREE_AT
@@ -642,7 +652,7 @@ window.Shop = (function () {
     add: add, setQty: setQty, bump: bump, remove: remove, clear: clear, setSize: setSize,
     setColour: setColour, undoRemove: undoRemove,
     read: read, count: count, totals: totals, charged: charged,
-    setMember: setMember, setVoucher: setVoucher,
+    setMember: setMember, setVoucher: setVoucher, setReward: setReward, REWARD: REWARD,
     money: money, onChange: onChange, refresh: emit,
     openMini: open, closeMini: close,
     miniMode: miniMode, setMiniMode: setMiniMode,
