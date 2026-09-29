@@ -1029,6 +1029,17 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .dash__grab{touch-action:none}
 .dash h4{margin:0 0 var(--space-8);font-weight:400;font-size:10px;line-height:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
 .dash__row{display:flex;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-10)}
+/* the panel's sections (Amelie, 2026-09-29): a rule and a caret per group, the body folds */
+.dash{max-height:calc(100vh - var(--space-32));overflow:auto;width:280px}
+.dash__sec{border-top:1px solid rgba(255,255,255,.2);padding:var(--space-8) 0}
+.dash__sec summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;line-height:14px;letter-spacing:.08em;text-transform:uppercase;padding:var(--space-4) 0}
+.dash__sec summary::-webkit-details-marker{display:none}
+.dash__sec summary::after{content:"+";font-size:14px;line-height:14px;opacity:.7}
+.dash__sec[open] summary::after{content:"−"}
+.dash__sec[open] summary{margin-bottom:var(--space-10)}
+.dash__sec .dash__row:last-child{margin-bottom:var(--space-4)}
+.dash__foot{border-top:1px solid rgba(255,255,255,.2);padding-top:var(--space-10);margin-bottom:0}
 .dash button{border:1px solid rgba(255,255,255,.3);padding:var(--space-6) var(--space-8);font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
 /* below 992 the sticky Checkout bar owns the bottom of the screen — the switcher
    is a prototype affordance and must never sit on top of the primary CTA */
@@ -1485,80 +1496,86 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   <div class="dash__grab" id="dashGrab" title="Drag to move">
     <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">drag</span>
   </div>
-  <h4>Prototype · Bag</h4>
-  <div class="dash__row">
-    <button data-cart-set="filled" aria-pressed="true">Sample bag</button>
-    <button data-cart-set="empty" aria-pressed="false">Empty</button>
-  </div>
-  <h4>Account</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-acct-set="guest" aria-pressed="true">Guest</button>
-    <button data-acct-set="member" aria-pressed="false">Signed in</button>
-  </div>
-  <h4>MyTriumph</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-member-set="false" aria-pressed="true">Not a member</button>
-    <button data-member-set="true" aria-pressed="false">Member</button>
-  </div>
-  <h4>Stock</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-stock-set="ok" aria-pressed="true">All available</button>
-    <button data-stock-set="out" aria-pressed="false">One sold out</button>
-  </div>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-stock-set="short" aria-pressed="false">Fewer left than in bag</button>
-  </div>
-  <h4>Pricing</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-sale-set="off" aria-pressed="true">Standard</button>
-    <button data-sale-set="on" aria-pressed="false">Seasonal sale −40%</button>
-  </div>
-  <h4>Offers · combinations</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-offer-preset="wb">Welcome + birthday</button>
-    <button data-offer-preset="wc">Welcome + code</button>
-    <button data-offer-preset="bc">Birthday + code</button>
-    <button data-offer-preset="swc">Sale + welcome + code</button>
-    <button data-offer-preset="none">None</button>
-  </div>
-  <h4>Offers · voucher card</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-offer-card="ticket">Ticket</button>
-    <button data-offer-card="strip">Current</button>
-  </div>
-  <h4>Offers · rules</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-offer-rule="vv:true">Vouchers combine</button>
-    <button data-offer-rule="vv:false">Vouchers don't combine</button>
-  </div>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-offer-rule="loyaltyDown:false">Loyalty OK</button>
-    <button data-offer-rule="loyaltyDown:true">Loyalty error</button>
-  </div>
-  <h4>Offers · try a code</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-offer-try="SUMMER15">SUMMER15</button>
-    <button data-offer-try="FRIENDS20" title="not with a MyTriumph voucher">FRIENDS20</button>
-    <button data-offer-try="NEWSEASON10" title="not on sale items">NEWSEASON10</button>
-    <button data-offer-try="MEMBER20" title="members only">MEMBER20</button>
-    <button data-offer-try="BIG25" title="min. spend €150">BIG25</button>
-    <button data-offer-try="SWIM20" title="swimwear only">SWIM20</button>
-    <button data-offer-try="SPRING26" title="expired">SPRING26</button>
-    <button data-offer-try="THANKYOU10" title="already used">THANKYOU10</button>
-    <button data-offer-try="TRIUMF10" title="a typo">TRIUMF10</button>
-  </div>
-  <h4>Mini cart after an add</h4>
-  <div class="dash__row">
-    <button data-mini-set="last" aria-pressed="true">Last added</button>
-    <button data-mini-set="all" aria-pressed="false">Whole bag</button>
-  </div>
-  <h4>Mini cart · complete your set</h4>
-  <div class="dash__row" style="margin-bottom:0">
-    <button data-miniset-set="off" aria-pressed="true">Off</button>
-    <button data-miniset-set="row" aria-pressed="false">One row</button>
-    <button data-miniset-set="tiles" aria-pressed="false">Three tiles</button>
-  </div>
-  <div class="dash__row" style="margin-bottom:0">
+  <!-- grouped (Amelie, 2026-09-29): what you set up first, the offers, then the design
+       alternatives and the edge cases folded away -->
+  <details class="dash__sec" open>
+    <summary>Setup</summary>
+    <h4>Bag</h4>
+    <div class="dash__row">
+      <button data-cart-set="filled" aria-pressed="true">Sample bag</button>
+      <button data-cart-set="empty" aria-pressed="false">Empty</button>
+    </div>
+    <h4>Account</h4>
+    <div class="dash__row">
+      <button data-acct-set="guest" aria-pressed="true">Guest</button>
+      <button data-acct-set="member" aria-pressed="false">Signed in</button>
+    </div>
+    <h4>MyTriumph</h4>
+    <div class="dash__row">
+      <button data-member-set="false" aria-pressed="true">Not a member</button>
+      <button data-member-set="true" aria-pressed="false">Member</button>
+    </div>
+  </details>
+  <details class="dash__sec" open>
+    <summary>Offers</summary>
+    <h4>Show a combination</h4>
+    <div class="dash__row">
+      <button data-offer-preset="wb">Welcome + birthday</button>
+      <button data-offer-preset="wc">Welcome + code</button>
+      <button data-offer-preset="bc">Birthday + code</button>
+      <button data-offer-preset="swc">Sale + welcome + code</button>
+      <button data-offer-preset="none">None</button>
+    </div>
+    <h4>Try a code</h4>
+    <div class="dash__row">
+      <button data-offer-try="SUMMER15" title="combines with everything">SUMMER15</button>
+      <button data-offer-try="FRIENDS20" title="can't be combined with a MyTriumph voucher">FRIENDS20</button>
+    </div>
+    <h4>Pricing</h4>
+    <div class="dash__row">
+      <button data-sale-set="off" aria-pressed="true">Standard</button>
+      <button data-sale-set="on" aria-pressed="false">Seasonal sale −40%</button>
+    </div>
+  </details>
+  <details class="dash__sec">
+    <summary>Design options</summary>
+    <h4>Voucher card</h4>
+    <div class="dash__row">
+      <button data-offer-card="ticket">Ticket</button>
+      <button data-offer-card="strip">Current</button>
+    </div>
+    <h4>Mini cart after an add</h4>
+    <div class="dash__row">
+      <button data-mini-set="last" aria-pressed="true">Last added</button>
+      <button data-mini-set="all" aria-pressed="false">Whole bag</button>
+    </div>
+    <h4>Mini cart · complete your set</h4>
+    <div class="dash__row">
+      <button data-miniset-set="off" aria-pressed="true">Off</button>
+      <button data-miniset-set="row" aria-pressed="false">One row</button>
+      <button data-miniset-set="tiles" aria-pressed="false">Three tiles</button>
+    </div>
+  </details>
+  <details class="dash__sec">
+    <summary>Edge cases</summary>
+    <h4>Stock</h4>
+    <div class="dash__row">
+      <button data-stock-set="ok" aria-pressed="true">All available</button>
+      <button data-stock-set="out" aria-pressed="false">One sold out</button>
+      <button data-stock-set="short" aria-pressed="false">Fewer left than in bag</button>
+    </div>
+    <h4>Welcome + birthday voucher</h4>
+    <div class="dash__row">
+      <button data-offer-rule="vv:true">Combine</button>
+      <button data-offer-rule="vv:false">Don't combine</button>
+    </div>
+    <h4>Loyalty service</h4>
+    <div class="dash__row">
+      <button data-offer-rule="loyaltyDown:false">Working</button>
+      <button data-offer-rule="loyaltyDown:true">Error</button>
+    </div>
+  </details>
+  <div class="dash__row dash__foot">
     <button id="dashHide">Hide</button>
   </div>
 </div>
