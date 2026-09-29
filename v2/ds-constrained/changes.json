@@ -136,13 +136,6 @@
    "to": "removed (inherits its DS style)"
   },
   {
-   "sel": ".cart__left",
-   "kind": "spacing",
-   "prop": "padding-right",
-   "from": "calc(var(--space-64) + var(--space-64) + var(--space-32)) = 160px",
-   "to": "120px"
-  },
-  {
    "sel": ".promise span",
    "kind": "type-override",
    "from": "line-height:20px",
@@ -233,8 +226,8 @@
   {
    "sel": ".reward__eyebrow",
    "kind": "type",
-   "from": "\u2013 10px/12px ls .12em UPPER",
-   "to": "Label/S"
+   "from": "400 12px/16px ls .04em UPPER",
+   "to": "Title/5"
   },
   {
    "sel": ".reward__btn",
@@ -246,6 +239,12 @@
    "sel": ".reward__rm",
    "kind": "type-override",
    "from": "font-size:11px, line-height:14px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".reward__terms",
+   "kind": "type-override",
+   "from": "font-size:10px, line-height:14px",
    "to": "removed (inherits its DS style)"
   },
   {
@@ -619,8 +618,8 @@
   {
    "sel": ".reward__eyebrow",
    "kind": "type",
-   "from": "\u2013 10px/12px ls .12em UPPER",
-   "to": "Label/S"
+   "from": "400 12px/16px ls .04em UPPER",
+   "to": "Title/5"
   },
   {
    "sel": ".reward__btn",
@@ -632,6 +631,12 @@
    "sel": ".reward__rm",
    "kind": "type-override",
    "from": "font-size:11px, line-height:14px",
+   "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".reward__terms",
+   "kind": "type-override",
+   "from": "font-size:10px, line-height:14px",
    "to": "removed (inherits its DS style)"
   },
   {

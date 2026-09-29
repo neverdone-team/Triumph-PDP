@@ -219,18 +219,24 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
    above the summary. The rule is drawn on the grid itself rather than as a border on a
    wrapper, so both right-hand blocks stay independent grid children and the phone layout
    can order them freely. */
-.cart{display:grid;grid-template-columns:minmax(0,1fr) 440px;align-items:start;
+/* The bag's two columns are the checkout's, line for line, so nothing jumps between the
+   bag and the review (Amelie, 2026-09-29). The checkout: a 1280 container, a 480 rail
+   with 48 inside it (a 1px rule, then the summary), 64 right of the form and 40 left of
+   it. Here the same lines come from the wrap's side padding (40 | 48) and a 432 column
+   (480 − 48) with 48 inside, so the product column reads 696 and the summary 383-384. */
+@media (min-width:1181px){ .wrap{padding-left:var(--space-40);padding-right:var(--space-48)} }
+.cart{display:grid;grid-template-columns:minmax(0,1fr) 432px;align-items:start;
   margin-top:var(--space-32)}
 /* The product column is deliberately narrower than the space it has: 160 of right
    padding puts 240px of gutter between the last product and the summary, and pulls the
    line's price back towards its name instead of stranding it at the far edge
    (Amelie, 2026-09-11). */
 .cart__left{min-width:0;display:flex;flex-direction:column;gap:var(--space-24);
-  padding-right:calc(var(--space-64) + var(--space-64) + var(--space-32))}
+  padding-right:var(--space-64)}
 /* No rule between the columns here (Amelie, 2026-09-10) — the bag is one list with its
    total beside it, and 144px of gutter separates them well enough. The checkout keeps its
    hairline, where the rail really is a second surface. */
-.cart__right{padding-left:calc(var(--space-64) + var(--space-16));
+.cart__right{padding-left:var(--space-48);
   position:sticky;top:calc(var(--header-h) + var(--space-24));
   display:flex;flex-direction:column;gap:var(--space-32)}
 .cart__status{display:flex;flex-direction:column;gap:var(--space-16)}
@@ -622,10 +628,13 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   mask-composite:intersect;
 }
 .reward[hidden]{display:none}
-.reward__main{flex:1;min-width:0;padding:var(--space-16) var(--space-16);
+/* 14 top and bottom, not 16: the Title/5 name and the terms line each carry ~2.5px of
+   leading beyond their letters, so 14 reads as an even 16-17 (Amelie, 2026-09-29) */
+.reward__main{flex:1;min-width:0;padding:var(--space-14) var(--space-16);
   display:flex;flex-direction:column;justify-content:center;gap:var(--space-2)}
 .reward__eyebrow{display:flex;align-items:center;gap:var(--space-6);
-  font-size:10px;line-height:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-burgundy)}
+  font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--c-burgundy)}
+/* the name in Title/5 behind the crown; the crown stands for "MyTriumph" (Amelie, 2026-09-29) */
 .reward__crown{flex:none;color:var(--c-burgundy)}
 .reward__amt{display:flex;align-items:baseline;gap:var(--space-6);margin-top:var(--space-4)}
 /* the figure is set as a price — the DS Price style the bag's line prices use */
@@ -652,6 +661,38 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   .reward[data-on="true"] .reward__num{animation:rewardPop .34s cubic-bezier(.34,1.56,.64,1)}
 }
 @keyframes rewardPop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+/* ---- OFFERS (draft, loyalty feedback 2026-09-25) --------------------------------------
+   Up to two promotions per order: the two MyTriumph vouchers and a discount code, in any
+   pair. The rules are lib/shop.js, the drawing lib/offers.js; this is only their look.
+   · the counter says how many of the two are used, and that a seasonal sale is not one
+   · an error sits under the control that caused it, in text/error with its icon
+   · "this will remove X" is a question in a surface/muted panel, not a modal: the
+     summary is where the customer is, and a dialog would take them out of it
+   · applied / removed is a quiet line in text/success under the rows it changed */
+.offers__meta{margin:var(--space-16) 0 0;color:var(--c-grey-medium)}
+.offers .reward{margin-top:var(--space-8)}
+.reward__terms{margin-top:var(--space-4);font-size:10px;line-height:14px;color:var(--c-grey-medium)}
+.offer-crown{display:inline-block;vertical-align:-1px;margin-right:var(--space-6);color:var(--c-burgundy)}
+/* Messages are the text field's own supporting text (Amelie, 2026-09-25): .field__err
+   for an error, .field__hint for info. Under the code field they flow instead of sitting
+   in the one-line band, because the loyalty team's messages run to two lines; a voucher
+   card, which has no field, carries the same two on an input-less .field--note. */
+.offers .voucher{align-items:flex-start}
+.offers .voucher .btn{margin-top:6px}
+.voucher .field{padding-bottom:0}
+.voucher .field__hint,.voucher .field__err,
+.field--note .field__hint,.field--note .field__err{position:static;padding-left:var(--space-4);margin-top:var(--space-4)}
+.voucher .field__hint:empty,.voucher .field__err:empty{display:none}
+.field--note{padding:0}
+/* a clash's two answers sit on their own line under the sentence, better deal first */
+.offer-choice{display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);margin-top:var(--space-6)}
+.offer-choice .t-link-s{text-align:left}
+.offers__status[hidden],.offers__meta[hidden]{display:none}
+/* a promotion that stopped qualifying stays on the order at €0, its reason as the field's hint */
+.dcode .field--note{margin-top:var(--space-2)}
+.dcode .field--note .field__hint,.dcode .field--note .field__err{padding-left:0;margin-top:0}
+.trow--code.is-blocked .t-price{color:var(--c-grey-medium)}
 
 .acc{margin-top:var(--space-20)}   /* no rule above it (Amelie, 2026-09-11) */
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-14,14px) 0}
@@ -976,7 +1017,13 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 /* declared before the media query — the desktop default is "no sticky bar", and the
    mobile block below turns it on. The other way round the `none` wins and it never shows. */
 .mbar{display:none}
-@media (max-width:1100px){ .cart{grid-template-columns:minmax(0,1fr) 340px;column-gap:var(--space-40)} }
+/* the checkout's 992–1180 lines: a 420 rail with 40 inside, 32 right of the form, 24 left */
+@media (min-width:992px) and (max-width:1180px){
+  .wrap{padding-left:var(--space-24);padding-right:var(--space-40)}
+  .cart{grid-template-columns:minmax(0,1fr) 380px}
+  .cart__left{padding-right:var(--space-32)}
+  .cart__right{padding-left:var(--space-40)}
+}
 /* At tablet widths there is room to read the summary before the product list, so it
    moves up; on a phone it stays under the products and the sticky bar carries the total. */
 /* a tablet reads the total before the list; a phone keeps the summary last, under the
@@ -1247,28 +1294,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
         </div>
         <!-- the applied code sits right under the subtotal it comes off, with its own
              remove link beneath it (Amelie, 2026-09-11) -->
-        <div class="trow trow--code" id="discountRow" hidden>
-          <span class="dcode">
-            <span class="dcode__line">
-              <span class="t-body-m" data-voucher-name>CODE</span>
-              <span class="muted t-body-s">10% off</span>
-              <button class="t-link-s dcode__x" type="button" id="voucherClear">remove</button>
-            </span>
-          </span>
-          <span class="t-price" data-discount>−€0.00</span>
-        </div>
-        <!-- applied, the voucher is a line like any code: its name and a remove link beside
-             it, and the card itself goes (Amelie, 2026-09-25) -->
-        <div class="trow trow--code" id="rewardRow" hidden>
-          <span class="dcode">
-            <span class="dcode__line">
-              <span class="t-body-m">MyTriumph voucher</span>
-              <span class="muted t-body-s" data-reward-note>€15 off</span>
-              <button class="t-link-s dcode__x" type="button" data-reward-remove>remove</button>
-            </span>
-          </span>
-          <span class="t-price" data-reward-off>−€10.00</span>
-        </div>
+        <!-- every applied promotion, loyalty or code, is a row here (lib/offers.js) -->
+        <div data-promo-rows></div>
+        <p class="offers__status t-body-s" data-offer-status role="status" hidden></p>
         <div class="trow" data-ship-row>
           <span class="t-body-m">Shipping <span class="muted t-body-s">(Standard, DHL)</span></span>
           <span class="t-price" data-shipping>€4.99</span>
@@ -1283,18 +1311,10 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 
         <!-- above the total it changes, as the checkout's summary has it (Amelie,
              2026-09-14) -->
-        <!-- the MyTriumph reward — signed-in members only, out in the open beside the
-             code fields (Amelie, 2026-09-25) -->
-        <div class="reward" data-reward hidden data-on="false">
-          <div class="reward__main">
-            <span class="reward__eyebrow"><svg class="reward__crown" width="14" height="12" viewBox="0 0 23 20" fill="none" aria-hidden="true"><path d="M22.3766 5.22624L15.5607 16.0549L15.7389 0L15.6142 6.93399e-09L11.2574 15.8444L6.89607 4.92073e-07L6.77135 4.99014e-07L6.94954 16.0549L0.133636 5.22624H0L4.41919 19.7137L8.77602 16.7804L13.7342 16.7804L18.091 19.7137L22.5103 5.22624H22.3766Z" fill="currentColor"/></svg>MyTriumph voucher</span>
-            <span class="reward__amt"><span class="reward__num t-price" data-reward-amt>€15 reduction</span></span>
-          </div>
-          <div class="reward__act">
-            <button class="reward__btn" type="button" data-reward-redeem><svg class="reward__tick" width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="currentColor" stroke-width="1.3"/></svg><span data-reward-label>Redeem</span></button>
-            <button class="reward__rm" type="button" data-reward-remove>Remove</button>
-          </div>
-        </div>
+        <!-- offers: the counter, the MyTriumph vouchers still to use, then the code field -->
+        <div class="offers" data-offers>
+        <p class="offers__meta t-body-s" data-offers-meta hidden></p>
+        <div data-loyalty-cards></div>
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
@@ -1303,13 +1323,16 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
           <div class="acc__body">
             <div class="voucher">
               <label class="field">
-                <input type="text" id="voucher" placeholder=" " />
+                <input type="text" id="voucher" placeholder=" " aria-describedby="voucherHint voucherErr" />
                 <fieldset class="field__frame"><legend><span>Code</span></legend></fieldset>
                 <span class="field__label">Code</span>
+                <span class="field__hint" id="voucherHint" aria-live="polite"></span>
+                <span class="field__err" id="voucherErr" role="alert"></span>
               </label>
               <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
             </div>
           </div>
+        </div>
         </div>
 
         <!-- VAT and the returns promise are gone from here (Amelie, 2026-09-10); the
@@ -1460,7 +1483,36 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   <h4>Pricing</h4>
   <div class="dash__row" style="margin-bottom:0">
     <button data-sale-set="off" aria-pressed="true">Standard</button>
-    <button data-sale-set="on" aria-pressed="false">Sale −20%</button>
+    <button data-sale-set="on" aria-pressed="false">Seasonal sale −40%</button>
+  </div>
+  <h4>Offers · combinations</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-offer-preset="wb">Welcome + birthday</button>
+    <button data-offer-preset="wc">Welcome + code</button>
+    <button data-offer-preset="bc">Birthday + code</button>
+    <button data-offer-preset="swc">Sale + welcome + code</button>
+    <button data-offer-preset="none">None</button>
+  </div>
+  <h4>Offers · rules</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-offer-rule="vv:true">Vouchers combine</button>
+    <button data-offer-rule="vv:false">Vouchers don't combine</button>
+  </div>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-offer-rule="loyaltyDown:false">Loyalty OK</button>
+    <button data-offer-rule="loyaltyDown:true">Loyalty error</button>
+  </div>
+  <h4>Offers · try a code</h4>
+  <div class="dash__row" style="margin-bottom:0">
+    <button data-offer-try="SUMMER15">SUMMER15</button>
+    <button data-offer-try="FRIENDS20" title="not with a MyTriumph voucher">FRIENDS20</button>
+    <button data-offer-try="NEWSEASON10" title="not on sale items">NEWSEASON10</button>
+    <button data-offer-try="MEMBER20" title="members only">MEMBER20</button>
+    <button data-offer-try="BIG25" title="min. spend €150">BIG25</button>
+    <button data-offer-try="SWIM20" title="swimwear only">SWIM20</button>
+    <button data-offer-try="SPRING26" title="expired">SPRING26</button>
+    <button data-offer-try="THANKYOU10" title="already used">THANKYOU10</button>
+    <button data-offer-try="TRIUMF10" title="a typo">TRIUMF10</button>
   </div>
   <h4>Mini cart after an add</h4>
   <div class="dash__row">
@@ -1478,7 +1530,8 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   </div>
 </div>
 
-<script src="./lib/shop.js?v=2026-09-25d"></script>
+<script src="./lib/shop.js?v=2026-09-29b"></script>
+<script src="./lib/offers.js?v=2026-09-29o"></script>
 <!-- the search overlay, opened from the header's control, as on the PLP -->
 <script src="./lib/search.js?v=30" defer></script>
 <script>
@@ -1526,12 +1579,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 
   /* Sale mode is a prototype device, not part of the bag: it derives a was-price from
      the unit so every line can show a markdown and the summary can total the saving.
-     20% off, so unit = was × 0.8. */
-  const SALE_OFF = 0.2;
-  const saleOn = () => document.body.dataset.sale === 'on';
-  const was = l => l.was ? l.was
-             : saleOn() ? Math.round((l.unit / (1 - SALE_OFF)) * 100) / 100
-             : l.unit;
+     It lives in lib/shop.js now (40%, the loyalty manager's example), because the
+     offer rules have to know whether the bag is on sale. */
+  const was = l => Shop.wasOf(l);
   const charged = (l, member) => (member && l.member) ? l.member : l.unit;
 
   /* Stock is a prototype state, switched in the panel rather than baked into the sample
@@ -1812,12 +1862,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 
     const t = Shop.totals();
     roll($('[data-subtotal]'), eur(t.sub));
-    $('#discountRow').hidden = !t.voucher;
-    roll($('[data-discount]'), '−' + eur(t.discount));
-    $('#rewardRow').hidden = !t.reward;
-    roll($('[data-reward-off]'), '−' + eur(t.reward));
-    syncReward(t);
-    if (t.voucher) $('[data-voucher-name]').textContent = t.voucher;
+    Offers.render(t, roll);   // applied rows, voucher cards, counter, messages (lib/offers.js)
     const shipCell = $('[data-shipping]');
     roll(shipCell, t.shipCost === 0 ? 'Free' : eur(t.shipCost));
     $('[data-ship-row]').classList.toggle('trow--free', t.shipCost === 0);
@@ -1830,13 +1875,14 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
     /* The count rides in the header so a collapsed section still says a code is on the
        order; the panel does NOT reopen itself here, or it would fight the customer
        opening it by hand (Amelie, 2026-09-11). */
-    $('[data-voucher-count]').textContent = t.voucher ? ' (1)' : '';
-    if (t.voucher) $('#voucher').value = t.voucher;
 
     /* what the order saves against the list prices: the sale mode's was-prices and a
        member's discount both land here, so one row covers both */
-    const saved = bag.member ? 0 : bag.lines.reduce((sum, l) =>
-      sum + (was(l) - charged(l, bag.member)) * l.qty, 0);
+    /* a member still sees the seasonal sale's saving — only the member-price
+       comparison is left out for them (offers draft, 2026-09-25) */
+    const saved = bag.lines.reduce((sum, l) =>
+      sum + (was(l) - (bag.member ? l.unit : charged(l, bag.member))) * l.qty, 0);
+    $('#saveRow .t-body-m').innerHTML = t.sale ? 'Seasonal sale savings <span class="muted t-body-s">in the prices</span>' : 'You save';
     $('#saveRow').hidden = saved < 0.01;
     roll($('[data-saved]'), eur(saved));
 
@@ -2143,18 +2189,11 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
     $('#voucherToggle').setAttribute('aria-expanded', String(!open));
   });
   $('#voucherBtn').addEventListener('click', () => {
-    const code = $('#voucher').value.trim().toUpperCase();
-    if (!code) return;
-    Shop.setVoucher(code);
-    // applied is done: the section folds away and the header carries the count
-    acc.dataset.open = 'false';
-    $('#voucherToggle').setAttribute('aria-expanded', 'false');
+    /* the field stays open now: its own hint says "Voucher applied successfully." and an
+       error or a "this will replace…" question is its error / hint (Amelie, 2026-09-25) */
+    Offers.applyCode($('#voucher').value);
   });
-  $('#voucherClear').addEventListener('click', () => {
-    Shop.setVoucher(null);
-    $('#voucher').value = '';
-    // removing it leaves the section open — the next thing wanted is probably another code
-  });
+
 
   $('#joinBtn').addEventListener('click', () => Shop.setMember(true));
 
@@ -2274,29 +2313,6 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
     Shop.onChange(sync);
     setTimeout(sync, 0);
   })();
-
-  /* ---------- MyTriumph reward ----------
-     Signed in and a member: the reward is offered here and in the checkout's summary,
-     and redeeming it in one place carries to the other (lib/shop.js keeps it). */
-  function syncReward(t) {
-    /* a reward card must never be able to stop the page: with an older lib/shop.js
-       (a cached copy) there is no reward to offer, and the card simply stays hidden */
-    if (!Shop.REWARD) { $$('[data-reward]').forEach(c => { c.hidden = true; }); return; }
-    $$('[data-reward-note]').forEach(n => { n.textContent = eur(Shop.REWARD.amount).replace('.00', '') + ' off'; });
-    $$('[data-reward]').forEach(c => {
-      // once applied it is a summary line with its own remove, not a card any more
-      c.hidden = !t.rewardOffered || t.count === 0 || t.rewardOn;
-      c.dataset.on = String(t.rewardOn);
-      $('[data-reward-amt]', c).textContent = eur(Shop.REWARD.amount).replace('.00', '') + ' reduction';
-      $('[data-reward-label]', c).textContent = t.rewardOn ? 'Applied' : 'Redeem';
-      $('[data-reward-redeem]', c).setAttribute('aria-pressed', String(t.rewardOn));
-    });
-  }
-  document.addEventListener('click', e => {
-    if (e.target.closest('[data-reward-redeem]')) { if (!Shop.read().reward) Shop.setReward(true); }
-    else if (e.target.closest('[data-reward-remove]')) Shop.setReward(false);
-  });
-
 
   Shop.onChange(render);
   render();

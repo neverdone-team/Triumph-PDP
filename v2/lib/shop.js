@@ -36,11 +36,51 @@ window.Shop = (function () {
   var FREE_AT = 130;      // free-shipping threshold, € — matches cart + checkout
   var SHIP_STD = 4.99;
   var VAT = 0.19;
-  /* The MyTriumph reward a signed-in member can redeem on the bag or in checkout
-     (Amelie, 2026-09-25). A fixed amount rather than a percentage, as a points reward
-     is; it only counts while the shopper is signed in AND a member, and never takes an
-     order below zero. */
-  var REWARD = { amount: 15, name: 'MyTriumph reward', until: '31 Oct 2026', points: 500 };
+  /* ---------------- promotions ----------------
+     Draft for the loyalty team's feedback (2026-09-25). An order carries at most TWO
+     promotions: a discount code, the MyTriumph welcome voucher and the MyTriumph
+     birthday voucher are all promotions. A seasonal sale is NOT one (it is in the
+     prices already) and a gift card is a way to pay, not a promotion.
+
+     Mechanics are data, not UI: each promotion says what it is worth, what it needs
+     and what it will not sit beside, and apply() answers with the customer-facing
+     message from the loyalty manager's list. The codes below exist to walk every
+     error scenario in a demo. */
+  var PROMO_MAX = 2;
+  var SALE_KEY = 'triumph.proto.cartSale';          // the bag's Pricing switch, shared
+  var RULE_KEY = 'triumph.proto.promoRules';        // prototype switches for the mechanics
+  var LOYALTY = {
+    welcome:  { id: 'welcome',  name: 'Welcome voucher',  pct: 10, until: '31 Dec 2026',
+                blurb: 'Your thank-you for joining' },
+    birthday: { id: 'birthday', name: 'Birthday voucher', off: 15, min: 40, until: '31 Oct 2026',
+                blurb: 'Happy birthday from Triumph' }
+  };
+  var CODES = {
+    SUMMER15:    { pct: 15, note: 'combines with everything' },
+    FRIENDS20:   { pct: 20, noLoyalty: true, note: 'not with a MyTriumph voucher' },
+    NEWSEASON10: { pct: 10, noSale: true, note: 'not on sale items' },
+    MEMBER20:    { pct: 20, membersOnly: true, note: 'MyTriumph members only' },
+    BIG25:       { off: 25, min: 150, note: 'minimum spend €150' },
+    SWIM20:      { pct: 20, swimOnly: true, note: 'swimwear only' },
+    SPRING26:    { pct: 15, expired: true, note: 'expired' },
+    THANKYOU10:  { pct: 10, used: true, note: 'already used' }
+  };
+  var MSG = {
+    invalid:    'This voucher code is not valid. Please check the code and try again.',
+    expired:    'This voucher has expired and can no longer be used.',
+    used:       'This voucher has already been used.',
+    notApplic:  'This voucher is not applicable to the items in your basket.',
+    minSpend:   function (m) { return 'A minimum purchase of ' + money(m) + ' is required to use this voucher.'; },
+    notElig:    'You are not eligible for this voucher.',
+    product:    'This voucher cannot be used for one or more items in your basket.',
+    vv:         'This voucher cannot be combined with another voucher.',
+    codeLoyal:  'This voucher cannot be combined with the discount code already applied.',
+    replace:    function (name) { return 'Applying this voucher will remove ' + name + '. Would you like to continue?'; },
+    applied:    'Voucher applied successfully.',
+    removed:    'Voucher removed.',
+    loyaltyErr: "We couldn't apply your loyalty voucher. Please try again or contact Customer Service.",
+    sameCode:   'This voucher is already applied.'
+  };
 
   /* ---------------- storage ---------------- */
   var mem = null;
@@ -51,7 +91,7 @@ window.Shop = (function () {
   }
   var store = backing();
 
-  function blank() { return { lines: [], member: false, voucher: null }; }
+  function blank() { return { lines: [], member: false, promos: [] }; }
 
   function read() {
     if (!store) return mem || (mem = blank());
@@ -59,7 +99,16 @@ window.Shop = (function () {
       var raw = store.getItem(KEY);
       if (!raw) return blank();
       var v = JSON.parse(raw);
-      return (v && Array.isArray(v.lines)) ? v : blank();
+      if (!(v && Array.isArray(v.lines))) return blank();
+      /* bags saved before promotions: a typed code becomes a code promo if it is one
+         the prototype knows, the old single MyTriumph voucher becomes the welcome one */
+      if (!Array.isArray(v.promos)) {
+        v.promos = [];
+        if (v.voucher && CODES[v.voucher]) v.promos.push({ type: 'code', id: v.voucher });
+        if (v.reward) v.promos.push({ type: 'loyalty', id: 'welcome' });
+      }
+      delete v.voucher; delete v.reward;
+      return v;
     } catch (e) { return blank(); }
   }
 
@@ -183,9 +232,138 @@ window.Shop = (function () {
   function clear() { return write(blank()); }
 
   function setMember(on) { var s = read(); s.member = !!on; return write(s); }
-  function setVoucher(code) { var s = read(); s.voucher = code || null; return write(s); }
-  function setReward(on) { var s = read(); s.reward = !!on; return write(s); }
-  function rewardOffered(s) { s = s || read(); return !!s.member && account() === 'member'; }
+  /* ---------------- promotion engine ---------------- */
+  function sale() { try { return localStorage.getItem(SALE_KEY) === 'on'; } catch (e) { return false; } }
+  /* the seasonal sale is a prototype device: it derives a was-price from the unit, so
+     unit = was × (1 − SALE_OFF). 40%, the loyalty manager's example. */
+  var SALE_OFF = 0.4;
+  function wasOf(l) { return l.was ? l.was : sale() ? Math.round((l.unit / (1 - SALE_OFF)) * 100) / 100 : l.unit; }
+  function rules() {
+    var r = { vv: true, loyaltyDown: false };
+    try { var v = JSON.parse(localStorage.getItem(RULE_KEY) || '{}'); if (v) { r.vv = v.vv !== false; r.loyaltyDown = !!v.loyaltyDown; } } catch (e) {}
+    return r;
+  }
+  function setRules(patch) {
+    var r = rules(); for (var k in patch) r[k] = patch[k];
+    try { localStorage.setItem(RULE_KEY, JSON.stringify(r)); } catch (e) {}
+    emit();
+  }
+  /* the loyalty vouchers are only there for someone signed in to MyTriumph */
+  function loyaltyOffered(s) { s = s || read(); return !!s.member && account() === 'member'; }
+  function promoOf(p) { return p.type === 'code' ? CODES[p.id] : LOYALTY[p.id]; }
+  function promoName(p) { return p.type === 'code' ? p.id : LOYALTY[p.id].name; }
+  function sameKind(a, b) { return a.type === b.type && (a.type === 'code' || a.id === b.id); }
+
+  /* what one promotion takes off, given the subtotal it is read against */
+  function worth(def, sub) { return def.pct ? Math.round(sub * def.pct) / 100 : Math.min(def.off, sub); }
+
+  /* Everything that could stop a promotion, in the order a customer would want to hear
+     it. `others` is what is already on the order. Returns null or { code, msg }. */
+  function block(p, s, sub, others, fresh) {
+    var def = promoOf(p);
+    if (!def) return { code: 'invalid', msg: MSG.invalid };
+    if (p.type === 'loyalty') {
+      if (!loyaltyOffered(s)) return { code: 'notElig', msg: MSG.notElig };
+      /* a service failure stops a NEW redemption; one already on the order stays */
+      if (fresh && rules().loyaltyDown) return { code: 'loyaltyErr', msg: MSG.loyaltyErr };
+    } else {
+      if (def.expired) return { code: 'expired', msg: MSG.expired };
+      if (def.used) return { code: 'used', msg: MSG.used };
+      if (def.membersOnly && !loyaltyOffered(s)) return { code: 'notElig', msg: MSG.notElig };
+      if (def.swimOnly) return { code: 'notApplic', msg: MSG.notApplic };
+      if (def.noSale && sale()) return { code: 'product', msg: MSG.product };
+    }
+    if (def.min && sub < def.min) return { code: 'minSpend', msg: MSG.minSpend(def.min), min: def.min };
+    for (var i = 0; i < others.length; i++) {
+      var o = others[i], od = promoOf(o);
+      if (!od) continue;
+      if (p.type === 'loyalty' && o.type === 'code' && od.noLoyalty) return { code: 'codeLoyal', msg: MSG.codeLoyal, with: o };
+      if (p.type === 'code' && o.type === 'loyalty' && def.noLoyalty) return { code: 'vv', msg: MSG.vv, with: o };
+      if (p.type === 'loyalty' && o.type === 'loyalty' && !rules().vv) return { code: 'vv', msg: MSG.vv, with: o };
+    }
+    return null;
+  }
+
+  function subOf(s) {
+    return s.lines.reduce(function (t, l) { return t + charged(l, s.member) * l.qty; }, 0);
+  }
+
+  /* which of the applied promotions a new one refuses to sit beside, by the mechanics */
+  function clashes(p, list) {
+    var def = promoOf(p);
+    return list.filter(function (o) {
+      var od = promoOf(o);
+      if (!od) return false;
+      if (p.type === 'code' && o.type === 'code') return true;                 // one code at a time
+      if (p.type === 'loyalty' && o.type === 'code' && od.noLoyalty) return true;
+      if (p.type === 'code' && o.type === 'loyalty' && def.noLoyalty) return true;
+      if (p.type === 'loyalty' && o.type === 'loyalty' && !rules().vv) return true;
+      return false;
+    });
+  }
+
+  /* apply() never changes the order when it answers with an error or a choice.
+     { ok:true, msg } · { ok:false, msg, code } — the code itself is wrong
+     { choice:true, reason, p, drop:[…], gain, lose } — the code is fine but cannot sit
+     beside what is applied: the page asks, naming both and what each is worth, and
+     nothing is dropped until the customer picks (loyalty feedback, 2026-09-29).
+     Confirm with apply(p, { drop: thatList }). */
+  function apply(p, opts) {
+    opts = opts || {};
+    var s = read();
+    if (p.type === 'code') p = { type: 'code', id: String(p.id || '').trim().toUpperCase() };
+    if (!p.id) return { ok: false, code: 'empty', msg: 'Enter a code.' };
+    if (s.promos.some(function (o) { return o.type === p.type && o.id === p.id; }))
+      return { ok: false, code: 'same', msg: MSG.sameCode };
+    var sub = subOf(s);
+    var hard = block(p, s, sub, [], true);     // invalid, expired, not eligible… — red
+    if (hard) return { ok: false, code: hard.code, msg: hard.msg };
+
+    var drop;
+    if (opts.drop) drop = opts.drop;
+    else {
+      drop = clashes(p, s.promos);
+      var reason = drop.length ? (drop.every(function (o) { return o.type === p.type && p.type === 'code'; }) ? 'code' : 'clash') : null;
+      /* still two left once the clashes go: the one worth least makes way */
+      var left = s.promos.filter(function (o) { return drop.indexOf(o) < 0; });
+      if (left.length >= PROMO_MAX) {
+        drop = drop.concat(left.sort(function (a, c) { return worth(promoOf(a), sub) - worth(promoOf(c), sub); })[0]);
+        reason = reason || 'limit';
+      }
+      if (drop.length) {
+        var now = totals().promos;
+        var lose = drop.reduce(function (t, o) {
+          var hit = now.filter(function (n) { return n.type === o.type && n.id === o.id; })[0];
+          return t + (hit ? hit.amount : 0);
+        }, 0);
+        return { choice: true, reason: reason, p: p, name: promoName(p),
+          drop: drop, dropNames: drop.map(promoLabel),
+          gain: Math.min(worth(promoOf(p), sub), sub), lose: lose };
+      }
+    }
+    s.promos = s.promos.filter(function (o) {
+      return !drop.some(function (d) { return d.type === o.type && d.id === o.id; });
+    });
+    s.promos.push(p);
+    write(s);
+    return { ok: true, msg: MSG.applied, p: p };
+  }
+  /* how a promotion is named in a sentence: "your MyTriumph Welcome voucher", "SUMMER15" */
+  function promoLabel(o) { return o.type === 'loyalty' ? 'your MyTriumph ' + LOYALTY[o.id].name : o.id; }
+  function removePromo(type, id) {
+    var s = read();
+    s.promos = s.promos.filter(function (o) { return !(o.type === type && o.id === id); });
+    write(s);
+    return { ok: true, msg: MSG.removed };
+  }
+  function setPromos(list) { var s = read(); s.promos = list.slice(); return write(s); }
+
+  /* kept for older callers: a code string in, a code promo out */
+  function setVoucher(code) {
+    if (!code) { var s = read(); s.promos = s.promos.filter(function (o) { return o.type !== 'code'; }); return write(s); }
+    var r = apply({ type: 'code', id: code });
+    return r.choice ? apply(r.p, { drop: r.drop }) : r;
+  }
 
   function count(s) {
     s = s || read();
@@ -210,10 +388,27 @@ window.Shop = (function () {
 
     var sub = s.lines.reduce(function (t, l) { return t + charged(l, member) * l.qty; }, 0);
     var listSub = s.lines.reduce(function (t, l) { return t + l.unit * l.qty; }, 0);
-    var discount = s.voucher ? Math.round(sub * 10) / 100 : 0;
-    var offered = rewardOffered(s);
-    var reward = (offered && s.reward) ? Math.min(REWARD.amount, Math.max(0, sub - discount)) : 0;
-    var base = sub - discount - reward;
+    /* Every applied promotion is re-checked on every read: one that stopped qualifying
+       (a line removed under the minimum spend, the sale switched on under a
+       full-price-only code, a signed-out member) stays on the order at €0 with its
+       reason, rather than disappearing without a word. */
+    var promos = [], taken = 0;
+    s.promos.forEach(function (p, i) {
+      var def = promoOf(p);
+      var others = s.promos.filter(function (o, j) { return j < i; });
+      var b = def ? block(p, s, sub, others) : { code: 'invalid', msg: MSG.invalid };
+      if (b && b.code === 'notElig' && p.type === 'loyalty') return;   // signed out: not shown at all
+      var amt = b ? 0 : Math.min(worth(def, sub), Math.max(0, sub - taken));
+      taken += amt;
+      promos.push({ type: p.type, id: p.id, name: promoName(p),
+        note: def ? (def.pct ? def.pct + '% off' : money(def.off).replace('.00', '') + ' off') : '',
+        amount: amt, blocked: b ? (b.code === 'minSpend'
+          ? 'Spend ' + money(b.min - sub) + ' more to use it' : b.msg) : null });
+    });
+    var codeP = promos.filter(function (p) { return p.type === 'code'; })[0];
+    var discount = codeP ? codeP.amount : 0;
+    var reward = taken - discount;
+    var base = sub - taken;
     var freeShip = member || base >= FREE_AT;
 
     var shipCost;
@@ -223,9 +418,10 @@ window.Shop = (function () {
 
     var total = base + shipCost;
     return {
-      lines: s.lines, member: member, voucher: s.voucher,
+      lines: s.lines, member: member, voucher: codeP ? codeP.id : null,
       count: count(s), sub: sub, listSub: listSub, discount: discount,
-      rewardOffered: offered, reward: reward, rewardOn: offered && !!s.reward,
+      promos: promos, promoCount: s.promos.length, promoMax: PROMO_MAX, promoOff: taken,
+      loyaltyOffered: loyaltyOffered(s), sale: sale(), reward: reward,
       base: base, freeShip: freeShip, shipCost: shipCost, total: total,
       vat: total - total / (1 + VAT),
       gap: Math.max(0, FREE_AT - base), freeAt: FREE_AT
@@ -646,13 +842,15 @@ window.Shop = (function () {
   }
 
   /* another tab changed the cart */
-  window.addEventListener('storage', function (e) { if (e.key === KEY) emit(); });
+  window.addEventListener('storage', function (e) { if (e.key === KEY || e.key === SALE_KEY || e.key === RULE_KEY) emit(); });
 
   return {
     add: add, setQty: setQty, bump: bump, remove: remove, clear: clear, setSize: setSize,
     setColour: setColour, undoRemove: undoRemove,
     read: read, count: count, totals: totals, charged: charged,
-    setMember: setMember, setVoucher: setVoucher, setReward: setReward, REWARD: REWARD,
+    setMember: setMember, setVoucher: setVoucher,
+    apply: apply, removePromo: removePromo, setPromos: setPromos, LOYALTY: LOYALTY, CODES: CODES,
+    MSG: MSG, PROMO_MAX: PROMO_MAX, sale: sale, wasOf: wasOf, SALE_OFF: SALE_OFF, rules: rules, setRules: setRules,
     money: money, onChange: onChange, refresh: emit,
     openMini: open, closeMini: close,
     miniMode: miniMode, setMiniMode: setMiniMode,
