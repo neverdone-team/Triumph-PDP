@@ -761,6 +761,35 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 .field--note{padding:0}
 /* the vouchers inside the code section sit under the field and its rule line */
 [data-place="acc"]:not(:empty){margin-top:var(--space-16)}
+/* ---- the ticket: a voucher card drawn as a coupon (Amelie, 2026-09-29) ----------------
+   The crown, then the reduction first (Title/3), the name (Body/S),
+   the dates, and Redeem as the summary's black text link. Round notches are cut into
+   both sides at the tear's height, as a mask, so they show whatever the summary sits on
+   (named colours in the mask: build.py would snap hex to a token). */
+.ticket{--notch:10px;position:relative;display:flex;align-items:center;gap:var(--space-16);
+  background:var(--c-offwhite);padding:var(--space-16) var(--space-32) var(--space-16) 0;margin-top:var(--space-8);
+  -webkit-mask:
+    radial-gradient(circle at 0 50%, transparent var(--notch), black calc(var(--notch) + .5px)),
+    radial-gradient(circle at 100% 50%, transparent var(--notch), black calc(var(--notch) + .5px));
+  -webkit-mask-composite:source-in;
+  mask:
+    radial-gradient(circle at 0 50%, transparent var(--notch), black calc(var(--notch) + .5px)),
+    radial-gradient(circle at 100% 50%, transparent var(--notch), black calc(var(--notch) + .5px));
+  mask-composite:intersect}
+.ticket:first-child{margin-top:0}
+/* the crown sits 32 in from the edge, then the card's 16 gap to the text (Amelie, 2026-09-29) */
+.ticket__stub{flex:none;padding-left:var(--space-32);align-self:stretch;display:flex;align-items:center}
+.ticket__crown{color:var(--c-burgundy)}
+.ticket__main{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--space-2)}
+.ticket__amt{font-weight:400;font-size:16px;line-height:20px;letter-spacing:.04em;text-transform:uppercase;color:var(--c-ink)}
+.ticket__terms{color:var(--c-grey-medium);margin-top:var(--space-4)}
+.ticket__redeem{flex:none;align-self:center}
+/* the tear sits between the text and Redeem, so Redeem is the stub that comes away
+   (Amelie, 2026-09-29): light grey (border/low contrast) dots, 1px wide and 4px tall every 12px down the left edge,
+   full height — drawn rather than a dotted border so they can be spaced */
+.ticket__act{flex:none;align-self:stretch;display:flex;align-items:center;
+  margin:calc(var(--space-16) * -1) 0;padding-left:var(--space-24);
+  background:linear-gradient(var(--c-edge) 4px, transparent 4px) left top / 1px 12px repeat-y}
 [data-place="acc"] .reward:first-child{margin-top:0}
 /* a clash's two answers sit on their own line under the sentence, better deal first */
 .offer-choice{display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);margin-top:var(--space-12)}
@@ -839,8 +868,8 @@ body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
 .billing{display:grid;row-gap:var(--space-12);margin-top:var(--space-12)}
 
 /* indented to the option text above it — radio (24) plus the row's gap (16) */
-.check--indent{padding-left:calc(24px + var(--space-16))}
-@media (max-width:575px){ .check--indent{padding-left:0} }
+/* .check--indent (40px in, under the radio labels) is gone: the billing checkbox lines up
+   with the radios and fields on their left edge (Amelie, 2026-09-29) */
 
 /* the open row and its fields are one block: the row's own rule goes and the form
    carries it instead (Amelie, 2026-09-15) */
@@ -1925,7 +1954,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <div style="margin-top:var(--space-12)">
         <!-- ticked by default and stated the other way round: the billing fields only
              appear for the minority who need them (Amelie, 2026-09-10) -->
-        <label class="check check--indent">
+        <label class="check">
           <input type="checkbox" id="sameBilling" data-toggle-hide="#billing" checked />
           <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
           <span class="t-body-s">Delivery address is also my billing address</span>
@@ -2496,6 +2525,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
     <button data-offer-preset="swc">Sale + welcome + code</button>
     <button data-offer-preset="none">None</button>
   </div>
+  <h4>Offers · voucher card</h4>
+  <div class="dash__row">
+    <button data-offer-card="ticket">Ticket</button>
+    <button data-offer-card="strip">Current</button>
+  </div>
   <h4>Offers · rules</h4>
   <div class="dash__row">
     <button data-offer-rule="vv:true">Vouchers combine</button>
@@ -2534,7 +2568,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
 </div>
 
 <script src="./lib/shop.js?v=2026-09-29b"></script>
-<script src="./lib/offers.js?v=2026-09-29q"></script>
+<script src="./lib/offers.js?v=2026-09-29u"></script>
 <script>
 (function () {
   const $  = (s, r = document) => r.querySelector(s);

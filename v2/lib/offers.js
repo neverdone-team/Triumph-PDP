@@ -103,6 +103,21 @@ window.Offers = (function () {
       /* the minimum spend is its own line: wrapped after "·" it left the dot or "€40"
          hanging (Amelie, 2026-09-29) */
       var terms = esc('Valid until ' + v.until) + (v.min ? '<br>' + esc('Min. spend ' + eur(v.min).replace('.00', '')) : '');
+      var describe = slots['loyalty:' + id] ? ' aria-describedby="offer-note-loyalty-' + id + '"' : '';
+      /* the ticket (Amelie, 2026-09-29, a coupon reference): the crown on its own stub,
+         then the reduction, the name, the dates, and Redeem as a text link */
+      if (cardStyle() === 'ticket') {
+        var amount = v.pct ? v.pct + '%' : eur(v.off).replace('.00', '');
+        return '<div class="ticket">' +
+            '<span class="ticket__stub">' + CROWN.replace('offer-crown', 'ticket__crown').replace('width="14" height="12"', 'width="22" height="19"') + '</span>' +
+            '<span class="ticket__main">' +
+              '<span class="ticket__amt">' + esc(amount) + '</span>' +
+              '<span class="ticket__name t-body-s">' + esc(v.name) + '</span>' +
+              '<span class="ticket__terms t-body-s">' + terms + '</span>' +
+            '</span>' +
+            '<span class="ticket__act"><button class="t-link-s dcode__x ticket__redeem" type="button" data-offer-redeem="' + id + '"' + describe + '>Redeem</button></span>' +
+          '</div>' + slotHTML('loyalty:' + id);
+      }
       return '<div class="reward" data-on="false">' +
           '<div class="reward__main">' +
             /* the crown says MyTriumph, so the words don't (Amelie, 2026-09-29) */
@@ -111,8 +126,7 @@ window.Offers = (function () {
             '<span class="reward__terms t-body-s">' + terms + '</span>' +
           '</div>' +
           '<div class="reward__act">' +
-            '<button class="reward__btn" type="button" data-offer-redeem="' + id + '"' +
-              (slots['loyalty:' + id] ? ' aria-describedby="offer-note-loyalty-' + id + '"' : '') + '>Redeem</button>' +
+            '<button class="reward__btn" type="button" data-offer-redeem="' + id + '"' + describe + '>Redeem</button>' +
           '</div>' +
         '</div>' + slotHTML('loyalty:' + id);
     }).join('');
@@ -131,6 +145,10 @@ window.Offers = (function () {
       (t.loyaltyOffered ? " Some discount codes can't be combined with MyTriumph vouchers." : '');
   }
 
+  /* which voucher card is drawn — a prototype switch (Amelie, 2026-09-29) */
+  var CARD_KEY = 'triumph.proto.voucherCard';
+  function cardStyle() { try { return localStorage.getItem(CARD_KEY) === 'strip' ? 'strip' : 'ticket'; } catch (e) { return 'ticket'; } }
+
   /* opened once for a member with vouchers to use; after that the section is the customer's */
   var autoOpened = false;
 
@@ -142,6 +160,7 @@ window.Offers = (function () {
     /* The MyTriumph vouchers live inside the collapsible code section, under the field
        (Amelie, 2026-09-29), and its header names them when there are some to use. */
     $$('[data-loyalty-cards]').forEach(function (n) { n.innerHTML = cardsHTML(t); });
+    $$('[data-offer-card]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.offerCard === cardStyle())); });
     var toUse = t.loyaltyOffered && t.count > 0 && Object.keys(Shop.LOYALTY).some(function (id) {
       return !t.promos.some(function (p) { return p.type === 'loyalty' && p.id === id; });
     });
@@ -270,6 +289,9 @@ window.Offers = (function () {
       preset(b.dataset.offerPreset);
     } else if ((b = e.target.closest('[data-offer-try]'))) {
       openCodeField(b.dataset.offerTry);
+    } else if ((b = e.target.closest('[data-offer-card]'))) {
+      try { localStorage.setItem(CARD_KEY, b.dataset.offerCard); } catch (err) {}
+      render();
     } else if ((b = e.target.closest('[data-offer-rule]'))) {
       var r = b.dataset.offerRule.split(':'), patch = {};
       patch[r[0]] = r[1] === 'true';

@@ -248,6 +248,12 @@
    "to": "removed (inherits its DS style)"
   },
   {
+   "sel": ".ticket__amt",
+   "kind": "type",
+   "from": "400 16px/20px ls .04em UPPER",
+   "to": "Title/3"
+  },
+  {
    "sel": ".field input,.field select",
    "kind": "type",
    "from": "300 14px/20px ls .04em",
@@ -638,6 +644,12 @@
    "kind": "type-override",
    "from": "font-size:10px, line-height:14px",
    "to": "removed (inherits its DS style)"
+  },
+  {
+   "sel": ".ticket__amt",
+   "kind": "type",
+   "from": "400 16px/20px ls .04em UPPER",
+   "to": "Title/3"
   },
   {
    "sel": "#payList .opt__logo svg",
