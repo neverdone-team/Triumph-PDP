@@ -225,8 +225,12 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
    it. Here the same lines come from the wrap's side padding (40 | 48) and a 432 column
    (480 − 48) with 48 inside, so the product column reads 696 and the summary 383-384. */
 @media (min-width:1181px){ .wrap{padding-left:var(--space-40);padding-right:var(--space-48)} }
-.cart{display:grid;grid-template-columns:minmax(0,1fr) 432px;align-items:start;
-  margin-top:var(--space-32)}
+/* SHOPPING BAG and SUMMARY sit where the checkout's headings do: 144 from the top of the page
+   at every desktop width, whatever height the header has there (78, or 124 with the nav on
+   two rows) — 64 + 80 − --header-h (Amelie, 2026-09-29) */
+@media (min-width:992px){ .wrap{padding-top:calc(var(--space-64) + var(--space-80) - var(--header-h))} }
+.cart{display:grid;grid-template-columns:minmax(0,1fr) 432px;align-items:start}
+.cart__left .pagehead{margin-bottom:calc(var(--space-8) * -1)}   /* with the column's 24 gap: 16 to the delivery box (Amelie, 2026-09-29) */
 /* The product column is deliberately narrower than the space it has: 160 of right
    padding puts 240px of gutter between the last product and the summary, and pulls the
    line's price back towards its name instead of stranding it at the far edge
@@ -237,7 +241,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
    total beside it, and 144px of gutter separates them well enough. The checkout keeps its
    hairline, where the rail really is a second surface. */
 .cart__right{padding-left:var(--space-48);
-  position:sticky;top:calc(var(--header-h) + var(--space-24));
+  position:sticky;top:calc(var(--header-h) + var(--space-20));   /* 20, not 24: with the 124 header it would sit below its 144 (2026-09-29) */
   display:flex;flex-direction:column;gap:var(--space-32)}
 .cart__status{display:flex;flex-direction:column;gap:var(--space-16)}
 
@@ -343,6 +347,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   grid-template-rows:1fr repeat(6,min-content) 1fr;
   column-gap:var(--space-24);row-gap:0;
   padding:var(--space-32) 0;background:var(--c-bg)}
+/* the first product sits a little closer to the delivery box: 16 of its own + the column's
+   24 (Amelie, 2026-09-29) */
+@media (min-width:992px){ .items > .item:first-child{padding-top:var(--space-16)} }
 /* series → name → price → colour → controls → stock, one column of text beside the
    packshot. The price used to sit in a third column at the row's right edge, which left
    it stranded metres from the product on a 790px row (Amelie, 2026-09-11). */
@@ -440,7 +447,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 /* The per-unit figure closes the price line. It keeps its place at every quantity —
    hidden, not removed, at one — so the row never grows or shrinks as the stepper
    crosses 1 (Amelie, 2026-09-14). */
-.item__unit{margin-left:var(--space-8);white-space:nowrap;color:var(--c-ink-soft)}
+.item__unit{white-space:nowrap;color:var(--c-ink-soft)}
+/* a little more air between the price line and the note under it (Amelie, 2026-09-29) */
+.pricepair .linesave,.pricepair__member{margin-top:var(--space-4)}
 /* at quantity 1 it says nothing new, but it keeps its place: hiding it outright made the
    row grow and shrink wherever the price line wraps */
 .item__unit.is-blank{visibility:hidden}
@@ -555,7 +564,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .trow .t-price{font-weight:400}
 /* one hairline over the total — the double rule was tried and reverted, see the note in
    checkout.html (Amelie, 2026-09-17) */
-.trow--grand{border-top:1px solid var(--c-edge);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
+.trow--grand{border-top:1px solid var(--c-hair);margin-top:var(--space-12);padding-top:var(--space-16);align-items:baseline}
 /* what this order saves against the list prices — burgundy, the colour every member and
    sale figure in the flow uses */
 .trow--save{color:var(--color-green)}
@@ -686,7 +695,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .voucher .field__hint:empty,.voucher .field__err:empty{display:none}
 .field--note{padding:0}
 /* the vouchers inside the code section sit under the field and its rule line */
-[data-place="acc"]:not(:empty){margin-top:var(--space-16)}
+[data-place="acc"]:not(:empty){margin-bottom:var(--space-16)}   /* the vouchers lead, the field follows */
 /* ---- the ticket: a voucher card drawn as a coupon (Amelie, 2026-09-29) ----------------
    The crown, then the reduction first (Title/3), the name (Body/S),
    the dates, and Redeem as the summary's black text link. Round notches are cut into
@@ -726,16 +735,37 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .dcode .field--note .field__hint,.dcode .field--note .field__err{padding-left:0;margin-top:0}
 .trow--code.is-blocked .t-price{color:var(--c-grey-medium)}
 
-.acc{margin-top:var(--space-20)}   /* no rule above it (Amelie, 2026-09-11) */
+.acc{margin-top:var(--space-24);border-top:1px solid var(--c-hair)}
+/* the total below brings 12 of its own margin: given back, so the label sits centred between the two rules (as .totals #voucherAcc does in the checkout) */
+.sum #voucherAcc{margin-bottom:calc(var(--space-12) * -1)}
+/* The summary takes the checkout rail's lines (Amelie, 2026-09-29): one over the code
+   section and one over the total, --c-hair as the rail draws them (this replaces the
+   2026-09-11 "no rule above the code section"). */
+.sum__head{margin-bottom:var(--space-8)}   /* no rule under it, and close to the rows it heads (Amelie, 2026-09-29) */
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-14,14px) 0}
+/* optically centred between the two rules: the face sits ~1px low in its line box (Amelie, 2026-09-29) */
+.acc__btn > .t-body-m{position:relative;top:-1px}
 /* a plus, not a chevron: it adds a code rather than revealing more of the summary */
 .acc__plus{position:relative;width:12px;height:12px;flex:none}
 .acc__plus::before,.acc__plus::after{content:"";position:absolute;background:currentColor}
 .acc__plus::before{left:0;right:0;top:5.5px;height:1px}
 .acc__plus::after{top:0;bottom:0;left:5.5px;width:1px;transition:opacity .2s var(--ease-out)}
 .acc[data-open="true"] .acc__plus::after{opacity:0}
-.acc__body{display:none;padding-bottom:var(--space-16)}
-.acc[data-open="true"] .acc__body{display:block}
+/* The code section opens and closes (Amelie, 2026-09-29): its height eases on the checkout's
+   reveal curve (a 0fr → 1fr grid row, so no height is ever measured), the content fades
+   out as it closes, and on opening the field and each voucher come in with rowReveal,
+   staggered, the entrance every checkout row uses (lib/offers.js adds .rvl). */
+.acc__body{display:grid;grid-template-rows:0fr;padding-bottom:0;
+  transition:grid-template-rows .5s var(--ease-reveal),padding-bottom .5s var(--ease-reveal)}
+.acc[data-open="true"] .acc__body{display:grid;grid-template-rows:1fr;padding-bottom:var(--space-16)}
+.acc__inner{min-height:0;overflow:hidden;opacity:0;visibility:hidden;
+  transition:opacity .2s var(--ease-out),visibility 0s linear .5s}
+.acc[data-open="true"] .acc__inner{opacity:1;visibility:visible;transition:opacity .3s var(--ease-out),visibility 0s}
+/* the field's floating label sits 6px above its box: room for it inside the clip */
+.acc__inner{padding-top:6px;margin-top:-6px}
+@media (prefers-reduced-motion: reduce){ .acc__body,.acc__inner{transition:none} }
+
+
 
 /* Text Field — the DS component, node 116:229 in *Design System Triumph*.
    Taken off the BUILT component, which differs from its own description: the box is a
@@ -1118,7 +1148,8 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   .statusbox .t-body-m{font-size:12px;line-height:18px}
   /* the phone gets a tighter rhythm throughout: the page is one column, so the air
      between its blocks can come down (Amelie, 2026-09-14) */
-  .cart{gap:var(--space-16);margin-top:var(--space-16)}
+  .cart{gap:var(--space-16);margin-top:0}
+  .cart__left .pagehead{margin-bottom:0}   /* the title is inside .cart now: its 16 gap is the air under it */
   .item{padding:var(--space-20) 0}
   /* one text column beside the shot, with the price sitting between the series and the
      colour — and controls at 44px so they are actually tappable */
@@ -1135,6 +1166,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
      rung smaller, tighter under the collection, and the shot pinned to the top */
   .item__name{font-size:14px;line-height:20px;margin-top:var(--space-2)}
   .item__unit{white-space:nowrap}
+  /* on a phone the unit price takes its own line under the price (Amelie, 2026-09-29) */
+  .priceline{flex-wrap:wrap;row-gap:var(--space-2)}
+  .priceline .item__unit{flex-basis:100%}
   .stepper{height:var(--control-44)}
   .stepper button{width:var(--control-44)}
   /* no room beside a 112px stepper at this width: the size takes its own line */
@@ -1260,19 +1294,17 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 
   <!-- ======================= FILLED CART ======================= -->
   <div id="filledCart">
-    <!-- ABOVE the columns, not inside the left one (Amelie, 2026-09-17). It had been put
-         in the column so it would start on the same line as Summary — but that put the
-         delivery status half a title lower than the figures it belongs with. It is the
-         page's title, so it sits over the page, and the two columns then start together:
-         the green box and Summary on one line. -->
-    <div class="pagehead">
-      <h1 class="t-title-m">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
-    </div>
     <div class="cart">
      <!-- Two column wrappers so the columns do not share grid rows (a tall packshot used
           to push the summary down the rail) and so the whole right column can stick.
           On a phone both wrappers go display:contents and the four blocks order freely. -->
      <div class="cart__left">
+      <!-- Title/4, the checkout's heading style (Amelie, 2026-09-29). Back IN the left column (reversing 2026-09-17): SHOPPING BAG and
+           SUMMARY start on one line, the checkout's CHECK YOUR ORDER / ORDER SUMMARY pairing.
+           On a phone the column dissolves and the title is simply the first block. -->
+      <div class="pagehead">
+        <h1 class="t-title-s">Shopping bag <span class="pagehead__n" data-count>(0)</span></h1>
+      </div>
       <!-- The delivery status leads the order on desktop as well as on mobile: it is
            about this order, so it belongs where the order is read (Amelie, 2026-09-10). -->
       <div class="cart__status">
@@ -1328,7 +1360,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
      <div class="cart__right">
       <!-- ------------ summary ------------ -->
       <aside class="sum" aria-label="Summary">
-        <h2 class="t-title-m" style="margin-bottom:var(--space-16)">Summary</h2>
+        <h2 class="t-title-s sum__head">Summary</h2>
         <div class="trow"><span class="t-body-m">Subtotal</span><span class="t-price" data-subtotal>€0.00</span></div>
         <!-- directly under the subtotal it is read against: what these items would have
              cost at list price (Amelie, 2026-09-10) -->
@@ -1363,6 +1395,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
             <span class="acc__plus" aria-hidden="true"></span>
           </button>
           <div class="acc__body">
+<div class="acc__inner">
+            <!-- the MyTriumph vouchers first, then the code field (Amelie, 2026-09-29) -->
+            <div data-loyalty-cards data-place="acc"></div>
             <div class="voucher">
               <label class="field">
                 <input type="text" id="voucher" placeholder=" " aria-describedby="voucherHint voucherErr" />
@@ -1373,8 +1408,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
               </label>
               <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
             </div>
-            <!-- the MyTriumph vouchers, inside this section under the field (Amelie, 2026-09-29) -->
-            <div data-loyalty-cards data-place="acc"></div>
+</div>
           </div>
         </div>
         </div>
@@ -1586,7 +1620,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 </div>
 
 <script src="./lib/shop.js?v=2026-09-29b"></script>
-<script src="./lib/offers.js?v=2026-09-29u"></script>
+<script src="./lib/offers.js?v=2026-09-29x"></script>
 <!-- the search overlay, opened from the header's control, as on the PLP -->
 <script src="./lib/search.js?v=30" defer></script>
 <script>
@@ -1718,10 +1752,11 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
        label or the saving, never both. */
     const price =
       '<span class="pricepair'+(isMember ? ' pricepair--member' : '')+'">'+
-        /* the charged figure leads and the former price follows it (Amelie, 2026-09-14) */
-        '<span class="priceline">'+
-          '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+ wasTag +
-          '<span class="item__unit t-price-note'+(l.qty>1?'':' is-blank')+'">'+eur(pay)+' each</span>'+
+        /* the former price first, then the charged one, then the unit price — beside them on
+           desktop, on its own line under them on a phone (Amelie, 2026-09-29) */
+        '<span class="priceline">'+ wasTag +
+          '<span class="t-price" data-line-price>'+eur(pay*l.qty)+'</span>'+
+          (l.qty > 1 ? '<span class="item__unit t-price-note">'+eur(pay)+' each</span>' : '')+
         '</span>'+
         (isMember ? '<span class="pricepair__member t-price-s">Member price</span>' : saveTag)+
       '</span>';
@@ -1821,24 +1856,14 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
     rows.forEach(n => REVEALED.add(n.dataset.sku));
   }
 
-  /* the cross-sell cards wait until they are scrolled to, the same trigger and the same
-     threshold the PLP uses for its grid. Called again whenever the strip is rebuilt,
-     which it is every time the bag changes (Amelie, 2026-09-16). */
+  /* the cross-sell cards come in with the page. Called again whenever the strip is
+     rebuilt, which it is every time the bag changes. */
   function revealAddons(){
     if (REDUCED.matches) return;
     const cards = $$('.acard:not(.rvl)');
-    if (!cards.length || !('IntersectionObserver' in window)) return;
-    cards.forEach(c => c.classList.add('rvl-pre'));
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(en => {
-        if (!en.isIntersecting) return;
-        en.target.style.setProperty('--i', cards.indexOf(en.target));
-        en.target.classList.remove('rvl-pre');
-        en.target.classList.add('rvl');
-        io.unobserve(en.target);
-      });
-    }, { threshold: .2, rootMargin: '0px 0px -10% 0px' });
-    cards.forEach(c => io.observe(c));
+    /* no longer waits to be scrolled to (Amelie, 2026-09-29): the cards are there on load,
+       with the same staggered entrance */
+    cards.forEach((c, i) => { c.style.setProperty('--i', i); c.classList.add('rvl'); });
   }
 
   /* ================= COMPLETE YOUR SET =================

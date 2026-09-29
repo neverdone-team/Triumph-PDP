@@ -145,7 +145,7 @@ h1,h2,h3,p{margin:0}
   align-items:stretch}
 .ck__form{padding:var(--space-64) var(--form-pad-r) var(--space-64) var(--space-40);min-width:0}
 /* the tinted column is the full-height grid child; the rail inside it is what sticks */
-.ck__railcol{background:var(--c-bg);border-left:1px solid var(--c-hair);position:relative}
+.ck__railcol{background:var(--c-bg);position:relative}   /* no rule between the content and the summary (Amelie, 2026-09-29) */
 /* The tint has to reach the right edge of the window, not stop at the 1200px container.
    A hard-stop gradient on <body> does it with no extra box: an absolutely-positioned
    `left:100%; width:100vw` bleed widened the document to 2760px, and a `position:fixed`
@@ -298,7 +298,7 @@ body{background-image:none}
 /* ============================================================
    OPTION ROWS — shipping method + payment method (DS Option Row)
    ============================================================ */
-.opts{border-top:1px solid var(--c-hair)}
+.opts{border-top:0}   /* no rule under a section heading (Amelie, 2026-09-29): the rows' own rules part them */
 .opt{
   display:flex;align-items:center;gap:var(--space-16);
   padding:var(--space-20) 0;
@@ -379,7 +379,7 @@ body{background-image:none}
 .who__body{flex:1;min-width:0}
 .who__mail{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.savedaddr{border-top:1px solid var(--c-hair)}   /* an option list, not a boxed card */
+.savedaddr{border-top:0}   /* an option list, not a boxed card */
 .editnote{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-12);
   margin:0 0 var(--space-16);color:var(--c-ink-soft)}
 .savedaddr .opt{align-items:flex-start}
@@ -488,6 +488,11 @@ body[data-gate="b2"] .gate__guest{
 body[data-gate="b2"] .gate__guest-txt{min-width:0}
 body[data-gate="b2"] .gate__guest-h{margin-bottom:0}
 body[data-gate="b2"] .gate__guest-act{padding-left:var(--space-64)}
+/* no rule between the guest door and Join MyTriumph, in any placement; the air stays
+   (Amelie, 2026-09-29) */
+body[data-gate] .gate__guest,.gate__guest{border-top:0;border-bottom:0}
+body[data-gate="a"] .gate__guest{padding-bottom:0}
+.gate__guest{padding-top:0}
 /* guest takes the outlined button and Sign in keeps the fill: position says which door
    is quickest, weight says which one most people are here for (Amelie, 2026-09-16) */
 body[data-gate="b2"] .gate__box{margin-top:var(--space-40)}
@@ -736,7 +741,7 @@ body[data-mode="steps"][data-step="3"] .ck__form{width:100%;max-width:820px;just
 .voucher .field__hint:empty,.voucher .field__err:empty{display:none}
 .field--note{padding:0}
 /* the vouchers inside the code section sit under the field and its rule line */
-[data-place="acc"]:not(:empty){margin-top:var(--space-16)}
+[data-place="acc"]:not(:empty){margin-bottom:var(--space-16)}   /* the vouchers lead, the field follows */
 /* ---- the ticket: a voucher card drawn as a coupon (Amelie, 2026-09-29) ----------------
    The crown, then the reduction first (Title/3), the name (Body/S),
    the dates, and Redeem as the summary's black text link. Round notches are cut into
@@ -852,6 +857,16 @@ body[data-mode="steps"][data-step="4"] .li [data-remove]{display:none}
 .savedaddr .opt:has(+ #addrForm){border-bottom-color:transparent}
 .savedaddr > #addrForm{padding:var(--space-20) 0 var(--space-24);
   border-bottom:1px solid var(--c-hair);margin-bottom:var(--space-16)}
+/* the billing checkbox: under the guest's form, or — for a member — inside the address list,
+   under the chosen row (or its open form), on the row's text column; the rule that closed
+   the row closes it instead (Amelie, 2026-09-29) */
+.billwrap{margin-top:var(--space-12)}
+.savedaddr > .billwrap{margin:calc(var(--space-6) * -1) 0 0;padding:0 0 var(--space-20) var(--space-40);
+  border-bottom:1px solid var(--c-hair)}
+/* after an open form it lines up with the form's fields, and the form's own 24 is the air */
+.savedaddr > #addrForm + .billwrap{margin-top:0;padding-left:0}
+.savedaddr .opt:has(+ .billwrap),.savedaddr > #addrForm:has(+ .billwrap){border-bottom-color:transparent}
+.savedaddr > #addrForm:has(+ .billwrap){margin-bottom:0}
 
 /* the "add address line 2" link needs room under it, or the next field crowds it */
 #addrForm > .t-link-s{margin:var(--space-4) 0 var(--space-12)}
@@ -943,7 +958,13 @@ body[data-mode="steps"] .place.is-last{display:block}
 /* ============================================================
    REVIEW (step 4)
    ============================================================ */
-.review{margin:0;border-top:1px solid var(--c-hair)}
+.review{margin:0}
+/* With no rule under the headings (Amelie, 2026-09-29) the lists move 16 closer to them,
+   and each list loses the rule under its last row: the list hides its own bottom 1px, so
+   whichever row or open panel happens to end it, its bottom line goes. */
+.opts,.savedaddr,.review{margin-top:calc(var(--space-16) * -1)}
+.opts,.savedaddr{clip-path:inset(0 0 1px 0)}
+/* the review keeps the rule under its last row: Items follows it (Amelie, 2026-09-29) */
 /* heading on its own line with Edit at the far right of it, value underneath — the same
    shape at every width, so a phone is not a different layout (Amelie, 2026-09-10) */
 .review__row{
@@ -989,8 +1010,7 @@ body[data-mode] .ck__rail .review__items .li__price{grid-row:auto;align-self:aut
 body[data-mode] .ck__rail .review__items .li__price{grid-column:2;margin-top:var(--space-12)}
 body[data-mode] .ck__rail .review__items .li__pricerow{flex-direction:row}
 body:not([data-step="4"]) .review__items .sec__head{
-  padding-bottom:var(--space-16);border-bottom:1px solid var(--c-hair);
-  margin-bottom:var(--space-16)}
+  margin-bottom:var(--space-16)}   /* no rule under the heading (Amelie, 2026-09-29) */
 body:not([data-step="4"]) .review__items .sec__head h3{color:var(--c-ink)}
 .review__items.is-folded .sec__head a{display:none}
 /* the same heading the reviewed facts carry, so the list reads as one of them */
@@ -1119,7 +1139,7 @@ body:not([data-step="4"]) .review__items .sec__head h3{color:var(--c-ink)}
 /* the rail reads from the left, so the charged figure leads there; the review's column
    is right-aligned, so the emphasis belongs at its right edge and the per-unit figure
    goes first */
-.review__items .li__pricerow{flex-direction:row-reverse}
+.review__items .li__pricerow{flex-direction:row}   /* former price, then the charged one (2026-09-29) */
 .li__unit{white-space:nowrap}
 
 /* In the rail the row is barely 390px across, and three columns put both the product
@@ -1186,6 +1206,8 @@ body[data-mode="steps"] .offers{display:none}
 .totals #voucherAcc{margin-bottom:calc(var(--space-12) * -1)}
 .acc{border-top:1px solid var(--c-hair);margin:var(--space-24) 0 0}
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-16) 0}
+/* optically centred between the two rules: the face sits ~1px low in its line box (Amelie, 2026-09-29) */
+.acc__btn > .t-body-m{position:relative;top:-1px}
 /* a plus, not a chevron — the bag's own mark: it adds a code rather than revealing more
    of the summary (Amelie, 2026-09-25) */
 .acc__plus{position:relative;width:12px;height:12px;flex:none}
@@ -1193,14 +1215,27 @@ body[data-mode="steps"] .offers{display:none}
 .acc__plus::before{left:0;right:0;top:5.5px;height:1px}
 .acc__plus::after{top:0;bottom:0;left:5.5px;width:1px;transition:opacity .2s var(--ease-out)}
 .acc[data-open="true"] .acc__plus::after{opacity:0}
-.acc__body{display:none;padding-bottom:var(--space-20)}
+/* The code section opens and closes (Amelie, 2026-09-29): its height eases on the checkout's
+   reveal curve (a 0fr → 1fr grid row, so no height is ever measured), the content fades
+   out as it closes, and on opening the field and each voucher come in with rowReveal,
+   staggered, the entrance every checkout row uses (lib/offers.js adds .rvl). */
+.acc__body{display:grid;grid-template-rows:0fr;padding-bottom:0;
+  transition:grid-template-rows .5s var(--ease-reveal),padding-bottom .5s var(--ease-reveal)}
+.acc[data-open="true"] .acc__body{display:grid;grid-template-rows:1fr;padding-bottom:var(--space-20)}
+.acc__inner{min-height:0;overflow:hidden;opacity:0;visibility:hidden;
+  transition:opacity .2s var(--ease-out),visibility 0s linear .5s}
+.acc[data-open="true"] .acc__inner{opacity:1;visibility:visible;transition:opacity .3s var(--ease-out),visibility 0s}
+/* the field's floating label sits 6px above its box: room for it inside the clip */
+.acc__inner{padding-top:6px;margin-top:-6px}
+@media (prefers-reduced-motion: reduce){ .acc__body,.acc__inner{transition:none} }
+
 /* `.totals .acc + .trow--grand{margin-top:0}` lived here: it zeroed the total's top
    margin because the accordion above it brought its own padding. The accordion is
    display:none in checkout now — but display:none does not take an element out of the
    DOM, so the adjacent-sibling rule went on matching and the hairline sat hard against
    Shipping instead of between the two rows. Deleted with the field (Amelie, 2026-09-17).
 */
-.acc[data-open="true"] .acc__body{display:block}
+
 /* the applied code: name and rate on one line, the remove link under them, the figure
    in green on the right */
 .trow--code{align-items:flex-start}
@@ -1226,12 +1261,12 @@ body[data-voucher-style="grey"] #voucherAcc{background:var(--c-grey-light)}
 body[data-voucher-style="grey"] #voucherAcc .field__frame{background:var(--c-bg)}
 body[data-voucher-style="dashed"] #voucherAcc .voucher,
 body[data-voucher-style="grey"] #voucherAcc .voucher{margin-bottom:0}
-body[data-voucher-style="dashed"] #voucherAcc .acc__body,
-body[data-voucher-style="grey"] #voucherAcc .acc__body{padding-bottom:var(--space-16)}
+body[data-voucher-style="dashed"] #voucherAcc[data-open="true"] .acc__body,
+body[data-voucher-style="grey"] #voucherAcc[data-open="true"] .acc__body{padding-bottom:var(--space-16)}
 body[data-voucher-style="dashed"] .ck__rail #voucherAcc,
 body[data-voucher-style="grey"] .ck__rail #voucherAcc{margin-bottom:var(--space-16)}
 
-.totals{border-top:1px solid var(--c-hair);padding-top:var(--space-24)}
+.totals{padding-top:0}   /* no rule under ORDER SUMMARY: the heading's own 24 is the gap (Amelie, 2026-09-29) */
 /* the same rhythm as the bag's summary (Amelie, 2026-09-11) */
 .trow{display:flex;justify-content:space-between;gap:var(--space-16);padding:var(--space-10) 0}
 .trow--free [data-shipping]{color:var(--color-green)}
@@ -1446,7 +1481,7 @@ body[data-voucher-style="grey"] .ck__rail #voucherAcc{margin-bottom:var(--space-
    ============================================================ */
 @media (max-width:1180px){
   :root{--rail-w:420px; --rail-pad:var(--space-40); --form-pad-r:var(--space-32)}
-  .ck__form{padding:var(--space-32) var(--form-pad-r) var(--space-64) var(--space-24)}
+  .ck__form{padding:var(--space-64) var(--form-pad-r) var(--space-64) var(--space-24)}   /* 64 on top, as the rail: the two headings share a line (2026-09-29) */
 }
 @media (max-width:991px){
   /* one clearance for the whole column, so whichever block ends up last is never under
@@ -1930,9 +1965,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
         </label>
       </div>
 
-      <div style="margin-top:var(--space-12)">
+      <div class="billwrap" id="billWrap">
         <!-- ticked by default and stated the other way round: the billing fields only
-             appear for the minority who need them (Amelie, 2026-09-10) -->
+             appear for the minority who need them (Amelie, 2026-09-10). For a signed-in
+             member it moves into the address list, under the row that is chosen
+             (Amelie, 2026-09-29) — see syncAddrChoice. -->
         <label class="check">
           <input type="checkbox" id="sameBilling" data-toggle-hide="#billing" checked />
           <span class="check__box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true"><path d="M1 4l2.6 2.6L9 1.2" stroke="#fff" stroke-width="1.4"/></svg></span>
@@ -1957,7 +1994,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       <!-- the one-pager reveals the next section on Continue rather than showing them all
            at once; the stepped mode has its own nav, so these are mode-only -->
       <div class="sec__next" data-mode-only="onepage" data-op-next="1">
-        <button class="btn btn--ghost btn--wide" type="button" data-op-go="2">Continue to delivery</button>
+        <button class="btn btn--wide" type="button" data-op-go="2">Continue to delivery</button>
       </div>
     </section>
 
@@ -2100,7 +2137,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       </div>
 
       <div class="sec__next" data-mode-only="onepage" data-op-next="2">
-        <button class="btn btn--ghost btn--wide" type="button" data-op-go="3">Continue to payment</button>
+        <button class="btn btn--wide" type="button" data-op-go="3">Continue to payment</button>
       </div>
     </section>
 
@@ -2263,7 +2300,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     </section>
 
     <div class="sec__next" data-mode-only="onepage" data-op-next="3">
-      <button class="btn btn--ghost btn--wide" type="button" data-op-go="4">Review your order</button>
+      <button class="btn btn--wide" type="button" data-op-go="4">Review your order</button>
     </div>
 
     <!-- ---------- STEP NAVIGATION (3-step mode) ---------- -->
@@ -2326,6 +2363,9 @@ body[data-mode="onepage"] .ck__rail{position:static;
           <span class="acc__plus" aria-hidden="true"></span>
         </button>
         <div class="acc__body" id="voucherBody">
+<div class="acc__inner">
+          <!-- the MyTriumph vouchers first, then the code field (Amelie, 2026-09-29) -->
+          <div data-loyalty-cards data-place="acc"></div>
           <div class="voucher">
             <label class="field">
               <input type="text" id="voucher" placeholder=" " aria-describedby="voucherHint voucherErr" />
@@ -2336,8 +2376,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
             </label>
             <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
           </div>
-          <!-- the MyTriumph vouchers, inside this section under the field (Amelie, 2026-09-29) -->
-          <div data-loyalty-cards data-place="acc"></div>
+</div>
         </div>
       </div>
     </div>
@@ -2555,7 +2594,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
 </div>
 
 <script src="./lib/shop.js?v=2026-09-29b"></script>
-<script src="./lib/offers.js?v=2026-09-29u"></script>
+<script src="./lib/offers.js?v=2026-09-29x"></script>
 <script>
 (function () {
   const $  = (s, r = document) => r.querySelector(s);
@@ -2605,14 +2644,17 @@ body[data-mode="onepage"] .ck__rail{position:static;
         '<span class="li__price' + (member && l.member ? ' li__price--member' : '') + '">' +
           /* the charged figure and what one of them costs share a line — the quantity is
              already stated by the stepper under it (Amelie, 2026-09-14) */
+          /* the former price first, then the charged one; the unit price on its own line
+             under them (Amelie, 2026-09-29) */
           '<span class="li__pricerow">' +
             (Shop.wasOf(l) > l.unit + 0.005 ? '<span class="li__was t-price-note">' + eur(Shop.wasOf(l) * l.qty) + '</span>' : '') +
             '<span class="t-price">' + eur(charged * l.qty) + '</span>' +
-            (l.qty > 1 ? '<span class="li__unit t-price-note muted">' + eur(charged) + ' each</span>' : '') +
           '</span>' +
           // a member is charged the member price, so that IS the price — showing the
-          // standard one beside it would only be noise at this point in the flow
+          // standard one beside it would only be noise at this point in the flow.
+          // The label sits right under the price, the unit price under it (Amelie, 2026-09-29)
           (member && l.member ? '<span class="t-price-s li__member">member price</span>' : '') +
+          (l.qty > 1 ? '<span class="li__unit t-price-note muted">' + eur(charged) + ' each</span>' : '') +
         '</span>' +
         /* no Remove: at a quantity of one the minus removes the line, which is the
            only control this list needs (Amelie, 2026-09-14) */
@@ -2727,6 +2769,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     });
     $$('[data-guest-only]').forEach(el => { el.hidden = state.account === 'member'; });
 
+    syncAddrChoice();   // the address list and the billing checkbox follow the account
     recalc();
   }
 
@@ -2857,6 +2900,19 @@ body[data-mode="onepage"] .ck__rail{position:static;
       if (host) host.after(form); else goHome(form);
     } else {
       goHome(form);
+    }
+    /* the billing checkbox follows the chosen row (or the form that row has opened) */
+    const bill = $('#billWrap');
+    if (bill) {
+      park(bill);
+      if (picker && state.account === 'member') {
+        const rows = $$('.opt', picker);
+        const chosen = wantsNew ? rows[1] : rows[0];
+        const anchor = (form.parentNode === picker && !form.hidden) ? form : chosen;
+        if (anchor) anchor.after(bill);
+      } else {
+        goHome(bill);
+      }
     }
     $$('input[name="savedaddr"]').forEach(r => r.closest('.opt').classList.toggle('is-on', r.checked));
   }
@@ -3066,7 +3122,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
     // the clone is a read-only mirror — strip its controls so ids/handlers stay unique
-    clone.querySelectorAll('.acc, .voucher, .stepper, .li__acts button').forEach(n => n.remove());
+    clone.querySelectorAll('.acc, .voucher, .stepper, .li__acts button, .place').forEach(n => n.remove());   // .place: one Place order per page
     body.replaceChildren(clone);
   }
   const msum = $('.msum');
@@ -3436,8 +3492,11 @@ body[data-mode="onepage"] .ck__rail{position:static;
     $('#stepNext').textContent = STEP_CTA[step] || '';
     /* Place order belongs to the review page in both modes. hidden AND the class, because
        the mobile rules key off .is-last while the desktop ones read [hidden]. */
-    $('.place').hidden = step !== LAST_STEP;
-    $('.place').classList.toggle('is-last', step === LAST_STEP);
+    /* PLACE_EL, never $('.place'): the phone drawer's copy of the rail used to carry a second
+       .place earlier in the DOM, and $('.place') hid that copy while the real button stayed
+       up on every step you edited back to (Amelie, 2026-09-29) */
+    PLACE_EL.hidden = step !== LAST_STEP;
+    PLACE_EL.classList.toggle('is-last', step === LAST_STEP);
     /* Your items appears ONCE, on the review, in both modes (Amelie, 2026-09-16). It used
        to sit at the foot of every step of the one-pager, which put a second copy of the
        bag under every form — the summary rail already states what is being bought, and
@@ -3457,7 +3516,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
       (mode === 'steps' && step !== 0 && step !== LAST_STEP) ? '' : 'none';
     $('.paybar').style.display = step === 0 ? 'none' : '';   // the gate has its own doors
     document.dispatchEvent(new CustomEvent('ck:step'));
-    $('.place').classList.toggle('is-last', step === LAST_STEP);
+    PLACE_EL.classList.toggle('is-last', step === LAST_STEP);
     if (step === LAST_STEP) fillReview();
     /* The step you have just arrived at comes in row by row — the same entrance the PLP
        gives its cards (Amelie, 2026-09-14). Only the section actually being worked on

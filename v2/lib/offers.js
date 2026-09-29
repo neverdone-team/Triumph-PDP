@@ -135,9 +135,8 @@ window.Offers = (function () {
   function metaText(t) {
     /* no "n of 2 offers used" counter (Amelie, 2026-09-29: more to read than it helps);
        the rule sits in the code field's hint and a clash names itself */
-    var bits = [];
-    if (t.sale) bits.push("Seasonal sale prices don't count as an offer.");
-    return bits.join(' ');
+    /* nor the seasonal-sale sentence (Amelie, 2026-09-29): the line stays empty */
+    return '';
   }
 
   function ruleText(t) {
@@ -170,7 +169,7 @@ window.Offers = (function () {
     /* A signed-in member with vouchers to use finds the section open: they should see what
        they have. It opens once — closing it, or applying a code (which folds it), is the
        customer's call and is not undone on the next render. Signing out resets it. */
-    if (toUse && !autoOpened) { autoOpened = true; openSection(); }
+    if (toUse && !autoOpened) { autoOpened = true; setTimeout(openSection, 0); }
     if (!t.loyaltyOffered) autoOpened = false;
     var meta = metaText(t);
     $$('[data-offers-meta]').forEach(function (n) { n.textContent = meta; n.hidden = !meta; });
@@ -186,8 +185,9 @@ window.Offers = (function () {
       f.classList.toggle('is-error', red);
       var err = f.querySelector('.field__err'), hint = f.querySelector('.field__hint');
       if (err) err.innerHTML = red ? msgInner('code', sl) : '';
-      /* with nothing to report, the hint states the rule before it bites */
-      if (hint) hint.innerHTML = red ? '' : esc(ruleText(t));
+      /* nothing under the field by default — only when something goes wrong (Amelie,
+         2026-09-29; the "Up to 2 offers per order…" rule line is gone) */
+      if (hint) hint.innerHTML = '';
     }
     var codes = t.promos.filter(function (p) { return p.type === 'code'; }).length;
     $$('[data-voucher-count]').forEach(function (n) { n.textContent = codes ? ' (' + codes + ')' : ''; });
@@ -228,10 +228,23 @@ window.Offers = (function () {
 
   /* a code that went on folds its field away: the new summary row says it is applied,
      and the header carries the count (Amelie, 2026-09-29) */
+  /* Opening the section brings its rows in the way every checkout row arrives: rowReveal
+     (.rvl), staggered 55ms — the field first, then each voucher (Amelie, 2026-09-29). */
+  var REDUCED = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  function revealSection() {
+    var acc = document.getElementById('voucherAcc');
+    if (!acc || acc.dataset.open !== 'true' || REDUCED.matches) return;
+    $$('.acc__inner > .voucher, [data-loyalty-cards] > .ticket, [data-loyalty-cards] > .reward', acc).forEach(function (n, i) {
+      n.style.setProperty('--i', i);
+      n.classList.remove('rvl'); void n.offsetWidth; n.classList.add('rvl');
+    });
+  }
   function openSection() {
     var acc = document.getElementById('voucherAcc'), b = document.getElementById('voucherToggle');
+    var was = acc && acc.dataset.open === 'true';
     if (acc) acc.dataset.open = 'true';
     if (b) b.setAttribute('aria-expanded', 'true');
+    if (!was) { render(); revealSection(); }
   }
   function foldCodeField() {
     var acc = document.getElementById('voucherAcc'), b = document.getElementById('voucherToggle');
@@ -241,7 +254,7 @@ window.Offers = (function () {
 
   function openCodeField(value) {
     var acc = document.getElementById('voucherAcc'), f = document.getElementById('voucher');
-    if (acc) { acc.dataset.open = 'true'; var b = document.getElementById('voucherToggle'); if (b) b.setAttribute('aria-expanded', 'true'); }
+    if (acc && acc.dataset.open !== 'true') openSection();
     if (f) { f.value = value || ''; f.focus(); }
     delete slots.code; render();
   }
@@ -271,6 +284,8 @@ window.Offers = (function () {
 
   document.addEventListener('click', function (e) {
     var b;
+    /* the page's own toggle has flipped data-open by the time this runs */
+    if (e.target.closest('#voucherToggle')) { revealSection(); return; }
     if ((b = e.target.closest('[data-offer-redeem]'))) {
       var id = b.dataset.offerRedeem;
       Object.keys(slots).forEach(function (k) { if (slots[k].kind === 'choice') delete slots[k]; });
