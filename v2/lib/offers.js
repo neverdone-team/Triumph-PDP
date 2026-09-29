@@ -131,12 +131,28 @@ window.Offers = (function () {
       (t.loyaltyOffered ? " Some discount codes can't be combined with MyTriumph vouchers." : '');
   }
 
+  /* opened once for a member with vouchers to use; after that the section is the customer's */
+  var autoOpened = false;
+
   var pageRoll = null;
   function render(t, roll) {
     if (roll) pageRoll = roll;
     t = t || Shop.totals();
     $$('[data-promo-rows]').forEach(function (n) { syncRows(n, t, pageRoll); });
+    /* The MyTriumph vouchers live inside the collapsible code section, under the field
+       (Amelie, 2026-09-29), and its header names them when there are some to use. */
     $$('[data-loyalty-cards]').forEach(function (n) { n.innerHTML = cardsHTML(t); });
+    var toUse = t.loyaltyOffered && t.count > 0 && Object.keys(Shop.LOYALTY).some(function (id) {
+      return !t.promos.some(function (p) { return p.type === 'loyalty' && p.id === id; });
+    });
+    $$('[data-acc-label]').forEach(function (n) {
+      n.textContent = toUse ? 'Vouchers, gift card or discount code' : 'Gift card or discount code';
+    });
+    /* A signed-in member with vouchers to use finds the section open: they should see what
+       they have. It opens once — closing it, or applying a code (which folds it), is the
+       customer's call and is not undone on the next render. Signing out resets it. */
+    if (toUse && !autoOpened) { autoOpened = true; openSection(); }
+    if (!t.loyaltyOffered) autoOpened = false;
     var meta = metaText(t);
     $$('[data-offers-meta]').forEach(function (n) { n.textContent = meta; n.hidden = !meta; });
     $$('[data-offer-status]').forEach(function (n) {
@@ -193,6 +209,11 @@ window.Offers = (function () {
 
   /* a code that went on folds its field away: the new summary row says it is applied,
      and the header carries the count (Amelie, 2026-09-29) */
+  function openSection() {
+    var acc = document.getElementById('voucherAcc'), b = document.getElementById('voucherToggle');
+    if (acc) acc.dataset.open = 'true';
+    if (b) b.setAttribute('aria-expanded', 'true');
+  }
   function foldCodeField() {
     var acc = document.getElementById('voucherAcc'), b = document.getElementById('voucherToggle');
     if (acc) acc.dataset.open = 'false';

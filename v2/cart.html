@@ -677,13 +677,16 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
    card, which has no field, carries the same two on an input-less .field--note. */
 .offers .voucher{align-items:flex-start}
 .offers .voucher .btn{margin-top:6px}
-.voucher .field{padding-bottom:0}
+.offers .voucher .field{padding-bottom:0}   /* outranks .field:has(.field__hint), whose band the flowing hint doesn't need */
 .voucher .field__hint,.voucher .field__err,
 .field--note .field__hint,.field--note .field__err{position:static;padding-left:var(--space-4);margin-top:var(--space-4)}
 .voucher .field__hint:empty,.voucher .field__err:empty{display:none}
 .field--note{padding:0}
+/* the vouchers inside the code section sit under the field and its rule line */
+[data-place="acc"]:not(:empty){margin-top:var(--space-16)}
+[data-place="acc"] .reward:first-child{margin-top:0}
 /* a clash's two answers sit on their own line under the sentence, better deal first */
-.offer-choice{display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);margin-top:var(--space-6)}
+.offer-choice{display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);margin-top:var(--space-12)}
 .offer-choice .t-link-s{text-align:left}
 .offers__status[hidden],.offers__meta[hidden]{display:none}
 /* a promotion that stopped qualifying stays on the order at €0, its reason as the field's hint */
@@ -1309,10 +1312,9 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
         <!-- offers: the counter, the MyTriumph vouchers still to use, then the code field -->
         <div class="offers" data-offers>
         <p class="offers__meta t-body-s" data-offers-meta hidden></p>
-        <div data-loyalty-cards></div>
         <div class="acc" data-open="false" id="voucherAcc">
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
-            <span class="t-body-m">Gift card or discount code<span data-voucher-count></span></span>
+            <span class="t-body-m"><span data-acc-label>Gift card or discount code</span><span data-voucher-count></span></span>
             <span class="acc__plus" aria-hidden="true"></span>
           </button>
           <div class="acc__body">
@@ -1326,6 +1328,8 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
               </label>
               <button class="btn btn--ghost" type="button" id="voucherBtn">Apply</button>
             </div>
+            <!-- the MyTriumph vouchers, inside this section under the field (Amelie, 2026-09-29) -->
+            <div data-loyalty-cards data-place="acc"></div>
           </div>
         </div>
         </div>
@@ -1526,7 +1530,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 </div>
 
 <script src="./lib/shop.js?v=2026-09-29b"></script>
-<script src="./lib/offers.js?v=2026-09-29o"></script>
+<script src="./lib/offers.js?v=2026-09-29q"></script>
 <!-- the search overlay, opened from the header's control, as on the PLP -->
 <script src="./lib/search.js?v=30" defer></script>
 <script>
@@ -1877,7 +1881,6 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
        comparison is left out for them (offers draft, 2026-09-25) */
     const saved = bag.lines.reduce((sum, l) =>
       sum + (was(l) - (bag.member ? l.unit : charged(l, bag.member))) * l.qty, 0);
-    $('#saveRow .t-body-m').innerHTML = t.sale ? 'Seasonal sale savings <span class="muted t-body-s">in the prices</span>' : 'You save';
     $('#saveRow').hidden = saved < 0.01;
     roll($('[data-saved]'), eur(saved));
 
