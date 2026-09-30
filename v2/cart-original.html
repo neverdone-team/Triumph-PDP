@@ -346,10 +346,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .item{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr);
   grid-template-rows:1fr repeat(6,min-content) 1fr;
   column-gap:var(--space-24);row-gap:0;
-  padding:var(--space-32) 0;background:var(--c-bg)}
-/* the first product sits a little closer to the delivery box: 16 of its own + the column's
-   24 (Amelie, 2026-09-29) */
-@media (min-width:992px){ .items > .item:first-child{padding-top:var(--space-16)} }
+  padding:var(--space-12) 0;background:var(--c-bg)}   /* 12 above and below each product: 24 between them (Amelie, 2026-09-30) */
 /* series → name → price → colour → controls → stock, one column of text beside the
    packshot. The price used to sit in a third column at the row's right edge, which left
    it stranded metres from the product on a 790px row (Amelie, 2026-09-11). */
@@ -535,7 +532,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
    2026-09-17). The gutter comes down with the cards. */
 .addon__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-24)}
 .acard{display:flex;flex-direction:column;min-width:0}
-.acard__img{width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--c-grey-light)}
+.acard__img{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--c-grey-light)}
 .acard__img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
 .acard:hover .acard__img img{transform:scale(1.04)}
 .acard__info{display:flex;flex-direction:column;gap:var(--space-2);min-width:0;padding-top:var(--space-12)}
@@ -544,10 +541,11 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
    cards beside it (Amelie, 2026-09-14) */
 .acard__nm{display:block;margin-top:var(--space-2);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* the price and the add control share the last line, with the + pushed to the card's
-   right edge (Amelie, 2026-09-10) */
-.acard__buy{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);
-  margin-top:auto;padding-top:var(--space-10)}
+/* the price follows the name, in Price/M (Price/S on a phone) (Amelie, 2026-09-30) */
+.acard__pr{display:block;margin-top:var(--space-4)}
+/* the add control sits on the picture's bottom-right corner, white-filled */
+.acard__img .addon__btn{position:absolute;right:var(--space-8);bottom:var(--space-8);
+  background:var(--c-bg);color:var(--c-ink);border-color:transparent}
 .addon__btn{flex:none;width:var(--control-32);height:var(--control-32);padding:0;border:1px solid var(--c-edge);display:grid;place-items:center;
   font-weight:400;font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase}
 .addon__btn:hover{border-color:var(--c-ink);background:var(--c-ink);color:var(--c-on-dark)}
@@ -1162,7 +1160,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
   .item__img{width:128px;height:171px}
   /* the cross-sell cards are narrow on a phone: the price comes down with them
      (Amelie, 2026-09-15) */
-  .acard__pr{font-size:12px;line-height:16px}
+  .acard__pr{font-weight:400;font-size:10px;line-height:12px;letter-spacing:0}   /* Price/S on a phone */
   /* the row order and the price layout are the base now; a phone only needs the name a
      rung smaller, tighter under the collection, and the shot pinned to the top */
   .item__name{font-size:14px;line-height:20px;margin-top:var(--space-2)}
@@ -1390,7 +1388,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
         <!-- offers: the counter, the MyTriumph vouchers still to use, then the code field -->
         <div class="offers" data-offers>
         <p class="offers__meta t-body-s" data-offers-meta hidden></p>
-        <div class="acc" data-open="false" id="voucherAcc" data-auto-open>   <!-- opens by itself only here, in the bag, for a member with a voucher to use -->
+        <div class="acc" data-open="false" id="voucherAcc">   <!-- always starts collapsed, vouchers or not (Amelie, 2026-09-30) -->
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m"><span data-acc-label>Gift card or discount code</span><span data-voucher-count></span></span>
             <span class="acc__plus" aria-hidden="true"></span>
@@ -1873,19 +1871,20 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
      owns the card only. */
   function setCardHTML(p){
     return '<article class="acard">' +
-      '<div class="acard__img"><img src="' + esc(p.img) + '" alt="' + esc(p.series + ' ' + p.name) + '" loading="lazy" /></div>' +
+      /* the + sits on the picture, bottom right, on a white fill; the price follows the name
+         directly (Amelie, 2026-09-30) */
+      '<div class="acard__img"><img src="' + esc(p.img) + '" alt="' + esc(p.series + ' ' + p.name) + '" loading="lazy" />' +
+        '<button class="addon__btn" type="button" aria-label="Choose a size for ' + esc(p.name) + '"' +
+          ' data-kind="' + p.kind + '" data-sku="' + esc(p.sku) + '" data-name="' + esc(p.name) + '"' +
+          ' data-series="' + esc(p.series) + '" data-colour="' + esc(p.colour) + '" data-size="' + esc(p.size) + '"' +
+          ' data-price="' + p.price + '" data-member="' + p.member + '" data-img="' + esc(p.img) + '">' +
+          '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>' +
+        '</button>' +
+      '</div>' +
       '<div class="acard__info">' +
         '<span class="t-body-s acard__series">' + esc(p.series) + '</span>' +
         '<span class="acard__nm t-title-xs">' + esc(p.name) + '</span>' +
-        '<span class="acard__buy">' +
-          '<span class="acard__pr t-price">' + eur(p.price) + '</span>' +
-          '<button class="addon__btn" type="button" aria-label="Choose a size for ' + esc(p.name) + '"' +
-            ' data-kind="' + p.kind + '" data-sku="' + esc(p.sku) + '" data-name="' + esc(p.name) + '"' +
-            ' data-series="' + esc(p.series) + '" data-colour="' + esc(p.colour) + '" data-size="' + esc(p.size) + '"' +
-            ' data-price="' + p.price + '" data-member="' + p.member + '" data-img="' + esc(p.img) + '">' +
-            '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10"/></svg>' +
-          '</button>' +
-        '</span>' +
+        '<span class="acard__pr t-price-s">' + eur(p.price) + '</span>' +
       '</div>' +
     '</article>';
   }

@@ -387,9 +387,9 @@
   },
   {
    "sel": ".acard__pr",
-   "kind": "type-override",
-   "from": "font-size:12px, line-height:16px",
-   "to": "removed (inherits its DS style)"
+   "kind": "type",
+   "from": "400 10px/12px ls 0",
+   "to": "Price/S"
   },
   {
    "sel": ".item__name",
