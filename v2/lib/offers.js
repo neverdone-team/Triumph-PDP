@@ -166,10 +166,13 @@ window.Offers = (function () {
     $$('[data-acc-label]').forEach(function (n) {
       n.textContent = toUse ? 'Vouchers, gift card or discount code' : 'Gift card or discount code';
     });
-    /* A signed-in member with vouchers to use finds the section open: they should see what
-       they have. It opens once — closing it, or applying a code (which folds it), is the
+    /* In the bag, a signed-in member with vouchers to use finds the section open: they should
+       see what they have. It opens once — closing it, or applying a code (which folds it), is the
        customer's call and is not undone on the next render. Signing out resets it. */
-    if (toUse && !autoOpened) { autoOpened = true; setTimeout(openSection, 0); }
+    /* only a section marked data-auto-open does (the bag's); in the checkout it always starts
+       collapsed (Amelie, 2026-09-30) */
+    var accEl = document.getElementById('voucherAcc');
+    if (toUse && !autoOpened && accEl && accEl.hasAttribute('data-auto-open')) { autoOpened = true; setTimeout(openSection, 0); }
     if (!t.loyaltyOffered) autoOpened = false;
     var meta = metaText(t);
     $$('[data-offers-meta]').forEach(function (n) { n.textContent = meta; n.hidden = !meta; });

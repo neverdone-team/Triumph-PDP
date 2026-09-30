@@ -929,6 +929,23 @@ body[data-mode="onepage"] [data-mode-only="steps"]{display:none!important}
 /* the one-pager's per-section Continue, shown only on the section it belongs to */
 .sec__next{display:none;margin-top:var(--space-32)}
 .sec__next.is-on{display:block}
+/* Review your order stays reachable on desktop (Amelie, 2026-09-30): while its place is below
+   the screen it sticks to the window's foot. Stuck, it sits on a white band that runs the
+   full width of the window with a light-grey rule on top, the checkout header's; the button
+   itself keeps the width of the column being filled in. Scrolled to, it is just the button
+   in the page again. The band and rule are border-images with a horizontal outset: they
+   paint edge to edge without widening the page (and no box-shadow, which build.py would
+   turn into an Elevation shadow). bottom:-1px lets an IntersectionObserver tell stuck from
+   in place. */
+@media (min-width:992px){
+  body[data-mode="onepage"] .sec__next[data-op-next="3"].is-on{position:sticky;bottom:-1px;z-index:6;
+    padding:var(--space-16) 0 var(--space-16);margin-top:var(--space-16)}
+  body[data-mode="onepage"] .sec__next[data-op-next="3"].is-stuck{
+    border-image:linear-gradient(var(--c-bg), var(--c-bg)) fill 0 / 0 / 0 100vmax}
+  body[data-mode="onepage"] .sec__next[data-op-next="3"].is-stuck::before{content:"";position:absolute;
+    left:0;right:0;top:0;height:1px;
+    border-image:linear-gradient(var(--c-hair), var(--c-hair)) fill 0 / 0 / 0 100vmax}
+}
 body[data-mode="steps"] .stepnav{display:flex}
 body[data-mode="steps"] .place{display:none}
 body[data-mode="steps"] .place.is-last{display:block}
@@ -1553,7 +1570,7 @@ body[data-voucher-style="grey"] .ck__rail #voucherAcc{margin-bottom:var(--space-
   .ck__rail .trow{padding:var(--space-6) 0}
   .ck__rail .totals{padding-top:var(--space-16)}
   .ck__rail .trow--grand{margin-top:var(--space-12);padding-top:var(--space-16)}
-  .ck__rail .acc__btn{padding:var(--space-12) 0}
+  .ck__rail .acc__btn{padding:var(--space-20) 0}   /* more air between its rules on a phone (2026-09-30) */
   .ck__rail .sum__head{margin-bottom:var(--space-20)}
   /* on the review the figures are in the sticky bar, so what was bought leads and the
      summary follows it (Amelie, 2026-09-14) */
@@ -2594,7 +2611,7 @@ body[data-mode="onepage"] .ck__rail{position:static;
 </div>
 
 <script src="./lib/shop.js?v=2026-09-29b"></script>
-<script src="./lib/offers.js?v=2026-09-29x"></script>
+<script src="./lib/offers.js?v=2026-09-30a"></script>
 <script>
 (function () {
   const $  = (s, r = document) => r.querySelector(s);
@@ -3681,6 +3698,13 @@ body[data-mode="onepage"] .ck__rail{position:static;
 
   $('#stepNext').addEventListener('click', () => applyStep(step + 1));
   $$('[data-op-go]').forEach(b => b.addEventListener('click', () => applyStep(Number(b.dataset.opGo))));
+  /* the sticky Review your order: a hairline only while it is stuck to the window's foot */
+  (function () {
+    const bar = $('.sec__next[data-op-next="3"]');
+    if (!bar || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(([e]) => bar.classList.toggle('is-stuck', e.intersectionRatio < 1 && e.boundingClientRect.top > 0),
+      { threshold: [0, 1] }).observe(bar);   // 0 as well: it starts hidden, and must be caught arriving already stuck
+  })();
   $$('.steps__item').forEach(b => b.addEventListener('click', () => {
     const i = Number(b.dataset.goto);
     if (i < step) applyStep(i);                 // only completed steps are navigable

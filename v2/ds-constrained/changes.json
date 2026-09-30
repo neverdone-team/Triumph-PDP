@@ -692,6 +692,13 @@
    "to": "removed (inherits its DS style)"
   },
   {
+   "sel": "body[data-mode=\"onepage\"] .sec__next[data-op-next=\"3\"].is-on",
+   "kind": "spacing",
+   "prop": "padding",
+   "from": "calc(var(--space-16) + 1px) = 17px",
+   "to": "16px"
+  },
+  {
    "sel": ".suggest",
    "kind": "shadow",
    "prop": "box-shadow",

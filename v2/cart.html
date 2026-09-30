@@ -742,6 +742,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 .acc__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);padding:var(--space-14,14px) 0}
 /* optically centred between the two rules: the face sits ~1px low in its line box (Amelie, 2026-09-29) */
 .acc__btn > .t-body-m{position:relative;top:-1px}
+@media (max-width:991px){ .acc__btn{padding:var(--space-20) 0} }   /* more air between its rules on a phone (2026-09-30) */
 /* a plus, not a chevron: it adds a code rather than revealing more of the summary */
 .acc__plus{position:relative;width:12px;height:12px;flex:none}
 .acc__plus::before,.acc__plus::after{content:"";position:absolute;background:currentColor}
@@ -1384,7 +1385,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
         <!-- offers: the counter, the MyTriumph vouchers still to use, then the code field -->
         <div class="offers" data-offers>
         <p class="offers__meta t-body-s" data-offers-meta hidden></p>
-        <div class="acc" data-open="false" id="voucherAcc">
+        <div class="acc" data-open="false" id="voucherAcc" data-auto-open>   <!-- opens by itself only here, in the bag, for a member with a voucher to use -->
           <button class="acc__btn" type="button" id="voucherToggle" aria-expanded="false">
             <span class="t-body-m"><span data-acc-label>Gift card or discount code</span><span data-voucher-count></span></span>
             <span class="acc__plus" aria-hidden="true"></span>
@@ -1615,7 +1616,7 @@ header{position:sticky;top:0;z-index:50;background:var(--c-bg)}
 </div>
 
 <script src="./lib/shop.js?v=2026-09-29b"></script>
-<script src="./lib/offers.js?v=2026-09-29x"></script>
+<script src="./lib/offers.js?v=2026-09-30a"></script>
 <!-- the search overlay, opened from the header's control, as on the PLP -->
 <script src="./lib/search.js?v=30" defer></script>
 <script>
