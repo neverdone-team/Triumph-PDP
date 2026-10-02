@@ -689,6 +689,110 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
 .sticky-cta.is-on { transform: translateY(0); }
 
 /* ============================================================
+   AB TEST — size in a sheet (Figma 4352:25699 phone / 4346:23341
+   desktop). With it on, the buy box loses its size grids and the
+   CTA reads "Select your size"; the grids move into the DS Sheet:
+   a bottom sheet below LG (992), the 506px side sheet from LG up.
+   ============================================================ */
+body.ab-sheet .sizes > .size-block,
+body.ab-sheet .sizes > .size-link { display: none; }
+.ssheet {
+  position: fixed; inset: 0; z-index: 250; /* over the prototype switcher */
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end;
+  padding-top: 120px;
+  visibility: hidden; pointer-events: none;
+  transition: visibility 0s linear .3s;
+}
+.ssheet.is-open { visibility: visible; pointer-events: auto; transition: none; }
+.ssheet__scrim {
+  position: absolute; inset: 0; background: rgba(0,0,0,.38);
+  opacity: 0; transition: opacity .3s var(--ease-out);
+}
+.ssheet.is-open .ssheet__scrim { opacity: 1; }
+.ssheet__panel {
+  position: relative; width: 100%; max-height: 100%;
+  display: flex; flex-direction: column; background: #fff;
+  transform: translateY(100%); transition: transform .3s var(--ease-out);
+}
+.ssheet.is-open .ssheet__panel { transform: none; }
+.ssheet__head {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 12px 12px 16px; border-bottom: 1px solid #CECECE; flex: none;
+}
+.ssheet__handle { width: 40px; height: 3px; border-radius: 999px; background: #AEAEAE; }
+.ssheet__titlerow { display: flex; align-items: center; gap: 12px; width: 100%; }
+.ssheet__title {
+  flex: 1; min-width: 0; margin: 0;
+  font-size: 12px; font-weight: 400; line-height: 16px; letter-spacing: .04em; text-transform: uppercase;
+}
+.ssheet__x { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex: none; }
+.ssheet__x img { width: 16px; height: 16px; display: block; }
+.ssheet__body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: clip;
+  padding: 24px 16px; display: flex; flex-direction: column; gap: 32px;
+}
+.ssheet__sizes { display: flex; flex-direction: column; gap: 20px; }
+/* the Size Chip as the DS draws it — medium-contrast border, low-contrast when sold out */
+.ssheet .chip { border-color: #AEAEAE; }
+.ssheet .chip:hover { border-color: var(--c-ink); }
+.ssheet .chip[data-sel="true"] { border-color: var(--c-ink); }
+.ssheet .chip--out, .ssheet .chip--out:hover { border-color: #CECECE; color: #6B6B6B; }
+.ssheet .chip--out::after { background: #6B6B6B; }
+.ssheet .size-grid.is-missing .chip { border-color: var(--c-sale); }
+.ssheet__help {
+  align-self: flex-start;
+  font-size: 12px; font-weight: 300; line-height: 14px; letter-spacing: .04em;
+  text-decoration: underline; text-underline-position: from-font;
+}
+.ssheet__help:hover { opacity: .5; }
+.ssheet__foot {
+  flex: none; display: flex; flex-direction: column; gap: 12px;
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid #CECECE; background: #fff;
+}
+.ssheet__foot .cta { border-color: var(--c-ink); }
+@media (min-width: 992px) {
+  .ssheet { padding-top: 0; justify-content: stretch; }
+  .ssheet__panel {
+    width: 506px; height: 100%; max-height: none;
+    box-shadow: 0 4px 50px rgba(0,0,0,.16);
+    transform: translateX(100%);
+  }
+  .ssheet__head { flex-direction: row; padding: 24px 32px; gap: 16px; }
+  .ssheet__handle { display: none; }
+  .ssheet__title { font-size: 14px; line-height: 20px; }
+  .ssheet__body { padding: 32px; gap: 40px; }
+  .ssheet__sizes { gap: 24px; }
+  .ssheet__help { font-size: 14px; line-height: 16px; }
+  .ssheet__foot { padding: 32px; }
+}
+html.ssheet-lock { overflow: hidden; }
+
+/* ---------------- prototype switcher (as on the cart + checkout) ---------------- */
+.dash{position:fixed;right:16px;bottom:16px;z-index:200;background:var(--c-ink);color:#fff;padding:12px 16px;user-select:none;
+  max-height:calc(100vh - 32px);overflow:auto;width:280px;font-family:var(--font-sans)}
+.dash__grab{display:flex;align-items:center;gap:8px;cursor:grab;touch-action:none;margin:-4px 0 8px;padding:4px 0;opacity:.6}
+.dash__grab::before{content:"";width:22px;height:2px;background:currentColor;flex:none}
+.dash.is-dragging,.dash.is-dragging .dash__grab,.dash__hide.is-dragging{cursor:grabbing}
+.dash h4{margin:0 0 8px;font-weight:400;font-size:10px;line-height:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.dash__row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.dash__sec{border-top:1px solid rgba(255,255,255,.2);padding:8px 0}
+.dash__sec summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;line-height:14px;letter-spacing:.08em;text-transform:uppercase;padding:4px 0}
+.dash__sec summary::-webkit-details-marker{display:none}
+.dash__sec summary::after{content:"+";font-size:14px;line-height:14px;opacity:.7}
+.dash__sec[open] summary::after{content:"−"}
+.dash__sec[open] summary{margin-bottom:10px}
+.dash__sec .dash__row:last-child{margin-bottom:4px}
+.dash__foot{border-top:1px solid rgba(255,255,255,.2);padding-top:10px;margin-bottom:0}
+.dash button{color:#fff;border:1px solid rgba(255,255,255,.3);padding:6px 8px;font-size:10px;line-height:12px;letter-spacing:.04em;text-transform:uppercase}
+.dash button[aria-pressed="true"]{background:#fff;color:var(--c-ink);border-color:#fff}
+.dash__hide{cursor:grab;touch-action:none;position:fixed;right:16px;bottom:16px;z-index:200;
+  background:var(--c-ink);color:#fff;padding:8px 10px;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+/* below 1200 the sticky Add to Cart owns the bottom of the screen — keep clear of it */
+@media (max-width:1199.98px){ .dash,.dash__hide{bottom:96px} }
+
+/* ============================================================
    RESPONSIVE — stacked design (Figma 727-2264), applied below
    Triumph's xl breakpoint per the responsive spec (1440-16050):
    everything under 1200px stacks like the @375/@600/@900 frames
@@ -1225,6 +1329,48 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; text-transfor
   <button class="cta" data-add="main">Add to Cart</button>
 </div>
 
+<!-- AB TEST — size sheet (Sheet / Size Picker, Figma 4352:25699 + 4346:23341) -->
+<div class="ssheet" id="sizeSheet" aria-hidden="true">
+  <div class="ssheet__scrim" data-ssheet-close></div>
+  <div class="ssheet__panel" role="dialog" aria-modal="true" aria-labelledby="sizeSheetTitle">
+    <div class="ssheet__head">
+      <span class="ssheet__handle" aria-hidden="true"></span>
+      <div class="ssheet__titlerow">
+        <h2 class="ssheet__title" id="sizeSheetTitle">Select your size</h2>
+        <button class="ssheet__x" type="button" aria-label="Close" data-ssheet-close>
+          <img src="./Assets/icons/close.svg" width="16" height="16" alt="" />
+        </button>
+      </div>
+    </div>
+    <div class="ssheet__body">
+      <div class="ssheet__sizes" id="sizeSheetSizes"><!-- the buy box's two size grids move in here --></div>
+      <a class="ssheet__help" href="#">Find my size</a>
+    </div>
+    <div class="ssheet__foot">
+      <p class="size-hint" id="sheetHint" role="status" hidden>Choose an underbust and a cup size first.</p>
+      <button class="cta" type="button" id="sizeSheetAdd">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROTOTYPE SWITCHER -->
+<div class="dash" id="dash">
+  <div class="dash__grab" id="dashGrab" title="Drag to move">
+    <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">drag</span>
+  </div>
+  <details class="dash__sec" open>
+    <summary>AB test</summary>
+    <h4>Size selection</h4>
+    <div class="dash__row">
+      <button data-ab-set="off" aria-pressed="true">On the page</button>
+      <button data-ab-set="sheet" aria-pressed="false">Select your size sheet</button>
+    </div>
+  </details>
+  <div class="dash__row dash__foot">
+    <button id="dashHide">Hide</button>
+  </div>
+</div>
+
 <script src="./lib/shop.js?v=2026-09-25d"></script>
 <!-- the search overlay: the Apple arrangement, opened from the header's control -->
 <script src="./lib/search.js?v=30" defer></script>
@@ -1380,6 +1526,8 @@ const PRODUCT = {
 const underbustGrid = document.querySelector('[aria-label="Underbust size"]');
 const cupGrid       = document.querySelector('[aria-label="Cup size"]');
 const sizeHint      = document.getElementById('sizeHint');
+const sheetHint     = document.getElementById('sheetHint');
+const abSheet = () => document.body.classList.contains('ab-sheet');
 
 const chosen = grid => {
   const c = grid && grid.querySelector('.chip[data-sel="true"]');
@@ -1393,8 +1541,9 @@ function flagMissing() {
   const missCup  = !chosen(cupGrid);
   underbustGrid.classList.toggle('is-missing', missBand);
   cupGrid.classList.toggle('is-missing', missCup);
-  sizeHint.hidden = !(missBand || missCup);
-  if (!sizeHint.hidden) (missBand ? underbustGrid : cupGrid)
+  const hint = abSheet() ? sheetHint : sizeHint;
+  hint.hidden = !(missBand || missCup);
+  if (!hint.hidden) (missBand ? underbustGrid : cupGrid)
     .scrollIntoView({ behavior: 'smooth', block: 'center' });
   return !(missBand || missCup);
 }
@@ -1402,7 +1551,7 @@ function flagMissing() {
 /* clearing the warning as soon as a size is picked keeps it from nagging */
 [underbustGrid, cupGrid].forEach(grid =>
   grid.addEventListener('click', () => {
-    if (!sizeHint.hidden) flagMissing();
+    if (!sizeHint.hidden || !sheetHint.hidden) flagMissing();
     else grid.classList.remove('is-missing');
   }));
 
@@ -1451,6 +1600,7 @@ function addSet(btn) {
 document.querySelectorAll('[data-add]').forEach(btn =>
   btn.addEventListener('click', () => {
     if (btn.dataset.add === 'set') addSet(btn);
+    else if (abSheet()) openSizeSheet(btn);
     else addMain();
   }));
 
@@ -1603,6 +1753,117 @@ new IntersectionObserver(([en]) => {
   stickyCta.classList.toggle('is-on', !en.isIntersecting);
   stickyCta.inert = en.isIntersecting;
 }, { threshold: 0, rootMargin: `0px 0px -${stickyCta.offsetHeight || 80}px 0px` }).observe(inlineCta);
+
+/* ============================================================
+   AB TEST — "Select your size" sheet
+   Off: sizes in the buy box, the CTA adds. On: the two size grids
+   move into the sheet (the same nodes, so selection and the add
+   logic are shared), and both CTAs open the sheet instead.
+   Set from the panel, kept in localStorage, or deep-link ?ab=sheet.
+   ============================================================ */
+const sizeSheet   = document.getElementById('sizeSheet');
+const sheetSizes  = document.getElementById('sizeSheetSizes');
+const sizesHome   = document.querySelector('.sizes');
+const sizeLinkEl  = sizesHome.querySelector('.size-link');
+const sizeBlocks  = [...sizesHome.querySelectorAll('.size-block')];
+const AB_KEY = 'triumph.proto.pdpAb';
+let sheetOpener = null;
+
+function setAb(mode) {
+  const on = mode === 'sheet';
+  document.body.classList.toggle('ab-sheet', on);
+  if (on) sizeBlocks.forEach(b => sheetSizes.appendChild(b));
+  else    sizeBlocks.forEach(b => sizesHome.insertBefore(b, sizeLinkEl));
+  document.querySelectorAll('.cta[data-add="main"]').forEach(b =>
+    b.textContent = on ? 'Select your size' : 'Add to Cart');
+  [sizeHint, sheetHint].forEach(h => h.hidden = true);
+  [underbustGrid, cupGrid].forEach(g => g.classList.remove('is-missing'));
+  if (!on) closeSizeSheet();
+  document.querySelectorAll('[data-ab-set]').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.abSet === (on ? 'sheet' : 'off'))));
+  try { localStorage.setItem(AB_KEY, on ? 'sheet' : 'off'); } catch (e) {}
+}
+
+function openSizeSheet(opener) {
+  sheetOpener = opener || null;
+  sizeSheet.classList.add('is-open');
+  sizeSheet.setAttribute('aria-hidden', 'false');
+  document.documentElement.classList.add('ssheet-lock');
+  setTimeout(() => sizeSheet.querySelector('.ssheet__x').focus({ preventScroll: true }), 50);
+}
+function closeSizeSheet() {
+  if (!sizeSheet.classList.contains('is-open')) return;
+  sizeSheet.classList.remove('is-open');
+  sizeSheet.setAttribute('aria-hidden', 'true');
+  document.documentElement.classList.remove('ssheet-lock');
+  sheetHint.hidden = true;
+  if (sheetOpener) sheetOpener.focus({ preventScroll: true });
+}
+sizeSheet.addEventListener('click', e => { if (e.target.closest('[data-ssheet-close]')) closeSizeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSizeSheet(); });
+document.getElementById('sizeSheetAdd').addEventListener('click', () => {
+  if (!flagMissing()) return;
+  sheetOpener = null;
+  closeSizeSheet();
+  addMain();
+});
+
+document.querySelectorAll('[data-ab-set]').forEach(b =>
+  b.addEventListener('click', () => setAb(b.dataset.abSet)));
+{
+  const q = new URLSearchParams(location.search).get('ab');
+  let saved = null;
+  try { saved = localStorage.getItem(AB_KEY); } catch (e) {}
+  setAb(q === 'sheet' || q === 'off' ? q : saved === 'sheet' ? 'sheet' : 'off');
+}
+
+/* the switcher starts folded into a chip, as on the cart */
+function collapseDash() {
+  document.getElementById('dash').hidden = true;
+  if (document.querySelector('.dash__hide')) return;
+  const b = document.createElement('button');
+  b.className = 'dash__hide'; b.textContent = 'States';
+  b.addEventListener('click', () => { document.getElementById('dash').hidden = false; b.remove(); });
+  document.body.appendChild(b);
+  makeDraggable(b);
+}
+/* the panel and its chip can be dragged out of the way; a real drag swallows the click */
+function makeDraggable(el, handle) {
+  if (!el) return;
+  handle = handle || el;
+  let dx = 0, dy = 0, moved = false;
+  const place = (x, y) => {
+    x = Math.min(Math.max(8, x), innerWidth - el.offsetWidth - 8);
+    y = Math.min(Math.max(8, y), innerHeight - el.offsetHeight - 8);
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.right = 'auto'; el.style.bottom = 'auto';
+  };
+  const move = e => {
+    const p = e.touches ? e.touches[0] : e;
+    moved = true; place(p.clientX - dx, p.clientY - dy);
+    if (e.cancelable) e.preventDefault();
+  };
+  const up = () => {
+    el.classList.remove('is-dragging');
+    document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up);
+    document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up);
+    if (moved) setTimeout(() => { moved = false; }, 0);
+  };
+  const down = e => {
+    const p = e.touches ? e.touches[0] : e;
+    const r = el.getBoundingClientRect();
+    dx = p.clientX - r.left; dy = p.clientY - r.top; moved = false;
+    place(r.left, r.top); el.classList.add('is-dragging');
+    document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false }); document.addEventListener('touchend', up);
+  };
+  handle.addEventListener('mousedown', down);
+  handle.addEventListener('touchstart', down, { passive: true });
+  el.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+}
+makeDraggable(document.getElementById('dash'), document.getElementById('dashGrab'));
+document.getElementById('dashHide').addEventListener('click', collapseDash);
+collapseDash();
 </script>
 
 </body>
