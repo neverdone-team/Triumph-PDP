@@ -578,7 +578,8 @@ p.rvw__rec { font-size: 12px; line-height: 16px; font-weight: 400; }
 .badge--light { color: #fff; }
 
 /* ============================================================
-   MOBILE STICKY CTA (slides in once the inline CTA scrolls out)
+   MOBILE STICKY CTA (on from first view; steps aside while the
+   inline CTA is on screen, slides back once it has scrolled out)
    ============================================================ */
 .sticky-cta {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
@@ -2986,7 +2987,7 @@ body[data-fit="plain"] .fitline { display: block; }
 </main>
 
 <!-- MOBILE STICKY CTA -->
-<div class="sticky-cta" id="stickyCta">
+<div class="sticky-cta is-on" id="stickyCta">
   <button class="cta" data-add>Add to Cart</button>
 </div>
 
@@ -3279,14 +3280,17 @@ strip.addEventListener('scroll', () => {
   bars.forEach((b, j) => b.classList.toggle('is-on', j === i));
 }, { passive: true });
 
-/* mobile sticky CTA — appears when the inline CTA scrolls out above */
+/* mobile sticky CTA — on from the first view, hidden only while the
+   inline Add to Cart is visible above the bar, back once it scrolls
+   past (either direction). The bottom rootMargin is the bar's height,
+   so the two buttons hand over where they would overlap. */
 const stickyCta = document.getElementById('stickyCta');
-const ctaBlock = document.getElementById('ctaBlock');
+const inlineCta = document.querySelector('#ctaBlock .cta');
+document.body.classList.add('has-sticky');
 new IntersectionObserver(([en]) => {
-  const goneAbove = !en.isIntersecting && en.boundingClientRect.top < 0;
-  stickyCta.classList.toggle('is-on', goneAbove);
-  document.body.classList.toggle('has-sticky', goneAbove);
-}, { threshold: 0 }).observe(ctaBlock);
+  stickyCta.classList.toggle('is-on', !en.isIntersecting);
+  stickyCta.inert = en.isIntersecting;
+}, { threshold: 0, rootMargin: `0px 0px -${stickyCta.offsetHeight || 80}px 0px` }).observe(inlineCta);
 </script>
 
 <script>
